@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
       };
 
       const { data } = await axios.post(
-        '/api/users/login',
+        import.meta.env.VITE_API + 'users/login',
         { email, password },
         config
       );
