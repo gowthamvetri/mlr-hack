@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }) => {
 
       setUser(data);
       localStorage.setItem('userInfo', JSON.stringify(data));
+      localStorage.setItem('token', data.token);
       return data;
     } catch (error) {
       throw error.response && error.response.data.message
@@ -41,11 +42,19 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('userInfo');
+    localStorage.removeItem('token');
     setUser(null);
   };
 
+  const updateUser = (updatedData) => {
+    const currentUserInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
+    const newUserInfo = { ...currentUserInfo, ...updatedData };
+    localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
+    setUser(newUserInfo);
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -89,153 +89,113 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Header */}
-      <header className="bg-white/80 backdrop-blur-md border-b border-gray-100 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg shadow-primary-200">
-                <GraduationCap className="w-6 h-6 text-white" />
+      {/* Full-Screen Hero Section with Video Background */}
+      <section className="relative min-h-screen overflow-hidden">
+        {/* Video Background */}
+        <div className="absolute inset-0 w-full h-full">
+          <iframe 
+            width="100%" 
+            height="100%" 
+            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1" 
+            title="MLRIT Academic Portal Introduction" 
+            frameBorder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            referrerPolicy="strict-origin-when-cross-origin"
+            className="w-full h-full object-cover scale-150"
+            style={{ pointerEvents: 'none' }}
+          />
+        </div>
+        
+        {/* Dark Overlay */}
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/50"></div>
+        
+        {/* Header */}
+        <header className="relative z-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
+                  <GraduationCap className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <span className="font-bold text-white text-xl">MLRIT</span>
+                  <span className="hidden sm:inline text-gray-300 ml-2">Academic Portal</span>
+                </div>
               </div>
-              <div>
-                <span className="font-bold text-gray-900 text-lg">MLRIT</span>
-                <span className="hidden sm:inline text-gray-500 ml-1">Academic Portal</span>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => navigate('/register')}
+                  className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-white hover:text-primary-300 font-medium transition-colors"
+                >
+                  Register
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="flex items-center gap-2 px-6 py-2.5 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all font-semibold shadow-lg"
+                >
+                  Login
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => navigate('/register')}
-                className="hidden sm:flex items-center gap-2 px-4 py-2 text-gray-700 hover:text-primary-600 font-medium transition-colors"
-              >
-                Register
-              </button>
-              <button
-                onClick={() => navigate('/login')}
-                className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl hover:shadow-lg hover:shadow-primary-200 transition-all font-medium"
-              >
-                Login
-                <ArrowRight className="w-4 h-4" />
-              </button>
             </div>
           </div>
-        </div>
-      </header>
+        </header>
 
-      {/* Hero Section with Video */}
-      <section className="relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-50 via-white to-blue-50"></div>
-        <div className="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-primary-100/50 to-transparent"></div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
-          <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-            {/* Left side - Content */}
-            <div className="order-2 lg:order-1">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary-100 text-primary-700 rounded-full text-sm font-medium mb-6">
-                <Sparkles className="w-4 h-4" />
+        {/* Hero Content */}
+        <div className="relative z-10 flex items-center min-h-[calc(100vh-5rem)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+            <div className="max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-medium mb-8 border border-white/20">
+                <Sparkles className="w-4 h-4 text-primary-400" />
                 Integrated Academic & Examination System
               </div>
               
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                 Transform Your
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-600 to-primary-800">
+                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-blue-400">
                   Academic Journey
                 </span>
               </h1>
               
-              <p className="text-lg text-gray-600 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-xl">
                 One unified platform for students, faculty, and administrators. 
-                Manage exams, track progress, explore career paths, and connect 
-                with opportunities – all in one place.
+                Manage exams, track progress, and explore career paths.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+              <div className="flex flex-col sm:flex-row gap-4 mb-12">
                 <button 
                   onClick={() => navigate('/register')}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-primary-200 transition-all transform hover:-translate-y-0.5"
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-primary-500/30 transition-all transform hover:-translate-y-0.5"
                 >
                   Get Started Free
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button 
                   onClick={() => navigate('/login')}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold hover:border-primary-300 hover:text-primary-600 transition-all"
+                  className="flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
                 >
-                  Sign In
+                  <Play className="w-5 h-5" />
+                  Watch Demo
                 </button>
               </div>
 
               {/* Quick Stats */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {stats.map((stat, index) => (
-                  <div key={index} className="text-center p-3 bg-white rounded-xl border border-gray-100 shadow-sm">
-                    <p className="text-2xl font-bold text-primary-600">{stat.value}</p>
-                    <p className="text-xs text-gray-500 mt-1">{stat.label}</p>
+                  <div key={index} className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
+                    <p className="text-2xl font-bold text-white">{stat.value}</p>
+                    <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
                   </div>
                 ))}
               </div>
             </div>
+          </div>
+        </div>
 
-            {/* Right side - Video */}
-            <div className="order-1 lg:order-2">
-              <div className="relative">
-                {/* Video container with decorative elements */}
-                <div className="absolute -inset-4 bg-gradient-to-r from-primary-600 to-primary-800 rounded-3xl opacity-10 blur-2xl"></div>
-                <div className="relative bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-1 shadow-2xl shadow-primary-300/30">
-                  <div className="bg-gray-900 rounded-xl overflow-hidden">
-                    {/* Video Header Bar */}
-                    <div className="flex items-center gap-2 px-4 py-3 bg-gray-800/50">
-                      <div className="flex gap-1.5">
-                        <div className="w-3 h-3 rounded-full bg-red-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-yellow-500"></div>
-                        <div className="w-3 h-3 rounded-full bg-green-500"></div>
-                      </div>
-                      <div className="flex-1 flex items-center justify-center">
-                        <div className="flex items-center gap-2 px-3 py-1 bg-gray-700/50 rounded-lg text-xs text-gray-400">
-                          <Play className="w-3 h-3" />
-                          Watch Introduction
-                        </div>
-                      </div>
-                    </div>
-                    {/* YouTube Video */}
-                    <div className="aspect-video">
-                      <iframe 
-                        width="100%" 
-                        height="100%" 
-                        src="https://www.youtube.com/embed/GQecKPAIzKE?si=EYlc45JK133mW22g" 
-                        title="MLRIT Academic Portal Introduction" 
-                        frameBorder="0" 
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-                        referrerPolicy="strict-origin-when-cross-origin" 
-                        allowFullScreen
-                        className="w-full h-full"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating badges */}
-                <div className="absolute -left-4 top-1/4 bg-white rounded-xl shadow-lg p-3 hidden lg:flex items-center gap-2">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Check className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-800">Verified</p>
-                    <p className="text-xs text-gray-500">Institution</p>
-                  </div>
-                </div>
-
-                <div className="absolute -right-4 bottom-1/4 bg-white rounded-xl shadow-lg p-3 hidden lg:flex items-center gap-2">
-                  <div className="w-8 h-8 bg-yellow-100 rounded-lg flex items-center justify-center">
-                    <Star className="w-4 h-4 text-yellow-600" />
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-gray-800">4.9 Rating</p>
-                    <p className="text-xs text-gray-500">User Reviews</p>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Scroll Indicator */}
+        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
+          <div className="w-8 h-12 border-2 border-white/30 rounded-full flex justify-center">
+            <div className="w-1.5 h-3 bg-white/60 rounded-full mt-2 animate-bounce"></div>
           </div>
         </div>
       </section>

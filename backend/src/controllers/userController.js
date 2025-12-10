@@ -25,11 +25,19 @@ const authUser = async (req, res) => {
   }
 };
 
-// @desc    Register a new user
+// @desc    Register a new user (Only for Student role - others require approval)
 // @route   POST /api/users
 // @access  Public
 const registerUser = async (req, res) => {
   const { name, email, password, role, department, year, rollNumber, clubName, office } = req.body;
+
+  // Only allow direct registration for Students
+  if (role !== 'Student') {
+    return res.status(400).json({ 
+      message: 'Direct registration is only available for Students. SeatingManager and ClubCoordinator require admin approval.',
+      requiresApproval: true
+    });
+  }
 
   const userExists = await User.findOne({ email });
 
@@ -154,50 +162,52 @@ const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
     
-    if (user) {
-      user.name = req.body.name || user.name;
-      user.email = req.body.email || user.email;
-      user.department = req.body.department || user.department;
-      user.year = req.body.year || user.year;
-      user.rollNumber = req.body.rollNumber || user.rollNumber;
-      user.clubName = req.body.clubName || user.clubName;
-      user.office = req.body.office || user.office;
-      user.phone = req.body.phone || user.phone;
-      user.bio = req.body.bio || user.bio;
-      user.address = req.body.address || user.address;
-      user.dateOfBirth = req.body.dateOfBirth || user.dateOfBirth;
-      user.gender = req.body.gender || user.gender;
-      
-      // Only update password if provided
-      if (req.body.password) {
-        user.password = req.body.password;
-      }
-      
-      const updatedUser = await user.save();
-      
-      res.json({
-        _id: updatedUser._id,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        role: updatedUser.role,
-        department: updatedUser.department,
-        year: updatedUser.year,
-        rollNumber: updatedUser.rollNumber,
-        clubName: updatedUser.clubName,
-        office: updatedUser.office,
-        phone: updatedUser.phone,
-        bio: updatedUser.bio,
-        address: updatedUser.address,
-        dateOfBirth: updatedUser.dateOfBirth,
-        gender: updatedUser.gender,
-        createdAt: updatedUser.createdAt,
-        updatedAt: updatedUser.updatedAt
-      });
-    } else {
-      res.status(404).json({ message: 'User not found' });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    
+    // Update fields - use !== undefined to allow empty strings
+    if (req.body.name !== undefined) user.name = req.body.name;
+    if (req.body.email !== undefined) user.email = req.body.email;
+    if (req.body.department !== undefined) user.department = req.body.department;
+    if (req.body.year !== undefined) user.year = req.body.year;
+    if (req.body.rollNumber !== undefined) user.rollNumber = req.body.rollNumber;
+    if (req.body.clubName !== undefined) user.clubName = req.body.clubName;
+    if (req.body.office !== undefined) user.office = req.body.office;
+    if (req.body.phone !== undefined) user.phone = req.body.phone;
+    if (req.body.bio !== undefined) user.bio = req.body.bio;
+    if (req.body.address !== undefined) user.address = req.body.address;
+    if (req.body.dateOfBirth !== undefined) user.dateOfBirth = req.body.dateOfBirth;
+    if (req.body.gender !== undefined) user.gender = req.body.gender;
+    
+    // Only update password if provided
+    if (req.body.password) {
+      user.password = req.body.password;
+    }
+    
+    const updatedUser = await user.save();
+    
+    res.json({
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      department: updatedUser.department,
+      year: updatedUser.year,
+      rollNumber: updatedUser.rollNumber,
+      clubName: updatedUser.clubName,
+      office: updatedUser.office,
+      phone: updatedUser.phone,
+      bio: updatedUser.bio,
+      address: updatedUser.address,
+      dateOfBirth: updatedUser.dateOfBirth,
+      gender: updatedUser.gender,
+      createdAt: updatedUser.createdAt,
+      updatedAt: updatedUser.updatedAt
+    });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    console.error('Profile update error:', error);
+    res.status(500).json({ message: error.message, stack: process.env.NODE_ENV === 'development' ? error.stack : undefined });
   }
 };
 

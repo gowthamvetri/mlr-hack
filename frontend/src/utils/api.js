@@ -32,6 +32,8 @@ export const createSubject = (data) => API.post('/subjects', data);
 
 export const getNotifications = () => API.get('/notifications');
 export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`);
+export const markAllNotificationsRead = () => API.put('/notifications/mark-all-read');
+export const deleteNotification = (id) => API.delete(`/notifications/${id}`);
 
 export const getCalendarEvents = () => API.get('/calendar');
 export const createCalendarEvent = (data) => API.post('/calendar', data);
@@ -95,6 +97,10 @@ export const updatePlacement = (id, data) => API.put(`/placements/${id}`, data);
 export const deletePlacement = (id) => API.delete(`/placements/${id}`);
 export const applyForPlacement = (id) => API.post(`/placements/${id}/apply`);
 export const getPlacementStats = () => API.get('/placements/stats');
+
+// Advanced placement features (for future student selection feature)
+export const addSelectedStudents = (id, studentIds) => API.post(`/placements/${id}/select-students`, { studentIds });
+export const getEligibleStudents = (params) => API.get('/placements/eligible-students', { params });
 
 // Student progress (streaks, skills, career)
 export const getStreak = () => API.get('/student-progress/streak');

@@ -38,6 +38,7 @@ app.use('/api/placements', require('./src/routes/placementRoutes'));
 app.use('/api/student-progress', require('./src/routes/studentProgressRoutes'));
 app.use('/api/activities', require('./src/routes/activityRoutes'));
 app.use('/api/career-approvals', require('./src/routes/careerApprovalRoutes'));
+app.use('/api/registration-requests', require('./src/routes/registrationRequestRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

@@ -195,37 +195,108 @@ const getPlacementStats = async (req, res) => {
       totalPlaced += p.totalSelected || 0;
     });
     
-    const averagePackage = packageCount > 0 ? (totalPackage / packageCount).toFixed(1) : 8.5;
+    let averagePackage = packageCount > 0 ? (totalPackage / packageCount).toFixed(1) : 0;
     
-    // Estimate placement rate - if we don't have enough data, return reasonable defaults
+    // Calculate placement rate
     const totalStudents = await User.countDocuments({ role: 'Student' });
-    const placementRate = totalStudents > 0 && totalPlaced > 0 
-      ? Math.min(Math.round((totalPlaced / (totalStudents * 0.25)) * 100), 100) 
-      : 94; // Default to 94% if no data
-
+    const placementRate = totalStudents > 0 ? Math.min(Math.round((totalPlaced / totalStudents) * 100), 100) : 0;
+    
     // Top recruiters with formatted data
     const topRecruiters = allPlacements
-      .filter(p => p.company)
+      .filter(p => p.company && p.totalSelected > 0)
       .sort((a, b) => (b.totalSelected || 0) - (a.totalSelected || 0))
       .slice(0, 6)
       .map(p => ({
         name: p.company,
-        offers: p.totalSelected || Math.floor(Math.random() * 50) + 10,
-        avgPackage: p.packageRange || `${p.package || 8} LPA`
+        offers: p.totalSelected || 0,
+        avgPackage: p.packageRange || (p.package ? `${p.package} LPA` : 'N/A')
       }));
-
     res.json({
       totalDrives,
       ongoingDrives,
       upcomingDrives,
       completedDrives,
-      totalPlaced: totalPlaced || 847, // Default if no data
-      averagePackage: averagePackage || 8.5,
-      highestPackage: highestPackage || 42,
-      companiesVisited: totalDrives || 65,
-      placementRate,
+      totalPlaced: totalPlaced || 0,
+      averagePackage: parseFloat(averagePackage) || 0,
+      highestPackage: highestPackage || 0,
+      companiesVisited: totalDrives || 0,
+      placementRate: placementRate || 0,
       topRecruiters
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Add selected students to a placement drive (Complete Solution Feature)
+const addSelectedStudents = async (req, res) => {
+  try {
+    const { studentIds } = req.body;
+    
+    if (!studentIds || !Array.isArray(studentIds)) {
+      return res.status(400).json({ message: 'Please provide an array of student IDs' });
+    }
+
+    const placement = await Placement.findById(req.params.id);
+    if (!placement) {
+      return res.status(404).json({ message: 'Placement not found' });
+    }
+
+    // Update placement with selected students
+    placement.selectedStudents = studentIds;
+    placement.totalSelected = studentIds.length;
+    await placement.save();
+
+    // Update student records - mark them as placed
+    await User.updateMany(
+      { _id: { $in: studentIds }, role: 'Student' },
+      { 
+        $set: { 
+          isPlaced: true, 
+          placedAt: placement._id,
+          placementCompany: placement.company,
+          placementPackage: placement.package,
+          placementPosition: placement.position,
+          placementDate: new Date()
+        } 
+      }
+    );
+
+    // Log activity
+    await ActivityLog.create({
+      type: 'placement',
+      title: 'Students placed',
+      description: `${studentIds.length} students placed at ${placement.company}`,
+      color: 'green'
+    });
+
+    const populatedPlacement = await Placement.findById(placement._id)
+      .populate('selectedStudents', 'name email rollNumber department');
+
+    res.json({ 
+      message: 'Students added successfully',
+      placement: populatedPlacement 
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get eligible students for placement selection (Complete Solution Feature)
+const getEligibleStudents = async (req, res) => {
+  try {
+    const { department, year, onlyUnplaced } = req.query;
+    const filter = { role: 'Student' };
+    
+    if (department) filter.department = department;
+    if (year) filter.year = year;
+    if (onlyUnplaced === 'true') filter.isPlaced = false;
+
+    const students = await User.find(filter)
+      .select('name email rollNumber department year isPlaced placementCompany')
+      .sort({ name: 1 });
+
+    res.json(students);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -238,5 +309,7 @@ module.exports = {
   updatePlacement, 
   deletePlacement,
   applyForPlacement,
-  getPlacementStats
+  getPlacementStats,
+  addSelectedStudents,
+  getEligibleStudents
 };

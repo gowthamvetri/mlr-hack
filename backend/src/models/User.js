@@ -15,6 +15,14 @@ const userSchema = mongoose.Schema({
   year: { type: String },
   rollNumber: { type: String },
   
+  // Placement tracking fields (for students)
+  isPlaced: { type: Boolean, default: false },
+  placementCompany: { type: String },
+  placementPackage: { type: Number },
+  placementPosition: { type: String },
+  placedAt: { type: mongoose.Schema.Types.ObjectId, ref: 'Placement' },
+  placementDate: { type: Date },
+  
   // Club Coordinator specific fields
   clubName: { type: String },
   
@@ -26,7 +34,7 @@ const userSchema = mongoose.Schema({
   bio: { type: String },
   address: { type: String },
   dateOfBirth: { type: Date },
-  gender: { type: String, enum: ['Male', 'Female', 'Other', ''] },
+  gender: { type: String, enum: ['Male', 'Female', 'Other', '', null] },
 }, {
   timestamps: true,
 });
@@ -35,9 +43,10 @@ userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-userSchema.pre('save', async function (next) {
+// Pre-save hook to hash password - using async without next() parameter
+userSchema.pre('save', async function () {
   if (!this.isModified('password')) {
-    next();
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);

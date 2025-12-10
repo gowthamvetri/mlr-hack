@@ -7,7 +7,7 @@ import {
 import DashboardLayout from '../components/DashboardLayout';
 import { 
   Users, FileText, Calendar, Clock, Check, X, AlertTriangle, 
-  GraduationCap, Building, TrendingUp, Flame, BookOpen, Award,
+  GraduationCap, Building, TrendingUp, BookOpen, Award,
   UserPlus, CheckCircle, AlertCircle, UserCheck
 } from 'lucide-react';
 
@@ -215,14 +215,14 @@ const AdminDashboard = () => {
           <p className="text-xs text-blue-200">Job placements</p>
         </div>
 
-        {/* Active Streaks - Blue gradient */}
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-4 text-white">
+        {/* Pending Approvals - Highlighted */}
+        <div className="bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-4 text-white">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-blue-100">Active Streaks</h3>
-            <Flame className="w-4 h-4 text-blue-200" />
+            <h3 className="text-xs font-medium text-yellow-100">Pending Events</h3>
+            <AlertTriangle className="w-4 h-4 text-yellow-200" />
           </div>
-          <p className="text-2xl font-bold">{stats?.activeStreaks || 0}</p>
-          <p className="text-xs text-blue-200">Student streaks</p>
+          <p className="text-2xl font-bold">{pendingEvents.length || 0}</p>
+          <p className="text-xs text-yellow-200">Awaiting review</p>
         </div>
 
         {/* Active Courses */}
@@ -236,13 +236,13 @@ const AdminDashboard = () => {
         </div>
 
         {/* Graduation Rate - Blue gradient */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white">
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 text-white">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-blue-100">Graduation Rate</h3>
-            <GraduationCap className="w-4 h-4 text-blue-200" />
+            <h3 className="text-xs font-medium text-green-100">Graduation Rate</h3>
+            <GraduationCap className="w-4 h-4 text-green-200" />
           </div>
           <p className="text-2xl font-bold">92%</p>
-          <p className="text-xs text-blue-200">Success rate</p>
+          <p className="text-xs text-green-200">Success rate</p>
         </div>
       </div>
 

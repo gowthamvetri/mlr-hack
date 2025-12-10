@@ -16,7 +16,8 @@ import {
   HeadphonesIcon,
   School,
   Target,
-  ClipboardCheck
+  ClipboardCheck,
+  UserPlus
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
@@ -43,6 +44,7 @@ const Sidebar = () => {
           { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
           { to: '/admin/courses', icon: BookOpen, label: 'Courses' },
           { to: '/admin/career-approvals', icon: ClipboardCheck, label: 'Career Approvals' },
+          { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
           { to: '/admin/exams', icon: ClipboardList, label: 'Exams' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },

@@ -27,6 +27,7 @@ import AdminAnalytics from './pages/admin/AdminAnalytics';
 import AdminCourses from './pages/admin/AdminCourses';
 import AdminPlacements from './pages/admin/AdminPlacements';
 import AdminCareerApprovals from './pages/admin/AdminCareerApprovals';
+import AdminRegistrationRequests from './pages/admin/AdminRegistrationRequests';
 import AdminProfile from './pages/admin/AdminProfile';
 
 // Seating Manager Pages
@@ -183,6 +184,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['Admin']}>
                 <AdminCareerApprovals />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/registration-requests" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <AdminRegistrationRequests />
               </ProtectedRoute>
             } 
           />
