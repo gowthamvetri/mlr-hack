@@ -9,6 +9,10 @@ import SeatingManagerDashboard from './pages/SeatingManagerDashboard';
 import ClubCoordinatorDashboard from './pages/ClubCoordinatorDashboard';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Public Pages
+import DepartmentPage from './pages/DepartmentPage';
+import PlacementsPage from './pages/PlacementsPage';
+
 // Student Pages
 import StudentExams from './pages/student/StudentExams';
 import StudentStudy from './pages/student/StudentStudy';
@@ -29,6 +33,7 @@ import AdminPlacements from './pages/admin/AdminPlacements';
 import AdminCareerApprovals from './pages/admin/AdminCareerApprovals';
 import AdminRegistrationRequests from './pages/admin/AdminRegistrationRequests';
 import AdminProfile from './pages/admin/AdminProfile';
+import AdminPlacementPage from './pages/admin/AdminPlacementPage';
 
 // Seating Manager Pages
 import SeatingAllocate from './pages/seating/SeatingAllocate';
@@ -54,6 +59,10 @@ function App() {
           <Route path="/" element={<Onboarding />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          
+          {/* Public Pages */}
+          <Route path="/departments/:slug" element={<DepartmentPage />} />
+          <Route path="/placements" element={<PlacementsPage />} />
           
           {/* Student Routes */}
           <Route 
@@ -159,6 +168,14 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['Admin']}>
                 <AdminPlacements />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/admin/placement-page" 
+            element={
+              <ProtectedRoute allowedRoles={['Admin']}>
+                <AdminPlacementPage />
               </ProtectedRoute>
             } 
           />

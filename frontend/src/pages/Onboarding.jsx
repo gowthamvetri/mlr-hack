@@ -1,61 +1,56 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 import { 
   GraduationCap, Building2, Compass, ClipboardCheck, 
   LineChart, Calendar, Users, Award, ArrowRight, 
   CheckCircle, Play, Sparkles, BookOpen, Target,
-  TrendingUp, Shield, Zap, Globe, ChevronRight, Star, Check
+  TrendingUp, Shield, Zap, Globe, ChevronRight, Star, Check, Briefcase
 } from 'lucide-react';
+
+const API_URL = import.meta.env.VITE_API;
 
 const Onboarding = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('student');
+  const [departments, setDepartments] = useState([]);
+
+  useEffect(() => {
+    fetchDepartments();
+  }, []);
+
+  const fetchDepartments = async () => {
+    try {
+      const response = await fetch(`${API_URL}/departments/public`);
+      const data = await response.json();
+      setDepartments(data);
+    } catch (error) {
+      console.error('Error fetching departments:', error);
+      // Use default departments on error
+      setDepartments(defaultDepartments);
+    }
+  };
+
+  const defaultDepartments = [
+    { name: 'Aeronautical Engineering', slug: 'aeronautical-engineering', image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400' },
+    { name: 'Computer Science and Engineering', slug: 'computer-science-and-engineering', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
+    { name: 'Computer Science Engineering - Cyber Security', slug: 'computer-science-engineering-cyber-security', image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' },
+    { name: 'Computer Science Engineering - Data Science', slug: 'computer-science-engineering-data-science', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400' },
+    { name: 'Computer Science and Information Technology', slug: 'computer-science-and-information-technology', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400' },
+    { name: 'CSE AI & ML', slug: 'cse-ai-ml', image: 'https://images.unsplash.com/photo-1677442135136-760c813a743d?w=400' },
+    { name: 'Electrical And Electronics Engineering', slug: 'electrical-and-electronics-engineering', image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400' },
+    { name: 'Electronics and Communication Engineering', slug: 'electronics-and-communication-engineering', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400' },
+    { name: 'Freshman', slug: 'freshman', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400' },
+    { name: 'Information Technology', slug: 'information-technology', image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400' },
+    { name: 'Master of Business Administration', slug: 'master-of-business-administration', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400' },
+    { name: 'Mechanical Engineering', slug: 'mechanical-engineering', image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=400' },
+  ];
 
   const stats = [
     { value: '10K+', label: 'Active Students', icon: Users },
     { value: '500+', label: 'Partner Institutes', icon: Building2 },
     { value: '95%', label: 'Placement Rate', icon: Target },
     { value: '24/7', label: 'Support Available', icon: Shield },
-  ];
-
-  const features = [
-    {
-      icon: Compass,
-      title: 'AI-Powered Career Guidance',
-      description: 'Personalized career roadmaps based on your skills, interests, and market trends',
-      color: 'from-blue-500 to-blue-600',
-    },
-    {
-      icon: ClipboardCheck,
-      title: 'Smart Exam Management',
-      description: 'Automated hall tickets, seating allocation, and schedule management',
-      color: 'from-green-500 to-green-600',
-    },
-    {
-      icon: LineChart,
-      title: 'Real-time Analytics',
-      description: 'Track progress, identify gaps, and optimize learning outcomes',
-      color: 'from-purple-500 to-purple-600',
-    },
-    {
-      icon: Calendar,
-      title: 'Event & Club Management',
-      description: 'Organize events, manage approvals, and engage with student communities',
-      color: 'from-orange-500 to-orange-600',
-    },
-    {
-      icon: BookOpen,
-      title: 'Study Resources',
-      description: 'Access curated learning materials and track your study streak',
-      color: 'from-pink-500 to-pink-600',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Placement Tracking',
-      description: 'Monitor placement drives, applications, and success rates',
-      color: 'from-cyan-500 to-cyan-600',
-    },
   ];
 
   const portalTypes = [
@@ -172,11 +167,11 @@ const Onboarding = () => {
                   <ArrowRight className="w-5 h-5" />
                 </button>
                 <button 
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/placements')}
                   className="flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
                 >
-                  <Play className="w-5 h-5" />
-                  Watch Demo
+                  <Briefcase className="w-5 h-5" />
+                  View Placements
                 </button>
               </div>
 
@@ -201,34 +196,42 @@ const Onboarding = () => {
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Departments Section */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-full text-sm font-medium mb-4">
-              <Zap className="w-4 h-4" />
-              Powerful Features
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-full text-sm font-medium mb-4">
+              <Building2 className="w-4 h-4" />
+              Explore Programs
             </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Everything You Need in One Platform
+            <h2 className="text-3xl sm:text-4xl font-bold text-red-600 mb-4">
+              Departments
             </h2>
             <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              A comprehensive suite of tools designed for modern academic institutions
+              Choose from our wide range of undergraduate and postgraduate programs
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {features.map((feature, index) => (
-              <div 
-                key={index} 
-                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-xl transition-all duration-300"
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+            {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
+              <Link
+                key={dept._id || index}
+                to={`/departments/${dept.slug}`}
+                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
               >
-                <div className={`w-14 h-14 rounded-2xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-5 shadow-lg group-hover:scale-110 transition-transform`}>
-                  <feature.icon className="w-7 h-7 text-white" />
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img 
+                    src={dept.image || `https://images.unsplash.com/photo-1562774053-701939374585?w=400`}
+                    alt={dept.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
-              </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-gray-800 text-sm text-center leading-tight group-hover:text-red-600 transition-colors">
+                    {dept.name}
+                  </h3>
+                </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -356,10 +359,10 @@ const Onboarding = () => {
             <div>
               <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
               <ul className="space-y-2 text-sm">
+                <li><button onClick={() => navigate('/placements')} className="text-gray-400 hover:text-white transition-colors">Placements</button></li>
                 <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
                 <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
-                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Club Coordinator</button></li>
-                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Seating Manager</button></li>
+                <li><button onClick={() => navigate('/register')} className="text-gray-400 hover:text-white transition-colors">Register</button></li>
               </ul>
             </div>
             <div>

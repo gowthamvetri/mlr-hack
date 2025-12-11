@@ -148,4 +148,20 @@ export const rejectCareerRequest = (id, data) => API.put(`/career-approvals/reje
 export const getProfile = () => API.get('/users/profile');
 export const updateProfile = (data) => API.put('/users/profile', data);
 
+// Placement Page (Admin)
+export const getAdminPlacementSlides = () => API.get('/placement-page/admin/slides');
+export const createPlacementSlide = (data) => API.post('/placement-page/admin/slides', data);
+export const updatePlacementSlide = (id, data) => API.put(`/placement-page/admin/slides/${id}`, data);
+export const deletePlacementSlide = (id) => API.delete(`/placement-page/admin/slides/${id}`);
+
+export const getAdminRecruiters = () => API.get('/placement-page/admin/recruiters');
+export const createRecruiter = (data) => API.post('/placement-page/admin/recruiters', data);
+export const updateRecruiter = (id, data) => API.put(`/placement-page/admin/recruiters/${id}`, data);
+export const deleteRecruiter = (id) => API.delete(`/placement-page/admin/recruiters/${id}`);
+
+export const getAdminTrainingContent = () => API.get('/placement-page/admin/training');
+export const createTrainingContent = (data) => API.post('/placement-page/admin/training', data);
+export const updateTrainingContent = (id, data) => API.put(`/placement-page/admin/training/${id}`, data);
+export const deleteTrainingContent = (id) => API.delete(`/placement-page/admin/training/${id}`);
+
 export default API;

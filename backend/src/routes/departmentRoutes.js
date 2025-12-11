@@ -6,9 +6,15 @@ const {
   createDepartment, 
   updateDepartment, 
   deleteDepartment,
-  getDepartmentStats
+  getDepartmentStats,
+  getPublicDepartments,
+  getDepartmentBySlug
 } = require('../controllers/departmentController');
 const { protect, admin } = require('../middleware/authMiddleware');
+
+// Public routes (no auth required)
+router.get('/public', getPublicDepartments);
+router.get('/public/:slug', getDepartmentBySlug);
 
 router.route('/')
   .get(protect, getDepartments)

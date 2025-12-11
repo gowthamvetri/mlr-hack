@@ -44,6 +44,7 @@ app.use('/api/activities', require('./src/routes/activityRoutes'));
 app.use('/api/career-approvals', require('./src/routes/careerApprovalRoutes'));
 app.use('/api/registration-requests', require('./src/routes/registrationRequestRoutes'));
 app.use('/api/staff', require('./src/routes/staffRoutes'));
+app.use('/api/placement-page', require('./src/routes/placementPageRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

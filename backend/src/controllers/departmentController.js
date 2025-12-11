@@ -1,11 +1,44 @@
 const Department = require('../models/Department');
 const User = require('../models/User');
+const Faculty = require('../models/Faculty');
 
-// Get all departments
+// Get all departments (public)
 const getDepartments = async (req, res) => {
   try {
     const departments = await Department.find({}).populate('headOfDepartment', 'name email');
     res.json(departments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get all departments for public page (minimal data)
+const getPublicDepartments = async (req, res) => {
+  try {
+    const departments = await Department.find({})
+      .select('name code slug image description totalStudents totalFaculty')
+      .sort('name');
+    res.json(departments);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get department by slug (public)
+const getDepartmentBySlug = async (req, res) => {
+  try {
+    const department = await Department.findOne({ slug: req.params.slug })
+      .populate('headOfDepartment', 'name email profileImage');
+    
+    if (!department) {
+      return res.status(404).json({ message: 'Department not found' });
+    }
+    
+    // Get faculty for this department
+    const faculty = await Faculty.find({ department: department._id })
+      .select('name designation email phone profileImage specialization');
+    
+    res.json({ ...department.toObject(), faculty });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -120,5 +153,7 @@ module.exports = {
   createDepartment, 
   updateDepartment, 
   deleteDepartment,
-  getDepartmentStats
+  getDepartmentStats,
+  getPublicDepartments,
+  getDepartmentBySlug
 };

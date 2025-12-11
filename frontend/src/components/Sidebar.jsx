@@ -47,6 +47,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/admin/career-approvals', icon: ClipboardCheck, label: 'Career Approvals' },
           { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
+          { to: '/admin/placement-page', icon: Building, label: 'Placement Page' },
           { to: '/admin/exams', icon: ClipboardList, label: 'Exams' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },
           { to: '/admin/profile', icon: UserCircle, label: 'My Profile' },
