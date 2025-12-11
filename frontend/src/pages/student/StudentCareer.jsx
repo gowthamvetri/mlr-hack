@@ -262,17 +262,17 @@ const StudentCareer = () => {
 
   return (
     <DashboardLayout title="Career Development">
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         {/* Header Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-5 text-white">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="col-span-2 lg:col-span-1 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-primary-100 text-sm">Steps Completed</p>
-                <p className="text-3xl font-bold mt-1">{getCompletedStepsCount()}/5</p>
+                <p className="text-primary-100 text-xs sm:text-sm">Steps Completed</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1">{getCompletedStepsCount()}/5</p>
               </div>
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-white" />
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                <Award className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
               </div>
             </div>
             <div className="mt-3 bg-white/20 rounded-full h-2">
@@ -280,23 +280,23 @@ const StudentCareer = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Career Readiness</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{Math.round((getCompletedStepsCount() / 5) * 100)}%</p>
+                <p className="text-gray-500 text-xs sm:text-sm">Career Ready</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{Math.round((getCompletedStepsCount() / 5) * 100)}%</p>
               </div>
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-green-600" />
+              <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Skills Added</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{skills.length}</p>
+                <p className="text-gray-500 text-xs sm:text-sm">Skills Added</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{skills.length}</p>
               </div>
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Brain className="w-5 h-5 text-blue-600" />

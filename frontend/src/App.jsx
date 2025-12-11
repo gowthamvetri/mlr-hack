@@ -39,6 +39,13 @@ import SeatingProfile from './pages/seating/SeatingProfile';
 import CoordinatorEvents from './pages/coordinator/CoordinatorEvents';
 import CoordinatorProfile from './pages/coordinator/CoordinatorProfile';
 
+// Staff Pages
+import StaffDashboard from './pages/staff/StaffDashboard';
+import StaffAttendance from './pages/staff/StaffAttendance';
+import StaffFees from './pages/staff/StaffFees';
+import StaffCareerApprovals from './pages/staff/StaffCareerApprovals';
+import StaffEligibility from './pages/staff/StaffEligibility';
+
 function App() {
   return (
     <AuthProvider>
@@ -260,6 +267,48 @@ function App() {
             element={
               <ProtectedRoute allowedRoles={['ClubCoordinator']}>
                 <CoordinatorProfile />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Staff Routes */}
+          <Route 
+            path="/staff" 
+            element={
+              <ProtectedRoute allowedRoles={['Staff']}>
+                <StaffDashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/staff/attendance" 
+            element={
+              <ProtectedRoute allowedRoles={['Staff']}>
+                <StaffAttendance />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/staff/fees" 
+            element={
+              <ProtectedRoute allowedRoles={['Staff']}>
+                <StaffFees />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/staff/career-approvals" 
+            element={
+              <ProtectedRoute allowedRoles={['Staff']}>
+                <StaffCareerApprovals />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/staff/eligibility" 
+            element={
+              <ProtectedRoute allowedRoles={['Staff']}>
+                <StaffEligibility />
               </ProtectedRoute>
             } 
           />

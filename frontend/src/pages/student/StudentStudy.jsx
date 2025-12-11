@@ -101,14 +101,14 @@ const StudentStudy = () => {
 
   return (
     <DashboardLayout role="student" userName={user?.name}>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Study Support</h1>
-        <p className="text-gray-500">Access learning resources and study materials</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Study Support</h1>
+        <p className="text-sm sm:text-base text-gray-500">Access learning resources and study materials</p>
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
-        <div className="flex flex-col md:flex-row gap-4">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
@@ -116,7 +116,7 @@ const StudentStudy = () => {
               placeholder="Search resources..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base"
             />
           </div>
           <div className="flex items-center gap-2">
@@ -124,11 +124,11 @@ const StudentStudy = () => {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white text-sm sm:text-base"
             >
               {categories.map(cat => (
                 <option key={cat} value={cat}>
-                  {cat === 'all' ? 'All Categories' : cat}
+                  {cat === 'all' ? 'All' : cat}
                 </option>
               ))}
             </select>
@@ -137,47 +137,47 @@ const StudentStudy = () => {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">12</p>
-              <p className="text-sm text-gray-500">Courses</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">12</p>
+              <p className="text-xs sm:text-sm text-gray-500">Courses</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Video className="w-5 h-5 text-purple-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Video className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">48</p>
-              <p className="text-sm text-gray-500">Videos</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">48</p>
+              <p className="text-xs sm:text-sm text-gray-500">Videos</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-green-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <FileText className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">25</p>
-              <p className="text-sm text-gray-500">Notes</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">25</p>
+              <p className="text-xs sm:text-sm text-gray-500">Notes</p>
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <Star className="w-5 h-5 text-yellow-600" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">5</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">5</p>
               <p className="text-sm text-gray-500">Saved</p>
             </div>
           </div>

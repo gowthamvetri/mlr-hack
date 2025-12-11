@@ -43,6 +43,7 @@ app.use('/api/student-progress', require('./src/routes/studentProgressRoutes'));
 app.use('/api/activities', require('./src/routes/activityRoutes'));
 app.use('/api/career-approvals', require('./src/routes/careerApprovalRoutes'));
 app.use('/api/registration-requests', require('./src/routes/registrationRequestRoutes'));
+app.use('/api/staff', require('./src/routes/staffRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

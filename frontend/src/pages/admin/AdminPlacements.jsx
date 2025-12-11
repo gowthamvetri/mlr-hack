@@ -325,75 +325,75 @@ const AdminPlacements = () => {
 
   return (
     <DashboardLayout role="admin" userName={user?.name}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Placement Management</h1>
-          <p className="text-gray-500">Track and manage campus placements</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Placement Management</h1>
+          <p className="text-sm sm:text-base text-gray-500">Track and manage campus placements</p>
         </div>
-        <div className="flex gap-3">
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+        <div className="flex gap-2 sm:gap-3">
+          <button onClick={handleExport} className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base">
             <Download className="w-4 h-4" />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </button>
-          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base">
             <Plus className="w-4 h-4" />
-            Add Drive
+            <span className="hidden sm:inline">Add Drive</span>
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-5 text-white">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="col-span-2 sm:col-span-1 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
           <div className="flex items-center justify-between mb-2">
-            <Users className="w-8 h-8 text-primary-200" />
+            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-primary-200" />
             <span className="text-xs bg-white/20 px-2 py-1 rounded-full">This Year</span>
           </div>
-          <p className="text-3xl font-bold">{stats.totalPlaced}</p>
-          <p className="text-primary-100 text-sm">Students Placed</p>
+          <p className="text-2xl sm:text-3xl font-bold">{stats.totalPlaced}</p>
+          <p className="text-primary-100 text-xs sm:text-sm">Students Placed</p>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-          <DollarSign className="w-8 h-8 text-green-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{stats.averagePackage}</p>
-          <p className="text-gray-500 text-sm">Average Package</p>
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <DollarSign className="w-6 sm:w-8 h-6 sm:h-8 text-green-500 mb-2" />
+          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.averagePackage}</p>
+          <p className="text-gray-500 text-xs sm:text-sm">Avg Package</p>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-          <Award className="w-8 h-8 text-yellow-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{stats.highestPackage}</p>
-          <p className="text-gray-500 text-sm">Highest Package</p>
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <Award className="w-6 sm:w-8 h-6 sm:h-8 text-yellow-500 mb-2" />
+          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.highestPackage}</p>
+          <p className="text-gray-500 text-xs sm:text-sm">Top Package</p>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-          <Building className="w-8 h-8 text-blue-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{stats.companiesVisited}</p>
-          <p className="text-gray-500 text-sm">Companies Visited</p>
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <Building className="w-6 sm:w-8 h-6 sm:h-8 text-blue-500 mb-2" />
+          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.companiesVisited}</p>
+          <p className="text-gray-500 text-xs sm:text-sm">Companies</p>
         </div>
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-white">
-          <TrendingUp className="w-8 h-8 text-green-200 mb-2" />
-          <p className="text-3xl font-bold">{stats.placementRate}%</p>
-          <p className="text-green-100 text-sm">Placement Rate</p>
+        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 sm:p-5 text-white">
+          <TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 text-green-200 mb-2" />
+          <p className="text-2xl sm:text-3xl font-bold">{stats.placementRate}%</p>
+          <p className="text-green-100 text-xs sm:text-sm">Placement Rate</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Top Recruiters */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h3 className="font-bold text-gray-800">Top Recruiters</h3>
             <button className="text-primary-600 text-sm font-medium hover:underline">View All</button>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {topRecruiters.map((company, index) => (
-              <div key={index} className="p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3 mb-3">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center font-bold ${company.color}`}>
+              <div key={index} className="p-3 sm:p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                <div className="flex items-center gap-3 mb-2 sm:mb-3">
+                  <div className={`w-8 sm:w-10 h-8 sm:h-10 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base ${company.color}`}>
                     {company.logo}
                   </div>
-                  <div>
-                    <p className="font-semibold text-gray-800">{company.name}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{company.name}</p>
                     <p className="text-xs text-gray-500">{company.offers} offers</p>
                   </div>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-xs sm:text-sm text-gray-600">
                   Avg: <span className="font-semibold text-gray-800">{company.avgPackage}</span>
                 </p>
               </div>
@@ -402,7 +402,7 @@ const AdminPlacements = () => {
         </div>
 
         {/* Department-wise Stats */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <h3 className="font-bold text-gray-800 mb-6">Department Wise</h3>
           <div className="space-y-4">
             {departmentStats.map((dept, index) => (

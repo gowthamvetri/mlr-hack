@@ -84,20 +84,20 @@ const SeatingAllocate = () => {
 
   return (
     <DashboardLayout role="seating_manager" userName={user?.name}>
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800">Seating Allocation</h1>
-        <p className="text-gray-500">Configure rooms and run the allocation algorithm</p>
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Seating Allocation</h1>
+        <p className="text-sm sm:text-base text-gray-500">Configure rooms and run the allocation algorithm</p>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <Clock className="w-5 h-5 text-yellow-600" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <Clock className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-600" />
             </div>
             <div>
-              <p className="text-2xl font-bold text-gray-800">{pendingExams.length}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-800">{pendingExams.length}</p>
               <p className="text-sm text-gray-500">Pending Allocation</p>
             </div>
           </div>

@@ -35,4 +35,22 @@ const admin = (req, res, next) => {
   }
 };
 
-module.exports = { protect, admin };
+// Staff middleware - allows Staff role access
+const staff = (req, res, next) => {
+  if (req.user && req.user.role === 'Staff') {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as staff' });
+  }
+};
+
+// Admin or Staff middleware - allows both Admin and Staff roles
+const adminOrStaff = (req, res, next) => {
+  if (req.user && (req.user.role === 'Admin' || req.user.role === 'Staff')) {
+    next();
+  } else {
+    res.status(401).json({ message: 'Not authorized as admin or staff' });
+  }
+};
+
+module.exports = { protect, admin, staff, adminOrStaff };

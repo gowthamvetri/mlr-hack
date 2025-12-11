@@ -80,6 +80,25 @@ export const uploadCourseMaterial = (id, formData) => API.post(`/courses/${id}/m
   headers: { 'Content-Type': 'multipart/form-data' }
 });
 export const deleteCourseMaterial = (courseId, materialId) => API.delete(`/courses/${courseId}/materials/${materialId}`);
+export const getMyEnrolledCourses = () => API.get('/courses/my-enrolled');
+export const getMyTaughtCourses = () => API.get('/courses/my-taught');
+export const uploadTeacherMaterial = (id, formData) => API.post(`/courses/${id}/materials/teacher`, formData, {
+  headers: { 'Content-Type': 'multipart/form-data' }
+});
+
+// Staff management
+export const getStudentsForStaff = (params) => API.get('/staff/students', { params });
+export const getStudentByIdForStaff = (id) => API.get(`/staff/students/${id}`);
+export const updateStudentAttendance = (id, attendance) => API.put(`/staff/students/${id}/attendance`, { attendance });
+export const bulkUpdateAttendance = (updates) => API.put('/staff/students/bulk-attendance', { updates });
+export const updateStudentFeeStatus = (id, data) => API.put(`/staff/students/${id}/fees`, data);
+export const getAttendanceSummary = (params) => API.get('/staff/attendance-summary', { params });
+export const getFeeSummary = (params) => API.get('/staff/fee-summary', { params });
+export const getIneligibleStudents = (params) => API.get('/staff/ineligible-students', { params });
+
+// Hall ticket
+export const getSemesterHallTicket = (params) => API.get('/exams/semester-hall-ticket', { params });
+export const checkStudentEligibility = (studentId) => API.get(`/exams/check-eligibility/${studentId}`);
 
 // Faculty management
 export const getFaculty = (params) => API.get('/faculty', { params });

@@ -138,50 +138,50 @@ const AdminAnalytics = () => {
 
   return (
     <DashboardLayout role="admin" userName={user?.name}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
-          <p className="text-gray-500">Comprehensive insights and performance metrics</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Analytics Dashboard</h1>
+          <p className="text-sm sm:text-base text-gray-500">Comprehensive insights and performance metrics</p>
         </div>
-        <div className="flex gap-3">
-          <select className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white">
+        <div className="flex gap-2 sm:gap-3">
+          <select className="flex-1 sm:flex-none px-3 sm:px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white text-sm sm:text-base">
             <option>Last 30 Days</option>
             <option>Last 90 Days</option>
             <option>This Year</option>
             <option>All Time</option>
           </select>
-          <button className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base">
             <Download className="w-4 h-4" />
-            Export Report
+            <span className="hidden sm:inline">Export</span>
           </button>
         </div>
       </div>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         {overviewStats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
-            <div className="flex items-center justify-between mb-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+          <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${
                 index === 0 ? 'bg-primary-100' :
                 index === 1 ? 'bg-green-100' :
                 index === 2 ? 'bg-purple-100' : 'bg-blue-100'
               }`}>
-                <stat.icon className={`w-6 h-6 ${
+                <stat.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${
                   index === 0 ? 'text-primary-600' :
                   index === 1 ? 'text-green-600' :
                   index === 2 ? 'text-purple-600' : 'text-blue-600'
                 }`} />
               </div>
-              <div className={`flex items-center gap-1 text-sm font-medium ${
+              <div className={`flex items-center gap-1 text-xs font-medium ${
                 stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
               }`}>
-                {stat.trend === 'up' ? <ArrowUp className="w-4 h-4" /> : <ArrowDown className="w-4 h-4" />}
+                {stat.trend === 'up' ? <ArrowUp className="w-3 sm:w-4 h-3 sm:h-4" /> : <ArrowDown className="w-3 sm:w-4 h-3 sm:h-4" />}
                 {stat.change}
               </div>
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stat.value}</p>
-            <p className="text-sm text-gray-500 mt-1">{stat.label}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stat.value}</p>
+            <p className="text-xs sm:text-sm text-gray-500 mt-1">{stat.label}</p>
           </div>
         ))}
       </div>

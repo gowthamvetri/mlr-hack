@@ -21,6 +21,7 @@ const Login = () => {
       else if (user.role === 'Admin') navigate('/admin');
       else if (user.role === 'SeatingManager') navigate('/seating-manager');
       else if (user.role === 'ClubCoordinator') navigate('/club-coordinator');
+      else if (user.role === 'Staff') navigate('/staff');
     } catch (err) {
       setError(err);
     } finally {

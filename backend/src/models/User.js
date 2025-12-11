@@ -7,13 +7,26 @@ const userSchema = mongoose.Schema({
   password: { type: String, required: true },
   role: {
     type: String,
-    enum: ['Student', 'Admin', 'SeatingManager', 'ClubCoordinator'],
+    enum: ['Student', 'Admin', 'SeatingManager', 'ClubCoordinator', 'Staff'],
     required: true,
   },
   // Student specific fields
   department: { type: String },
   year: { type: String },
   rollNumber: { type: String },
+  semester: { type: String },
+  batch: { type: String },
+  
+  // Student attendance and fee fields (for hall ticket eligibility)
+  attendance: { type: Number, default: 0, min: 0, max: 100 }, // percentage
+  feesPaid: { type: Boolean, default: false },
+  feeDetails: {
+    totalAmount: { type: Number, default: 0 },
+    paidAmount: { type: Number, default: 0 },
+    dueAmount: { type: Number, default: 0 },
+    lastPaymentDate: { type: Date },
+    remarks: { type: String }
+  },
   
   // Placement tracking fields (for students)
   isPlaced: { type: Boolean, default: false },
@@ -25,6 +38,10 @@ const userSchema = mongoose.Schema({
   
   // Club Coordinator specific fields
   clubName: { type: String },
+  
+  // Staff specific fields
+  staffDepartment: { type: String },
+  staffDesignation: { type: String },
   
   // Admin specific fields
   office: { type: String },

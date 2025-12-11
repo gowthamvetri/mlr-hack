@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ChatBot from '../components/ChatBot';
 import { 
   GraduationCap, Building2, Compass, ClipboardCheck, 
   LineChart, Calendar, Users, Award, ArrowRight, 
@@ -335,26 +336,26 @@ const Onboarding = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 py-12">
+      <footer className="bg-gray-900 py-8 sm:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div className="md:col-span-2">
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
+            <div className="sm:col-span-2">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center">
                   <GraduationCap className="w-6 h-6 text-white" />
                 </div>
                 <div>
                   <span className="font-bold text-white text-lg">MLRIT</span>
-                  <span className="text-gray-400 ml-1">Academic Portal</span>
+                  <span className="text-gray-400 ml-1 hidden sm:inline">Academic Portal</span>
                 </div>
               </div>
-              <p className="text-gray-400 max-w-md">
+              <p className="text-gray-400 max-w-md text-sm sm:text-base">
                 Integrated Academic and Examination Management System for modern educational institutions.
               </p>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-4">Quick Links</h4>
-              <ul className="space-y-2">
+              <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
+              <ul className="space-y-2 text-sm">
                 <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
                 <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
                 <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Club Coordinator</button></li>
@@ -362,23 +363,31 @@ const Onboarding = () => {
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold text-white mb-4">Contact</h4>
-              <ul className="space-y-2 text-gray-400">
+              <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Contact</h4>
+              <ul className="space-y-2 text-gray-400 text-sm">
                 <li>MLRIT, Hyderabad</li>
                 <li>info@mlrit.ac.in</li>
                 <li>+91 40 2345 6789</li>
               </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-gray-500 text-sm">© 2025 MLRIT. All rights reserved.</p>
-            <div className="flex items-center gap-6 text-sm text-gray-500">
+          <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p className="text-gray-500 text-xs sm:text-sm">© 2025 MLRIT. All rights reserved.</p>
+            <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
               <span>Privacy Policy</span>
               <span>Terms of Service</span>
             </div>
           </div>
         </div>
       </footer>
+
+      {/* ChatBot Component */}
+      <ChatBot 
+        apiEndpoint="http://localhost:8000/chat"
+        title="MLRIT Assistant"
+        subtitle="Ask me anything about academics!"
+        position="bottom-right"
+      />
     </div>
   );
 };

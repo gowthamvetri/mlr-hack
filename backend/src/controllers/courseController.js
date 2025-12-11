@@ -21,7 +21,8 @@ const getCourses = async (req, res) => {
 
     const courses = await Course.find(filter)
       .populate('instructor', 'name email')
-      .populate('department', 'name code');
+      .populate('department', 'name code')
+      .populate('enrolledStudents', '_id name rollNumber');
     
     // Transform data to include department code and instructor name
     const transformedCourses = courses.map(course => ({
@@ -33,11 +34,15 @@ const getCourses = async (req, res) => {
       departmentName: course.department?.name || 'N/A',
       credits: course.credits,
       instructor: course.instructorName || course.instructor?.name || 'TBA',
+      instructorId: course.instructor?._id || null,
       students: course.totalEnrolled || course.enrolledStudents?.length || 0,
+      enrolledStudents: course.enrolledStudents || [],
       rating: course.rating || 0,
       status: course.status,
       semester: course.semester,
       year: course.year,
+      hasMaterials: course.materials?.length > 0,
+      materialsCount: course.materials?.length || 0
     }));
     
     res.json(transformedCourses);
@@ -319,11 +324,21 @@ const deleteMaterial = async (req, res) => {
 const getCourseMaterials = async (req, res) => {
   try {
     const course = await Course.findById(req.params.id)
-      .select('name code materials')
+      .select('name code materials enrolledStudents instructor')
       .populate('materials.uploadedBy', 'name');
     
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Check if user is enrolled, is the instructor, or is admin/staff
+    const userId = req.user._id.toString();
+    const isEnrolled = course.enrolledStudents?.some(s => s.toString() === userId);
+    const isInstructor = course.instructor?.toString() === userId;
+    const isAdminOrStaff = ['Admin', 'Staff'].includes(req.user.role);
+    
+    if (!isEnrolled && !isInstructor && !isAdminOrStaff) {
+      return res.status(403).json({ message: 'You must be enrolled in this course to view materials' });
     }
 
     res.json({
@@ -332,6 +347,123 @@ const getCourseMaterials = async (req, res) => {
       courseCode: course.code,
       materials: course.materials
     });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get my enrolled courses (for students)
+const getMyEnrolledCourses = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    const courses = await Course.find({ enrolledStudents: userId })
+      .populate('instructor', 'name email')
+      .populate('department', 'name code');
+    
+    const transformedCourses = courses.map(course => ({
+      _id: course._id,
+      name: course.name,
+      code: course.code,
+      description: course.description,
+      department: course.department?.code || 'N/A',
+      departmentName: course.department?.name || 'N/A',
+      credits: course.credits,
+      instructor: course.instructorName || course.instructor?.name || 'TBA',
+      instructorId: course.instructor?._id || null,
+      students: course.totalEnrolled || course.enrolledStudents?.length || 0,
+      rating: course.rating || 0,
+      status: course.status,
+      semester: course.semester,
+      year: course.year,
+      hasMaterials: course.materials?.length > 0,
+      materialsCount: course.materials?.length || 0
+    }));
+    
+    res.json(transformedCourses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Get courses taught by teacher (for Faculty/Teachers)
+const getMyTaughtCourses = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    const courses = await Course.find({ instructor: userId })
+      .populate('department', 'name code')
+      .populate('enrolledStudents', 'name email rollNumber');
+    
+    const transformedCourses = courses.map(course => ({
+      _id: course._id,
+      name: course.name,
+      code: course.code,
+      description: course.description,
+      department: course.department?.code || 'N/A',
+      departmentName: course.department?.name || 'N/A',
+      credits: course.credits,
+      students: course.totalEnrolled || course.enrolledStudents?.length || 0,
+      enrolledStudents: course.enrolledStudents || [],
+      rating: course.rating || 0,
+      status: course.status,
+      semester: course.semester,
+      year: course.year,
+      materials: course.materials || [],
+      materialsCount: course.materials?.length || 0
+    }));
+    
+    res.json(transformedCourses);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Upload course materials (for Teachers assigned to the course)
+const uploadMaterialAsTeacher = async (req, res) => {
+  try {
+    const course = await Course.findById(req.params.id);
+    if (!course) {
+      return res.status(404).json({ message: 'Course not found' });
+    }
+
+    // Check if user is the instructor of this course
+    const userId = req.user._id.toString();
+    const isInstructor = course.instructor?.toString() === userId;
+    const isAdmin = req.user.role === 'Admin';
+    
+    if (!isInstructor && !isAdmin) {
+      return res.status(403).json({ message: 'Only the assigned instructor or admin can upload materials to this course' });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // Determine file type
+    const mimeToType = {
+      'application/pdf': 'pdf',
+      'application/msword': 'doc',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document': 'doc',
+      'application/vnd.ms-powerpoint': 'doc',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation': 'doc',
+      'video/mp4': 'video',
+      'video/webm': 'video'
+    };
+
+    const material = {
+      name: req.body.name || req.file.originalname,
+      type: mimeToType[req.file.mimetype] || 'other',
+      url: `/uploads/course-materials/${req.file.filename}`,
+      size: req.file.size,
+      uploadedBy: req.user._id,
+      uploadedAt: new Date()
+    };
+
+    course.materials.push(material);
+    await course.save();
+
+    res.status(201).json({ message: 'Material uploaded successfully', material, course });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -347,5 +479,8 @@ module.exports = {
   getCourseStats,
   uploadMaterial,
   deleteMaterial,
-  getCourseMaterials
+  getCourseMaterials,
+  getMyEnrolledCourses,
+  getMyTaughtCourses,
+  uploadMaterialAsTeacher
 };

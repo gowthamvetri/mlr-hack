@@ -164,9 +164,9 @@ const AdminDashboard = () => {
   return (
     <DashboardLayout role="admin" userName={user?.name}>
       {/* Top Stats Row */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 mb-6 sm:mb-8">
         {/* Total Students - Featured */}
-        <div className="col-span-2 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-6 text-white shadow-lg">
+        <div className="col-span-2 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold text-primary-100">Total Students</h3>
             <GraduationCap className="w-6 h-6 text-primary-200" />

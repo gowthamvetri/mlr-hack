@@ -133,97 +133,97 @@ const AdminStudents = () => {
 
   return (
     <DashboardLayout role="admin" userName={user?.name}>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Student Management</h1>
-          <p className="text-gray-500">Manage and view all enrolled students</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Student Management</h1>
+          <p className="text-sm sm:text-base text-gray-500">Manage and view all enrolled students</p>
         </div>
-        <div className="flex gap-3">
-          <button onClick={handleExport} className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
+        <div className="flex gap-2 sm:gap-3">
+          <button onClick={handleExport} className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base">
             <Download className="w-4 h-4" />
-            Export
+            <span className="hidden sm:inline">Export</span>
           </button>
-          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors">
+          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base">
             <UserPlus className="w-4 h-4" />
-            Add Student
+            <span className="hidden sm:inline">Add Student</span>
           </button>
         </div>
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-5 text-white">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-primary-100 text-sm">Total Students</p>
-              <p className="text-3xl font-bold mt-1">{stats.total}</p>
+              <p className="text-primary-100 text-xs sm:text-sm">Total Students</p>
+              <p className="text-2xl sm:text-3xl font-bold mt-1">{stats.total}</p>
             </div>
-            <Users className="w-10 h-10 text-primary-200" />
+            <Users className="w-8 sm:w-10 h-8 sm:h-10 text-primary-200" />
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Active Students</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.active}</p>
+              <p className="text-gray-500 text-xs sm:text-sm">Active Students</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{stats.active}</p>
             </div>
-            <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-green-600" />
-            </div>
-          </div>
-        </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-gray-500 text-sm">Departments</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">{departments.length - 1}</p>
-            </div>
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Building className="w-5 h-5 text-blue-600" />
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
+              <GraduationCap className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-gray-500 text-sm">Avg. Attendance</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">87%</p>
+              <p className="text-gray-500 text-xs sm:text-sm">Departments</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{departments.length - 1}</p>
             </div>
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <GraduationCap className="w-5 h-5 text-purple-600" />
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Building className="w-4 sm:w-5 h-4 sm:h-5 text-blue-600" />
+            </div>
+          </div>
+        </div>
+        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-gray-500 text-xs sm:text-sm">Avg. Attendance</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">87%</p>
+            </div>
+            <div className="w-8 sm:w-10 h-8 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+              <GraduationCap className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600" />
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
-        <div className="flex flex-wrap items-center gap-4">
-          <div className="flex-1 min-w-[200px]">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4 mb-6">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
+          <div className="flex-1">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
-                placeholder="Search students by name, email, or roll number..."
-                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                placeholder="Search students..."
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 text-sm sm:text-base"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <select
-              className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white text-sm sm:text-base"
               value={filterDept}
               onChange={(e) => setFilterDept(e.target.value)}
             >
-              <option value="all">All Departments</option>
+              <option value="all">All Depts</option>
               {departments.slice(1).map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}
             </select>
             <select
-              className="px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white"
+              className="flex-1 sm:flex-none px-3 sm:px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 bg-white text-sm sm:text-base"
               value={filterYear}
               onChange={(e) => setFilterYear(e.target.value)}
             >
