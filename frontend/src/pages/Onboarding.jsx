@@ -386,7 +386,7 @@ const Onboarding = () => {
 
       {/* ChatBot Component */}
       <ChatBot 
-        apiEndpoint="http://localhost:8000/chat"
+        apiEndpoint="http://localhost:8000/api/v1/chat/"
         title="MLRIT Assistant"
         subtitle="Ask me anything about academics!"
         position="bottom-right"

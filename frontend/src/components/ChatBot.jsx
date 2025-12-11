@@ -5,7 +5,7 @@ import {
 } from 'lucide-react';
 
 const ChatBot = ({ 
-  apiEndpoint = 'http://localhost:8000/chat', // Your Python API endpoint
+  apiEndpoint = 'http://localhost:8000/api/v1/chat/', // Zenith RAG API endpoint
   title = 'MLRIT Assistant',
   subtitle = 'Ask me anything about academics!',
   position = 'bottom-right', // 'bottom-right' or 'bottom-left'
@@ -60,14 +60,28 @@ const ChatBot = ({
     setConnectionError(false);
 
     try {
+      // Build conversation history for Zenith RAG
+      const conversationHistory = messages
+        .slice(1) // Skip the initial welcome message
+        .map(msg => ({
+          role: msg.type === 'user' ? 'user' : 'assistant',
+          content: msg.text
+        }));
+      
+      // Add current user message
+      conversationHistory.push({
+        role: 'user',
+        content: userMessage.text
+      });
+
       const response = await fetch(apiEndpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          message: userMessage.text,
-          conversation_id: 'session_' + Date.now(), // You can use a proper session ID
+          question: userMessage.text,
+          conversation_history: conversationHistory
         }),
       });
 
@@ -80,7 +94,10 @@ const ChatBot = ({
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
-        text: data.response || data.message || "I'm sorry, I couldn't process that request.",
+        text: data.answer || "I'm sorry, I couldn't process that request.",
+        sources: data.sources || [],
+        images: data.images || [],
+        category: data.category,
         timestamp: new Date()
       };
 
