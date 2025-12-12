@@ -7,11 +7,11 @@ const generateToken = require('../utils/generateToken');
 // @access  Public
 const submitRegistrationRequest = async (req, res) => {
   try {
-    const { name, email, password, role, clubName } = req.body;
+    const { name, email, password, role, clubName, staffDepartment, staffDesignation } = req.body;
 
     // Validate role
-    if (!['SeatingManager', 'ClubCoordinator'].includes(role)) {
-      return res.status(400).json({ message: 'Invalid role. Only SeatingManager and ClubCoordinator require approval.' });
+    if (!['SeatingManager', 'ClubCoordinator', 'Staff'].includes(role)) {
+      return res.status(400).json({ message: 'Invalid role. Only SeatingManager, ClubCoordinator, and Staff require approval.' });
     }
 
     // Check if user already exists
@@ -36,8 +36,22 @@ const submitRegistrationRequest = async (req, res) => {
       email,
       password,
       role,
-      clubName: role === 'ClubCoordinator' ? clubName : undefined
+      role,
+      clubName: role === 'ClubCoordinator' ? clubName : undefined,
+      staffDepartment: role === 'Staff' ? staffDepartment : undefined,
+      staffDesignation: role === 'Staff' ? staffDesignation : undefined
     });
+
+
+
+    // Notify Admins
+    if (req.io) {
+      req.io.to('role:Admin').emit('notification', {
+        message: `New registration request from ${name} (${role})`,
+        type: 'info'
+      });
+      req.io.to('role:Admin').emit('registration_request_created', registrationRequest);
+    }
 
     res.status(201).json({
       message: 'Registration request submitted successfully. Please wait for admin approval.',
@@ -55,19 +69,19 @@ const submitRegistrationRequest = async (req, res) => {
 const getAllRegistrationRequests = async (req, res) => {
   try {
     const { status, role, search } = req.query;
-    
+
     let query = {};
-    
+
     // Filter by status
     if (status && status !== 'all') {
       query.status = status;
     }
-    
+
     // Filter by role
     if (role && role !== 'all') {
       query.role = role;
     }
-    
+
     // Search by name or email
     if (search) {
       query.$or = [
@@ -75,11 +89,11 @@ const getAllRegistrationRequests = async (req, res) => {
         { email: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     const requests = await RegistrationRequest.find(query)
       .populate('reviewedBy', 'name email')
       .sort({ createdAt: -1 });
-    
+
     res.json(requests);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -94,7 +108,7 @@ const getRegistrationStats = async (req, res) => {
     const pending = await RegistrationRequest.countDocuments({ status: 'pending' });
     const approved = await RegistrationRequest.countDocuments({ status: 'approved' });
     const rejected = await RegistrationRequest.countDocuments({ status: 'rejected' });
-    
+
     res.json({
       pending,
       approved,
@@ -113,39 +127,51 @@ const approveRegistrationRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { comment } = req.body;
-    
+
     const request = await RegistrationRequest.findById(id);
-    
+
     if (!request) {
       return res.status(404).json({ message: 'Registration request not found' });
     }
-    
+
     if (request.status !== 'pending') {
       return res.status(400).json({ message: 'Request has already been processed' });
     }
-    
+
     // Check if user with this email was created in the meantime
     const userExists = await User.findOne({ email: request.email });
     if (userExists) {
       return res.status(400).json({ message: 'User with this email already exists' });
     }
-    
+
     // Create the user account (password will be hashed by User model)
     const user = await User.create({
       name: request.name,
       email: request.email,
       password: request.password,
       role: request.role,
-      clubName: request.clubName
+      role: request.role,
+      clubName: request.clubName,
+      staffDepartment: request.staffDepartment,
+      staffDesignation: request.staffDesignation
     });
-    
+
     // Update request status
     request.status = 'approved';
     request.reviewedBy = req.user._id;
     request.reviewedAt = new Date();
     request.adminComment = comment;
     await request.save();
-    
+
+    // Notify Admins (for list update)
+    if (req.io) {
+      req.io.to('role:Admin').emit('registration_request_updated', request);
+      req.io.to('role:Admin').emit('notification', {
+        message: `Registration request for ${request.name} approved`,
+        type: 'success'
+      });
+    }
+
     res.json({
       message: 'Registration request approved and user account created',
       user: {
@@ -167,24 +193,33 @@ const rejectRegistrationRequest = async (req, res) => {
   try {
     const { id } = req.params;
     const { comment } = req.body;
-    
+
     const request = await RegistrationRequest.findById(id);
-    
+
     if (!request) {
       return res.status(404).json({ message: 'Registration request not found' });
     }
-    
+
     if (request.status !== 'pending') {
       return res.status(400).json({ message: 'Request has already been processed' });
     }
-    
+
     // Update request status
     request.status = 'rejected';
     request.reviewedBy = req.user._id;
     request.reviewedAt = new Date();
     request.adminComment = comment || 'Request rejected by admin';
     await request.save();
-    
+
+    // Notify Admins
+    if (req.io) {
+      req.io.to('role:Admin').emit('registration_request_updated', request);
+      req.io.to('role:Admin').emit('notification', {
+        message: `Registration request for ${request.name} rejected`,
+        type: 'error'
+      });
+    }
+
     res.json({
       message: 'Registration request rejected',
       request
@@ -200,15 +235,15 @@ const rejectRegistrationRequest = async (req, res) => {
 const checkRequestStatus = async (req, res) => {
   try {
     const { email } = req.params;
-    
+
     const request = await RegistrationRequest.findOne({ email })
       .select('-password')
       .sort({ createdAt: -1 });
-    
+
     if (!request) {
       return res.status(404).json({ message: 'No registration request found for this email' });
     }
-    
+
     res.json({
       status: request.status,
       role: request.role,

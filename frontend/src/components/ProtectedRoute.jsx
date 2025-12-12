@@ -1,19 +1,18 @@
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser, selectAuthLoading } from '../store/slices/authSlice';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  const user = useSelector(selectCurrentUser);
+  // We can use the auth loading state or just rely on user presence if detailed loading isn't needed here
+  // const loading = useSelector(selectAuthLoading); 
 
   if (!user) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    return <Navigate to="/" />; // Or unauthorized page
+    return <Navigate to="/" replace />; // Or unauthorized page
   }
 
   return children;

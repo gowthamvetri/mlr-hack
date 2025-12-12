@@ -1,58 +1,53 @@
-import { useState, useEffect } from 'react';
-import { getNotifications, markNotificationRead, markAllNotificationsRead, deleteNotification } from '../utils/api';
-import { Bell, X, CheckCheck, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { 
+  useGetNotificationsQuery, 
+  useMarkNotificationReadMutation, 
+  useMarkAllNotificationsReadMutation, 
+  useDeleteNotificationMutation 
+} from '../services/api';
+import { Bell, X, CheckCheck, Trash2, Loader2 } from 'lucide-react';
 
 const NotificationPanel = () => {
-  const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(0);
+  
+  // RTK Query hooks - automatically handles caching, loading states, and refetching
+  const { 
+    data: notifications = [], 
+    isLoading, 
+    isError 
+  } = useGetNotificationsQuery(undefined, {
+    // Poll every minute for new notifications
+    pollingInterval: 60000,
+  });
+  
+  const [markRead] = useMarkNotificationReadMutation();
+  const [markAllRead] = useMarkAllNotificationsReadMutation();
+  const [deleteNotification] = useDeleteNotificationMutation();
 
-  useEffect(() => {
-    fetchNotifications();
-    // Poll every minute
-    const interval = setInterval(fetchNotifications, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const fetchNotifications = async () => {
-    try {
-      const { data } = await getNotifications();
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  const unreadCount = notifications.filter(n => !n.read).length;
 
   const handleMarkRead = async (id) => {
     try {
-      await markNotificationRead(id);
-      // Remove from list since backend now filters out read notifications
-      setNotifications(notifications.filter(n => n._id !== id));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      await markRead(id).unwrap();
     } catch (error) {
-      console.error(error);
+      console.error('Failed to mark notification as read:', error);
     }
   };
 
   const handleMarkAllRead = async () => {
     try {
-      await markAllNotificationsRead();
-      setNotifications([]);
-      setUnreadCount(0);
+      await markAllRead().unwrap();
     } catch (error) {
-      console.error(error);
+      console.error('Failed to mark all notifications as read:', error);
     }
   };
 
   const handleDelete = async (id, e) => {
-    e.stopPropagation(); // Prevent triggering parent handlers
+    e.stopPropagation();
     try {
-      await deleteNotification(id);
-      setNotifications(notifications.filter(n => n._id !== id));
-      setUnreadCount(prev => Math.max(0, prev - 1));
+      await deleteNotification(id).unwrap();
     } catch (error) {
-      console.error(error);
+      console.error('Failed to delete notification:', error);
     }
   };
 
@@ -94,7 +89,16 @@ const NotificationPanel = () => {
           
           {/* Notification List */}
           <div className="overflow-y-auto flex-1">
-            {notifications.length === 0 ? (
+            {isLoading ? (
+              <div className="p-8 text-center">
+                <Loader2 className="w-8 h-8 text-gray-400 mx-auto animate-spin" />
+                <p className="text-gray-500 text-sm mt-2">Loading notifications...</p>
+              </div>
+            ) : isError ? (
+              <div className="p-8 text-center">
+                <p className="text-red-500 text-sm">Failed to load notifications</p>
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-8 text-center">
                 <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
                 <p className="text-gray-500 text-sm">No new notifications</p>

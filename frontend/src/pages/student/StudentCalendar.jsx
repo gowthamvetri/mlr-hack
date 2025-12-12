@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getStudentExams, getEvents } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, MapPin, FileText, Users } from 'lucide-react';
 
 const StudentCalendar = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [exams, setExams] = useState([]);
   const [events, setEvents] = useState([]);
@@ -69,8 +70,8 @@ const StudentCalendar = () => {
     );
   };
 
-  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
-                      'July', 'August', 'September', 'October', 'November', 'December'];
+  const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December'];
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
   const selectedDateEvents = selectedDate ? getEventsForDate(selectedDate) : null;
@@ -97,19 +98,19 @@ const StudentCalendar = () => {
                 </h2>
               </div>
               <div className="flex items-center gap-2">
-                <button 
+                <button
                   onClick={prevMonth}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <button 
+                <button
                   onClick={() => setCurrentDate(new Date())}
                   className="px-3 py-1 text-sm font-medium text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
                 >
                   Today
                 </button>
-                <button 
+                <button
                   onClick={nextMonth}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
                 >
@@ -133,24 +134,22 @@ const StudentCalendar = () => {
               {Array.from({ length: startingDay }).map((_, idx) => (
                 <div key={`empty-${idx}`} className="p-3 min-h-[100px] border-b border-r border-gray-100 bg-gray-50" />
               ))}
-              
+
               {/* Days of the month */}
               {Array.from({ length: daysInMonth }).map((_, idx) => {
                 const day = idx + 1;
                 const { exams: dayExams, events: dayEvents } = getEventsForDate(day);
                 const hasContent = dayExams.length > 0 || dayEvents.length > 0;
-                
+
                 return (
-                  <div 
+                  <div
                     key={day}
                     onClick={() => hasContent && setSelectedDate(day)}
-                    className={`p-2 min-h-[100px] border-b border-r border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${
-                      selectedDate === day ? 'bg-primary-50' : ''
-                    }`}
+                    className={`p-2 min-h-[100px] border-b border-r border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${selectedDate === day ? 'bg-primary-50' : ''
+                      }`}
                   >
-                    <div className={`w-8 h-8 flex items-center justify-center rounded-full mb-1 ${
-                      isToday(day) ? 'bg-primary-600 text-white' : 'text-gray-700'
-                    }`}>
+                    <div className={`w-8 h-8 flex items-center justify-center rounded-full mb-1 ${isToday(day) ? 'bg-primary-600 text-white' : 'text-gray-700'
+                      }`}>
                       {day}
                     </div>
                     <div className="space-y-1">

@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getEvents, createEvent } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Calendar, Plus, X, Check, Clock, MapPin, Send, Filter, Search, CheckCircle, XCircle } from 'lucide-react';
 
+import { useSocket } from '../../context/SocketContext';
+
 const CoordinatorEvents = () => {
-  const { user } = useAuth();
+  const socket = useSocket();
+  const user = useSelector(selectCurrentUser);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -18,6 +22,18 @@ const CoordinatorEvents = () => {
   useEffect(() => {
     fetchEvents();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('event_status_updated', () => {
+      fetchEvents();
+    });
+
+    return () => {
+      socket.off('event_status_updated');
+    };
+  }, [socket]);
 
   const fetchEvents = async () => {
     try {
@@ -84,11 +100,10 @@ const CoordinatorEvents = () => {
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-            showForm 
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
-              : 'bg-primary-600 text-white hover:bg-primary-700'
-          }`}
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${showForm
+            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
         >
           {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {showForm ? 'Cancel' : 'Propose Event'}
@@ -154,7 +169,7 @@ const CoordinatorEvents = () => {
                 type="text"
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={newEvent.title}
-                onChange={(e) => setNewEvent({...newEvent, title: e.target.value})}
+                onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                 placeholder="Enter event title"
                 required
               />
@@ -164,7 +179,7 @@ const CoordinatorEvents = () => {
               <select
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
                 value={newEvent.category}
-                onChange={(e) => setNewEvent({...newEvent, category: e.target.value})}
+                onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
               >
                 <option>Technical</option>
                 <option>Cultural</option>
@@ -176,7 +191,7 @@ const CoordinatorEvents = () => {
               <textarea
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={newEvent.description}
-                onChange={(e) => setNewEvent({...newEvent, description: e.target.value})}
+                onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                 placeholder="Describe your event"
                 rows={3}
                 required
@@ -188,7 +203,7 @@ const CoordinatorEvents = () => {
                 type="date"
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={newEvent.date}
-                onChange={(e) => setNewEvent({...newEvent, date: e.target.value})}
+                onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                 required
               />
             </div>
@@ -199,7 +214,7 @@ const CoordinatorEvents = () => {
                   type="time"
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                   value={newEvent.startTime}
-                  onChange={(e) => setNewEvent({...newEvent, startTime: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
                   required
                 />
               </div>
@@ -209,7 +224,7 @@ const CoordinatorEvents = () => {
                   type="time"
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                   value={newEvent.endTime}
-                  onChange={(e) => setNewEvent({...newEvent, endTime: e.target.value})}
+                  onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
                   required
                 />
               </div>
@@ -220,7 +235,7 @@ const CoordinatorEvents = () => {
                 type="text"
                 className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={newEvent.venue}
-                onChange={(e) => setNewEvent({...newEvent, venue: e.target.value})}
+                onChange={(e) => setNewEvent({ ...newEvent, venue: e.target.value })}
                 placeholder="Event venue"
                 required
               />
@@ -271,11 +286,10 @@ const CoordinatorEvents = () => {
       {/* Events List */}
       <div className="space-y-4">
         {filteredEvents.map(event => (
-          <div key={event._id} className={`bg-white rounded-xl shadow-sm border overflow-hidden ${
-            event.status === 'Approved' ? 'border-green-200' :
+          <div key={event._id} className={`bg-white rounded-xl shadow-sm border overflow-hidden ${event.status === 'Approved' ? 'border-green-200' :
             event.status === 'Rejected' ? 'border-red-200' :
-            'border-yellow-200'
-          }`}>
+              'border-yellow-200'
+            }`}>
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
@@ -294,7 +308,7 @@ const CoordinatorEvents = () => {
                   {event.status}
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-6 text-sm text-gray-500">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />

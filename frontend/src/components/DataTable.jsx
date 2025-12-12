@@ -1,4 +1,6 @@
-const DataTable = ({ columns, data, emptyMessage = 'No data available' }) => {
+import { memo } from 'react';
+
+const DataTable = memo(({ columns, data, emptyMessage = 'No data available' }) => {
   return (
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -21,7 +23,7 @@ const DataTable = ({ columns, data, emptyMessage = 'No data available' }) => {
               </tr>
             ) : (
               data.map((row, rowIdx) => (
-                <tr key={rowIdx} className="hover:bg-gray-50 transition-colors">
+                <tr key={row._id || row.id || rowIdx} className="hover:bg-gray-50 transition-colors">
                   {columns.map((col, colIdx) => (
                     <td key={colIdx} className="px-6 py-4 text-sm text-gray-700">
                       {col.render ? col.render(row) : row[col.accessor]}
@@ -35,6 +37,8 @@ const DataTable = ({ columns, data, emptyMessage = 'No data available' }) => {
       </div>
     </div>
   );
-};
+});
+
+DataTable.displayName = 'DataTable';
 
 export default DataTable;

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getEvents, updateEventStatus } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Calendar, Check, X, Clock, Search, Filter, Users, MapPin, AlertTriangle } from 'lucide-react';
 
 const AdminEvents = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -202,7 +203,7 @@ const AdminEvents = () => {
                   {event.status}
                 </span>
               </div>
-              
+
               <div className="flex items-center gap-6 text-sm text-gray-500 mb-4">
                 <span className="flex items-center gap-1">
                   <Calendar className="w-4 h-4" />
@@ -225,7 +226,7 @@ const AdminEvents = () => {
                     {event.coordinator?.name || 'Unknown'} • {event.clubName}
                   </span>
                 </div>
-                
+
                 {event.status === 'Pending' && (
                   <div className="flex gap-2">
                     <button

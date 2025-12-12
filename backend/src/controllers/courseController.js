@@ -8,7 +8,7 @@ const getCourses = async (req, res) => {
   try {
     const { department, status, instructor } = req.query;
     const filter = {};
-    
+
     // Handle department filter - can be department code or ID
     if (department) {
       const dept = await Department.findOne({ code: department });
@@ -23,7 +23,7 @@ const getCourses = async (req, res) => {
       .populate('instructor', 'name email')
       .populate('department', 'name code')
       .populate('enrolledStudents', '_id name rollNumber');
-    
+
     // Transform data to include department code and instructor name
     const transformedCourses = courses.map(course => ({
       _id: course._id,
@@ -44,7 +44,7 @@ const getCourses = async (req, res) => {
       hasMaterials: course.materials?.length > 0,
       materialsCount: course.materials?.length || 0
     }));
-    
+
     res.json(transformedCourses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -71,7 +71,7 @@ const getCourseById = async (req, res) => {
 const createCourse = async (req, res) => {
   try {
     const { name, code, description, department, credits, instructor, instructorName, semester, year, status } = req.body;
-    
+
     const existingCourse = await Course.findOne({ code });
     if (existingCourse) {
       return res.status(400).json({ message: 'Course code already exists' });
@@ -119,6 +119,16 @@ const createCourse = async (req, res) => {
     const populatedCourse = await Course.findById(course._id)
       .populate('department', 'name code')
       .populate('instructor', 'name email');
+
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').to('role:Faculty').emit('course_created', populatedCourse);
+      req.io.to('role:Admin').emit('notification', {
+        title: 'New Course Created',
+        message: `${name} (${code}) has been created successfully.`,
+        type: 'success'
+      });
+    }
 
     res.status(201).json(populatedCourse);
   } catch (error) {
@@ -169,6 +179,12 @@ const updateCourse = async (req, res) => {
 
     Object.assign(course, otherFields);
     const updatedCourse = await course.save();
+
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').to('role:Faculty').emit('course_updated', updatedCourse);
+    }
+
     res.json(updatedCourse);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -183,6 +199,12 @@ const deleteCourse = async (req, res) => {
       return res.status(404).json({ message: 'Course not found' });
     }
     await course.deleteOne();
+
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').to('role:Faculty').emit('course_deleted', { _id: req.params.id });
+    }
+
     res.json({ message: 'Course deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -218,15 +240,15 @@ const getCourseStats = async (req, res) => {
     const totalCourses = await Course.countDocuments({});
     const activeCourses = await Course.countDocuments({ status: 'Active' });
     const completedCourses = await Course.countDocuments({ status: 'Completed' });
-    
+
     // Get total enrollments
     const courses = await Course.find({});
     const totalEnrollments = courses.reduce((acc, c) => acc + (c.totalEnrolled || c.enrolledStudents?.length || 0), 0);
-    
+
     // Calculate average rating
     const ratingsSum = courses.reduce((acc, c) => acc + (c.rating || 0), 0);
     const avgRating = totalCourses > 0 ? (ratingsSum / totalCourses).toFixed(1) : 0;
-    
+
     // Get top courses by enrollment
     const topCourses = await Course.find({})
       .sort({ totalEnrolled: -1 })
@@ -299,7 +321,7 @@ const uploadMaterial = async (req, res) => {
 const deleteMaterial = async (req, res) => {
   try {
     const { id, materialId } = req.params;
-    
+
     const course = await Course.findById(id);
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
@@ -326,7 +348,7 @@ const getCourseMaterials = async (req, res) => {
     const course = await Course.findById(req.params.id)
       .select('name code materials enrolledStudents instructor')
       .populate('materials.uploadedBy', 'name');
-    
+
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
@@ -336,7 +358,7 @@ const getCourseMaterials = async (req, res) => {
     const isEnrolled = course.enrolledStudents?.some(s => s.toString() === userId);
     const isInstructor = course.instructor?.toString() === userId;
     const isAdminOrStaff = ['Admin', 'Staff'].includes(req.user.role);
-    
+
     if (!isEnrolled && !isInstructor && !isAdminOrStaff) {
       return res.status(403).json({ message: 'You must be enrolled in this course to view materials' });
     }
@@ -356,11 +378,11 @@ const getCourseMaterials = async (req, res) => {
 const getMyEnrolledCourses = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+
     const courses = await Course.find({ enrolledStudents: userId })
       .populate('instructor', 'name email')
       .populate('department', 'name code');
-    
+
     const transformedCourses = courses.map(course => ({
       _id: course._id,
       name: course.name,
@@ -379,7 +401,7 @@ const getMyEnrolledCourses = async (req, res) => {
       hasMaterials: course.materials?.length > 0,
       materialsCount: course.materials?.length || 0
     }));
-    
+
     res.json(transformedCourses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -390,11 +412,11 @@ const getMyEnrolledCourses = async (req, res) => {
 const getMyTaughtCourses = async (req, res) => {
   try {
     const userId = req.user._id;
-    
+
     const courses = await Course.find({ instructor: userId })
       .populate('department', 'name code')
       .populate('enrolledStudents', 'name email rollNumber');
-    
+
     const transformedCourses = courses.map(course => ({
       _id: course._id,
       name: course.name,
@@ -412,7 +434,7 @@ const getMyTaughtCourses = async (req, res) => {
       materials: course.materials || [],
       materialsCount: course.materials?.length || 0
     }));
-    
+
     res.json(transformedCourses);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -431,7 +453,7 @@ const uploadMaterialAsTeacher = async (req, res) => {
     const userId = req.user._id.toString();
     const isInstructor = course.instructor?.toString() === userId;
     const isAdmin = req.user.role === 'Admin';
-    
+
     if (!isInstructor && !isAdmin) {
       return res.status(403).json({ message: 'Only the assigned instructor or admin can upload materials to this course' });
     }
@@ -469,11 +491,11 @@ const uploadMaterialAsTeacher = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getCourses, 
-  getCourseById, 
-  createCourse, 
-  updateCourse, 
+module.exports = {
+  getCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
   deleteCourse,
   enrollStudent,
   getCourseStats,

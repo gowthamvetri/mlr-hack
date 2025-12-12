@@ -18,9 +18,15 @@ const registrationRequestSchema = new mongoose.Schema({
   role: {
     type: String,
     required: true,
-    enum: ['SeatingManager', 'ClubCoordinator']
+    enum: ['SeatingManager', 'ClubCoordinator', 'Staff']
   },
   clubName: {
+    type: String
+  },
+  staffDepartment: {
+    type: String
+  },
+  staffDesignation: {
     type: String
   },
   status: {

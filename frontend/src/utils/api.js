@@ -135,6 +135,8 @@ export const getRecentActivities = (limit) => API.get(`/activities?limit=${limit
 export const createActivity = (data) => API.post('/activities', data);
 
 // Career Approval Requests
+export const submitRegistrationRequest = (data) => API.post('/registration-requests', data);
+export const registerUser = (data) => API.post('/users', data);
 export const submitCareerApproval = (data) => API.post('/career-approvals/submit', data);
 export const getMyApprovalRequests = () => API.get('/career-approvals/my-requests');
 export const getMyApprovalStatus = () => API.get('/career-approvals/my-status');

@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
-import { 
-  GraduationCap, Building2, Compass, ClipboardCheck, 
-  LineChart, Calendar, Users, Award, ArrowRight, 
+import {
+  GraduationCap, Building2, Compass, ClipboardCheck,
+  LineChart, Calendar, Users, Award, ArrowRight,
   CheckCircle, Play, Sparkles, BookOpen, Target,
   TrendingUp, Shield, Zap, Globe, ChevronRight, Star, Check, Briefcase
 } from 'lucide-react';
@@ -89,34 +89,32 @@ const Onboarding = () => {
       <section className="relative min-h-screen overflow-hidden">
         {/* Video Background */}
         <div className="absolute inset-0 w-full h-full">
-          <iframe 
-            width="100%" 
-            height="100%" 
-            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1" 
-            title="MLRIT Academic Portal Introduction" 
-            frameBorder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
+            title="MLRIT Academic Portal Introduction"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             referrerPolicy="strict-origin-when-cross-origin"
             className="w-full h-full object-cover scale-150"
             style={{ pointerEvents: 'none' }}
           />
         </div>
-        
+
         {/* Dark Overlay */}
         <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/50"></div>
-        
+
         {/* Header */}
         <header className="relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-20">
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-700 rounded-xl flex items-center justify-center shadow-lg">
-                  <GraduationCap className="w-7 h-7 text-white" />
-                </div>
-                <div>
-                  <span className="font-bold text-white text-xl">MLRIT</span>
-                  <span className="hidden sm:inline text-gray-300 ml-2">Academic Portal</span>
-                </div>
+                <img
+                  src="/mlrit-logo.png"
+                  alt="MLRIT Logo"
+                  className="h-12 w-auto object-contain"
+                />
               </div>
               <div className="flex items-center gap-4">
                 <button
@@ -145,28 +143,28 @@ const Onboarding = () => {
                 <Sparkles className="w-4 h-4 text-primary-400" />
                 Integrated Academic & Examination System
               </div>
-              
+
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                 Transform Your
                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-blue-400">
                   Academic Journey
                 </span>
               </h1>
-              
+
               <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-xl">
-                One unified platform for students, faculty, and administrators. 
+                One unified platform for students, faculty, and administrators.
                 Manage exams, track progress, and explore career paths.
               </p>
 
               <div className="flex flex-col sm:flex-row gap-4 mb-12">
-                <button 
+                <button
                   onClick={() => navigate('/register')}
                   className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-primary-500/30 transition-all transform hover:-translate-y-0.5"
                 >
                   Get Started Free
                   <ArrowRight className="w-5 h-5" />
                 </button>
-                <button 
+                <button
                   onClick={() => navigate('/placements')}
                   className="flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
                 >
@@ -220,7 +218,7 @@ const Onboarding = () => {
                 className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
               >
                 <div className="aspect-[4/3] overflow-hidden">
-                  <img 
+                  <img
                     src={dept.image || `https://images.unsplash.com/photo-1562774053-701939374585?w=400`}
                     alt={dept.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
@@ -255,24 +253,22 @@ const Onboarding = () => {
 
           <div className="grid md:grid-cols-3 gap-8">
             {portalTypes.map((portal, index) => (
-              <div 
+              <div
                 key={index}
-                className={`relative rounded-2xl p-8 transition-all duration-300 hover:shadow-2xl ${
-                  portal.primary 
-                    ? 'bg-gradient-to-br from-primary-600 to-primary-800 text-white' 
-                    : 'bg-white border border-gray-200 hover:border-primary-200'
-                }`}
+                className={`relative rounded-2xl p-8 transition-all duration-300 hover:shadow-2xl ${portal.primary
+                  ? 'bg-gradient-to-br from-primary-600 to-primary-800 text-white'
+                  : 'bg-white border border-gray-200 hover:border-primary-200'
+                  }`}
               >
                 {portal.primary && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
                     POPULAR
                   </div>
                 )}
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${
-                  portal.primary 
-                    ? 'bg-white/20' 
-                    : 'bg-primary-50'
-                }`}>
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary
+                  ? 'bg-white/20'
+                  : 'bg-primary-50'
+                  }`}>
                   <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
                 </div>
                 <h3 className={`text-xl font-bold mb-2 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>
@@ -284,9 +280,8 @@ const Onboarding = () => {
                 <ul className="space-y-3 mb-8">
                   {portal.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-3">
-                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${
-                        portal.primary ? 'text-green-300' : 'text-green-500'
-                      }`} />
+                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${portal.primary ? 'text-green-300' : 'text-green-500'
+                        }`} />
                       <span className={`text-sm ${portal.primary ? 'text-primary-100' : 'text-gray-600'}`}>
                         {feature}
                       </span>
@@ -295,11 +290,10 @@ const Onboarding = () => {
                 </ul>
                 <button
                   onClick={portal.action}
-                  className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${
-                    portal.primary 
-                      ? 'bg-white text-primary-600 hover:bg-gray-100' 
-                      : 'bg-primary-600 text-white hover:bg-primary-700'
-                  }`}
+                  className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${portal.primary
+                    ? 'bg-white text-primary-600 hover:bg-gray-100'
+                    : 'bg-primary-600 text-white hover:bg-primary-700'
+                    }`}
                 >
                   {portal.cta}
                   <ChevronRight className="w-4 h-4" />
@@ -321,14 +315,14 @@ const Onboarding = () => {
             Join thousands of students and educators already using MLRIT Academic Portal
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button 
+            <button
               onClick={() => navigate('/register')}
               className="px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:bg-gray-100 transition-all flex items-center justify-center gap-2 shadow-lg"
             >
               Start Free Today
               <ArrowRight className="w-5 h-5" />
             </button>
-            <button 
+            <button
               onClick={() => navigate('/login')}
               className="px-8 py-4 border-2 border-white/30 text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
             >
@@ -344,13 +338,11 @@ const Onboarding = () => {
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
             <div className="sm:col-span-2">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <span className="font-bold text-white text-lg">MLRIT</span>
-                  <span className="text-gray-400 ml-1 hidden sm:inline">Academic Portal</span>
-                </div>
+                <img
+                  src="/mlrit-logo.png"
+                  alt="MLRIT Logo"
+                  className="h-10 w-auto object-contain"
+                />
               </div>
               <p className="text-gray-400 max-w-md text-sm sm:text-base">
                 Integrated Academic and Examination Management System for modern educational institutions.
@@ -385,7 +377,7 @@ const Onboarding = () => {
       </footer>
 
       {/* ChatBot Component */}
-      <ChatBot 
+      <ChatBot
         apiEndpoint="http://localhost:8000/api/v1/chat/"
         title="MLRIT Assistant"
         subtitle="Ask me anything about academics!"

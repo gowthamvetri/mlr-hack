@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useLoginMutation } from '../services/api';
+import { useAppDispatch } from '../store';
+import { setCredentials } from '../store/slices/authSlice';
 import { Lock, Mail, GraduationCap, ArrowRight, Shield, Users, Building, AlertCircle } from 'lucide-react';
 
 const Login = () => {
@@ -8,22 +10,33 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  /* REMOVED DUPLICATE STATE DECLARATIONS */
+  // loading state is now handled by RTK mutation hook
+  const [loginMutation, { isLoading }] = useLoginMutation();
+  const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    // setLoading(true); // Handled by isLoading from hook if we used it, but for now we kept local state compatible
+    // Actually, let's use the local state to match the existing return JSX that uses 'loading'
     setLoading(true);
+
     try {
-      const user = await login(email, password);
-      if (user.role === 'Student') navigate('/student');
-      else if (user.role === 'Admin') navigate('/admin');
-      else if (user.role === 'SeatingManager') navigate('/seating-manager');
-      else if (user.role === 'ClubCoordinator') navigate('/club-coordinator');
-      else if (user.role === 'Staff') navigate('/staff');
+      // RTK Query mutation expects one argument usually. Assuming it takes { email, password }
+      const userData = await loginMutation({ email, password }).unwrap();
+      dispatch(setCredentials({ ...userData, email })); // adjust based on response structure
+
+      const role = userData.role || userData.user?.role;
+      if (role === 'Student') navigate('/student');
+      else if (role === 'Admin') navigate('/admin');
+      else if (role === 'SeatingManager') navigate('/seating-manager');
+      else if (role === 'ClubCoordinator') navigate('/club-coordinator');
+      else if (role === 'Staff') navigate('/staff');
     } catch (err) {
-      setError(err);
+      console.error('Login error:', err);
+      setError(err.data?.message || err.message || 'Login failed');
     } finally {
       setLoading(false);
     }
@@ -49,13 +62,11 @@ const Login = () => {
         <div className="hidden lg:block space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200">
-                <GraduationCap className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">MLRIT Portal</h1>
-                <p className="text-gray-500">Academic Management System</p>
-              </div>
+              <img
+                src="/mlrit-logo.png"
+                alt="MLRIT Logo"
+                className="h-14 w-auto object-contain"
+              />
             </div>
           </div>
 

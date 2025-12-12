@@ -9,7 +9,7 @@ const getPlacements = async (req, res) => {
   try {
     const { status, department, type } = req.query;
     const filter = {};
-    
+
     if (status) filter.status = status;
     if (department) filter.departmentName = department;
     if (type) filter.type = type;
@@ -81,6 +81,16 @@ const createPlacement = async (req, res) => {
       .populate('department', 'name code')
       .populate('selectedStudents', 'name email');
 
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').emit('placement_created', populatedPlacement);
+      req.io.to('role:Student').emit('notification', {
+        title: 'New Placement Drive',
+        message: `${placement.company} is hiring for ${placement.position}`,
+        type: 'info'
+      });
+    }
+
     res.status(201).json(populatedPlacement);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -121,10 +131,15 @@ const updatePlacement = async (req, res) => {
 
     Object.assign(placement, updateData);
     const updatedPlacement = await placement.save();
-    
+
     const populatedPlacement = await Placement.findById(updatedPlacement._id)
       .populate('department', 'name code')
       .populate('selectedStudents', 'name email');
+
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').emit('placement_updated', populatedPlacement);
+    }
 
     res.json(populatedPlacement);
   } catch (error) {
@@ -140,6 +155,12 @@ const deletePlacement = async (req, res) => {
       return res.status(404).json({ message: 'Placement not found' });
     }
     await placement.deleteOne();
+
+    // Notify relevant users
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Student').emit('placement_deleted', { _id: req.params.id });
+    }
+
     res.json({ message: 'Placement deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -176,16 +197,16 @@ const getPlacementStats = async (req, res) => {
     const ongoingDrives = await Placement.countDocuments({ status: 'Ongoing' });
     const upcomingDrives = await Placement.countDocuments({ status: 'Upcoming' });
     const completedDrives = await Placement.countDocuments({ status: 'Completed' });
-    
+
     // Get all placements to calculate stats
     const allPlacements = await Placement.find({});
-    
+
     // Calculate package stats
     let highestPackage = 0;
     let totalPackage = 0;
     let packageCount = 0;
     let totalPlaced = 0;
-    
+
     allPlacements.forEach(p => {
       if (p.package) {
         highestPackage = Math.max(highestPackage, p.package);
@@ -194,13 +215,13 @@ const getPlacementStats = async (req, res) => {
       }
       totalPlaced += p.totalSelected || 0;
     });
-    
+
     let averagePackage = packageCount > 0 ? (totalPackage / packageCount).toFixed(1) : 0;
-    
+
     // Calculate placement rate
     const totalStudents = await User.countDocuments({ role: 'Student' });
     const placementRate = totalStudents > 0 ? Math.min(Math.round((totalPlaced / totalStudents) * 100), 100) : 0;
-    
+
     // Top recruiters with formatted data
     const topRecruiters = allPlacements
       .filter(p => p.company && p.totalSelected > 0)
@@ -232,7 +253,7 @@ const getPlacementStats = async (req, res) => {
 const addSelectedStudents = async (req, res) => {
   try {
     const { studentIds } = req.body;
-    
+
     if (!studentIds || !Array.isArray(studentIds)) {
       return res.status(400).json({ message: 'Please provide an array of student IDs' });
     }
@@ -250,15 +271,15 @@ const addSelectedStudents = async (req, res) => {
     // Update student records - mark them as placed
     await User.updateMany(
       { _id: { $in: studentIds }, role: 'Student' },
-      { 
-        $set: { 
-          isPlaced: true, 
+      {
+        $set: {
+          isPlaced: true,
           placedAt: placement._id,
           placementCompany: placement.company,
           placementPackage: placement.package,
           placementPosition: placement.position,
           placementDate: new Date()
-        } 
+        }
       }
     );
 
@@ -273,9 +294,9 @@ const addSelectedStudents = async (req, res) => {
     const populatedPlacement = await Placement.findById(placement._id)
       .populate('selectedStudents', 'name email rollNumber department');
 
-    res.json({ 
+    res.json({
       message: 'Students added successfully',
-      placement: populatedPlacement 
+      placement: populatedPlacement
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -287,7 +308,7 @@ const getEligibleStudents = async (req, res) => {
   try {
     const { department, year, onlyUnplaced } = req.query;
     const filter = { role: 'Student' };
-    
+
     if (department) filter.department = department;
     if (year) filter.year = year;
     if (onlyUnplaced === 'true') filter.isPlaced = false;
@@ -302,11 +323,11 @@ const getEligibleStudents = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getPlacements, 
-  getPlacementById, 
-  createPlacement, 
-  updatePlacement, 
+module.exports = {
+  getPlacements,
+  getPlacementById,
+  createPlacement,
+  updatePlacement,
   deletePlacement,
   applyForPlacement,
   getPlacementStats,

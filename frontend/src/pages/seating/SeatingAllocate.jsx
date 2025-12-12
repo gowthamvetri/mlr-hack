@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getExams, allocateSeating } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Grid, Plus, X, Play, Download, CheckCircle, Clock, Users, Building } from 'lucide-react';
 
+import { useSocket } from '../../context/SocketContext';
+
 const SeatingAllocate = () => {
-  const { user } = useAuth();
+  const socket = useSocket();
+  const user = useSelector(selectCurrentUser);
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState('');
   const [rooms, setRooms] = useState([{ roomNumber: '101', capacity: 30, floor: '1' }]);
@@ -14,6 +18,18 @@ const SeatingAllocate = () => {
   useEffect(() => {
     fetchExams();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('seating_allocated', () => {
+      fetchExams();
+    });
+
+    return () => {
+      socket.off('seating_allocated');
+    };
+  }, [socket]);
 
   const fetchExams = async () => {
     try {
@@ -43,7 +59,7 @@ const SeatingAllocate = () => {
   const handleAllocate = async () => {
     if (!selectedExam) return alert('Please select an exam');
     if (rooms.some(r => !r.roomNumber)) return alert('Please fill all room numbers');
-    
+
     setAllocating(true);
     try {
       await allocateSeating({ examId: selectedExam, rooms });
@@ -59,7 +75,7 @@ const SeatingAllocate = () => {
   const handleExport = () => {
     if (!selectedExam) return alert('Select an exam to export');
     const exam = exams.find(e => e._id === selectedExam);
-    
+
     // Generate mock seating data for export
     const headers = ['Room', 'Seat Number', 'Roll Number', 'Student Name'];
     const rows = [
@@ -67,7 +83,7 @@ const SeatingAllocate = () => {
       ['101', 'A-2', '21CS002', 'Student 2'],
       ['102', 'B-1', '21CS003', 'Student 3'],
     ];
-    
+
     const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
@@ -293,11 +309,10 @@ const SeatingAllocate = () => {
                 <button
                   key={exam._id}
                   onClick={() => setSelectedExam(exam._id)}
-                  className={`w-full text-left p-4 rounded-xl border transition-colors ${
-                    selectedExam === exam._id 
-                      ? 'bg-purple-50 border-purple-200' 
-                      : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
-                  }`}
+                  className={`w-full text-left p-4 rounded-xl border transition-colors ${selectedExam === exam._id
+                    ? 'bg-purple-50 border-purple-200'
+                    : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
+                    }`}
                 >
                   <p className="font-medium text-gray-800">{exam.courseName}</p>
                   <p className="text-sm text-gray-500">{exam.courseCode}</p>

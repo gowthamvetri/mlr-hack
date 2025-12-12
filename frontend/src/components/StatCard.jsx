@@ -8,23 +8,22 @@ const StatCard = ({ icon: Icon, label, value, subtitle, color = 'primary', trend
   };
 
   return (
-    <div className="bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow">
-      <div className="flex items-start justify-between">
-        <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${colorClasses[color]}`}>
-          <Icon className="w-5 sm:w-6 h-5 sm:h-6" />
+    <div className="bg-white rounded-2xl p-6 shadow-[0_2px_10px_-4px_rgba(6,81,237,0.1)] hover-card border border-gray-100">
+      <div className="flex items-start justify-between mb-4">
+        <div className={`p-3 rounded-xl ${colorClasses[color]} ring-4 ring-opacity-20 ${color === 'primary' ? 'ring-primary-100' : 'ring-gray-100'}`}>
+          <Icon className="w-6 h-6" />
         </div>
         {trend && (
-          <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-            trend > 0 ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'
-          }`}>
-            {trend > 0 ? '+' : ''}{trend}%
+          <span className={`text-xs font-semibold px-2.5 py-1 rounded-full flex items-center gap-1 ${trend > 0 ? 'bg-green-50 text-green-700 ring-1 ring-green-100' : 'bg-red-50 text-red-700 ring-1 ring-red-100'
+            }`}>
+            {trend > 0 ? '↑' : '↓'} {Math.abs(trend)}%
           </span>
         )}
       </div>
-      <div className="mt-3 sm:mt-4">
-        <h3 className="text-2xl sm:text-3xl font-bold text-gray-800">{value}</h3>
-        <p className="text-gray-500 text-xs sm:text-sm mt-1">{label}</p>
-        {subtitle && <p className="text-gray-400 text-xs mt-0.5">{subtitle}</p>}
+      <div>
+        <h3 className="text-3xl font-bold text-gray-900 tracking-tight">{value}</h3>
+        <p className="text-gray-500 text-sm font-medium mt-1">{label}</p>
+        {subtitle && <p className="text-gray-400 text-xs mt-1">{subtitle}</p>}
       </div>
     </div>
   );

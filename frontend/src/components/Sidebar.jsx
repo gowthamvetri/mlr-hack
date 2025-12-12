@@ -1,10 +1,10 @@
 import { NavLink } from 'react-router-dom';
-import { 
-  LayoutDashboard, 
-  Calendar, 
-  Users, 
-  ClipboardList, 
-  Bell, 
+import {
+  LayoutDashboard,
+  Calendar,
+  Users,
+  ClipboardList,
+  Bell,
   Settings,
   GraduationCap,
   Building,
@@ -20,10 +20,17 @@ import {
   UserPlus,
   X
 } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser, logout } from '../store/slices/authSlice';
 
 const Sidebar = ({ isOpen, onClose }) => {
-  const { user, logout } = useAuth();
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    if (onClose) onClose();
+  };
 
   const getNavItems = () => {
     switch (user?.role) {
@@ -41,10 +48,9 @@ const Sidebar = ({ isOpen, onClose }) => {
         return [
           { to: '/admin', icon: LayoutDashboard, label: 'Overview' },
           { to: '/admin/students', icon: Users, label: 'Students' },
-          { to: '/admin/faculty', icon: School, label: 'Faculty' },
+          { to: '/admin/staff', icon: School, label: 'Staff' },
           { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
           { to: '/admin/courses', icon: BookOpen, label: 'Courses' },
-          { to: '/admin/career-approvals', icon: ClipboardCheck, label: 'Career Approvals' },
           { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
           { to: '/admin/placement-page', icon: Building, label: 'Placement Page' },
@@ -72,6 +78,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/staff/fees', icon: ClipboardCheck, label: 'Fee Management' },
           { to: '/staff/career-approvals', icon: Target, label: 'Career Approvals' },
           { to: '/staff/eligibility', icon: ClipboardList, label: 'Eligibility Check' },
+          { to: '/staff/profile', icon: UserCircle, label: 'My Profile' },
         ];
       default:
         return [];
@@ -87,33 +94,31 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside className={`
-      fixed left-0 top-0 h-screen w-64 bg-white shadow-lg z-50 flex flex-col
+      fixed left-0 top-0 h-screen w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 shadow-xl shadow-gray-200/50 z-50 flex flex-col
       transform transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       lg:translate-x-0
     `}>
       {/* Logo */}
-      <div className="p-4 sm:p-6 border-b flex items-center justify-between">
+      <div className="p-6 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-            <GraduationCap className="text-white w-5 h-5 sm:w-6 sm:h-6" />
-          </div>
-          <div>
-            <h1 className="font-bold text-gray-800 text-sm sm:text-base">MLRIT</h1>
-            <p className="text-xs text-gray-500">Academic Portal</p>
-          </div>
+          <img
+            src="/mlrit-logo.png"
+            alt="MLRIT Logo"
+            className="h-10 w-auto object-contain"
+          />
         </div>
         {/* Close button - Only on mobile */}
-        <button 
+        <button
           onClick={onClose}
-          className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
+          className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
         >
           <X className="w-5 h-5 text-gray-500" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 sm:p-4 space-y-1 sm:space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -121,39 +126,33 @@ const Sidebar = ({ isOpen, onClose }) => {
             end
             onClick={handleNavClick}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl transition-all text-sm sm:text-base ${
-                isActive
-                  ? 'bg-primary-600 text-white shadow-lg shadow-primary-200'
-                  : 'text-gray-600 hover:bg-gray-100'
+              `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
+                ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm ring-1 ring-primary-100'
+                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`
             }
           >
-            <item.icon className="w-5 h-5" />
-            <span className="font-medium">{item.label}</span>
+            {({ isActive }) => (
+              <>
+                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                <span>{item.label}</span>
+                {isActive && (
+                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-600 shadow-sm" />
+                )}
+              </>
+            )}
           </NavLink>
         ))}
       </nav>
 
       {/* User Section */}
-      <div className="p-3 sm:p-4 border-t">
-        <div className="flex items-center gap-3 mb-3 sm:mb-4">
-          <div className="w-9 h-9 sm:w-10 sm:h-10 bg-primary-100 rounded-full flex items-center justify-center">
-            <UserCircle className="text-primary-600 w-5 h-5 sm:w-6 sm:h-6" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="font-medium text-gray-800 truncate text-sm">{user?.name}</p>
-            <p className="text-xs text-gray-500">{user?.role}</p>
-          </div>
-        </div>
+      <div className="p-4 border-t border-gray-100 bg-gray-50/50">
         <button
-          onClick={() => {
-            logout();
-            if (onClose) onClose();
-          }}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-red-50 hover:text-red-600 rounded-xl text-gray-600 transition-all text-sm"
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-red-50 hover:text-red-600 rounded-xl text-gray-600 shadow-sm border border-gray-200/50 transition-all duration-200 group"
         >
-          <LogOut size={18} />
-          <span>Logout</span>
+          <LogOut size={18} className="group-hover:scale-110 transition-transform" />
+          <span className="font-medium text-sm">Sign Out</span>
         </button>
       </div>
     </aside>

@@ -1,18 +1,20 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
-import { 
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../store/slices/authSlice';
+import {
   getEvents, updateEventStatus, getExams, getAdminStats, getUsers,
   getDepartments, getCourseStats, getFacultyStats, getPlacementStats, getRecentActivities
 } from '../utils/api';
 import DashboardLayout from '../components/DashboardLayout';
-import { 
-  Users, FileText, Calendar, Clock, Check, X, AlertTriangle, 
+import {
+  Users, FileText, Calendar, Clock, Check, X, AlertTriangle,
   GraduationCap, Building, TrendingUp, BookOpen, Award,
   UserPlus, CheckCircle, AlertCircle, UserCheck
 } from 'lucide-react';
 
 const AdminDashboard = () => {
-  const { user } = useAuth();
+  /* REMOVED: const { user } = useAuth(); */
+  const user = useSelector(selectCurrentUser);
   const [stats, setStats] = useState(null);
   const [pendingEvents, setPendingEvents] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +32,7 @@ const AdminDashboard = () => {
 
   // Activity icon mapping
   const getActivityIcon = (type) => {
-    switch(type) {
+    switch (type) {
       case 'enrollment': return { icon: UserPlus, color: 'blue' };
       case 'course': return { icon: CheckCircle, color: 'green' };
       case 'system': return { icon: AlertCircle, color: 'yellow' };
@@ -46,7 +48,7 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch core admin stats and events
       const [statsRes, eventsRes] = await Promise.all([
         getAdminStats(),
@@ -260,7 +262,7 @@ const AdminDashboard = () => {
                 <div className={`w-2 h-2 rounded-full ${index === 0 ? 'bg-primary-600' : 'bg-gray-300'}`} />
                 <span className="flex-1 font-medium text-gray-700">{dept.name}</span>
                 <div className="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
+                  <div
                     className={`h-full rounded-full ${index === 0 ? 'bg-primary-600' : 'bg-primary-400'}`}
                     style={{ width: `${dept.percentage}%` }}
                   />
@@ -292,10 +294,9 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full rounded-full transition-all duration-500 ${
-                      metric.color === 'green' ? 'bg-green-500' : 'bg-primary-600'
-                    }`}
+                  <div
+                    className={`h-full rounded-full transition-all duration-500 ${metric.color === 'green' ? 'bg-green-500' : 'bg-primary-600'
+                      }`}
                     style={{ width: `${metric.value}%` }}
                   />
                 </div>
@@ -318,18 +319,16 @@ const AdminDashboard = () => {
               const IconComponent = activity.icon;
               return (
                 <div key={index} className="flex items-start gap-4 p-4 hover:bg-gray-50 rounded-xl transition-colors">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    activity.color === 'blue' ? 'bg-blue-100' :
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${activity.color === 'blue' ? 'bg-blue-100' :
                     activity.color === 'green' ? 'bg-green-100' :
-                    activity.color === 'yellow' ? 'bg-yellow-100' :
-                    'bg-purple-100'
-                  }`}>
-                    <IconComponent className={`w-5 h-5 ${
-                      activity.color === 'blue' ? 'text-blue-600' :
+                      activity.color === 'yellow' ? 'bg-yellow-100' :
+                        'bg-purple-100'
+                    }`}>
+                    <IconComponent className={`w-5 h-5 ${activity.color === 'blue' ? 'text-blue-600' :
                       activity.color === 'green' ? 'text-green-600' :
-                      activity.color === 'yellow' ? 'text-yellow-600' :
-                      'text-purple-600'
-                    }`} />
+                        activity.color === 'yellow' ? 'text-yellow-600' :
+                          'text-purple-600'
+                      }`} />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-semibold text-gray-800">{activity.title}</p>
@@ -372,15 +371,15 @@ const AdminDashboard = () => {
                 </div>
                 <p className="text-xs text-gray-600 mb-3 line-clamp-2">{event.description}</p>
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => handleApproveEvent(event._id)} 
+                  <button
+                    onClick={() => handleApproveEvent(event._id)}
                     className="flex-1 flex items-center justify-center gap-1 bg-green-500 hover:bg-green-600 text-white px-2 py-1.5 rounded-lg text-xs font-medium transition-colors"
                   >
                     <Check className="w-3 h-3" />
                     Approve
                   </button>
-                  <button 
-                    onClick={() => handleRejectEvent(event._id)} 
+                  <button
+                    onClick={() => handleRejectEvent(event._id)}
                     className="flex-1 flex items-center justify-center gap-1 bg-red-500 hover:bg-red-600 text-white px-2 py-1.5 rounded-lg text-xs font-medium transition-colors"
                   >
                     <X className="w-3 h-3" />

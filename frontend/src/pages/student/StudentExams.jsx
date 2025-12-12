@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getStudentExams, getHallTicket, getSemesterHallTicket } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
+import Modal from '../../components/Modal';
 import { FileText, Download, Calendar, Clock, MapPin, CheckCircle, AlertCircle, XCircle, AlertTriangle, List } from 'lucide-react';
 
+import { useSocket } from '../../context/SocketContext';
+
 const StudentExams = () => {
-  const { user } = useAuth();
+  const socket = useSocket();
+  const user = useSelector(selectCurrentUser);
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedExam, setSelectedExam] = useState(null);
@@ -17,6 +22,23 @@ const StudentExams = () => {
   useEffect(() => {
     fetchExams();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('exam_schedule_released', () => {
+      fetchExams();
+    });
+
+    socket.on('hall_tickets_generated', () => {
+      fetchExams();
+    });
+
+    return () => {
+      socket.off('exam_schedule_released');
+      socket.off('hall_tickets_generated');
+    };
+  }, [socket]);
 
   const fetchExams = async () => {
     try {
@@ -33,7 +55,7 @@ const StudentExams = () => {
     try {
       setEligibilityError(null);
       const { data } = await getHallTicket(examId);
-      
+
       if (!data.eligible && data.issues) {
         setEligibilityError({
           issues: data.issues,
@@ -42,7 +64,7 @@ const StudentExams = () => {
         });
         return;
       }
-      
+
       setHallTicket(data);
       setSelectedExam(examId);
     } catch (error) {
@@ -120,14 +142,14 @@ const StudentExams = () => {
 
   return (
     <DashboardLayout role="student" userName={user?.name}>
-      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">My Exams</h1>
-          <p className="text-sm sm:text-base text-gray-500">View your exam schedule and download hall tickets</p>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Exams</h1>
+          <p className="text-gray-500 mt-1 text-lg">View your exam schedule and download hall tickets</p>
         </div>
         <button
           onClick={handleViewSemesterHallTicket}
-          className="flex items-center gap-2 px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors"
+          className="flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-semibold transition-all shadow-lg shadow-gray-200 hover:shadow-xl active:scale-95"
         >
           <List className="w-5 h-5" />
           Semester Hall Ticket
@@ -136,17 +158,18 @@ const StudentExams = () => {
 
       {/* Eligibility Warning */}
       {eligibilityError && (
-        <div className="mb-6 bg-red-50 border border-red-200 rounded-xl p-4">
-          <div className="flex items-start gap-3">
-            <div className="p-2 bg-red-100 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-red-600" />
+        <div className="mb-8 bg-red-50 border border-red-200 rounded-2xl p-6 animate-slide-in-up shadow-sm">
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-red-100 rounded-xl flex-shrink-0">
+              <AlertTriangle className="w-6 h-6 text-red-600" />
             </div>
             <div>
-              <h3 className="font-semibold text-red-800">Not Eligible for Hall Ticket</h3>
-              <ul className="mt-2 space-y-1">
+              <h3 className="text-lg font-bold text-red-900">Not Eligible for Hall Ticket</h3>
+              <p className="text-red-700 mt-1">Please address the following issues to generate your hall ticket:</p>
+              <ul className="mt-4 space-y-3">
                 {eligibilityError.issues?.map((issue, i) => (
-                  <li key={i} className="text-sm text-red-700 flex items-center gap-2">
-                    <XCircle className="w-4 h-4" />
+                  <li key={i} className="text-sm font-medium text-red-800 flex items-center gap-2 bg-white/50 px-3 py-2 rounded-lg border border-red-100">
+                    <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
                     {issue}
                   </li>
                 ))}
@@ -166,65 +189,69 @@ const StudentExams = () => {
       )}
 
       {/* Upcoming Exams */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 mb-6">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-              <Calendar className="w-5 h-5 text-primary-600" />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 animate-fade-in hover-card">
+        <div className="p-8 border-b border-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center">
+              <Calendar className="w-6 h-6 text-primary-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Upcoming Exams</h2>
-              <p className="text-sm text-gray-500">{upcomingExams.length} exams scheduled</p>
+              <h2 className="text-xl font-bold text-gray-900">Upcoming Exams</h2>
+              <p className="text-gray-500 mt-1">{upcomingExams.length} exams scheduled</p>
             </div>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-8">
           {loading ? (
-            <div className="text-center py-8 text-gray-500">Loading exams...</div>
+            <div className="text-center py-12 text-gray-500 flex flex-col items-center">
+              <div className="w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-4"></div>
+              <p>Loading exams...</p>
+            </div>
           ) : upcomingExams.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">
-              <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p>No upcoming exams</p>
+            <div className="text-center py-16 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+              <Calendar className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+              <p className="font-semibold text-gray-900 text-lg">No upcoming exams</p>
+              <p className="text-gray-500">You're all caught up for now!</p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-4">
               {upcomingExams.map(exam => (
-                <div key={exam._id} className="p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                  <div className="flex items-start justify-between">
+                <div key={exam._id} className="p-6 bg-white border border-gray-100 rounded-2xl hover:border-primary-200 hover:shadow-md transition-all group">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-semibold text-lg text-gray-800">{exam.courseName}</h3>
-                        <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">{exam.courseName}</h3>
+                        <span className="px-2.5 py-0.5 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold border border-primary-100">
                           {exam.courseCode}
                         </span>
                       </div>
-                      <div className="flex items-center gap-6 text-sm text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Calendar className="w-4 h-4" />
-                          {new Date(exam.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
+                          <Calendar className="w-4 h-4 text-gray-400" />
+                          {new Date(exam.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
+                          <Clock className="w-4 h-4 text-gray-400" />
                           {exam.startTime} - {exam.endTime}
                         </span>
-                        <span className="flex items-center gap-1">
-                          <MapPin className="w-4 h-4" />
+                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
+                          <MapPin className="w-4 h-4 text-gray-400" />
                           {exam.venue || 'TBA'}
                         </span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3 w-full md:w-auto">
                       {exam.hallTicketsGenerated ? (
                         <button
                           onClick={() => handleViewHallTicket(exam._id)}
-                          className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg text-sm font-medium transition-colors"
+                          className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-green-600 hover:bg-green-700 text-white rounded-xl text-sm font-semibold transition-all shadow-lg shadow-green-200"
                         >
                           <FileText className="w-4 h-4" />
                           View Hall Ticket
                         </button>
                       ) : (
-                        <span className="flex items-center gap-1 px-3 py-2 bg-yellow-100 text-yellow-700 rounded-lg text-sm">
-                          <AlertCircle className="w-4 h-4" />
+                        <span className="flex-1 md:flex-none flex items-center justify-center gap-2 px-5 py-2.5 bg-amber-50 text-amber-700 rounded-xl text-sm font-semibold border border-amber-100">
+                          <Clock className="w-4 h-4" />
                           Hall Ticket Pending
                         </span>
                       )}
@@ -238,30 +265,34 @@ const StudentExams = () => {
       </div>
 
       {/* Past Exams */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center">
-              <CheckCircle className="w-5 h-5 text-gray-600" />
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 animate-fade-in hover-card">
+        <div className="p-8 border-b border-gray-100">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">
+              <CheckCircle className="w-6 h-6 text-gray-600" />
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-gray-800">Past Exams</h2>
-              <p className="text-sm text-gray-500">{pastExams.length} completed</p>
+              <h2 className="text-xl font-bold text-gray-900">Past Exams</h2>
+              <p className="text-gray-500 mt-1">{pastExams.length} completed</p>
             </div>
           </div>
         </div>
-        <div className="p-6">
+        <div className="p-8">
           {pastExams.length === 0 ? (
-            <div className="text-center py-8 text-gray-500">No past exams</div>
+            <div className="text-center py-12 text-gray-500">No past exams</div>
           ) : (
             <div className="space-y-3">
               {pastExams.map(exam => (
-                <div key={exam._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                <div key={exam._id} className="flex items-center justify-between p-5 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
                   <div>
-                    <p className="font-medium text-gray-800">{exam.courseName} ({exam.courseCode})</p>
-                    <p className="text-sm text-gray-500">{new Date(exam.date).toLocaleDateString()}</p>
+                    <p className="font-bold text-gray-900 text-lg mb-1">{exam.courseName} <span className="text-gray-400 font-normal text-sm ml-2">{exam.courseCode}</span></p>
+                    <p className="text-sm font-medium text-gray-500 flex items-center gap-2">
+                      <Calendar className="w-3.5 h-3.5" />
+                      {new Date(exam.date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </p>
                   </div>
-                  <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  <span className="px-4 py-1.5 bg-green-100 text-green-700 rounded-lg text-sm font-bold flex items-center gap-1.5">
+                    <CheckCircle className="w-3.5 h-3.5" />
                     Completed
                   </span>
                 </div>
@@ -272,192 +303,224 @@ const StudentExams = () => {
       </div>
 
       {/* Hall Ticket Modal */}
-      {hallTicket && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-lg w-full mx-4">
-            <div className="p-6 border-b border-gray-100 bg-primary-600 rounded-t-2xl">
-              <h2 className="text-xl font-bold text-white">Hall Ticket</h2>
-              <p className="text-primary-100 text-sm">MLRIT Academic Portal</p>
+      <Modal
+        isOpen={!!hallTicket}
+        onClose={() => { setHallTicket(null); setSelectedExam(null); }}
+        title="Hall Ticket"
+        size="md"
+      >
+        {hallTicket && (
+          <div className="space-y-6">
+            <div className="text-center bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-gray-100">{hallTicket.exam?.courseName}</h3>
+              <p className="text-sm text-primary-600 dark:text-primary-400 font-medium">MLRIT Academic Portal</p>
             </div>
-            <div className="p-6 space-y-4">
-              {hallTicket.eligible === false && hallTicket.eligibilityIssues?.length > 0 && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg mb-4">
-                  <p className="text-red-800 font-medium flex items-center gap-2">
-                    <AlertTriangle className="w-4 h-4" />
-                    Eligibility Issues
-                  </p>
-                  <ul className="mt-2 text-sm text-red-700">
-                    {hallTicket.eligibilityIssues.map((issue, i) => (
-                      <li key={i}>• {issue}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs text-gray-500">Student Name</label>
-                  <p className="font-medium">{hallTicket.student?.name || user?.name}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Roll Number</label>
-                  <p className="font-medium">{hallTicket.student?.rollNumber || user?.rollNumber || 'N/A'}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Course</label>
-                  <p className="font-medium">{hallTicket.courseName}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Course Code</label>
-                  <p className="font-medium">{hallTicket.courseCode}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Date</label>
-                  <p className="font-medium">{new Date(hallTicket.date).toLocaleDateString()}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Time</label>
-                  <p className="font-medium">{hallTicket.startTime} - {hallTicket.endTime}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Attendance</label>
-                  <p className={`font-medium ${(hallTicket.student?.attendance || 0) >= 75 ? 'text-green-600' : 'text-red-600'}`}>
+
+            {hallTicket.eligible === false && hallTicket.eligibilityIssues?.length > 0 && (
+              <div className="p-4 bg-red-50 border border-red-100 rounded-xl mb-6">
+                <p className="text-red-800 font-bold flex items-center gap-2 mb-2">
+                  <AlertTriangle className="w-5 h-5" />
+                  Eligibility Issues
+                </p>
+                <ul className="space-y-1">
+                  {hallTicket.eligibilityIssues.map((issue, i) => (
+                    <li key={i} className="text-sm text-red-700 flex items-start gap-2">
+                      <span className="mt-1.5 w-1.5 h-1.5 bg-red-400 rounded-full flex-shrink-0"></span>
+                      {issue}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="grid grid-cols-2 gap-x-6 gap-y-6">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Student Name</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{hallTicket.student?.name || user?.name}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Roll Number</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{hallTicket.student?.rollNumber || user?.rollNumber || 'N/A'}</p>
+              </div>
+              <div className="space-y-1 col-span-2">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Course</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{hallTicket.courseName}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Course Code</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{hallTicket.courseCode}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Date</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{new Date(hallTicket.date).toLocaleDateString()}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Time</label>
+                <p className="font-semibold text-gray-900 dark:text-white border-b border-gray-100 dark:border-gray-700 pb-2">{hallTicket.startTime} - {hallTicket.endTime}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Attendance</label>
+                <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-2">
+                  <div className={`w-2 h-2 rounded-full ${(hallTicket.student?.attendance || 0) >= 75 ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <p className={`font-bold ${(hallTicket.student?.attendance || 0) >= 75 ? 'text-green-700' : 'text-red-700'}`}>
                     {hallTicket.student?.attendance || 0}%
                   </p>
                 </div>
-                <div>
-                  <label className="text-xs text-gray-500">Fees Status</label>
-                  <p className={`font-medium ${hallTicket.student?.feesPaid ? 'text-green-600' : 'text-red-600'}`}>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Fees Status</label>
+                <div className="flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-2">
+                  <div className={`w-2 h-2 rounded-full ${hallTicket.student?.feesPaid ? 'bg-green-500' : 'bg-red-500'}`}></div>
+                  <p className={`font-bold ${hallTicket.student?.feesPaid ? 'text-green-700' : 'text-red-700'}`}>
                     {hallTicket.student?.feesPaid ? 'Cleared' : 'Pending'}
                   </p>
                 </div>
               </div>
             </div>
-            <div className="p-6 border-t border-gray-100 flex gap-3">
+
+            <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
               <button
                 onClick={handleDownloadHallTicket}
                 disabled={hallTicket.eligible === false}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex-1 flex items-center justify-center gap-2 bg-gray-900 hover:bg-black text-white py-3 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Download className="w-5 h-5" />
                 Download / Print
               </button>
               <button
                 onClick={() => { setHallTicket(null); setSelectedExam(null); }}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                className="flex-1 px-8 py-3 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 rounded-xl font-bold transition-all shadow-sm hover:shadow-md"
               >
                 Close
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Semester Hall Ticket Modal */}
-      {showSemesterModal && semesterHallTicket && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-gray-100 bg-primary-600 rounded-t-2xl">
-              <h2 className="text-xl font-bold text-white">Semester Hall Ticket</h2>
-              <p className="text-primary-100 text-sm">{semesterHallTicket.semester} - {semesterHallTicket.examType}</p>
+      <Modal
+        isOpen={showSemesterModal && !!semesterHallTicket}
+        onClose={() => { setShowSemesterModal(false); setSemesterHallTicket(null); }}
+        title="Semester Hall Ticket"
+        size="lg"
+      >
+        {semesterHallTicket && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between p-4 bg-primary-50 dark:bg-primary-900/20 rounded-xl border border-primary-100 dark:border-primary-800 mb-6">
+              <div>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white">{semesterHallTicket.semester}</h2>
+                <p className="text-primary-700 dark:text-primary-400 text-sm font-medium">{semesterHallTicket.examType}</p>
+              </div>
+              <div className="bg-white dark:bg-gray-700 p-2 rounded-lg shadow-sm">
+                <List className="w-6 h-6 text-primary-600 dark:text-primary-400" />
+              </div>
             </div>
-            
-            <div className="p-6 overflow-y-auto flex-1">
-              {/* Eligibility Status */}
-              {!semesterHallTicket.eligible && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg mb-6">
-                  <div className="flex items-center gap-2 text-red-800 font-medium mb-2">
-                    <AlertTriangle className="w-5 h-5" />
-                    Not Eligible for Hall Ticket
-                  </div>
-                  <ul className="text-sm text-red-700 space-y-1">
-                    {semesterHallTicket.eligibilityIssues?.map((issue, i) => (
-                      <li key={i}>• {issue}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-              
-              {semesterHallTicket.eligible && (
-                <div className="p-4 bg-green-50 border border-green-200 rounded-lg mb-6">
-                  <div className="flex items-center gap-2 text-green-800 font-medium">
-                    <CheckCircle className="w-5 h-5" />
-                    Eligible for All Exams
-                  </div>
-                </div>
-              )}
 
-              {/* Student Details */}
-              <div className="grid grid-cols-2 gap-4 mb-6 p-4 bg-gray-50 rounded-lg">
-                <div>
-                  <label className="text-xs text-gray-500">Student Name</label>
-                  <p className="font-medium">{semesterHallTicket.student?.name}</p>
+            {/* Eligibility Status */}
+            {!semesterHallTicket.eligible && (
+              <div className="p-5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl mb-8">
+                <div className="flex items-center gap-3 text-red-900 dark:text-red-200 font-bold mb-3 text-lg">
+                  <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                  Not Eligible for Hall Ticket
                 </div>
-                <div>
-                  <label className="text-xs text-gray-500">Roll Number</label>
-                  <p className="font-medium">{semesterHallTicket.student?.rollNumber}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Department</label>
-                  <p className="font-medium">{semesterHallTicket.student?.department}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Year</label>
-                  <p className="font-medium">{semesterHallTicket.student?.year}</p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Attendance</label>
-                  <p className={`font-medium ${(semesterHallTicket.student?.attendance || 0) >= 75 ? 'text-green-600' : 'text-red-600'}`}>
-                    {semesterHallTicket.student?.attendance || 0}%
-                  </p>
-                </div>
-                <div>
-                  <label className="text-xs text-gray-500">Fees Status</label>
-                  <p className={`font-medium ${semesterHallTicket.student?.feesPaid ? 'text-green-600' : 'text-red-600'}`}>
-                    {semesterHallTicket.student?.feesPaid ? 'Cleared' : 'Pending'}
-                  </p>
-                </div>
-              </div>
-
-              {/* Exam List */}
-              <h3 className="font-semibold text-gray-800 mb-3">Scheduled Exams ({semesterHallTicket.totalExams})</h3>
-              <div className="space-y-3">
-                {semesterHallTicket.exams?.map((exam, index) => (
-                  <div key={exam.examId || index} className="p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <h4 className="font-medium text-gray-800">{exam.courseName}</h4>
-                        <p className="text-sm text-gray-500">{exam.courseCode}</p>
-                      </div>
-                      <span className="px-2 py-1 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
-                        {exam.examType}
-                      </span>
-                    </div>
-                    <div className="mt-2 flex items-center gap-4 text-sm text-gray-600">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {new Date(exam.date).toLocaleDateString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {exam.startTime} - {exam.endTime}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Instructions */}
-              <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-                <h4 className="font-medium text-yellow-800 mb-2">Instructions</h4>
-                <ul className="text-sm text-yellow-700 space-y-1">
-                  {semesterHallTicket.instructions?.map((instruction, i) => (
-                    <li key={i}>• {instruction}</li>
+                <ul className="text-red-800 dark:text-red-300 space-y-2 ml-1">
+                  {semesterHallTicket.eligibilityIssues?.map((issue, i) => (
+                    <li key={i} className="flex items-center gap-2 font-medium">
+                      <span className="w-2 h-2 bg-red-500 rounded-full"></span>
+                      {issue}
+                    </li>
                   ))}
                 </ul>
               </div>
+            )}
+
+            {semesterHallTicket.eligible && (
+              <div className="p-5 bg-green-50 border border-green-200 rounded-2xl mb-8">
+                <div className="flex items-center gap-3 text-green-900 font-bold text-lg">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  Eligible for All Exams
+                </div>
+              </div>
+            )}
+
+            {/* Student Details */}
+            <div className="grid grid-cols-2 text-sm gap-4 mb-8 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl border border-gray-100 dark:border-gray-700">
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Student Name</label>
+                <p className="font-semibold text-gray-900 dark:text-white">{semesterHallTicket.student?.name}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Roll Number</label>
+                <p className="font-semibold text-gray-900 dark:text-white">{semesterHallTicket.student?.rollNumber}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Department</label>
+                <p className="font-semibold text-gray-900 dark:text-white">{semesterHallTicket.student?.department}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Year</label>
+                <p className="font-semibold text-gray-900 dark:text-white">{semesterHallTicket.student?.year}</p>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Attendance</label>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${(semesterHallTicket.student?.attendance || 0) >= 75 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                  }`}>
+                  {semesterHallTicket.student?.attendance || 0}%
+                </span>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Fees Status</label>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold ${semesterHallTicket.student?.feesPaid ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+                  }`}>
+                  {semesterHallTicket.student?.feesPaid ? 'Cleared' : 'Pending'}
+                </span>
+              </div>
             </div>
 
-            <div className="p-6 border-t border-gray-100 flex gap-3">
+            {/* Exam List */}
+            <h3 className="font-bold text-gray-900 dark:text-white mb-4 text-base border-b dark:border-gray-700 pb-2">Scheduled Exams <span className="text-gray-400 font-medium ml-2">({semesterHallTicket.totalExams})</span></h3>
+            <div className="space-y-3">
+              {semesterHallTicket.exams?.map((exam, index) => (
+                <div key={exam.examId || index} className="p-4 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <h4 className="font-bold text-gray-900 dark:text-white text-base">{exam.courseName}</h4>
+                      <div className="flex items-center gap-3 mt-1">
+                        <span className="text-xs font-medium text-gray-500 dark:text-gray-300 bg-gray-100 dark:bg-gray-600 px-2 py-0.5 rounded">{exam.courseCode}</span>
+                        <span className="px-2 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 rounded-lg text-xs font-bold border border-primary-100 dark:border-primary-800">
+                          {exam.examType}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-600 flex flex-wrap gap-4 text-xs">
+                    <span className="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-300">
+                      <Calendar className="w-3.5 h-3.5 text-primary-500" />
+                      {new Date(exam.date).toLocaleDateString()}
+                    </span>
+                    <span className="flex items-center gap-2 font-medium text-gray-600 dark:text-gray-300">
+                      <Clock className="w-3.5 h-3.5 text-primary-500" />
+                      {exam.startTime} - {exam.endTime}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Instructions */}
+            <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-xl">
+              <h4 className="font-bold text-yellow-900 dark:text-yellow-200 mb-2 text-base">Instructions</h4>
+              <ul className="text-yellow-800 dark:text-yellow-300 space-y-1.5 ml-1 text-sm">
+                {semesterHallTicket.instructions?.map((instruction, i) => (
+                  <li key={i} className="flex items-start gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 bg-yellow-500 rounded-full mt-1.5 flex-shrink-0"></span>
+                    {instruction}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="flex gap-4 mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
               <button
                 onClick={() => {
                   const printWindow = window.open('', '_blank');
@@ -522,7 +585,7 @@ const StudentExams = () => {
                           <p>Generated on: ${new Date().toLocaleString()}</p>
                         </div>
                       </body>
-                    </html>
+    </html>
                   `);
                   printWindow.document.close();
                   printWindow.print();
@@ -535,14 +598,14 @@ const StudentExams = () => {
               </button>
               <button
                 onClick={() => { setShowSemesterModal(false); setSemesterHallTicket(null); }}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium transition-colors"
+                className="flex-1 px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 dark:text-gray-200 rounded-lg font-medium transition-colors"
               >
                 Close
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </DashboardLayout>
   );
 };

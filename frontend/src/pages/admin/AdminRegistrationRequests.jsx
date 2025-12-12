@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import Modal from '../../components/Modal';
+import { useSocket } from '../../context/SocketContext';
+import { toast } from 'react-hot-toast';
 import {
   Users, Building, CheckCircle, XCircle, Clock,
   Search, Filter, Eye, AlertCircle, UserPlus, RefreshCw
 } from 'lucide-react';
 
 const AdminRegistrationRequests = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [requests, setRequests] = useState([]);
   const [stats, setStats] = useState({ pending: 0, approved: 0, rejected: 0, total: 0 });
   const [loading, setLoading] = useState(true);
@@ -24,6 +28,28 @@ const AdminRegistrationRequests = () => {
     fetchStats();
     fetchRequests();
   }, []);
+
+  const socket = useSocket();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('registration_request_created', (newRequest) => {
+      setRequests(prev => [newRequest, ...prev]);
+      fetchStats();
+      // Toast handled globally in DashboardLayout, but we could add specific sound here
+    });
+
+    socket.on('registration_request_updated', (updatedRequest) => {
+      setRequests(prev => prev.map(req => req._id === updatedRequest._id ? updatedRequest : req));
+      fetchStats();
+    });
+
+    return () => {
+      socket.off('registration_request_created');
+      socket.off('registration_request_updated');
+    };
+  }, [socket]);
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -312,57 +338,54 @@ const AdminRegistrationRequests = () => {
       </div>
 
       {/* Details Modal */}
-      {showDetailsModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">Request Details</h3>
-              <button onClick={() => setShowDetailsModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <XCircle className="w-5 h-5 text-gray-500" />
-              </button>
+      <Modal
+        isOpen={showDetailsModal && !!selectedRequest}
+        onClose={() => setShowDetailsModal(false)}
+        title="Request Details"
+        size="md"
+      >
+        {selectedRequest && (
+          <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase">Name</label>
+              <p className="text-gray-900 font-medium">{selectedRequest.name}</p>
             </div>
-            <div className="space-y-4">
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase">Email</label>
+              <p className="text-gray-900">{selectedRequest.email}</p>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase">Role</label>
+              <div className="mt-1">{getRoleBadge(selectedRequest.role)}</div>
+            </div>
+            {selectedRequest.clubName && (
               <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Name</label>
-                <p className="text-gray-900 font-medium">{selectedRequest.name}</p>
+                <label className="text-xs font-semibold text-gray-500 uppercase">Club Name</label>
+                <p className="text-gray-900">{selectedRequest.clubName}</p>
               </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Email</label>
-                <p className="text-gray-900">{selectedRequest.email}</p>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Role</label>
-                <div className="mt-1">{getRoleBadge(selectedRequest.role)}</div>
-              </div>
-              {selectedRequest.clubName && (
+            )}
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase">Status</label>
+              <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
+            </div>
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase">Submitted</label>
+              <p className="text-gray-900">{new Date(selectedRequest.createdAt).toLocaleString()}</p>
+            </div>
+            {selectedRequest.reviewedAt && (
+              <>
                 <div>
-                  <label className="text-xs font-semibold text-gray-500 uppercase">Club Name</label>
-                  <p className="text-gray-900">{selectedRequest.clubName}</p>
+                  <label className="text-xs font-semibold text-gray-500 uppercase">Reviewed</label>
+                  <p className="text-gray-900">{new Date(selectedRequest.reviewedAt).toLocaleString()}</p>
                 </div>
-              )}
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Status</label>
-                <div className="mt-1">{getStatusBadge(selectedRequest.status)}</div>
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-500 uppercase">Submitted</label>
-                <p className="text-gray-900">{new Date(selectedRequest.createdAt).toLocaleString()}</p>
-              </div>
-              {selectedRequest.reviewedAt && (
-                <>
+                {selectedRequest.adminComment && (
                   <div>
-                    <label className="text-xs font-semibold text-gray-500 uppercase">Reviewed</label>
-                    <p className="text-gray-900">{new Date(selectedRequest.reviewedAt).toLocaleString()}</p>
+                    <label className="text-xs font-semibold text-gray-500 uppercase">Admin Comment</label>
+                    <p className="text-gray-900">{selectedRequest.adminComment}</p>
                   </div>
-                  {selectedRequest.adminComment && (
-                    <div>
-                      <label className="text-xs font-semibold text-gray-500 uppercase">Admin Comment</label>
-                      <p className="text-gray-900">{selectedRequest.adminComment}</p>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
+                )}
+              </>
+            )}
             <button
               onClick={() => setShowDetailsModal(false)}
               className="w-full mt-6 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors font-medium"
@@ -370,19 +393,24 @@ const AdminRegistrationRequests = () => {
               Close
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Approve Modal */}
-      {showApproveModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+      <Modal
+        isOpen={showApproveModal && !!selectedRequest}
+        onClose={() => setShowApproveModal(false)}
+        title="Approve Request"
+        size="md"
+      >
+        {selectedRequest && (
+          <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Approve Request</h3>
+                <h3 className="text-lg font-bold text-gray-900">Approve Request</h3>
                 <p className="text-sm text-gray-500">Create user account</p>
               </div>
             </div>
@@ -421,19 +449,24 @@ const AdminRegistrationRequests = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Reject Modal */}
-      {showRejectModal && selectedRequest && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6">
+      <Modal
+        isOpen={showRejectModal && !!selectedRequest}
+        onClose={() => setShowRejectModal(false)}
+        title="Reject Request"
+        size="md"
+      >
+        {selectedRequest && (
+          <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
                 <XCircle className="w-6 h-6 text-red-600" />
               </div>
               <div>
-                <h3 className="text-xl font-bold text-gray-900">Reject Request</h3>
+                <h3 className="text-lg font-bold text-gray-900">Reject Request</h3>
                 <p className="text-sm text-gray-500">Decline registration</p>
               </div>
             </div>
@@ -473,8 +506,8 @@ const AdminRegistrationRequests = () => {
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </DashboardLayout>
   );
 };

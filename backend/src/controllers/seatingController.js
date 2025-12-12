@@ -8,7 +8,7 @@ const User = require('../models/User');
 const allocateSeating = async (req, res) => {
   try {
     const { examId, rooms } = req.body; // rooms is array of { roomNumber, capacity }
-    
+
     const exam = await Exam.findById(examId);
     if (!exam) return res.status(404).json({ message: 'Exam not found' });
 
@@ -50,7 +50,7 @@ const allocateSeating = async (req, res) => {
     }
 
     await Seating.insertMany(seatingArr);
-    
+
     exam.seatingPublished = true;
     await exam.save();
 
@@ -62,6 +62,16 @@ const allocateSeating = async (req, res) => {
       message: `Seating for ${exam.courseName} has been allocated. Check your dashboard.`,
       type: 'Seating'
     });
+
+    if (req.io) {
+      req.io.to('role:Student').emit('seating_allocated', { examId: exam._id });
+      req.io.to('role:Student').emit('notification', {
+        title: 'Seating Allocated',
+        message: `Seating for ${exam.courseName} is out now.`,
+        type: 'info'
+      });
+      req.io.to('role:Seating Manager').emit('seating_allocated', { examId: exam._id });
+    }
 
     res.json({ message: `Seating allocated for ${seatingArr.length} students` });
   } catch (error) {

@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../store/slices/authSlice';
 import { getExams, allocateSeating } from '../utils/api';
 import DashboardLayout from '../components/DashboardLayout';
 import StatCard from '../components/StatCard';
 import { Grid, CheckCircle, Clock, Download, Plus, X, Play, FileText } from 'lucide-react';
 
 const SeatingManagerDashboard = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [exams, setExams] = useState([]);
   const [selectedExam, setSelectedExam] = useState('');
   const [rooms, setRooms] = useState([{ roomNumber: '101', capacity: 30, floor: '1' }]);
@@ -38,10 +39,10 @@ const SeatingManagerDashboard = () => {
   const handleExport = () => {
     if (!selectedExam) return alert('Select an exam to export');
     const exam = exams.find(e => e._id === selectedExam);
-    const csvContent = "data:text/csv;charset=utf-8," 
-        + "Room,Seat,Student ID\n"
-        + "101,S-1,12345\n101,S-2,67890"; // Mock data
-    
+    const csvContent = "data:text/csv;charset=utf-8,"
+      + "Room,Seat,Student ID\n"
+      + "101,S-1,12345\n101,S-2,67890"; // Mock data
+
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
@@ -117,12 +118,12 @@ const SeatingManagerDashboard = () => {
                 </div>
               </div>
             </div>
-            
+
             <div className="p-6 space-y-6">
               {/* Exam Selection */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Select Exam</label>
-                <select 
+                <select
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all bg-white"
                   value={selectedExam}
                   onChange={(e) => setSelectedExam(e.target.value)}
@@ -140,8 +141,8 @@ const SeatingManagerDashboard = () => {
               <div>
                 <div className="flex justify-between items-center mb-3">
                   <label className="text-sm font-medium text-gray-700">Available Rooms</label>
-                  <button 
-                    onClick={addRoom} 
+                  <button
+                    onClick={addRoom}
                     className="flex items-center gap-1 text-purple-600 hover:text-purple-700 text-sm font-medium"
                   >
                     <Plus className="w-4 h-4" />
@@ -153,8 +154,8 @@ const SeatingManagerDashboard = () => {
                     <div key={idx} className="flex gap-3 items-center bg-gray-50 p-3 rounded-lg">
                       <div className="flex-1">
                         <label className="block text-xs text-gray-500 mb-1">Room Number</label>
-                        <input 
-                          placeholder="e.g. 101" 
+                        <input
+                          placeholder="e.g. 101"
                           className="w-full p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           value={room.roomNumber}
                           onChange={(e) => updateRoom(idx, 'roomNumber', e.target.value)}
@@ -162,8 +163,8 @@ const SeatingManagerDashboard = () => {
                       </div>
                       <div className="w-24">
                         <label className="block text-xs text-gray-500 mb-1">Capacity</label>
-                        <input 
-                          placeholder="30" 
+                        <input
+                          placeholder="30"
                           type="number"
                           className="w-full p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           value={room.capacity}
@@ -172,15 +173,15 @@ const SeatingManagerDashboard = () => {
                       </div>
                       <div className="w-20">
                         <label className="block text-xs text-gray-500 mb-1">Floor</label>
-                        <input 
-                          placeholder="1" 
+                        <input
+                          placeholder="1"
                           className="w-full p-2 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-purple-500 focus:border-transparent"
                           value={room.floor}
                           onChange={(e) => updateRoom(idx, 'floor', e.target.value)}
                         />
                       </div>
                       {rooms.length > 1 && (
-                        <button 
+                        <button
                           onClick={() => removeRoom(idx)}
                           className="mt-5 p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
                         >
@@ -194,14 +195,14 @@ const SeatingManagerDashboard = () => {
 
               {/* Action Buttons */}
               <div className="flex gap-3 pt-4">
-                <button 
+                <button
                   onClick={handleAllocate}
                   className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white py-3 rounded-lg font-semibold transition-colors"
                 >
                   <Play className="w-5 h-5" />
                   Run Allocation Algorithm
                 </button>
-                <button 
+                <button
                   onClick={handleExport}
                   className="flex items-center gap-2 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
@@ -229,13 +230,12 @@ const SeatingManagerDashboard = () => {
             </div>
             <div className="p-6 space-y-3 max-h-[500px] overflow-y-auto">
               {exams.map(exam => (
-                <div 
-                  key={exam._id} 
-                  className={`p-4 rounded-xl border transition-colors ${
-                    exam.seatingPublished 
-                      ? 'bg-green-50 border-green-100' 
+                <div
+                  key={exam._id}
+                  className={`p-4 rounded-xl border transition-colors ${exam.seatingPublished
+                      ? 'bg-green-50 border-green-100'
                       : 'bg-gray-50 border-gray-100 hover:bg-gray-100'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1">

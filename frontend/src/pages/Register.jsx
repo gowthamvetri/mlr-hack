@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import axios from 'axios';
-import { 
-  User, Mail, Lock, Briefcase, GraduationCap, Building, 
-  Shield, Users, Hash, BookOpen, Calendar, AlertCircle, 
-  CheckCircle, ArrowRight, Sparkles 
+
+import {
+  User, Mail, Lock, Briefcase, GraduationCap, Building,
+  Shield, Users, Hash, BookOpen, Calendar, AlertCircle,
+  CheckCircle, ArrowRight, Sparkles, UserCheck
 } from 'lucide-react';
+import { submitRegistrationRequest, registerUser } from '../utils/api';
 
 const Register = () => {
   const [formData, setFormData] = useState({
     name: '', email: '', password: '', role: 'Student',
-    department: '', year: '', rollNumber: '', clubName: '', office: ''
+    department: '', year: '', rollNumber: '', clubName: '', office: '',
+    staffDepartment: '', staffDesignation: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -27,17 +29,17 @@ const Register = () => {
     setError('');
     setLoading(true);
     setPendingApproval(false);
-    
+
     try {
       const { role } = formData;
-      
-      // For SeatingManager and ClubCoordinator, submit registration request
-      if (role === 'SeatingManager' || role === 'ClubCoordinator') {
-        await axios.post('http://localhost:5000/api/registration-requests', formData);
+
+      // For SeatingManager, ClubCoordinator, and Staff, submit registration request
+      if (['SeatingManager', 'ClubCoordinator', 'Staff'].includes(role)) {
+        await submitRegistrationRequest(formData);
         setPendingApproval(true);
       } else {
         // For Student, register directly
-        await axios.post('http://localhost:5000/api/users', formData);
+        await registerUser(formData);
         setSuccess(true);
         setTimeout(() => navigate('/login'), 2000);
       }
@@ -51,7 +53,8 @@ const Register = () => {
   const roleOptions = [
     { value: 'Student', label: 'Student', icon: GraduationCap, color: 'blue' },
     { value: 'SeatingManager', label: 'Seating Manager', icon: Users, color: 'purple' },
-    { value: 'ClubCoordinator', label: 'Club Coordinator', icon: Building, color: 'green' }
+    { value: 'ClubCoordinator', label: 'Club Coordinator', icon: Building, color: 'green' },
+    { value: 'Staff', label: 'Faculty / Staff', icon: UserCheck, color: 'orange' }
   ];
 
   const benefits = [
@@ -116,13 +119,11 @@ const Register = () => {
         <div className="hidden lg:block space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl flex items-center justify-center shadow-lg shadow-primary-200">
-                <GraduationCap className="w-8 h-8 text-white" />
-              </div>
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">MLRIT Portal</h1>
-                <p className="text-gray-500">Academic Management System</p>
-              </div>
+              <img
+                src="/mlrit-logo.png"
+                alt="MLRIT Logo"
+                className="h-14 w-auto object-contain"
+              />
             </div>
           </div>
 
@@ -256,18 +257,15 @@ const Register = () => {
                         key={role.value}
                         type="button"
                         onClick={() => setFormData({ ...formData, role: role.value })}
-                        className={`p-4 rounded-xl border-2 transition-all text-left ${
-                          isSelected
-                            ? 'border-primary-500 bg-primary-50'
-                            : 'border-gray-200 hover:border-gray-300 bg-white'
-                        }`}
+                        className={`p-4 rounded-xl border-2 transition-all text-left ${isSelected
+                          ? 'border-primary-500 bg-primary-50'
+                          : 'border-gray-200 hover:border-gray-300 bg-white'
+                          }`}
                       >
-                        <IconComponent className={`w-6 h-6 mb-2 ${
-                          isSelected ? 'text-primary-600' : 'text-gray-400'
-                        }`} />
-                        <p className={`text-sm font-semibold ${
-                          isSelected ? 'text-primary-700' : 'text-gray-700'
-                        }`}>
+                        <IconComponent className={`w-6 h-6 mb-2 ${isSelected ? 'text-primary-600' : 'text-gray-400'
+                          }`} />
+                        <p className={`text-sm font-semibold ${isSelected ? 'text-primary-700' : 'text-gray-700'
+                          }`}>
                           {role.label}
                         </p>
                       </button>
@@ -329,6 +327,54 @@ const Register = () => {
                       className="w-full pl-10 pr-3 py-2.5 bg-white border border-green-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 text-sm"
                       onChange={handleChange}
                     />
+                  </div>
+                </div>
+              )}
+
+              {formData.role === 'Staff' && (
+                <div className="space-y-4 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                  <p className="text-sm font-semibold text-orange-900 mb-3">Staff Information</p>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Building className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <select
+                      name="staffDepartment"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm appearance-none"
+                      onChange={handleChange}
+                      value={formData.staffDepartment}
+                    >
+                      <option value="">Select Department</option>
+                      <option value="CSE">CSE</option>
+                      <option value="IT">IT</option>
+                      <option value="ECE">ECE</option>
+                      <option value="EEE">EEE</option>
+                      <option value="MECH">MECH</option>
+                      <option value="CIVIL">CIVIL</option>
+                      <option value="CSD">CSD</option>
+                      <option value="CSM">CSM</option>
+                      <option value="CSC">CSC</option>
+                      <option value="MBA">MBA</option>
+                      <option value="H&S">H&S</option>
+                    </select>
+                  </div>
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Briefcase className="w-4 h-4 text-gray-400" />
+                    </div>
+                    <select
+                      name="staffDesignation"
+                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-orange-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm appearance-none"
+                      onChange={handleChange}
+                      value={formData.staffDesignation}
+                    >
+                      <option value="">Select Designation</option>
+                      <option value="Professor">Professor</option>
+                      <option value="Associate Professor">Associate Professor</option>
+                      <option value="Assistant Professor">Assistant Professor</option>
+                      <option value="Lab Assistant">Lab Assistant</option>
+                      <option value="Other">Other</option>
+                    </select>
                   </div>
                 </div>
               )}

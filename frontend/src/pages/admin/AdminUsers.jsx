@@ -1,40 +1,37 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useState, useMemo } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getUsers, deleteUser } from '../../utils/api';
-import { Users, Search, Filter, UserPlus, Edit, Trash2, Shield, GraduationCap, Building, Calendar } from 'lucide-react';
+import { useGetUsersQuery, useDeleteUserMutation } from '../../services/api';
+import { useAppDispatch } from '../../store';
+import { showSuccessToast, showErrorToast } from '../../store/slices/uiSlice';
+import { Users, Search, Filter, UserPlus, Edit, Trash2, Shield, GraduationCap, Building, Calendar, Loader2 } from 'lucide-react';
 
 const AdminUsers = () => {
-  const { user } = useAuth();
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRole, setFilterRole] = useState('all');
   const [showAddUser, setShowAddUser] = useState(false);
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const { data } = await getUsers({ 
-        role: filterRole !== 'all' ? filterRole : undefined,
-        search: searchQuery || undefined 
-      });
-      setUsers(data);
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // RTK Query - automatically caches and manages loading/error states
+  const {
+    data: users = [],
+    isLoading,
+    isFetching,
+    isError
+  } = useGetUsersQuery({
+    role: filterRole !== 'all' ? filterRole : undefined,
+    search: debouncedSearch || undefined
+  });
 
-  useEffect(() => {
-    fetchUsers();
-  }, [filterRole]);
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
-  // Debounced search
-  useEffect(() => {
+  // Debounced search effect
+  useMemo(() => {
     const timeoutId = setTimeout(() => {
-      fetchUsers();
+      setDebouncedSearch(searchQuery);
     }, 300);
     return () => clearTimeout(timeoutId);
   }, [searchQuery]);
@@ -42,10 +39,10 @@ const AdminUsers = () => {
   const handleDeleteUser = async (userId) => {
     if (window.confirm('Are you sure you want to delete this user?')) {
       try {
-        await deleteUser(userId);
-        fetchUsers();
+        await deleteUser(userId).unwrap();
+        dispatch(showSuccessToast('User deleted successfully'));
       } catch (error) {
-        console.error('Error deleting user:', error);
+        dispatch(showErrorToast(error.message || 'Error deleting user'));
       }
     }
   };
@@ -175,73 +172,95 @@ const AdminUsers = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
-                <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredUsers.map(u => (
-                <tr key={u._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span className="text-primary-600 font-semibold">
-                          {u.name.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{u.name}</p>
-                        <p className="text-sm text-gray-500">{u.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(u.role)}`}>
-                      {getRoleIcon(u.role)}
-                      {u.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-gray-700">
-                      {u.department || u.clubName || '-'}
-                      {u.year && ` • Year ${u.year}`}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-gray-500">
-                      {new Date(u.createdAt).toLocaleDateString()}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </td>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative">
+        {/* Loading overlay for refetching */}
+        {isFetching && !isLoading && (
+          <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
+            <Loader2 className="w-6 h-6 text-primary-600 animate-spin" />
+          </div>
+        )}
+
+        {isLoading ? (
+          <div className="p-12 text-center">
+            <Loader2 className="w-8 h-8 text-primary-600 animate-spin mx-auto mb-3" />
+            <p className="text-gray-500">Loading users...</p>
+          </div>
+        ) : isError ? (
+          <div className="p-12 text-center">
+            <p className="text-red-500">Failed to load users. Please try again.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">User</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Department</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Joined</th>
+                  <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredUsers.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-              <p className="font-medium">No users found</p>
-              <p className="text-sm">Try adjusting your search or filters</p>
-            </div>
-          )}
-        </div>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredUsers.map(u => (
+                  <tr key={u._id} className="hover:bg-gray-50">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 font-semibold">
+                            {u.name.charAt(0).toUpperCase()}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">{u.name}</p>
+                          <p className="text-sm text-gray-500">{u.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${getRoleColor(u.role)}`}>
+                        {getRoleIcon(u.role)}
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-700">
+                        {u.department || u.clubName || '-'}
+                        {u.year && ` • Year ${u.year}`}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-gray-500">
+                        {new Date(u.createdAt).toLocaleDateString()}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                          <Edit className="w-4 h-4" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteUser(u._id)}
+                          disabled={isDeleting}
+                          className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {filteredUsers.length === 0 && (
+              <div className="text-center py-12 text-gray-500">
+                <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                <p className="font-medium">No users found</p>
+                <p className="text-sm">Try adjusting your search or filters</p>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Pagination Info */}

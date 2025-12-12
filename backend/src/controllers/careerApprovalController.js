@@ -6,7 +6,7 @@ const mongoose = require('mongoose');
 const submitApprovalRequest = async (req, res) => {
   try {
     const { step, stepTitle, requestMessage } = req.body;
-    
+
     // Check if there's already a pending request for this step
     const existingRequest = await CareerApproval.findOne({
       student: req.user._id,
@@ -38,6 +38,15 @@ const submitApprovalRequest = async (req, res) => {
     });
 
     res.status(201).json(approval);
+
+    if (req.io) {
+      req.io.to('role:Admin').to('role:Staff').emit('career_request_created', approval);
+      req.io.to('role:Admin').to('role:Staff').emit('notification', {
+        title: 'New Career Approval Request',
+        message: `A new approval request from has been submitted for ${stepTitle}`,
+        type: 'info'
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -58,7 +67,7 @@ const getMyApprovalRequests = async (req, res) => {
 const getMyApprovalStatus = async (req, res) => {
   try {
     const approvals = await CareerApproval.find({ student: req.user._id });
-    
+
     // Create a map of step -> status
     const statusMap = {};
     approvals.forEach(approval => {
@@ -72,7 +81,7 @@ const getMyApprovalStatus = async (req, res) => {
         };
       }
     });
-    
+
     res.json(statusMap);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -96,10 +105,10 @@ const getAllApprovals = async (req, res) => {
   try {
     const { status, step } = req.query;
     const filter = {};
-    
+
     if (status && status !== 'all') filter.status = status;
     if (step && step !== 'all') filter.step = parseInt(step);
-    
+
     const requests = await CareerApproval.find(filter)
       .populate('student', 'name email department rollNumber')
       .populate('reviewedBy', 'name')
@@ -147,6 +156,15 @@ const approveRequest = async (req, res) => {
       .populate('reviewedBy', 'name');
 
     res.json(populated);
+
+    if (req.io) {
+      req.io.to(`user:${approval.student._id}`).emit('career_approval_updated', populated);
+      req.io.to(`user:${approval.student._id}`).emit('notification', {
+        title: 'Career Request Approved',
+        message: `Your request for ${approval.stepTitle} has been approved.`,
+        type: 'success'
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -178,6 +196,15 @@ const rejectRequest = async (req, res) => {
       .populate('reviewedBy', 'name');
 
     res.json(populated);
+
+    if (req.io) {
+      req.io.to(`user:${approval.student._id}`).emit('career_approval_updated', populated);
+      req.io.to(`user:${approval.student._id}`).emit('notification', {
+        title: 'Career Request Rejected',
+        message: `Your request for ${approval.stepTitle} has been rejected. Check remarks.`,
+        type: 'error'
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

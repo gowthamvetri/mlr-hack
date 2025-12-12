@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { 
-  getAdminStats, getDepartments, getCourseStats, 
-  getPlacementStats, getFacultyStats 
+import {
+  getAdminStats, getDepartments, getCourseStats,
+  getPlacementStats, getFacultyStats
 } from '../../utils/api';
-import { 
-  BarChart3, TrendingUp, Users, GraduationCap, Award, 
+import {
+  BarChart3, TrendingUp, Users, GraduationCap, Award,
   Download, Calendar, ArrowUp, ArrowDown, Target, BookOpen
 } from 'lucide-react';
 
 const AdminAnalytics = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [loading, setLoading] = useState(true);
   const [overviewStats, setOverviewStats] = useState([
     { label: 'Total Enrollments', value: '0', change: '+0%', trend: 'up', icon: Users },
@@ -38,7 +39,7 @@ const AdminAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all analytics data
       const [adminStats, departmentsData, courseStats, placementStats] = await Promise.all([
         getAdminStats().catch(() => ({ data: {} })),
@@ -49,33 +50,33 @@ const AdminAnalytics = () => {
 
       // Process overview stats
       setOverviewStats([
-        { 
-          label: 'Total Enrollments', 
-          value: adminStats.data?.totalStudents?.toLocaleString() || '0', 
-          change: '+12%', 
-          trend: 'up', 
-          icon: Users 
+        {
+          label: 'Total Enrollments',
+          value: adminStats.data?.totalStudents?.toLocaleString() || '0',
+          change: '+12%',
+          trend: 'up',
+          icon: Users
         },
-        { 
-          label: 'Course Completion', 
-          value: `${courseStats.data?.completionRate || 87}%`, 
-          change: '+5%', 
-          trend: 'up', 
-          icon: Target 
+        {
+          label: 'Course Completion',
+          value: `${courseStats.data?.completionRate || 87}%`,
+          change: '+5%',
+          trend: 'up',
+          icon: Target
         },
-        { 
-          label: 'Avg. Student Score', 
-          value: adminStats.data?.avgScore || '78.5', 
-          change: '+3.2', 
-          trend: 'up', 
-          icon: Award 
+        {
+          label: 'Avg. Student Score',
+          value: adminStats.data?.avgScore || '78.5',
+          change: '+3.2',
+          trend: 'up',
+          icon: Award
         },
-        { 
-          label: 'Active Courses', 
-          value: courseStats.data?.totalCourses?.toString() || '0', 
-          change: '+8', 
-          trend: 'up', 
-          icon: BookOpen 
+        {
+          label: 'Active Courses',
+          value: courseStats.data?.totalCourses?.toString() || '0',
+          change: '+8',
+          trend: 'up',
+          icon: BookOpen
         },
       ]);
 
@@ -162,20 +163,17 @@ const AdminAnalytics = () => {
         {overviewStats.map((stat, index) => (
           <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
-              <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${
-                index === 0 ? 'bg-primary-100' :
-                index === 1 ? 'bg-green-100' :
-                index === 2 ? 'bg-purple-100' : 'bg-blue-100'
-              }`}>
-                <stat.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${
-                  index === 0 ? 'text-primary-600' :
-                  index === 1 ? 'text-green-600' :
-                  index === 2 ? 'text-purple-600' : 'text-blue-600'
-                }`} />
+              <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${index === 0 ? 'bg-primary-100' :
+                  index === 1 ? 'bg-green-100' :
+                    index === 2 ? 'bg-purple-100' : 'bg-blue-100'
+                }`}>
+                <stat.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${index === 0 ? 'text-primary-600' :
+                    index === 1 ? 'text-green-600' :
+                      index === 2 ? 'text-purple-600' : 'text-blue-600'
+                  }`} />
               </div>
-              <div className={`flex items-center gap-1 text-xs font-medium ${
-                stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
-              }`}>
+              <div className={`flex items-center gap-1 text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
+                }`}>
                 {stat.trend === 'up' ? <ArrowUp className="w-3 sm:w-4 h-3 sm:h-4" /> : <ArrowDown className="w-3 sm:w-4 h-3 sm:h-4" />}
                 {stat.change}
               </div>
@@ -205,7 +203,7 @@ const AdminAnalytics = () => {
                     <p className="text-xs text-gray-500 mb-1">Completion</p>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-green-500 rounded-full"
                           style={{ width: `${dept.completion}%` }}
                         />
@@ -217,7 +215,7 @@ const AdminAnalytics = () => {
                     <p className="text-xs text-gray-500 mb-1">Placement</p>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-blue-500 rounded-full"
                           style={{ width: `${dept.placement}%` }}
                         />
@@ -229,7 +227,7 @@ const AdminAnalytics = () => {
                     <p className="text-xs text-gray-500 mb-1">Avg Score</p>
                     <div className="flex items-center gap-2">
                       <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-purple-500 rounded-full"
                           style={{ width: `${dept.avgScore}%` }}
                         />
@@ -255,17 +253,17 @@ const AdminAnalytics = () => {
                 <span className="w-10 text-sm text-gray-500">{month.month}</span>
                 <div className="flex-1 flex items-center gap-2">
                   <div className="flex-1 h-6 bg-gray-100 rounded-lg overflow-hidden flex">
-                    <div 
+                    <div
                       className="h-full bg-primary-500"
                       style={{ width: `${(month.enrollments / 200) * 100}%` }}
                       title={`Enrollments: ${month.enrollments}`}
                     />
-                    <div 
+                    <div
                       className="h-full bg-green-500"
                       style={{ width: `${(month.completions / 200) * 100}%` }}
                       title={`Completions: ${month.completions}`}
                     />
-                    <div 
+                    <div
                       className="h-full bg-blue-500"
                       style={{ width: `${(month.placements / 200) * 100}%` }}
                       title={`Placements: ${month.placements}`}
@@ -325,7 +323,7 @@ const AdminAnalytics = () => {
                   <td className="py-4 px-4">
                     <div className="flex items-center gap-2">
                       <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div 
+                        <div
                           className="h-full bg-green-500 rounded-full"
                           style={{ width: `${course.completion}%` }}
                         />

@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getExams, createExamSchedule, generateBatchHallTickets } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { FileText, Plus, X, Check, Calendar, Clock, Users, Ticket, Search, Filter, Trash2 } from 'lucide-react';
 
 const AdminExams = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [exams, setExams] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -77,7 +78,7 @@ const AdminExams = () => {
 
   const filteredExams = exams.filter(exam => {
     const matchesSearch = exam.courseName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          exam.courseCode.toLowerCase().includes(searchQuery.toLowerCase());
+      exam.courseCode.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDept = filterDept === 'all' || exam.department === filterDept;
     return matchesSearch && matchesDept;
   });
@@ -110,11 +111,10 @@ const AdminExams = () => {
         </div>
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-            showCreateForm 
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${showCreateForm
+              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               : 'bg-primary-600 text-white hover:bg-primary-700'
-          }`}
+            }`}
         >
           {showCreateForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {showCreateForm ? 'Cancel' : 'Create Exam Schedule'}
@@ -125,7 +125,7 @@ const AdminExams = () => {
       {showCreateForm && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-6">Create New Exam Schedule</h2>
-          
+
           {/* Step 1: Schedule Details */}
           <div className="mb-6">
             <h3 className="text-sm font-semibold text-gray-700 mb-3 flex items-center gap-2">
@@ -135,10 +135,10 @@ const AdminExams = () => {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-600 mb-1">Department</label>
-                <select 
+                <select
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
                   value={schedule.department}
-                  onChange={e => setSchedule({...schedule, department: e.target.value})}
+                  onChange={e => setSchedule({ ...schedule, department: e.target.value })}
                 >
                   <option value="CSE">CSE</option>
                   <option value="ECE">ECE</option>
@@ -154,7 +154,7 @@ const AdminExams = () => {
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                   placeholder="e.g. 3"
                   value={schedule.year}
-                  onChange={e => setSchedule({...schedule, year: e.target.value})}
+                  onChange={e => setSchedule({ ...schedule, year: e.target.value })}
                 />
               </div>
               <div>
@@ -162,7 +162,7 @@ const AdminExams = () => {
                 <select
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
                   value={schedule.examType}
-                  onChange={e => setSchedule({...schedule, examType: e.target.value})}
+                  onChange={e => setSchedule({ ...schedule, examType: e.target.value })}
                 >
                   <option value="Final">Final Exam</option>
                   <option value="Midterm">Midterm Exam</option>
@@ -182,33 +182,33 @@ const AdminExams = () => {
                 placeholder="Course Name"
                 className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={currentSubject.courseName}
-                onChange={e => setCurrentSubject({...currentSubject, courseName: e.target.value})}
+                onChange={e => setCurrentSubject({ ...currentSubject, courseName: e.target.value })}
               />
               <input
                 placeholder="Course Code"
                 className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={currentSubject.courseCode}
-                onChange={e => setCurrentSubject({...currentSubject, courseCode: e.target.value})}
+                onChange={e => setCurrentSubject({ ...currentSubject, courseCode: e.target.value })}
               />
               <input
                 type="date"
                 className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={currentSubject.date}
-                onChange={e => setCurrentSubject({...currentSubject, date: e.target.value})}
+                onChange={e => setCurrentSubject({ ...currentSubject, date: e.target.value })}
               />
               <input
                 type="time"
                 placeholder="Start Time"
                 className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={currentSubject.startTime}
-                onChange={e => setCurrentSubject({...currentSubject, startTime: e.target.value})}
+                onChange={e => setCurrentSubject({ ...currentSubject, startTime: e.target.value })}
               />
               <input
                 type="time"
                 placeholder="End Time"
                 className="p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
                 value={currentSubject.endTime}
-                onChange={e => setCurrentSubject({...currentSubject, endTime: e.target.value})}
+                onChange={e => setCurrentSubject({ ...currentSubject, endTime: e.target.value })}
               />
             </div>
             <button
@@ -357,9 +357,8 @@ const AdminExams = () => {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-sm ${
-                      exam.examType === 'Final' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-                    }`}>
+                    <span className={`px-2 py-1 rounded text-sm ${exam.examType === 'Final' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
+                      }`}>
                       {exam.examType}
                     </span>
                   </td>

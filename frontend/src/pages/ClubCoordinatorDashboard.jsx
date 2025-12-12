@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { createEvent, getEvents, getClubProfile, updateClubProfile } from '../utils/api';
 import DashboardLayout from '../components/DashboardLayout';
 import StatCard from '../components/StatCard';
 import { Calendar, CheckCircle, Clock, XCircle, Plus, X, Send, Users, Building, Mail } from 'lucide-react';
 
 const ClubCoordinatorDashboard = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [events, setEvents] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
@@ -33,7 +34,7 @@ const ClubCoordinatorDashboard = () => {
 
   const fetchMyEvents = async () => {
     try {
-      const { data } = await getEvents(); 
+      const { data } = await getEvents();
       setEvents(data.filter(e => e.coordinator?._id === user._id || e.coordinator === user._id));
     } catch (error) {
       console.error(error);
@@ -90,46 +91,46 @@ const ClubCoordinatorDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Club Name</label>
-                <input 
-                  placeholder="Enter club name" 
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-                  value={profile.clubName} 
-                  onChange={e => setProfile({...profile, clubName: e.target.value})} 
-                  required 
+                <input
+                  placeholder="Enter club name"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  value={profile.clubName}
+                  onChange={e => setProfile({ ...profile, clubName: e.target.value })}
+                  required
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Tagline</label>
-                <input 
-                  placeholder="Short tagline for your club" 
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-                  value={profile.tagline} 
-                  onChange={e => setProfile({...profile, tagline: e.target.value})} 
+                <input
+                  placeholder="Short tagline for your club"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  value={profile.tagline}
+                  onChange={e => setProfile({ ...profile, tagline: e.target.value })}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Contact Email</label>
-                <input 
-                  placeholder="club@example.com" 
+                <input
+                  placeholder="club@example.com"
                   type="email"
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-                  value={profile.contactEmail} 
-                  onChange={e => setProfile({...profile, contactEmail: e.target.value})} 
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  value={profile.contactEmail}
+                  onChange={e => setProfile({ ...profile, contactEmail: e.target.value })}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                <textarea 
-                  placeholder="Brief description of your club" 
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
-                  value={profile.description} 
-                  onChange={e => setProfile({...profile, description: e.target.value})} 
+                <textarea
+                  placeholder="Brief description of your club"
+                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  value={profile.description}
+                  onChange={e => setProfile({ ...profile, description: e.target.value })}
                   rows={2}
                 />
               </div>
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-2 rounded-lg font-medium transition-colors"
             >
               <CheckCircle className="w-4 h-4" />
@@ -169,18 +170,17 @@ const ClubCoordinatorDashboard = () => {
 
       {/* Action Buttons */}
       <div className="flex gap-3 mb-6">
-        <button 
+        <button
           onClick={() => setShowForm(!showForm)}
-          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${
-            showForm 
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200' 
+          className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${showForm
+              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               : 'bg-primary-600 text-white hover:bg-primary-700'
-          }`}
+            }`}
         >
           {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
           {showForm ? 'Close Form' : 'Propose New Event'}
         </button>
-        <button 
+        <button
           onClick={() => setShowProfile(!showProfile)}
           className="flex items-center gap-2 px-6 py-3 rounded-lg font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
         >
@@ -205,31 +205,31 @@ const ClubCoordinatorDashboard = () => {
               <form onSubmit={handleSubmit} className="p-6 space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Event Title</label>
-                  <input 
-                    placeholder="Enter event title" 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                  <input
+                    placeholder="Enter event title"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     value={newEvent.title}
-                    onChange={e => setNewEvent({...newEvent, title: e.target.value})} 
-                    required 
+                    onChange={e => setNewEvent({ ...newEvent, title: e.target.value })}
+                    required
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                  <textarea 
-                    placeholder="Describe your event" 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                  <textarea
+                    placeholder="Describe your event"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     value={newEvent.description}
-                    onChange={e => setNewEvent({...newEvent, description: e.target.value})} 
-                    required 
+                    onChange={e => setNewEvent({ ...newEvent, description: e.target.value })}
+                    required
                     rows={3}
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                  <select 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white" 
+                  <select
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
                     value={newEvent.category}
-                    onChange={e => setNewEvent({...newEvent, category: e.target.value})}
+                    onChange={e => setNewEvent({ ...newEvent, category: e.target.value })}
                   >
                     <option value="Technical">Technical</option>
                     <option value="Cultural">Cultural</option>
@@ -238,48 +238,48 @@ const ClubCoordinatorDashboard = () => {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Date</label>
-                  <input 
-                    type="date" 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                  <input
+                    type="date"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     value={newEvent.date}
-                    onChange={e => setNewEvent({...newEvent, date: e.target.value})} 
-                    required 
+                    onChange={e => setNewEvent({ ...newEvent, date: e.target.value })}
+                    required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
-                    <input 
-                      type="time" 
-                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                    <input
+                      type="time"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       value={newEvent.startTime}
-                      onChange={e => setNewEvent({...newEvent, startTime: e.target.value})} 
-                      required 
+                      onChange={e => setNewEvent({ ...newEvent, startTime: e.target.value })}
+                      required
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
-                    <input 
-                      type="time" 
-                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                    <input
+                      type="time"
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                       value={newEvent.endTime}
-                      onChange={e => setNewEvent({...newEvent, endTime: e.target.value})} 
-                      required 
+                      onChange={e => setNewEvent({ ...newEvent, endTime: e.target.value })}
+                      required
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">Venue</label>
-                  <input 
-                    placeholder="Event venue" 
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent" 
+                  <input
+                    placeholder="Event venue"
+                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                     value={newEvent.venue}
-                    onChange={e => setNewEvent({...newEvent, venue: e.target.value})} 
-                    required 
+                    onChange={e => setNewEvent({ ...newEvent, venue: e.target.value })}
+                    required
                   />
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   className="w-full flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-semibold transition-colors"
                 >
                   <Send className="w-5 h-5" />
@@ -317,23 +317,21 @@ const ClubCoordinatorDashboard = () => {
             <div className="p-6">
               <div className="grid gap-4">
                 {events.map(event => (
-                  <div 
-                    key={event._id} 
-                    className={`p-5 rounded-xl border transition-colors ${
-                      event.status === 'Approved' ? 'bg-green-50 border-green-100' :
-                      event.status === 'Rejected' ? 'bg-red-50 border-red-100' :
-                      'bg-yellow-50 border-yellow-100'
-                    }`}
+                  <div
+                    key={event._id}
+                    className={`p-5 rounded-xl border transition-colors ${event.status === 'Approved' ? 'bg-green-50 border-green-100' :
+                        event.status === 'Rejected' ? 'bg-red-50 border-red-100' :
+                          'bg-yellow-50 border-yellow-100'
+                      }`}
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-3 mb-2">
                           <h3 className="font-semibold text-lg text-gray-800">{event.title}</h3>
-                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                            event.category === 'Technical' ? 'bg-blue-100 text-blue-700' :
-                            event.category === 'Cultural' ? 'bg-purple-100 text-purple-700' :
-                            'bg-orange-100 text-orange-700'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${event.category === 'Technical' ? 'bg-blue-100 text-blue-700' :
+                              event.category === 'Cultural' ? 'bg-purple-100 text-purple-700' :
+                                'bg-orange-100 text-orange-700'
+                            }`}>
                             {event.category}
                           </span>
                         </div>
@@ -351,11 +349,10 @@ const ClubCoordinatorDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right ml-4">
-                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${
-                          event.status === 'Approved' ? 'bg-green-100 text-green-700' :
-                          event.status === 'Rejected' ? 'bg-red-100 text-red-700' :
-                          'bg-yellow-100 text-yellow-700'
-                        }`}>
+                        <span className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium ${event.status === 'Approved' ? 'bg-green-100 text-green-700' :
+                            event.status === 'Rejected' ? 'bg-red-100 text-red-700' :
+                              'bg-yellow-100 text-yellow-700'
+                          }`}>
                           {event.status === 'Approved' && <CheckCircle className="w-4 h-4" />}
                           {event.status === 'Rejected' && <XCircle className="w-4 h-4" />}
                           {event.status === 'Pending' && <Clock className="w-4 h-4" />}

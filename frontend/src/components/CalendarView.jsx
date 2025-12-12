@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { getCalendarEvents, createCalendarEvent, deleteCalendarEvent } from '../utils/api';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../store/slices/authSlice';
 
 const CalendarView = ({ isAdmin }) => {
   const [events, setEvents] = useState([]);
   const [newEvent, setNewEvent] = useState({ title: '', start: '', type: 'Event', scope: 'Institute' });
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
 
   useEffect(() => {
     fetchEvents();
@@ -44,30 +45,30 @@ const CalendarView = ({ isAdmin }) => {
   return (
     <div className="bg-white p-6 rounded-lg shadow-md">
       <h2 className="text-xl font-semibold mb-4 text-gray-700 border-b pb-2">Academic Calendar</h2>
-      
+
       {isAdmin && (
         <form onSubmit={handleCreate} className="mb-6 bg-gray-50 p-4 rounded border text-sm">
           <div className="grid grid-cols-2 gap-2 mb-2">
-            <input placeholder="Event Title" className="p-2 border rounded" value={newEvent.title} onChange={e => setNewEvent({...newEvent, title: e.target.value})} required />
-            <input type="date" className="p-2 border rounded" value={newEvent.start} onChange={e => setNewEvent({...newEvent, start: e.target.value})} required />
-            <select className="p-2 border rounded" value={newEvent.type} onChange={e => setNewEvent({...newEvent, type: e.target.value})}>
+            <input placeholder="Event Title" className="p-2 border rounded" value={newEvent.title} onChange={e => setNewEvent({ ...newEvent, title: e.target.value })} required />
+            <input type="date" className="p-2 border rounded" value={newEvent.start} onChange={e => setNewEvent({ ...newEvent, start: e.target.value })} required />
+            <select className="p-2 border rounded" value={newEvent.type} onChange={e => setNewEvent({ ...newEvent, type: e.target.value })}>
               <option value="Event">Event</option>
               <option value="Holiday">Holiday</option>
               <option value="Exam">Exam</option>
               <option value="Deadline">Deadline</option>
               <option value="Academic">Academic</option>
             </select>
-            <select className="p-2 border rounded" value={newEvent.scope} onChange={e => setNewEvent({...newEvent, scope: e.target.value})}>
+            <select className="p-2 border rounded" value={newEvent.scope} onChange={e => setNewEvent({ ...newEvent, scope: e.target.value })}>
               <option value="Institute">Institute Wide</option>
               <option value="Department">Department</option>
               <option value="Batch">Batch</option>
             </select>
           </div>
           {newEvent.scope === 'Department' && (
-             <input placeholder="Department (e.g. CSE)" className="p-2 border rounded w-full mb-2" onChange={e => setNewEvent({...newEvent, department: e.target.value})} />
+            <input placeholder="Department (e.g. CSE)" className="p-2 border rounded w-full mb-2" onChange={e => setNewEvent({ ...newEvent, department: e.target.value })} />
           )}
           {newEvent.scope === 'Batch' && (
-             <input placeholder="Batch (e.g. 2025)" className="p-2 border rounded w-full mb-2" onChange={e => setNewEvent({...newEvent, batch: e.target.value})} />
+            <input placeholder="Batch (e.g. 2025)" className="p-2 border rounded w-full mb-2" onChange={e => setNewEvent({ ...newEvent, batch: e.target.value })} />
           )}
           <button type="submit" className="bg-primary-600 text-white px-3 py-1 rounded w-full">Add Event</button>
         </form>
@@ -77,11 +78,10 @@ const CalendarView = ({ isAdmin }) => {
         {events.map(event => (
           <div key={event._id} className="flex items-center justify-between p-2 border rounded hover:bg-gray-50">
             <div className="flex items-center gap-3">
-              <div className={`w-2 h-10 rounded ${
-                event.type === 'Holiday' ? 'bg-red-500' : 
-                event.type === 'Exam' ? 'bg-purple-500' : 
-                'bg-primary-500'
-              }`}></div>
+              <div className={`w-2 h-10 rounded ${event.type === 'Holiday' ? 'bg-red-500' :
+                  event.type === 'Exam' ? 'bg-purple-500' :
+                    'bg-primary-500'
+                }`}></div>
               <div>
                 <p className="font-medium text-sm">{event.title}</p>
                 <p className="text-xs text-gray-500">{new Date(event.start).toLocaleDateString()} • {event.type}</p>

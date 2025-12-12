@@ -7,9 +7,9 @@ const User = require('../models/User');
 const createExamSchedule = async (req, res) => {
   try {
     const { department, year, examType, semester, exams } = req.body;
-    
+
     // exams is an array of { courseName, courseCode, date, startTime, endTime, duration }
-    
+
     const createdExams = await Promise.all(exams.map(async (e) => {
       const exam = new Exam({
         courseName: e.courseName,
@@ -26,6 +26,19 @@ const createExamSchedule = async (req, res) => {
       return await exam.save();
     }));
 
+    if (req.io) {
+      req.io.to('role:Student').emit('exam_schedule_released', {
+        department,
+        year,
+        count: createdExams.length
+      });
+      req.io.to('role:Student').emit('notification', {
+        title: 'New Exam Schedule',
+        message: `Schedule released for ${department} - ${year} Year`,
+        type: 'info'
+      });
+    }
+
     res.status(201).json(createdExams);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -38,18 +51,18 @@ const createExamSchedule = async (req, res) => {
 const generateBatchHallTickets = async (req, res) => {
   try {
     const { department, year, examType, semester } = req.body;
-    
+
     // Find all exams for this dept/year/type/semester
-    const query = { 
-      department, 
+    const query = {
+      department,
       batches: { $in: [year] },
       examType
     };
-    
+
     if (semester) {
       query.semester = semester;
     }
-    
+
     const exams = await Exam.find(query);
 
     if (exams.length === 0) {
@@ -71,6 +84,15 @@ const generateBatchHallTickets = async (req, res) => {
       type: 'Exam'
     });
 
+    if (req.io) {
+      req.io.to('role:Student').emit('hall_tickets_generated', { department, year });
+      req.io.to('role:Student').emit('notification', {
+        title: 'Semester Hall Tickets Released',
+        message: `Hall tickets for ${department} Year ${year} are now available.`,
+        type: 'success'
+      });
+    }
+
     res.json({ message: `Hall tickets generated for ${exams.length} exams.`, exams });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -83,7 +105,7 @@ const generateBatchHallTickets = async (req, res) => {
 const createExam = async (req, res) => {
   try {
     const { courseName, courseCode, date, startTime, endTime, duration, examType, department, semester, batches } = req.body;
-    
+
     const exam = new Exam({
       courseName,
       courseCode,
@@ -149,6 +171,10 @@ const generateHallTickets = async (req, res) => {
         type: 'Exam'
       });
 
+      if (req.io) {
+        req.io.to('role:Student').emit('hall_tickets_generated', { examId: exam._id });
+      }
+
       res.json({ message: 'Hall tickets generated successfully' });
     } else {
       res.status(404).json({ message: 'Exam not found' });
@@ -164,7 +190,7 @@ const generateHallTickets = async (req, res) => {
 const getHallTicket = async (req, res) => {
   try {
     const exam = await Exam.findById(req.params.id);
-    
+
     if (!exam) {
       return res.status(404).json({ message: 'Exam not found' });
     }
@@ -175,19 +201,19 @@ const getHallTicket = async (req, res) => {
 
     // Check eligibility: attendance >= 75% and fees paid
     const student = await User.findById(req.user._id);
-    
+
     const eligibilityIssues = [];
-    
+
     if (student.attendance < 75) {
       eligibilityIssues.push(`Insufficient attendance: ${student.attendance}% (minimum 75% required)`);
     }
-    
+
     if (!student.feesPaid) {
       eligibilityIssues.push('Fees not cleared. Please clear all pending fees.');
     }
-    
+
     if (eligibilityIssues.length > 0) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         message: 'Not eligible for hall ticket',
         eligible: false,
         issues: eligibilityIssues,
@@ -238,36 +264,36 @@ const getSemesterHallTicket = async (req, res) => {
   try {
     const { semester, examType } = req.query;
     const student = await User.findById(req.user._id);
-    
+
     // Build query for student's exams
     const query = {
       department: student.department,
       batches: { $in: [student.year, student.batch].filter(Boolean) },
       hallTicketsGenerated: true
     };
-    
+
     if (semester) query.semester = semester;
     if (examType) query.examType = examType;
-    
+
     const exams = await Exam.find(query).sort({ date: 1 });
-    
+
     if (exams.length === 0) {
       return res.status(404).json({ message: 'No exams found for this semester' });
     }
-    
+
     // Check eligibility
     const eligibilityIssues = [];
-    
+
     if (student.attendance < 75) {
       eligibilityIssues.push(`Insufficient attendance: ${student.attendance}% (minimum 75% required)`);
     }
-    
+
     if (!student.feesPaid) {
       eligibilityIssues.push('Fees not cleared. Please clear all pending fees.');
     }
-    
+
     const isEligible = eligibilityIssues.length === 0;
-    
+
     // Return semester hall ticket
     const semesterHallTicket = {
       semester: semester || exams[0]?.semester,
@@ -317,21 +343,21 @@ const getSemesterHallTicket = async (req, res) => {
 const checkStudentEligibility = async (req, res) => {
   try {
     const student = await User.findById(req.params.studentId);
-    
+
     if (!student || student.role !== 'Student') {
       return res.status(404).json({ message: 'Student not found' });
     }
-    
+
     const eligibilityIssues = [];
-    
+
     if (student.attendance < 75) {
       eligibilityIssues.push(`Insufficient attendance: ${student.attendance}% (minimum 75% required)`);
     }
-    
+
     if (!student.feesPaid) {
       eligibilityIssues.push('Fees not cleared');
     }
-    
+
     res.json({
       studentId: student._id,
       name: student.name,
@@ -349,13 +375,13 @@ const checkStudentEligibility = async (req, res) => {
   }
 };
 
-module.exports = { 
-  createExam, 
-  createExamSchedule, 
-  getExams, 
-  getStudentExams, 
-  generateHallTickets, 
-  generateBatchHallTickets, 
+module.exports = {
+  createExam,
+  createExamSchedule,
+  getExams,
+  getStudentExams,
+  generateHallTickets,
+  generateBatchHallTickets,
   getHallTicket,
   getSemesterHallTicket,
   checkStudentEligibility

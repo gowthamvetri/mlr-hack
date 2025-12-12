@@ -1,63 +1,19 @@
-import { createContext, useState, useEffect, useContext } from 'react';
-import axios from 'axios';
+import { createContext, useContext } from 'react';
 
-const AuthContext = createContext();
+// This is a compatibility wrapper for the Redux auth system
+// The actual auth state is managed by Redux (store/slices/authSlice)
+// This context exists to satisfy components that expect the AuthProvider wrapper
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+const AuthContext = createContext(null);
 
-  useEffect(() => {
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'));
-    if (userInfo) {
-      setUser(userInfo);
-    }
-    setLoading(false);
-  }, []);
-
-  const login = async (email, password) => {
-    try {
-      const config = {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      };
-
-      const { data } = await axios.post(
-        import.meta.env.VITE_API + 'users/login',
-        { email, password },
-        config
-      );
-
-      setUser(data);
-      localStorage.setItem('userInfo', JSON.stringify(data));
-      localStorage.setItem('token', data.token);
-      return data;
-    } catch (error) {
-      throw error.response && error.response.data.message
-        ? error.response.data.message
-        : error.message;
-    }
-  };
-
-  const logout = () => {
-    localStorage.removeItem('userInfo');
-    localStorage.removeItem('token');
-    setUser(null);
-  };
-
-  const updateUser = (updatedData) => {
-    const currentUserInfo = JSON.parse(localStorage.getItem('userInfo')) || {};
-    const newUserInfo = { ...currentUserInfo, ...updatedData };
-    localStorage.setItem('userInfo', JSON.stringify(newUserInfo));
-    setUser(newUserInfo);
-  };
-
-  return (
-    <AuthContext.Provider value={{ user, login, logout, loading, updateUser }}>
-      {children}
-    </AuthContext.Provider>
-  );
+// eslint-disable-next-line react-refresh/only-export-components
+export const useAuth = () => {
+    return useContext(AuthContext);
 };
 
-export const useAuth = () => useContext(AuthContext);
+export const AuthProvider = ({ children }) => {
+    // Auth state is managed by Redux, so this just passes children through
+    return <AuthContext.Provider value={null}>{children}</AuthContext.Provider>;
+};
+
+export default AuthContext;

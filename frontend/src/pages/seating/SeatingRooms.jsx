@@ -1,10 +1,12 @@
 import { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import Modal from '../../components/Modal';
 import { Building, Plus, Edit, Trash2, Search, MapPin, Users, Check, X } from 'lucide-react';
 
 const SeatingRooms = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddRoom, setShowAddRoom] = useState(false);
   const [editingRoom, setEditingRoom] = useState(null);
@@ -210,119 +212,115 @@ const SeatingRooms = () => {
       )}
 
       {/* Add/Edit Room Modal */}
-      {(showAddRoom || editingRoom) && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full mx-4">
-            <div className="p-6 border-b border-gray-100">
-              <h2 className="text-xl font-bold text-gray-800">
-                {editingRoom ? 'Edit Room' : 'Add New Room'}
-              </h2>
+      <Modal
+        isOpen={showAddRoom || !!editingRoom}
+        onClose={() => { setShowAddRoom(false); setEditingRoom(null); }}
+        title={editingRoom ? 'Edit Room' : 'Add New Room'}
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
+            <input
+              type="text"
+              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
+              value={editingRoom ? editingRoom.roomNumber : newRoom.roomNumber}
+              onChange={(e) => editingRoom
+                ? setEditingRoom({ ...editingRoom, roomNumber: e.target.value })
+                : setNewRoom({ ...newRoom, roomNumber: e.target.value })
+              }
+              placeholder="e.g. 101"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Building</label>
+            <select
+              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
+              value={editingRoom ? editingRoom.building : newRoom.building}
+              onChange={(e) => editingRoom
+                ? setEditingRoom({ ...editingRoom, building: e.target.value })
+                : setNewRoom({ ...newRoom, building: e.target.value })
+              }
+            >
+              <option>Main Block</option>
+              <option>Annex Block</option>
+              <option>Science Block</option>
+            </select>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Floor</label>
+              <input
+                type="text"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
+                value={editingRoom ? editingRoom.floor : newRoom.floor}
+                onChange={(e) => editingRoom
+                  ? setEditingRoom({ ...editingRoom, floor: e.target.value })
+                  : setNewRoom({ ...newRoom, floor: e.target.value })
+                }
+                placeholder="1"
+              />
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Room Number</label>
-                <input
-                  type="text"
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                  value={editingRoom ? editingRoom.roomNumber : newRoom.roomNumber}
-                  onChange={(e) => editingRoom 
-                    ? setEditingRoom({...editingRoom, roomNumber: e.target.value})
-                    : setNewRoom({...newRoom, roomNumber: e.target.value})
-                  }
-                  placeholder="e.g. 101"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Building</label>
-                <select
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
-                  value={editingRoom ? editingRoom.building : newRoom.building}
-                  onChange={(e) => editingRoom
-                    ? setEditingRoom({...editingRoom, building: e.target.value})
-                    : setNewRoom({...newRoom, building: e.target.value})
-                  }
-                >
-                  <option>Main Block</option>
-                  <option>Annex Block</option>
-                  <option>Science Block</option>
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Floor</label>
-                  <input
-                    type="text"
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                    value={editingRoom ? editingRoom.floor : newRoom.floor}
-                    onChange={(e) => editingRoom
-                      ? setEditingRoom({...editingRoom, floor: e.target.value})
-                      : setNewRoom({...newRoom, floor: e.target.value})
-                    }
-                    placeholder="1"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
-                  <input
-                    type="number"
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-                    value={editingRoom ? editingRoom.capacity : newRoom.capacity}
-                    onChange={(e) => editingRoom
-                      ? setEditingRoom({...editingRoom, capacity: parseInt(e.target.value)})
-                      : setNewRoom({...newRoom, capacity: parseInt(e.target.value)})
-                    }
-                    placeholder="30"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
-                <select
-                  className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
-                  value={editingRoom ? editingRoom.type : newRoom.type}
-                  onChange={(e) => editingRoom
-                    ? setEditingRoom({...editingRoom, type: e.target.value})
-                    : setNewRoom({...newRoom, type: e.target.value})
-                  }
-                >
-                  <option>Classroom</option>
-                  <option>Lab</option>
-                  <option>Seminar Hall</option>
-                </select>
-              </div>
-              {editingRoom && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                  <select
-                    className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
-                    value={editingRoom.status}
-                    onChange={(e) => setEditingRoom({...editingRoom, status: e.target.value})}
-                  >
-                    <option>Available</option>
-                    <option>In Use</option>
-                    <option>Maintenance</option>
-                  </select>
-                </div>
-              )}
-            </div>
-            <div className="p-6 border-t border-gray-100 flex gap-3">
-              <button
-                onClick={editingRoom ? handleUpdateRoom : handleAddRoom}
-                className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-medium"
-              >
-                <Check className="w-5 h-5" />
-                {editingRoom ? 'Save Changes' : 'Add Room'}
-              </button>
-              <button
-                onClick={() => { setShowAddRoom(false); setEditingRoom(null); }}
-                className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium"
-              >
-                Cancel
-              </button>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Capacity</label>
+              <input
+                type="number"
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
+                value={editingRoom ? editingRoom.capacity : newRoom.capacity}
+                onChange={(e) => editingRoom
+                  ? setEditingRoom({ ...editingRoom, capacity: parseInt(e.target.value) })
+                  : setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) })
+                }
+                placeholder="30"
+              />
             </div>
           </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+            <select
+              className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
+              value={editingRoom ? editingRoom.type : newRoom.type}
+              onChange={(e) => editingRoom
+                ? setEditingRoom({ ...editingRoom, type: e.target.value })
+                : setNewRoom({ ...newRoom, type: e.target.value })
+              }
+            >
+              <option>Classroom</option>
+              <option>Lab</option>
+              <option>Seminar Hall</option>
+            </select>
+          </div>
+          {editingRoom && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select
+                className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white"
+                value={editingRoom.status}
+                onChange={(e) => setEditingRoom({ ...editingRoom, status: e.target.value })}
+              >
+                <option>Available</option>
+                <option>In Use</option>
+                <option>Maintenance</option>
+              </select>
+            </div>
+          )}
         </div>
-      )}
+        <div className="mt-6 pt-4 border-t border-gray-100 flex gap-3">
+          <button
+            onClick={() => { setShowAddRoom(false); setEditingRoom(null); }}
+            className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg font-medium"
+          >
+            Cancel
+          </button>
+          <button
+            onClick={editingRoom ? handleUpdateRoom : handleAddRoom}
+            className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white py-3 rounded-lg font-medium"
+          >
+            <Check className="w-5 h-5" />
+            {editingRoom ? 'Save Changes' : 'Add Room'}
+          </button>
+        </div>
+      </Modal>
     </DashboardLayout>
   );
 };

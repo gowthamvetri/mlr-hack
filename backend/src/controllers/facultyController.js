@@ -9,7 +9,7 @@ const getFaculty = async (req, res) => {
   try {
     const { department, status } = req.query;
     const filter = {};
-    
+
     if (department) {
       // Try to match by department code
       const dept = await Department.findOne({ code: department });
@@ -25,7 +25,7 @@ const getFaculty = async (req, res) => {
       .populate('user', 'name email')
       .populate('department', 'name code')
       .populate('courses', 'name code');
-    
+
     // Transform to include display-friendly fields
     const transformedFaculty = faculty.map(f => ({
       _id: f._id,
@@ -39,7 +39,7 @@ const getFaculty = async (req, res) => {
       rating: f.rating || 0,
       status: f.status || 'Active',
     }));
-    
+
     res.json(transformedFaculty);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -66,7 +66,7 @@ const getFacultyById = async (req, res) => {
 const createFaculty = async (req, res) => {
   try {
     const { userId, name, email, department, departmentName, designation, specialization, experience, phone } = req.body;
-    
+
     // Handle existing faculty check
     if (userId) {
       const existingFaculty = await Faculty.findOne({ user: userId });
@@ -107,6 +107,10 @@ const createFaculty = async (req, res) => {
 
     const populatedFaculty = await Faculty.findById(faculty._id)
       .populate('department', 'name code');
+
+    if (req.io) {
+      req.io.to('role:Admin').emit('faculty_created', populatedFaculty);
+    }
 
     res.status(201).json(populatedFaculty);
   } catch (error) {
@@ -162,6 +166,9 @@ const deleteFaculty = async (req, res) => {
       return res.status(404).json({ message: 'Faculty not found' });
     }
     await faculty.deleteOne();
+    if (req.io) {
+      req.io.to('role:Admin').emit('faculty_deleted', req.params.id);
+    }
     res.json({ message: 'Faculty deleted' });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -173,24 +180,24 @@ const getFacultyStats = async (req, res) => {
   try {
     const totalFaculty = await Faculty.countDocuments({});
     const activeFaculty = await Faculty.countDocuments({ status: 'Active' });
-    
+
     // Count professors
-    const professors = await Faculty.countDocuments({ 
+    const professors = await Faculty.countDocuments({
       designation: { $regex: /professor/i }
     });
-    
+
     // Calculate avg experience
     const allFaculty = await Faculty.find({});
     const totalExperience = allFaculty.reduce((acc, f) => acc + (f.experience || 0), 0);
     const avgExperience = totalFaculty > 0 ? (totalExperience / totalFaculty).toFixed(1) : 0;
-    
+
     // Calculate avg rating
     const totalRating = allFaculty.reduce((acc, f) => acc + (f.rating || 0), 0);
     const avgRating = totalFaculty > 0 ? (totalRating / totalFaculty).toFixed(1) : 0;
-    
+
     // Total courses taught
     const totalCourses = allFaculty.reduce((acc, f) => acc + (f.totalCourses || f.courses?.length || 0), 0);
-    
+
     // Faculty by department
     const byDepartment = await Faculty.aggregate([
       { $group: { _id: '$departmentName', count: { $sum: 1 } } },
@@ -211,11 +218,11 @@ const getFacultyStats = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getFaculty, 
-  getFacultyById, 
-  createFaculty, 
-  updateFaculty, 
+module.exports = {
+  getFaculty,
+  getFacultyById,
+  createFaculty,
+  updateFaculty,
   deleteFaculty,
   getFacultyStats
 };

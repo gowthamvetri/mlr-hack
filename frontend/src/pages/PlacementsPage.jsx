@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { 
+import {
   GraduationCap, ChevronLeft, ChevronRight, Play, Building2,
   ArrowLeft, Briefcase, TrendingUp, Users, Award
 } from 'lucide-react';
@@ -136,30 +136,28 @@ const PlacementsPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-4">
-              <button 
+              <button
                 onClick={() => navigate('/')}
                 className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 <ArrowLeft className="w-5 h-5 text-gray-600" />
               </button>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center">
-                  <GraduationCap className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <span className="font-bold text-gray-800">MLRIT</span>
-                  <span className="text-gray-500 ml-2 hidden sm:inline">Placements</span>
-                </div>
+                <img
+                  src="/mlrit-logo.png"
+                  alt="MLRIT Logo"
+                  className="h-10 w-auto object-contain"
+                />
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Link 
+              <Link
                 to="/login"
                 className="px-4 py-2 text-gray-600 hover:text-gray-900 font-medium"
               >
                 Login
               </Link>
-              <Link 
+              <Link
                 to="/register"
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
               >
@@ -194,11 +192,11 @@ const PlacementsPage = () => {
           <h2 className="text-3xl font-bold text-red-600 text-center mb-12">
             Recent Placements
           </h2>
-          
+
           <div className="relative" ref={sliderRef}>
             {/* Slider Container */}
             <div className="overflow-hidden rounded-2xl">
-              <div 
+              <div
                 className="flex transition-transform duration-500 ease-in-out"
                 style={{ transform: `translateX(-${currentSlide * 100}%)` }}
               >
@@ -223,7 +221,7 @@ const PlacementsPage = () => {
                         )}
                       </div>
                       <div className="w-48 h-48 md:w-64 md:h-64 rounded-2xl overflow-hidden shadow-xl">
-                        <img 
+                        <img
                           src={slide.image || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300'}
                           alt={slide.title}
                           className="w-full h-full object-cover"
@@ -236,13 +234,13 @@ const PlacementsPage = () => {
             </div>
 
             {/* Navigation Buttons */}
-            <button 
+            <button
               onClick={prevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
               <ChevronLeft className="w-6 h-6 text-gray-600" />
             </button>
-            <button 
+            <button
               onClick={nextSlide}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white shadow-lg rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors"
             >
@@ -255,9 +253,8 @@ const PlacementsPage = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-colors ${
-                    index === currentSlide ? 'bg-red-600' : 'bg-gray-300'
-                  }`}
+                  className={`w-3 h-3 rounded-full transition-colors ${index === currentSlide ? 'bg-red-600' : 'bg-gray-300'
+                    }`}
                 />
               ))}
             </div>
@@ -272,14 +269,14 @@ const PlacementsPage = () => {
             Placement Highlights
           </h2>
           <div className="aspect-video rounded-2xl overflow-hidden shadow-2xl">
-            <iframe 
-              width="100%" 
-              height="100%" 
-              src="https://www.youtube.com/embed/NHZ3gwhY8VU?si=JRRLpVGQ-q53gykM" 
-              title="YouTube video player" 
-              frameBorder="0" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-              referrerPolicy="strict-origin-when-cross-origin" 
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/NHZ3gwhY8VU?si=JRRLpVGQ-q53gykM"
+              title="YouTube video player"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              referrerPolicy="strict-origin-when-cross-origin"
               allowFullScreen
               className="w-full h-full"
             />
@@ -293,14 +290,14 @@ const PlacementsPage = () => {
           <h2 className="text-3xl font-bold text-red-600 text-center mb-12">
             Our Top Recruiters
           </h2>
-          
+
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
             {recruiters.slice(0, 10).map((recruiter, index) => (
-              <div 
+              <div
                 key={recruiter.id || index}
                 className="bg-white border border-gray-200 rounded-xl p-6 flex items-center justify-center hover:shadow-lg transition-shadow h-24"
               >
-                <img 
+                <img
                   src={recruiter.logo}
                   alt={recruiter.name}
                   className="max-h-12 max-w-full object-contain"
@@ -308,7 +305,7 @@ const PlacementsPage = () => {
               </div>
             ))}
           </div>
-          
+
           <div className="text-center mt-10">
             <button className="px-8 py-3 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors">
               VIEW ALL COMPANIES
@@ -324,7 +321,7 @@ const PlacementsPage = () => {
           <h2 className="text-3xl font-bold text-red-600 text-center mb-12">
             Training
           </h2>
-          
+
           <div className="grid md:grid-cols-2 gap-8">
             {training.map((item, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-lg">
@@ -364,13 +361,13 @@ const PlacementsPage = () => {
             Join MLRIT and get access to top companies and excellent placement opportunities.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link 
+            <Link
               to="/register"
               className="px-8 py-4 bg-white text-red-600 rounded-xl font-semibold hover:bg-gray-100 transition-colors"
             >
               Apply Now
             </Link>
-            <Link 
+            <Link
               to="/login"
               className="px-8 py-4 border-2 border-white text-white rounded-xl font-semibold hover:bg-white/10 transition-colors"
             >
@@ -385,13 +382,11 @@ const PlacementsPage = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-red-600 to-red-700 rounded-xl flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="font-bold text-white">MLRIT</span>
-                <span className="text-gray-400 ml-2">Academic Portal</span>
-              </div>
+              <img
+                src="/mlrit-logo.png"
+                alt="MLRIT Logo"
+                className="h-10 w-auto object-contain"
+              />
             </div>
             <p className="text-gray-500 text-sm">© 2025 MLRIT. All rights reserved.</p>
           </div>
@@ -399,7 +394,7 @@ const PlacementsPage = () => {
       </footer>
 
       {/* ChatBot */}
-      <ChatBot 
+      <ChatBot
         apiEndpoint="http://localhost:8000/api/v1/chat/"
         title="MLRIT Assistant"
         subtitle="Ask me about placements!"

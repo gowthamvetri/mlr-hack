@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { selectCurrentUser, updateUserInfo } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import { getProfile, updateProfile } from '../../utils/api';
-import { 
-  User, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Calendar, 
+import {
+  User,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
   Building,
   Edit,
   Save,
@@ -18,7 +19,8 @@ import {
 } from 'lucide-react';
 
 const SeatingProfile = () => {
-  const { user, updateUser } = useAuth();
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useDispatch();
   const [profile, setProfile] = useState({
     name: '',
     email: '',
@@ -69,11 +71,11 @@ const SeatingProfile = () => {
     e.preventDefault();
     setSaving(true);
     setMessage({ type: '', text: '' });
-    
+
     try {
       const { data } = await updateProfile(profile);
-      if (updateUser) {
-        updateUser(data);
+      if (data) {
+        dispatch(updateUserInfo(data));
       }
       setIsEditing(false);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
@@ -139,9 +141,8 @@ const SeatingProfile = () => {
 
       {/* Message */}
       {message.text && (
-        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${
-          message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
-        }`}>
+        <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 ${message.type === 'success' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          }`}>
           <CheckCircle className="w-5 h-5" />
           {message.text}
         </div>
@@ -168,7 +169,7 @@ const SeatingProfile = () => {
                   <p className="font-medium text-gray-800 truncate">{profile.email}</p>
                 </div>
               </div>
-              
+
               {profile.phone && (
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -180,7 +181,7 @@ const SeatingProfile = () => {
                   </div>
                 </div>
               )}
-              
+
               {profile.office && (
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -192,7 +193,7 @@ const SeatingProfile = () => {
                   </div>
                 </div>
               )}
-              
+
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
                   <Armchair className="w-5 h-5 text-orange-600" />
@@ -210,7 +211,7 @@ const SeatingProfile = () => {
         <div className="lg:col-span-2">
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
             <h3 className="text-lg font-semibold text-gray-800 mb-6">Personal Information</h3>
-            
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {/* Name */}

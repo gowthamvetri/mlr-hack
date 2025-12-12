@@ -247,7 +247,7 @@ const ChatBot = ({
                     key={message.id} 
                     className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex items-start gap-2 max-w-[85%] ${
+                    <div className={`flex items-start gap-2 max-w-[90%] ${
                       message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
                     }`}>
                       {/* Avatar */}
@@ -266,14 +266,14 @@ const ChatBot = ({
                       </div>
                       
                       {/* Message Bubble */}
-                      <div className={`rounded-2xl px-4 py-2.5 ${
+                      <div className={`rounded-2xl px-4 py-2.5 break-words ${
                         message.type === 'user'
                           ? 'bg-primary-600 text-white rounded-tr-md'
                           : message.isError
                             ? 'bg-red-50 text-red-700 border border-red-200 rounded-tl-md'
                             : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-md'
                       }`}>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.text}</p>
+                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.text}</p>
                         <p className={`text-xs mt-1 ${
                           message.type === 'user' ? 'text-primary-200' : 'text-gray-400'
                         }`}>

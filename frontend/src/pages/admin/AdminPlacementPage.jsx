@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import Sidebar from '../../components/Sidebar';
-import { 
-  Image, Building2, BookOpen, Plus, Edit2, Trash2, 
+import Modal from '../../components/Modal';
+import {
+  Image, Building2, BookOpen, Plus, Edit2, Trash2,
   Save, X, ChevronDown, ChevronUp, Eye, EyeOff
 } from 'lucide-react';
 import {
@@ -161,11 +162,10 @@ const AdminPlacementPage = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${
-                  activeTab === tab.id 
-                    ? 'bg-red-600 text-white' 
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
+                    ? 'bg-red-600 text-white'
                     : 'bg-white text-gray-600 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 <tab.icon className="w-4 h-4" />
                 {tab.label}
@@ -252,9 +252,8 @@ const AdminPlacementPage = () => {
                           </td>
                           <td className="px-4 py-3 font-medium text-gray-800">{recruiter.name}</td>
                           <td className="px-4 py-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              recruiter.category === 'Top' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${recruiter.category === 'Top' ? 'bg-yellow-100 text-yellow-700' : 'bg-gray-100 text-gray-600'
+                              }`}>
                               {recruiter.category}
                             </span>
                           </td>
@@ -292,9 +291,8 @@ const AdminPlacementPage = () => {
                     <div key={item._id} className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-3">
-                          <span className={`px-2 py-1 rounded text-xs font-medium ${
-                            item.type === 'Industry Ready' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
-                          }`}>
+                          <span className={`px-2 py-1 rounded text-xs font-medium ${item.type === 'Industry Ready' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'
+                            }`}>
                             {item.type}
                           </span>
                           <h3 className="font-medium text-gray-800">{item.title}</h3>
@@ -331,135 +329,128 @@ const AdminPlacementPage = () => {
         </div>
 
         {/* Modal */}
-        {showModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-xl max-w-lg w-full max-h-[90vh] overflow-y-auto">
-              <div className="p-6 border-b flex items-center justify-between">
-                <h2 className="text-lg font-bold text-gray-800">
-                  {editingItem ? 'Edit' : 'Add'} {activeTab === 'slides' ? 'Slide' : activeTab === 'recruiters' ? 'Recruiter' : 'Training Content'}
-                </h2>
-                <button onClick={() => setShowModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-              <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                {activeTab === 'slides' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                      <input type="text" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
-                        <input type="text" value={formData.studentName || ''} onChange={e => setFormData({...formData, studentName: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
-                        <input type="text" value={formData.rollNumber || ''} onChange={e => setFormData({...formData, rollNumber: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                      </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Company *</label>
-                        <input type="text" value={formData.company || ''} onChange={e => setFormData({...formData, company: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Package</label>
-                        <input type="text" value={formData.package || ''} onChange={e => setFormData({...formData, package: e.target.value})} placeholder="₹25 LPA" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
-                      <input type="url" value={formData.image || ''} onChange={e => setFormData({...formData, image: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Batch</label>
-                      <input type="text" value={formData.batch || ''} onChange={e => setFormData({...formData, batch: e.target.value})} placeholder="Batch 2025" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="rounded text-red-600" />
-                      <span className="text-sm text-gray-700">Active (visible on public page)</span>
-                    </label>
-                  </>
-                )}
-
-                {activeTab === 'recruiters' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
-                      <input type="text" value={formData.name || ''} onChange={e => setFormData({...formData, name: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL *</label>
-                      <input type="url" value={formData.logo || ''} onChange={e => setFormData({...formData, logo: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
-                      <input type="url" value={formData.website || ''} onChange={e => setFormData({...formData, website: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                      <select value={formData.category || 'Regular'} onChange={e => setFormData({...formData, category: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
-                        <option value="Top">Top Recruiter</option>
-                        <option value="Regular">Regular</option>
-                        <option value="Partner">Partner</option>
-                      </select>
-                    </div>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="rounded text-red-600" />
-                      <span className="text-sm text-gray-700">Active (visible on public page)</span>
-                    </label>
-                  </>
-                )}
-
-                {activeTab === 'training' && (
-                  <>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
-                      <select value={formData.type || 'Industry Ready'} onChange={e => setFormData({...formData, type: e.target.value})} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
-                        <option value="Industry Ready">Industry Ready Training</option>
-                        <option value="Domain">Domain Training</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
-                      <input type="text" value={formData.title || ''} onChange={e => setFormData({...formData, title: e.target.value})} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Points</label>
-                      <div className="space-y-2">
-                        {formData.points?.map((point, index) => (
-                          <div key={index} className="flex gap-2">
-                            <input type="text" value={point} onChange={e => updatePoint(index, e.target.value)} className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" placeholder={`Point ${index + 1}`} />
-                            <button type="button" onClick={() => removePoint(index)} className="p-2 text-red-600 hover:bg-red-50 rounded">
-                              <X className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                        <button type="button" onClick={addPoint} className="text-sm text-red-600 hover:underline">+ Add Point</button>
-                      </div>
-                    </div>
-                    <label className="flex items-center gap-2">
-                      <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({...formData, isActive: e.target.checked})} className="rounded text-red-600" />
-                      <span className="text-sm text-gray-700">Active (visible on public page)</span>
-                    </label>
-                  </>
-                )}
-
-                <div className="flex justify-end gap-3 pt-4">
-                  <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-                    Cancel
-                  </button>
-                  <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2">
-                    <Save className="w-4 h-4" />
-                    Save
-                  </button>
+        <Modal
+          isOpen={showModal}
+          onClose={() => setShowModal(false)}
+          title={`${editingItem ? 'Edit' : 'Add'} ${activeTab === 'slides' ? 'Slide' : activeTab === 'recruiters' ? 'Recruiter' : 'Training Content'}`}
+          size="lg"
+        >
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {activeTab === 'slides' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                  <input type="text" value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
                 </div>
-              </form>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Student Name</label>
+                    <input type="text" value={formData.studentName || ''} onChange={e => setFormData({ ...formData, studentName: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
+                    <input type="text" value={formData.rollNumber || ''} onChange={e => setFormData({ ...formData, rollNumber: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Company *</label>
+                    <input type="text" value={formData.company || ''} onChange={e => setFormData({ ...formData, company: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Package</label>
+                    <input type="text" value={formData.package || ''} onChange={e => setFormData({ ...formData, package: e.target.value })} placeholder="₹25 LPA" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Image URL *</label>
+                  <input type="url" value={formData.image || ''} onChange={e => setFormData({ ...formData, image: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Batch</label>
+                  <input type="text" value={formData.batch || ''} onChange={e => setFormData({ ...formData, batch: e.target.value })} placeholder="Batch 2025" className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded text-red-600" />
+                  <span className="text-sm text-gray-700">Active (visible on public page)</span>
+                </label>
+              </>
+            )}
+
+            {activeTab === 'recruiters' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label>
+                  <input type="text" value={formData.name || ''} onChange={e => setFormData({ ...formData, name: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Logo URL *</label>
+                  <input type="url" value={formData.logo || ''} onChange={e => setFormData({ ...formData, logo: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Website</label>
+                  <input type="url" value={formData.website || ''} onChange={e => setFormData({ ...formData, website: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                  <select value={formData.category || 'Regular'} onChange={e => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                    <option value="Top">Top Recruiter</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Partner">Partner</option>
+                  </select>
+                </div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded text-red-600" />
+                  <span className="text-sm text-gray-700">Active (visible on public page)</span>
+                </label>
+              </>
+            )}
+
+            {activeTab === 'training' && (
+              <>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Type *</label>
+                  <select value={formData.type || 'Industry Ready'} onChange={e => setFormData({ ...formData, type: e.target.value })} className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500">
+                    <option value="Industry Ready">Industry Ready Training</option>
+                    <option value="Domain">Domain Training</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                  <input type="text" value={formData.title || ''} onChange={e => setFormData({ ...formData, title: e.target.value })} required className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Points</label>
+                  <div className="space-y-2">
+                    {formData.points?.map((point, index) => (
+                      <div key={index} className="flex gap-2">
+                        <input type="text" value={point} onChange={e => updatePoint(index, e.target.value)} className="flex-1 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-red-500" placeholder={`Point ${index + 1}`} />
+                        <button type="button" onClick={() => removePoint(index)} className="p-2 text-red-600 hover:bg-red-50 rounded">
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ))}
+                    <button type="button" onClick={addPoint} className="text-sm text-red-600 hover:underline">+ Add Point</button>
+                  </div>
+                </div>
+                <label className="flex items-center gap-2">
+                  <input type="checkbox" checked={formData.isActive} onChange={e => setFormData({ ...formData, isActive: e.target.checked })} className="rounded text-red-600" />
+                  <span className="text-sm text-gray-700">Active (visible on public page)</span>
+                </label>
+              </>
+            )}
+
+            <div className="flex justify-end gap-3 pt-4">
+              <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg">
+                Cancel
+              </button>
+              <button type="submit" className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 flex items-center gap-2">
+                <Save className="w-4 h-4" />
+                Save
+              </button>
             </div>
-          </div>
-        )}
+          </form>
+        </Modal>
       </main>
     </div>
   );

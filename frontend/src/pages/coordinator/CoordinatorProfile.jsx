@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getClubProfile, updateClubProfile } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import { Building, Save, Mail, Globe, Users, Calendar, Image, Edit, Check } from 'lucide-react';
 
 const CoordinatorProfile = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [profile, setProfile] = useState({
     clubName: user?.clubName || '',
     tagline: '',
@@ -163,7 +164,7 @@ const CoordinatorProfile = () => {
                     type="text"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.clubName}
-                    onChange={(e) => setProfile({...profile, clubName: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, clubName: e.target.value })}
                     placeholder="Enter club name"
                     disabled={!isEditing}
                     required
@@ -175,7 +176,7 @@ const CoordinatorProfile = () => {
                     type="text"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.tagline}
-                    onChange={(e) => setProfile({...profile, tagline: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, tagline: e.target.value })}
                     placeholder="Short catchy tagline"
                     disabled={!isEditing}
                   />
@@ -186,7 +187,7 @@ const CoordinatorProfile = () => {
                     type="email"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.contactEmail}
-                    onChange={(e) => setProfile({...profile, contactEmail: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, contactEmail: e.target.value })}
                     placeholder="club@example.com"
                     disabled={!isEditing}
                   />
@@ -197,7 +198,7 @@ const CoordinatorProfile = () => {
                     type="url"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.website}
-                    onChange={(e) => setProfile({...profile, website: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, website: e.target.value })}
                     placeholder="https://yourclub.com"
                     disabled={!isEditing}
                   />
@@ -208,7 +209,7 @@ const CoordinatorProfile = () => {
                     type="number"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.foundedYear}
-                    onChange={(e) => setProfile({...profile, foundedYear: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, foundedYear: e.target.value })}
                     placeholder="2020"
                     disabled={!isEditing}
                   />
@@ -219,7 +220,7 @@ const CoordinatorProfile = () => {
                     type="number"
                     className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.memberCount}
-                    onChange={(e) => setProfile({...profile, memberCount: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, memberCount: e.target.value })}
                     placeholder="50"
                     disabled={!isEditing}
                   />
@@ -231,7 +232,7 @@ const CoordinatorProfile = () => {
                 <textarea
                   className="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                   value={profile.description}
-                  onChange={(e) => setProfile({...profile, description: e.target.value})}
+                  onChange={(e) => setProfile({ ...profile, description: e.target.value })}
                   placeholder="Tell us about your club, its mission, and activities..."
                   rows={4}
                   disabled={!isEditing}
@@ -245,7 +246,7 @@ const CoordinatorProfile = () => {
                     type="url"
                     className="flex-1 p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 disabled:bg-gray-50"
                     value={profile.logo}
-                    onChange={(e) => setProfile({...profile, logo: e.target.value})}
+                    onChange={(e) => setProfile({ ...profile, logo: e.target.value })}
                     placeholder="https://example.com/logo.png"
                     disabled={!isEditing}
                   />

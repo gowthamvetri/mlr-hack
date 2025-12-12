@@ -1,19 +1,24 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import Modal from '../../components/Modal';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { 
+import {
   getCareerProgress, updateCareerProgress, getSkills, updateSkill,
-  submitCareerApproval, getMyApprovalStatus 
+  submitCareerApproval, getMyApprovalStatus
 } from '../../utils/api';
-import { 
-  Briefcase, Target, Award, TrendingUp, CheckCircle, Circle, 
+import {
+  Briefcase, Target, Award, TrendingUp, CheckCircle, Circle,
   Sparkles, Code, Users, Brain, Plus, Trash2, X,
   User, ClipboardCheck, FileCheck, MessageSquare, Send,
   Clock, AlertCircle, Lock
 } from 'lucide-react';
 
+import { useSocket } from '../../context/SocketContext';
+
 const StudentCareer = () => {
-  const { user } = useAuth();
+  const socket = useSocket();
+  const user = useSelector(selectCurrentUser);
   const [activeTab, setActiveTab] = useState('roadmap');
   const [loading, setLoading] = useState(true);
   const [showAddGoalModal, setShowAddGoalModal] = useState(false);
@@ -30,10 +35,10 @@ const StudentCareer = () => {
   const [goals, setGoals] = useState([]);
 
   const roadmapSteps = [
-    { 
-      id: 1, 
-      title: 'Complete Your Profile', 
-      description: 'Add your education, skills, and experience to your profile', 
+    {
+      id: 1,
+      title: 'Complete Your Profile',
+      description: 'Add your education, skills, and experience to your profile',
       icon: User,
       requirements: [
         'Upload profile photo',
@@ -43,9 +48,9 @@ const StudentCareer = () => {
         'Write a bio/about section'
       ]
     },
-    { 
-      id: 2, 
-      title: 'Skill Assessment', 
+    {
+      id: 2,
+      title: 'Skill Assessment',
       description: 'Complete assessments to validate and showcase your skills',
       icon: ClipboardCheck,
       requirements: [
@@ -56,9 +61,9 @@ const StudentCareer = () => {
         'Complete coding challenge'
       ]
     },
-    { 
-      id: 3, 
-      title: 'Build Your Resume', 
+    {
+      id: 3,
+      title: 'Build Your Resume',
       description: 'Create a professional resume that stands out',
       icon: FileCheck,
       requirements: [
@@ -69,9 +74,9 @@ const StudentCareer = () => {
         'Get resume reviewed by mentor'
       ]
     },
-    { 
-      id: 4, 
-      title: 'Interview Preparation', 
+    {
+      id: 4,
+      title: 'Interview Preparation',
       description: 'Practice and prepare for technical and HR interviews',
       icon: MessageSquare,
       requirements: [
@@ -82,9 +87,9 @@ const StudentCareer = () => {
         'Get feedback from career counselor'
       ]
     },
-    { 
-      id: 5, 
-      title: 'Apply for Jobs', 
+    {
+      id: 5,
+      title: 'Apply for Jobs',
       description: 'Start applying to your dream companies',
       icon: Send,
       requirements: [
@@ -106,6 +111,18 @@ const StudentCareer = () => {
   useEffect(() => {
     fetchCareerData();
   }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('career_approval_updated', () => {
+      fetchCareerData();
+    });
+
+    return () => {
+      socket.off('career_approval_updated');
+    };
+  }, [socket]);
 
   const fetchCareerData = async () => {
     try {
@@ -213,7 +230,7 @@ const StudentCareer = () => {
   };
 
   const handleUpdateGoalProgress = async (goalId, newProgress) => {
-    const updatedGoals = goals.map(goal => 
+    const updatedGoals = goals.map(goal =>
       goal.id === goalId ? { ...goal, progress: newProgress, status: newProgress >= 100 ? 'Completed' : 'In Progress' } : goal
     );
     setGoals(updatedGoals);
@@ -325,9 +342,8 @@ const StudentCareer = () => {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap ${
-                    activeTab === tab.id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
-                  }`}
+                  className={`flex items-center gap-2 px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                    }`}
                 >
                   <tab.icon className="w-4 h-4" />
                   {tab.label}
@@ -349,47 +365,44 @@ const StudentCareer = () => {
                   {roadmapSteps.map((step) => {
                     const status = getStepStatus(step.id);
                     const approval = approvalStatus[step.id];
-                    
+
                     return (
-                      <div 
-                        key={step.id} 
-                        className={`rounded-xl border-2 p-6 transition-all ${
-                          status === 'approved' ? 'border-green-200 bg-green-50' :
+                      <div
+                        key={step.id}
+                        className={`rounded-xl border-2 p-6 transition-all ${status === 'approved' ? 'border-green-200 bg-green-50' :
                           status === 'pending' ? 'border-yellow-200 bg-yellow-50' :
-                          status === 'rejected' ? 'border-red-200 bg-red-50' :
-                          status === 'available' ? 'border-primary-200 bg-white hover:shadow-md' :
-                          'border-gray-200 bg-gray-50 opacity-60'
-                        }`}
+                            status === 'rejected' ? 'border-red-200 bg-red-50' :
+                              status === 'available' ? 'border-primary-200 bg-white hover:shadow-md' :
+                                'border-gray-200 bg-gray-50 opacity-60'
+                          }`}
                       >
                         <div className="flex items-start gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                            status === 'approved' ? 'bg-green-500' :
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${status === 'approved' ? 'bg-green-500' :
                             status === 'pending' ? 'bg-yellow-500' :
-                            status === 'rejected' ? 'bg-red-500' :
-                            status === 'available' ? 'bg-primary-600' :
-                            'bg-gray-300'
-                          }`}>
+                              status === 'rejected' ? 'bg-red-500' :
+                                status === 'available' ? 'bg-primary-600' :
+                                  'bg-gray-300'
+                            }`}>
                             {status === 'approved' ? <CheckCircle className="w-6 h-6 text-white" /> :
-                             status === 'locked' ? <Lock className="w-5 h-5 text-white" /> :
-                             status === 'pending' ? <Clock className="w-5 h-5 text-white" /> :
-                             status === 'rejected' ? <AlertCircle className="w-5 h-5 text-white" /> :
-                             <step.icon className="w-6 h-6 text-white" />}
+                              status === 'locked' ? <Lock className="w-5 h-5 text-white" /> :
+                                status === 'pending' ? <Clock className="w-5 h-5 text-white" /> :
+                                  status === 'rejected' ? <AlertCircle className="w-5 h-5 text-white" /> :
+                                    <step.icon className="w-6 h-6 text-white" />}
                           </div>
 
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
                               <h4 className="font-bold text-gray-800">{step.title}</h4>
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                                status === 'approved' ? 'bg-green-100 text-green-700' :
+                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${status === 'approved' ? 'bg-green-100 text-green-700' :
                                 status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                status === 'available' ? 'bg-blue-100 text-blue-700' :
-                                'bg-gray-100 text-gray-600'
-                              }`}>
+                                  status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                    status === 'available' ? 'bg-blue-100 text-blue-700' :
+                                      'bg-gray-100 text-gray-600'
+                                }`}>
                                 {status === 'approved' ? 'Approved' :
-                                 status === 'pending' ? 'Pending Approval' :
-                                 status === 'rejected' ? 'Rejected' :
-                                 status === 'available' ? 'Available' : 'Locked'}
+                                  status === 'pending' ? 'Pending Approval' :
+                                    status === 'rejected' ? 'Rejected' :
+                                      status === 'available' ? 'Available' : 'Locked'}
                               </span>
                             </div>
                             <p className="text-sm text-gray-600 mb-4">{step.description}</p>
@@ -538,9 +551,8 @@ const StudentCareer = () => {
                       <div key={goal.id} className="bg-gray-50 rounded-xl p-5 hover:shadow-md transition-all">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                              goal.category === 'Technical' ? 'bg-blue-100' : goal.category === 'Projects' ? 'bg-green-100' : 'bg-purple-100'
-                            }`}>
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${goal.category === 'Technical' ? 'bg-blue-100' : goal.category === 'Projects' ? 'bg-green-100' : 'bg-purple-100'
+                              }`}>
                               {getCategoryIcon(goal.category)}
                             </div>
                             <div>
@@ -628,19 +640,16 @@ const StudentCareer = () => {
       </div>
 
       {/* Request Approval Modal */}
-      {showRequestModal && selectedStep && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b">
-              <div>
-                <h2 className="text-xl font-bold text-gray-800">Request Approval</h2>
-                <p className="text-sm text-gray-500">{selectedStep.title}</p>
-              </div>
-              <button onClick={() => setShowRequestModal(false)} className="p-2 hover:bg-gray-100 rounded-lg">
-                <X className="w-5 h-5 text-gray-500" />
-              </button>
-            </div>
-            <div className="p-6 space-y-4">
+      <Modal
+        isOpen={showRequestModal && selectedStep}
+        onClose={() => setShowRequestModal(false)}
+        title="Request Approval"
+        size="md"
+      >
+        {selectedStep && (
+          <>
+            <p className="text-sm text-gray-500 mb-6 -mt-4">{selectedStep.title}</p>
+            <div className="space-y-4">
               <div className="bg-blue-50 rounded-lg p-4">
                 <p className="text-sm text-blue-700">
                   By submitting this request, you confirm that you have completed all the requirements for this step.
@@ -657,73 +666,67 @@ const StudentCareer = () => {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
 
       {/* Add Skill Modal */}
-      {showAddSkillModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Add New Skill</h2>
-              <button onClick={() => setShowAddSkillModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
-                <input type="text" value={newSkill.name} onChange={(e) => setNewSkill({...newSkill, name: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Python, React" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select value={newSkill.category} onChange={(e) => setNewSkill({...newSkill, category: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
-                  <option>Technical</option><option>Soft Skills</option><option>Tools</option><option>Languages</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Initial Proficiency: {newSkill.level}%</label>
-                <input type="range" min="0" max="100" value={newSkill.level} onChange={(e) => setNewSkill({...newSkill, level: parseInt(e.target.value)})} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button onClick={() => setShowAddSkillModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                <button onClick={handleAddSkill} disabled={!newSkill.name} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Skill</button>
-              </div>
-            </div>
+      <Modal
+        isOpen={showAddSkillModal}
+        onClose={() => setShowAddSkillModal(false)}
+        title="Add New Skill"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
+            <input type="text" value={newSkill.name} onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Python, React" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select value={newSkill.category} onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
+              <option>Technical</option><option>Soft Skills</option><option>Tools</option><option>Languages</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Initial Proficiency: {newSkill.level}%</label>
+            <input type="range" min="0" max="100" value={newSkill.level} onChange={(e) => setNewSkill({ ...newSkill, level: parseInt(e.target.value) })} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button onClick={() => setShowAddSkillModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button onClick={handleAddSkill} disabled={!newSkill.name} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Skill</button>
           </div>
         </div>
-      )}
+      </Modal>
 
       {/* Add Goal Modal */}
-      {showAddGoalModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Add New Goal</h2>
-              <button onClick={() => setShowAddGoalModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
-            </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Goal Title *</label>
-                <input type="text" value={newGoal.title} onChange={(e) => setNewGoal({...newGoal, title: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Learn React Native" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-                <select value={newGoal.category} onChange={(e) => setNewGoal({...newGoal, category: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
-                  <option>Technical</option><option>Soft Skills</option><option>Projects</option><option>Certifications</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Deadline *</label>
-                <input type="date" value={newGoal.deadline} onChange={(e) => setNewGoal({...newGoal, deadline: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" />
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button onClick={() => setShowAddGoalModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                <button onClick={handleAddGoal} disabled={!newGoal.title || !newGoal.deadline} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Goal</button>
-              </div>
-            </div>
+      <Modal
+        isOpen={showAddGoalModal}
+        onClose={() => setShowAddGoalModal(false)}
+        title="Add New Goal"
+        size="md"
+      >
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Goal Title *</label>
+            <input type="text" value={newGoal.title} onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Learn React Native" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+            <select value={newGoal.category} onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
+              <option>Technical</option><option>Soft Skills</option><option>Projects</option><option>Certifications</option>
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Deadline *</label>
+            <input type="date" value={newGoal.deadline} onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" />
+          </div>
+          <div className="flex gap-3 pt-4">
+            <button onClick={() => setShowAddGoalModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button onClick={handleAddGoal} disabled={!newGoal.title || !newGoal.deadline} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Goal</button>
           </div>
         </div>
-      )}
+      </Modal>
     </DashboardLayout>
   );
 };

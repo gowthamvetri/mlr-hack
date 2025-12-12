@@ -6,7 +6,7 @@ const Event = require('../models/Event');
 const createEvent = async (req, res) => {
   try {
     const { title, description, category, date, startTime, endTime, venue, clubName } = req.body;
-    
+
     const event = new Event({
       title,
       description,
@@ -20,6 +20,16 @@ const createEvent = async (req, res) => {
     });
 
     const createdEvent = await event.save();
+
+    if (req.io) {
+      req.io.to('role:Admin').emit('event_proposed', createdEvent);
+      req.io.to('role:Admin').emit('notification', {
+        title: 'New Event Proposal',
+        message: `New event '${title}' proposed by ${clubName}`,
+        type: 'info'
+      });
+    }
+
     res.status(201).json(createdEvent);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -33,7 +43,7 @@ const getEvents = async (req, res) => {
   try {
     const { status } = req.query;
     let query = {};
-    
+
     // If student, only show approved
     if (req.user.role === 'Student') {
       query.status = 'Approved';
@@ -88,11 +98,24 @@ const updateEventStatus = async (req, res) => {
       // Notify Coordinator about the decision
       const Notification = require('../models/Notification');
       await Notification.create({
-        recipientRole: 'Club Coordinator', // Ideally target specific user, but role-based for now or we need a recipientId field
-        title: `Event Proposal ${status}`,
-        message: `Your event '${event.title}' has been ${status}. ${adminComments ? 'Comments: ' + adminComments : ''}`,
         type: 'Event'
       });
+
+      if (req.io) {
+        // Notify Coordinator
+        // Ideally we would emit to specific user, but we'll broadcast to coordinators or specific room if we had it
+        // For now, we'll assume the client filters or we just emit to all coordinators to refresh list
+        req.io.to('role:Club Coordinator').emit('event_status_updated', updatedEvent);
+
+        if (status === 'Approved') {
+          req.io.to('role:Student').emit('event_published', updatedEvent);
+          req.io.to('role:Student').emit('notification', {
+            title: 'New Club Event',
+            message: `New event '${event.title}' approved!`,
+            type: 'success'
+          });
+        }
+      }
 
       res.json(updatedEvent);
     } else {

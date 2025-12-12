@@ -1,17 +1,18 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { 
-  Users, BookOpen, CreditCard, Calendar, CheckCircle, 
+import {
+  Users, BookOpen, CreditCard, Calendar, CheckCircle,
   XCircle, AlertTriangle, TrendingUp, Clock, Award
 } from 'lucide-react';
-import { 
-  getStudentsForStaff, getAttendanceSummary, getFeeSummary, 
-  getIneligibleStudents, getPendingApprovals 
+import {
+  getAttendanceSummary, getFeeSummary,
+  getIneligibleStudents, getPendingApprovals
 } from '../../utils/api';
 
 const StaffDashboard = () => {
-  const { user } = useAuth();
+  const user = useSelector(selectCurrentUser);
   const [stats, setStats] = useState({
     totalStudents: 0,
     eligibleStudents: 0,
@@ -24,19 +25,24 @@ const StaffDashboard = () => {
   const [ineligibleList, setIneligibleList] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Staff can only see students from their department
+  const staffDepartment = user?.department || '';
+
   useEffect(() => {
     fetchDashboardData();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [staffDepartment]);
 
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
-      // Fetch all data in parallel
+      const params = staffDepartment ? { department: staffDepartment } : {};
+
+      // Fetch all data in parallel with department filter
       const [attendanceRes, feeRes, ineligibleRes, approvalsRes] = await Promise.all([
-        getAttendanceSummary().catch(() => ({ data: {} })),
-        getFeeSummary().catch(() => ({ data: {} })),
-        getIneligibleStudents().catch(() => ({ data: { students: [] } })),
+        getAttendanceSummary(params).catch(() => ({ data: {} })),
+        getFeeSummary(params).catch(() => ({ data: {} })),
+        getIneligibleStudents(params).catch(() => ({ data: { students: [] } })),
         getPendingApprovals().catch(() => ({ data: [] }))
       ]);
 
@@ -64,52 +70,52 @@ const StaffDashboard = () => {
   };
 
   const statCards = [
-    { 
-      title: 'Total Students', 
-      value: stats.totalStudents, 
-      icon: Users, 
+    {
+      title: 'Total Students',
+      value: stats.totalStudents,
+      icon: Users,
       color: 'blue',
       desc: 'Under your management'
     },
-    { 
-      title: 'Eligible for Exams', 
-      value: stats.eligibleStudents, 
-      icon: CheckCircle, 
+    {
+      title: 'Eligible for Exams',
+      value: stats.eligibleStudents,
+      icon: CheckCircle,
       color: 'green',
       desc: '≥75% attendance & fees paid'
     },
-    { 
-      title: 'Not Eligible', 
-      value: stats.ineligibleStudents, 
-      icon: XCircle, 
+    {
+      title: 'Not Eligible',
+      value: stats.ineligibleStudents,
+      icon: XCircle,
       color: 'red',
       desc: 'Need attention'
     },
-    { 
-      title: 'Avg Attendance', 
-      value: `${stats.avgAttendance}%`, 
-      icon: TrendingUp, 
+    {
+      title: 'Avg Attendance',
+      value: `${stats.avgAttendance}%`,
+      icon: TrendingUp,
       color: 'purple',
       desc: 'Overall average'
     },
-    { 
-      title: 'Fees Cleared', 
-      value: stats.feesClearedCount, 
-      icon: CreditCard, 
+    {
+      title: 'Fees Cleared',
+      value: stats.feesClearedCount,
+      icon: CreditCard,
       color: 'emerald',
       desc: 'All dues paid'
     },
-    { 
-      title: 'Fees Pending', 
-      value: stats.feesPendingCount, 
-      icon: AlertTriangle, 
+    {
+      title: 'Fees Pending',
+      value: stats.feesPendingCount,
+      icon: AlertTriangle,
       color: 'amber',
       desc: 'Outstanding dues'
     },
-    { 
-      title: 'Pending Approvals', 
-      value: stats.pendingApprovals, 
-      icon: Clock, 
+    {
+      title: 'Pending Approvals',
+      value: stats.pendingApprovals,
+      icon: Clock,
       color: 'orange',
       desc: 'Career requests'
     }
@@ -117,13 +123,13 @@ const StaffDashboard = () => {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-      green: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-      red: 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400',
-      purple: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
-      emerald: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400',
-      amber: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
-      orange: 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400'
+      blue: 'bg-blue-100 text-blue-600',
+      green: 'bg-green-100 text-green-600',
+      red: 'bg-red-100 text-red-600',
+      purple: 'bg-purple-100 text-purple-600',
+      emerald: 'bg-emerald-100 text-emerald-600',
+      amber: 'bg-amber-100 text-amber-600',
+      orange: 'bg-orange-100 text-orange-600'
     };
     return colors[color] || colors.blue;
   };
@@ -131,27 +137,50 @@ const StaffDashboard = () => {
   return (
     <DashboardLayout>
       <div className="space-y-6">
+        {/* Department Warning */}
+        {!user?.department && (
+          <div className="bg-amber-100 border border-amber-300 rounded-xl p-4 text-amber-800">
+            <div className="flex items-center gap-3">
+              <AlertTriangle className="w-6 h-6 flex-shrink-0" />
+              <div>
+                <p className="font-semibold">Department Not Set!</p>
+                <p className="text-sm">
+                  You need to set your department in your profile to manage students.
+                  <a href="/staff/profile" className="underline font-medium ml-1">Go to Profile →</a>
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Staff Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400">Welcome back, {user?.name || 'Staff'}</p>
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Staff Dashboard</h1>
+            <p className="text-sm sm:text-base text-gray-500">
+              Welcome back, {user?.name || 'Staff'}
+              {user?.department && (
+                <span className="ml-2 px-2 py-0.5 bg-primary-100 text-primary-700 rounded-full text-xs font-medium">
+                  {user.department} Department
+                </span>
+              )}
+            </p>
           </div>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {statCards.map((stat, index) => (
-            <div key={index} className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div key={index} className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
               <div className="flex items-center justify-between">
                 <div className={`p-2 rounded-lg ${getColorClasses(stat.color)}`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
               </div>
               <div className="mt-3">
-                <p className="text-2xl font-bold text-gray-900 dark:text-white">{loading ? '...' : stat.value}</p>
-                <p className="text-sm font-medium text-gray-700 dark:text-gray-300">{stat.title}</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">{stat.desc}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800">{loading ? '...' : stat.value}</p>
+                <p className="text-sm font-medium text-gray-700">{stat.title}</p>
+                <p className="text-xs text-gray-500">{stat.desc}</p>
               </div>
             </div>
           ))}
@@ -160,35 +189,35 @@ const StaffDashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ineligible Students Alert */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white flex items-center gap-2">
+              <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
                 Students Needing Attention
               </h2>
-              <a href="/staff/attendance" className="text-blue-600 dark:text-blue-400 hover:underline text-sm">
+              <a href="/staff/attendance" className="text-primary-600 hover:underline text-sm">
                 View All
               </a>
             </div>
-            
+
             {loading ? (
               <div className="text-center py-4 text-gray-500">Loading...</div>
             ) : ineligibleList.length === 0 ? (
-              <div className="text-center py-4 text-green-600 dark:text-green-400">
+              <div className="text-center py-4 text-green-600">
                 <CheckCircle className="w-8 h-8 mx-auto mb-2" />
                 All students are eligible!
               </div>
             ) : (
               <div className="space-y-3">
                 {ineligibleList.map((student, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg">
                     <div>
-                      <p className="font-medium text-gray-900 dark:text-white">{student.name}</p>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{student.rollNumber}</p>
+                      <p className="font-medium text-gray-800">{student.name}</p>
+                      <p className="text-sm text-gray-600">{student.rollNumber}</p>
                     </div>
                     <div className="text-right">
                       {student.issues?.map((issue, i) => (
-                        <p key={i} className="text-xs text-red-600 dark:text-red-400">{issue}</p>
+                        <p key={i} className="text-xs text-red-600">{issue}</p>
                       ))}
                     </div>
                   </div>
@@ -198,24 +227,24 @@ const StaffDashboard = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Quick Actions</h2>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-4">
-              <a href="/staff/attendance" className="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors">
-                <Users className="w-8 h-8 text-blue-600 dark:text-blue-400 mb-2" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Manage Attendance</span>
+              <a href="/staff/attendance" className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <Users className="w-8 h-8 text-blue-600 mb-2" />
+                <span className="text-sm font-medium text-gray-800">Manage Attendance</span>
               </a>
-              <a href="/staff/fees" className="flex flex-col items-center p-4 bg-green-50 dark:bg-green-900/20 rounded-lg hover:bg-green-100 dark:hover:bg-green-900/40 transition-colors">
-                <CreditCard className="w-8 h-8 text-green-600 dark:text-green-400 mb-2" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Fee Management</span>
+              <a href="/staff/fees" className="flex flex-col items-center p-4 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <CreditCard className="w-8 h-8 text-green-600 mb-2" />
+                <span className="text-sm font-medium text-gray-800">Fee Management</span>
               </a>
-              <a href="/staff/career-approvals" className="flex flex-col items-center p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg hover:bg-purple-100 dark:hover:bg-purple-900/40 transition-colors">
-                <Award className="w-8 h-8 text-purple-600 dark:text-purple-400 mb-2" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Career Approvals</span>
+              <a href="/staff/career-approvals" className="flex flex-col items-center p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                <Award className="w-8 h-8 text-purple-600 mb-2" />
+                <span className="text-sm font-medium text-gray-800">Career Approvals</span>
               </a>
-              <a href="/staff/eligibility" className="flex flex-col items-center p-4 bg-amber-50 dark:bg-amber-900/20 rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/40 transition-colors">
-                <CheckCircle className="w-8 h-8 text-amber-600 dark:text-amber-400 mb-2" />
-                <span className="text-sm font-medium text-gray-900 dark:text-white">Check Eligibility</span>
+              <a href="/staff/eligibility" className="flex flex-col items-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors">
+                <CheckCircle className="w-8 h-8 text-amber-600 mb-2" />
+                <span className="text-sm font-medium text-gray-800">Check Eligibility</span>
               </a>
             </div>
           </div>

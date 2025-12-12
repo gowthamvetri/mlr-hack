@@ -1,22 +1,26 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/AuthContext';
+import { useState } from 'react';
+import { useSelector } from 'react-redux';
+import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getUsers, getDepartments, deleteUser } from '../../utils/api';
-import axios from 'axios';
-import { 
-  Users, Search, Filter, UserPlus, Download, Mail, 
+import { useGetUsersQuery, useGetDepartmentsQuery, useDeleteUserMutation, useCreateUserMutation } from '../../services/api';
+import { useAppDispatch } from '../../store';
+import { showSuccessToast, showErrorToast } from '../../store/slices/uiSlice';
+import {
+  Users, Search, Filter, UserPlus, Download, Mail,
   GraduationCap, Building, ChevronDown, MoreVertical, X,
   Trash2, Edit, Eye, AlertTriangle, CheckCircle
 } from 'lucide-react';
+import Modal from '../../components/Modal';
+import { useSocket } from '../../context/SocketContext';
+import { useEffect } from 'react';
 
 const AdminStudents = () => {
-  const { user } = useAuth();
-  const [students, setStudents] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const user = useSelector(selectCurrentUser);
+  const dispatch = useAppDispatch();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDept, setFilterDept] = useState('all');
   const [filterYear, setFilterYear] = useState('all');
-  const [departments, setDepartments] = useState(['all']);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
@@ -24,86 +28,83 @@ const AdminStudents = () => {
     name: '', email: '', password: '', department: 'CSE', year: '1', rollNumber: '', role: 'Student'
   });
   const [formError, setFormError] = useState('');
-  const [formSuccess, setFormSuccess] = useState('');
 
   const years = ['all', '1', '2', '3', '4'];
 
-  useEffect(() => {
-    fetchInitialData();
-  }, []);
+  // RTK Query Hooks
+  const { data: departmentsData } = useGetDepartmentsQuery();
+  const departments = ['all', ...(departmentsData?.map(d => d.code) || ['CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT'])];
+
+  // Construct query params
+  const queryParams = { role: 'Student' };
+  if (filterDept !== 'all') queryParams.department = filterDept;
+  // Note: Backend might need to support year filtering in the API, or we filter client side.
+  // The original code passed role and department to API, and filtered by search/year on client.
+  // We'll keep that pattern for now to match behavior, but eventually backend filtering is better.
+
+  const { data: students = [], isLoading: loading, refetch } = useGetUsersQuery(queryParams, {
+    refetchOnMountOrArgChange: true
+  });
+
+  const socket = useSocket();
 
   useEffect(() => {
-    fetchStudents();
-  }, [filterDept, filterYear]);
+    if (!socket) return;
 
-  const fetchInitialData = async () => {
-    try {
-      // Fetch departments
-      const { data } = await getDepartments();
-      const deptCodes = data.map(d => d.code);
-      setDepartments(['all', ...deptCodes]);
-    } catch (error) {
-      console.log('Using default departments');
-      setDepartments(['all', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT']);
-    }
-  };
+    const handleUserUpdate = (data) => {
+      // If we received a full user object check role, otherwise just refetch
+      if (data && data.role && data.role !== 'Student') return;
+      refetch();
+    };
 
-  const fetchStudents = async () => {
-    try {
-      setLoading(true);
-      const params = { role: 'Student' };
-      if (filterDept !== 'all') params.department = filterDept;
-      const { data } = await getUsers(params);
-      setStudents(data);
-    } catch (error) {
-      console.error('Error fetching students:', error);
-      // Mock data for demo
-      setStudents([
-        { _id: '1', name: 'John Doe', email: 'john@mlrit.ac.in', department: 'CSE', year: '3', rollNumber: '20CS101', status: 'Active' },
-        { _id: '2', name: 'Jane Smith', email: 'jane@mlrit.ac.in', department: 'ECE', year: '2', rollNumber: '21EC045', status: 'Active' },
-        { _id: '3', name: 'Mike Johnson', email: 'mike@mlrit.ac.in', department: 'CSE', year: '4', rollNumber: '19CS078', status: 'Active' },
-        { _id: '4', name: 'Sarah Williams', email: 'sarah@mlrit.ac.in', department: 'MECH', year: '1', rollNumber: '22ME032', status: 'Active' },
-        { _id: '5', name: 'David Brown', email: 'david@mlrit.ac.in', department: 'IT', year: '3', rollNumber: '20IT056', status: 'Inactive' },
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
+    socket.on('user_created', handleUserUpdate);
+    socket.on('user_deleted', handleUserUpdate);
+
+    return () => {
+      socket.off('user_created', handleUserUpdate);
+      socket.off('user_deleted', handleUserUpdate);
+    };
+  }, [socket, refetch]);
+
+  const [createUser, { isLoading: isCreating }] = useCreateUserMutation();
+  const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
 
   const handleAddStudent = async (e) => {
     e.preventDefault();
-    setFormError(''); setFormSuccess('');
+    setFormError('');
+
     if (!formData.name || !formData.email || !formData.password || !formData.rollNumber) {
-      setFormError('Please fill in all required fields'); return;
+      setFormError('Please fill in all required fields');
+      return;
     }
+
     try {
-      const API = axios.create({ baseURL: '/api' });
-      await API.post('/users', formData);
-      setFormSuccess('Student added successfully!');
-      setTimeout(() => {
-        setShowAddModal(false);
-        setFormData({ name: '', email: '', password: '', department: 'CSE', year: '1', rollNumber: '', role: 'Student' });
-        setFormSuccess(''); fetchStudents();
-      }, 1500);
+      await createUser(formData).unwrap();
+      dispatch(showSuccessToast('Student added successfully!'));
+      setShowAddModal(false);
+      setFormData({ name: '', email: '', password: '', department: 'CSE', year: '1', rollNumber: '', role: 'Student' });
     } catch (error) {
-      setFormError(error.response?.data?.message || 'Error adding student');
+      setFormError(error?.data?.message || error?.message || 'Error adding student');
+      // dispatch(showErrorToast(error?.data?.message || 'Error adding student'));
     }
   };
 
   const handleDeleteStudent = async () => {
     if (!selectedStudent) return;
     try {
-      await deleteUser(selectedStudent._id);
-      setShowDeleteModal(false); setSelectedStudent(null); fetchStudents();
+      await deleteUser(selectedStudent._id).unwrap();
+      dispatch(showSuccessToast('Student deleted successfully'));
+      setShowDeleteModal(false);
+      setSelectedStudent(null);
     } catch (error) {
       console.error('Error deleting student:', error);
-      alert('Error deleting student');
+      dispatch(showErrorToast(error?.data?.message || 'Error deleting student'));
     }
   };
 
   const handleExport = () => {
     const headers = ['Name', 'Email', 'Roll Number', 'Department', 'Year', 'Status'];
-    const csvContent = [headers.join(','), ...filteredStudents.map(s => 
+    const csvContent = [headers.join(','), ...filteredStudents.map(s =>
       [s.name, s.email, s.rollNumber, s.department, s.year, s.status || 'Active'].join(',')
     )].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -115,11 +116,14 @@ const AdminStudents = () => {
 
   const filteredStudents = students.filter(s => {
     const matchesSearch = s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          s.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          s.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDept = filterDept === 'all' || s.department === filterDept;
+      s.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase());
+    // Department filtering is already done by API queryParams if selected
+    // But if 'all' was selected, queryParams didn't have department.
+    // If we change filterDept, the query re-runs.
+    // However, if we want to be safe with client side filtering as backup or for Year:
     const matchesYear = filterYear === 'all' || s.year === filterYear;
-    return matchesSearch && matchesDept && matchesYear;
+    return matchesSearch && matchesYear;
   });
 
   const stats = {
@@ -238,76 +242,79 @@ const AdminStudents = () => {
 
       {/* Students Table */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Student</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Roll Number</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Department</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Year</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Status</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {filteredStudents.map((student) => (
-                <tr key={student._id} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
-                        <span className="text-primary-600 font-semibold">
-                          {student.name?.charAt(0)}
-                        </span>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">{student.name}</p>
-                        <p className="text-sm text-gray-500">{student.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="font-mono text-gray-700">{student.rollNumber}</span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
-                      {student.department}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="text-gray-700">Year {student.year}</span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      student.status === 'Active' 
-                        ? 'bg-green-100 text-green-700' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {student.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-2">
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
-                        <Eye className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
-                        <Edit className="w-4 h-4 text-gray-500" />
-                      </button>
-                      <button 
-                        onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
-                        className="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete"
-                      >
-                        <Trash2 className="w-4 h-4 text-red-500" />
-                      </button>
-                    </div>
-                  </td>
+        {loading ? (
+          <div className="p-8 text-center text-gray-500">Loading students...</div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Student</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Roll Number</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Department</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Year</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Status</th>
+                  <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        {filteredStudents.length === 0 && (
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {filteredStudents.map((student) => (
+                  <tr key={student._id} className="hover:bg-gray-50 transition-colors">
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                          <span className="text-primary-600 font-semibold">
+                            {student.name?.charAt(0)}
+                          </span>
+                        </div>
+                        <div>
+                          <p className="font-medium text-gray-800">{student.name}</p>
+                          <p className="text-sm text-gray-500">{student.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="font-mono text-gray-700">{student.rollNumber}</span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm font-medium">
+                        {student.department}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className="text-gray-700">Year {student.year}</span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <span className={`px-3 py-1 rounded-full text-sm font-medium ${student.status === 'Active'
+                        ? 'bg-green-100 text-green-700'
+                        : 'bg-gray-100 text-gray-600'
+                        }`}>
+                        {student.status || 'Active'}
+                      </span>
+                    </td>
+                    <td className="py-4 px-6">
+                      <div className="flex items-center gap-2">
+                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="View">
+                          <Eye className="w-4 h-4 text-gray-500" />
+                        </button>
+                        <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors" title="Edit">
+                          <Edit className="w-4 h-4 text-gray-500" />
+                        </button>
+                        <button
+                          onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
+                          className="p-2 hover:bg-red-50 rounded-lg transition-colors" title="Delete"
+                        >
+                          <Trash2 className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+        {!loading && filteredStudents.length === 0 && (
           <div className="text-center py-12 text-gray-500">
             <Users className="w-12 h-12 mx-auto mb-3 text-gray-300" />
             <p className="font-medium">No students found</p>
@@ -317,47 +324,47 @@ const AdminStudents = () => {
       </div>
 
       {/* Add Student Modal */}
-      {showAddModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-6 border-b">
-              <h2 className="text-xl font-bold text-gray-800">Add New Student</h2>
-              <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-gray-100 rounded-lg"><X className="w-5 h-5 text-gray-500" /></button>
-            </div>
-            <form onSubmit={handleAddStudent} className="p-6 space-y-4">
-              {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-              {formSuccess && <div className="p-3 bg-green-50 text-green-600 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label><input type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Enter student name" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Email *</label><input type="email" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="student@mlrit.ac.in" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Password *</label><input type="password" value={formData.password} onChange={(e) => setFormData({...formData, password: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Create a password" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-1">Roll Number *</label><input type="text" value={formData.rollNumber} onChange={(e) => setFormData({...formData, rollNumber: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., 20CS101" /></div>
-              <div className="grid grid-cols-2 gap-4">
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Department</label><select value={formData.department} onChange={(e) => setFormData({...formData, department: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">{departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}</select></div>
-                <div><label className="block text-sm font-medium text-gray-700 mb-1">Year</label><select value={formData.year} onChange={(e) => setFormData({...formData, year: e.target.value})} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select></div>
-              </div>
-              <div className="flex gap-3 pt-4">
-                <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                <button type="submit" className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Add Student</button>
-              </div>
-            </form>
+      <Modal
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        title="Add New Student"
+        size="md"
+      >
+        <form onSubmit={handleAddStudent} className="space-y-4">
+          {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Full Name *</label><input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Enter student name" /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Email *</label><input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="student@mlrit.ac.in" /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Password *</label><input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="Create a password" /></div>
+          <div><label className="block text-sm font-medium text-gray-700 mb-1">Roll Number *</label><input type="text" value={formData.rollNumber} onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., 20CS101" /></div>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">Department</label><select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">{departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}</select></div>
+            <div><label className="block text-sm font-medium text-gray-700 mb-1">Year</label><select value={formData.year} onChange={(e) => setFormData({ ...formData, year: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="1">1st Year</option><option value="2">2nd Year</option><option value="3">3rd Year</option><option value="4">4th Year</option></select></div>
           </div>
-        </div>
-      )}
+          <div className="flex gap-3 pt-4">
+            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
+            <button type="submit" disabled={isCreating} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">{isCreating ? 'Adding...' : 'Add Student'}</button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Delete Confirmation Modal */}
-      {showDeleteModal && selectedStudent && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-sm w-full p-6 text-center">
+      <Modal
+        isOpen={showDeleteModal && selectedStudent}
+        onClose={() => setShowDeleteModal(false)}
+        size="sm"
+      >
+        {selectedStudent && (
+          <div className="text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4"><AlertTriangle className="w-8 h-8 text-red-600" /></div>
             <h3 className="text-lg font-bold text-gray-800 mb-2">Delete Student?</h3>
             <p className="text-gray-500 mb-6">Are you sure you want to delete <strong>{selectedStudent.name}</strong>? This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={() => { setShowDeleteModal(false); setSelectedStudent(null); }} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-              <button onClick={handleDeleteStudent} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700">Delete</button>
+              <button onClick={handleDeleteStudent} disabled={isDeleting} className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50">{isDeleting ? 'Deleting...' : 'Delete'}</button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </DashboardLayout>
   );
 };

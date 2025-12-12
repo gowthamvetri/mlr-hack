@@ -33,7 +33,7 @@ const registerUser = async (req, res) => {
 
   // Only allow direct registration for Students
   if (role !== 'Student') {
-    return res.status(400).json({ 
+    return res.status(400).json({
       message: 'Direct registration is only available for Students. SeatingManager and ClubCoordinator require admin approval.',
       requiresApproval: true
     });
@@ -59,6 +59,9 @@ const registerUser = async (req, res) => {
   });
 
   if (user) {
+    if (req.io) {
+      req.io.to('role:Admin').emit('user_created', user);
+    }
     res.status(201).json({
       _id: user._id,
       name: user.name,
@@ -77,19 +80,19 @@ const registerUser = async (req, res) => {
 const getUsers = async (req, res) => {
   try {
     const { role, department, search } = req.query;
-    
+
     let query = {};
-    
+
     // Filter by role if provided
     if (role && role !== 'all') {
       query.role = role;
     }
-    
+
     // Filter by department if provided
     if (department && department !== 'all') {
       query.department = department;
     }
-    
+
     // Search by name or email
     if (search) {
       query.$or = [
@@ -98,7 +101,7 @@ const getUsers = async (req, res) => {
         { rollNumber: { $regex: search, $options: 'i' } }
       ];
     }
-    
+
     const users = await User.find(query).select('-password');
     res.json(users);
   } catch (error) {
@@ -130,6 +133,9 @@ const deleteUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (user) {
       await User.deleteOne({ _id: req.params.id });
+      if (req.io) {
+        req.io.to('role:Admin').emit('user_deleted', req.params.id);
+      }
       res.json({ message: 'User removed' });
     } else {
       res.status(404).json({ message: 'User not found' });
@@ -161,11 +167,11 @@ const getProfile = async (req, res) => {
 const updateProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user._id);
-    
+
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
-    
+
     // Update fields - use !== undefined to allow empty strings
     if (req.body.name !== undefined) user.name = req.body.name;
     if (req.body.email !== undefined) user.email = req.body.email;
@@ -179,14 +185,14 @@ const updateProfile = async (req, res) => {
     if (req.body.address !== undefined) user.address = req.body.address;
     if (req.body.dateOfBirth !== undefined) user.dateOfBirth = req.body.dateOfBirth;
     if (req.body.gender !== undefined) user.gender = req.body.gender;
-    
+
     // Only update password if provided
     if (req.body.password) {
       user.password = req.body.password;
     }
-    
+
     const updatedUser = await user.save();
-    
+
     res.json({
       _id: updatedUser._id,
       name: updatedUser.name,
