@@ -108,15 +108,18 @@ const Onboarding = () => {
         {/* Header */}
         <header className="relative z-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-20">
+            <div className="flex items-center justify-between h-45">
+              <div className='w-1/32'>
+                
+              </div>
               <div className="flex items-center gap-3">
                 <img
                   src="/mlrit-logo.png"
                   alt="MLRIT Logo"
-                  className="h-12 w-auto object-contain"
+                  className="h-42 w-auto object-contain"
                 />
               </div>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-4 w-1/18">
                 <button
                   onClick={() => navigate('/register')}
                   className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-white hover:text-primary-300 font-medium transition-colors"
@@ -136,13 +139,9 @@ const Onboarding = () => {
         </header>
 
         {/* Hero Content */}
-        <div className="relative z-10 flex items-center min-h-[calc(100vh-5rem)]">
+        <div className="relative z-10 flex items-center min-h-[calc(80vh-5rem)]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-medium mb-8 border border-white/20">
-                <Sparkles className="w-4 h-4 text-primary-400" />
-                Integrated Academic & Examination System
-              </div>
+            <div className="max-w-2xl text-center">
 
               <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
                 Transform Your
@@ -151,12 +150,12 @@ const Onboarding = () => {
                 </span>
               </h1>
 
-              <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-xl">
+              <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-xl text-center">
                 One unified platform for students, faculty, and administrators.
                 Manage exams, track progress, and explore career paths.
               </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12">
+              <div className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center">
                 <button
                   onClick={() => navigate('/register')}
                   className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-primary-500/30 transition-all transform hover:-translate-y-0.5"

@@ -6,14 +6,15 @@ const materialSchema = mongoose.Schema({
   url: { type: String, required: true },
   size: { type: Number },
   uploadedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  uploadedAt: { type: Date, default: Date.now }
+  uploadedAt: { type: Date, default: Date.now },
+  mindMap: { type: String } // Markdown content for mind map
 });
 
 const courseSchema = mongoose.Schema({
   name: { type: String, required: true },
   code: { type: String, required: true, unique: true },
   description: { type: String },
-  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
+  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department', required: true },
   credits: { type: Number, default: 3 },
   instructor: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   instructorName: { type: String },

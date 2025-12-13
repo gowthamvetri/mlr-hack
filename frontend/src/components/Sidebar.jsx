@@ -13,6 +13,7 @@ import {
   BarChart3,
   BookOpen,
   Briefcase,
+  Calculator,
   HeadphonesIcon,
   School,
   Target,
@@ -42,6 +43,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/student/exams', icon: ClipboardList, label: 'My Exams' },
           { to: '/student/study', icon: GraduationCap, label: 'Study Support' },
           { to: '/student/calendar', icon: Calendar, label: 'Calendar' },
+          { to: '/student/calculators', icon: Calculator, label: 'Calculators' },
           { to: '/student/profile', icon: UserCircle, label: 'My Profile' },
         ];
       case 'Admin':
@@ -72,9 +74,11 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/club-coordinator/profile', icon: UserCircle, label: 'Club Profile' },
         ];
       case 'Staff':
+      case 'Faculty':
         return [
           { to: '/staff', icon: LayoutDashboard, label: 'Dashboard' },
-          { to: '/staff/attendance', icon: Users, label: 'Attendance' },
+          { to: '/staff/courses', icon: BookOpen, label: 'My Courses' },
+          { to: '/staff/attendance', icon: ClipboardList, label: 'Attendance' },
           { to: '/staff/fees', icon: ClipboardCheck, label: 'Fee Management' },
           { to: '/staff/career-approvals', icon: Target, label: 'Career Approvals' },
           { to: '/staff/eligibility', icon: ClipboardList, label: 'Eligibility Check' },

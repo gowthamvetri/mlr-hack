@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { 
-  getCourses, 
-  getCourseById, 
-  createCourse, 
-  updateCourse, 
+const {
+  getCourses,
+  getCourseById,
+  createCourse,
+  updateCourse,
   deleteCourse,
   enrollStudent,
   getCourseStats,
@@ -15,20 +15,25 @@ const {
   getMyTaughtCourses,
   uploadMaterialAsTeacher
 } = require('../controllers/courseController');
-const { protect, admin } = require('../middleware/authMiddleware');
-const { uploadCourseMaterial } = require('../config/upload');
+const { generateMindMap, saveMindMap } = require('../controllers/mindMapController');
+const { protect, admin, authorize } = require('../middleware/authMiddleware');
+const { uploadCourseMaterial } = require('../middleware/uploadMiddleware'); // Import from new middleware location
 
 router.route('/')
-  .get(protect, getCourses)
-  .post(protect, admin, createCourse);
+  .get(getCourses) // Changed from protect, getCourses
+  .post(protect, authorize('Admin', 'Faculty'), createCourse); // Changed from admin to authorize
 
-router.route('/stats').get(protect, admin, getCourseStats);
+router.route('/stats').get(protect, authorize('Admin', 'Faculty'), getCourseStats); // Changed from admin to authorize
 
 // Student routes
 router.route('/my-enrolled').get(protect, getMyEnrolledCourses);
 
-// Teacher routes  
-router.route('/my-taught').get(protect, getMyTaughtCourses);
+// Teacher routes
+router.route('/my-taught').get(protect, authorize('Faculty', 'Staff'), getMyTaughtCourses); // Changed to authorize
+
+// Mind Map Routes
+router.route('/mindmap/generate').post(protect, authorize('Admin', 'Staff', 'Faculty'), generateMindMap);
+router.route('/mindmap/save').post(protect, authorize('Admin', 'Staff', 'Faculty'), saveMindMap);
 
 router.route('/:id')
   .get(protect, getCourseById)

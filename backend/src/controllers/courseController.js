@@ -9,8 +9,14 @@ const getCourses = async (req, res) => {
     const { department, status, instructor } = req.query;
     const filter = {};
 
-    // Handle department filter - can be department code or ID
-    if (department) {
+    // For students, automatically filter by their department
+    if (req.user && req.user.role === 'Student' && req.user.department) {
+      const studentDept = await Department.findOne({ code: req.user.department });
+      if (studentDept) {
+        filter.department = studentDept._id;
+      }
+    } else if (department) {
+      // Handle department filter - can be department code or ID
       const dept = await Department.findOne({ code: department });
       if (dept) {
         filter.department = dept._id;
@@ -77,14 +83,19 @@ const createCourse = async (req, res) => {
       return res.status(400).json({ message: 'Course code already exists' });
     }
 
-    // Handle department - can be code or ID
+    // Handle department - can be code or ID (REQUIRED)
     let departmentId = null;
-    if (department) {
-      if (mongoose.Types.ObjectId.isValid(department)) {
-        departmentId = department;
+    if (!department) {
+      return res.status(400).json({ message: 'Department is required' });
+    }
+    if (mongoose.Types.ObjectId.isValid(department)) {
+      departmentId = department;
+    } else {
+      const dept = await Department.findOne({ code: department });
+      if (dept) {
+        departmentId = dept._id;
       } else {
-        const dept = await Department.findOne({ code: department });
-        if (dept) departmentId = dept._id;
+        return res.status(400).json({ message: 'Invalid department' });
       }
     }
 
@@ -444,7 +455,7 @@ const getMyTaughtCourses = async (req, res) => {
 // Upload course materials (for Teachers assigned to the course)
 const uploadMaterialAsTeacher = async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id);
+    const course = await Course.findById(req.params.id).populate('department');
     if (!course) {
       return res.status(404).json({ message: 'Course not found' });
     }
@@ -456,6 +467,15 @@ const uploadMaterialAsTeacher = async (req, res) => {
 
     if (!isInstructor && !isAdmin) {
       return res.status(403).json({ message: 'Only the assigned instructor or admin can upload materials to this course' });
+    }
+
+    // Additional check for Staff: must be in the same department as the course
+    if (req.user.role === 'Staff' && !isAdmin) {
+      const staffDept = req.user.department || req.user.staffDepartment;
+      const courseDept = course.department?.code;
+      if (staffDept && courseDept && staffDept !== courseDept) {
+        return res.status(403).json({ message: 'You can only upload materials for courses in your department' });
+      }
     }
 
     if (!req.file) {

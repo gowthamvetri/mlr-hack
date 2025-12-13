@@ -6,9 +6,10 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { getCourses, getDepartments, getCourseStats, createCourse, deleteCourse, getCourseById, updateCourse, uploadCourseMaterial, deleteCourseMaterial, getUsers } from '../../utils/api';
 import {
   BookOpen, Search, Plus, Users, Clock, Star,
-  MoreVertical, Edit, Trash2, Eye, Filter, X, AlertTriangle, CheckCircle, Download, Upload, FileText, File
+  MoreVertical, Edit, Trash2, Eye, Filter, X, AlertTriangle, CheckCircle, Download, Upload, FileText, File, BrainCircuit
 } from 'lucide-react';
 import Modal from '../../components/Modal';
+import MindMapPreview from '../../components/MindMapPreview'; // Import MindMapPreview
 
 const AdminCourses = () => {
   const socket = useSocket();
@@ -33,6 +34,8 @@ const AdminCourses = () => {
   const [uploadingMaterial, setUploadingMaterial] = useState(false);
   const [materialFile, setMaterialFile] = useState(null);
   const [materialName, setMaterialName] = useState('');
+  const [selectedMaterial, setSelectedMaterial] = useState(null); // For mind map
+  const [showMindMapModal, setShowMindMapModal] = useState(false);
   const [stats, setStats] = useState({
     total: 0,
     active: 0,
@@ -686,9 +689,16 @@ const AdminCourses = () => {
                           <Download className="w-4 h-4" />
                         </a>
                         <button
-                          onClick={() => handleDeleteMaterial(material._id)}
-                          className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          onClick={() => {
+                            setSelectedMaterial(material);
+                            setShowMindMapModal(true);
+                          }}
+                          className="p-1 hover:bg-purple-50 rounded-lg transition-colors text-purple-600"
+                          title="Generate/View Mind Map"
                         >
+                          <BrainCircuit className="w-4 h-4" />
+                        </button>
+                        <button onClick={() => handleDeleteMaterial(material._id)} className="p-1 hover:bg-red-50 rounded-lg transition-colors text-red-500" title="Delete Material">
                           <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
@@ -710,6 +720,22 @@ const AdminCourses = () => {
           </div>
         )}
       </Modal>
+      {/* Mind Map Modal */}
+      {showMindMapModal && selectedCourse && selectedMaterial && (
+        <MindMapPreview
+          courseId={selectedCourse._id}
+          materialId={selectedMaterial._id}
+          onClose={() => {
+            setShowMindMapModal(false);
+            setSelectedMaterial(null);
+          }}
+          onSave={() => {
+            // Optional: refresh materials or show success message
+            setShowMindMapModal(false);
+          }}
+          initialMarkdown={selectedMaterial.mindMap}
+        />
+      )}
     </DashboardLayout>
   );
 };

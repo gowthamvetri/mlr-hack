@@ -1,4 +1,6 @@
 const User = require('../models/User');
+const Course = require('../models/Course');
+const StaffRating = require('../models/StaffRating');
 const generateToken = require('../utils/generateToken');
 
 // @desc    Auth user & get token
@@ -103,6 +105,31 @@ const getUsers = async (req, res) => {
     }
 
     const users = await User.find(query).select('-password');
+
+    // If fetching Staff users, enrich with course count and average rating
+    if (role === 'Staff' && users.length > 0) {
+      const enrichedUsers = await Promise.all(users.map(async (user) => {
+        const userObj = user.toObject();
+
+        // Get course count where this user is instructor
+        const courseCount = await Course.countDocuments({ instructor: user._id });
+
+        // Get average rating
+        const ratingResult = await StaffRating.aggregate([
+          { $match: { staff: user._id } },
+          { $group: { _id: '$staff', avgRating: { $avg: '$rating' }, count: { $sum: 1 } } }
+        ]);
+
+        userObj.courses = courseCount;
+        userObj.rating = ratingResult.length > 0 ? parseFloat(ratingResult[0].avgRating.toFixed(1)) : null;
+        userObj.ratingCount = ratingResult.length > 0 ? ratingResult[0].count : 0;
+
+        return userObj;
+      }));
+
+      return res.json(enrichedUsers);
+    }
+
     res.json(users);
   } catch (error) {
     res.status(500).json({ message: error.message });

@@ -166,4 +166,10 @@ export const createTrainingContent = (data) => API.post('/placement-page/admin/t
 export const updateTrainingContent = (id, data) => API.put(`/placement-page/admin/training/${id}`, data);
 export const deleteTrainingContent = (id) => API.delete(`/placement-page/admin/training/${id}`);
 
+// Staff Ratings
+export const submitStaffRating = (data) => API.post('/ratings', data);
+export const getStaffRatings = (staffId) => API.get(`/ratings/staff/${staffId}`);
+export const canRateStaff = (staffId, courseId) => API.get(`/ratings/can-rate/${staffId}/${courseId}`);
+export const getStaffAverageRating = (staffId) => API.get(`/ratings/average/${staffId}`);
+
 export default API;

@@ -79,12 +79,17 @@ const AdminStaff = () => {
             const { data } = await getUsers(params);
             setStaff(data || []);
 
-            // Calculate stats from data
+            // Calculate stats from enriched data
             const staffData = data || [];
             const total = staffData.length;
             const professors = staffData.filter(f => f.designation?.includes('Professor')).length;
-            const avgRating = 0; // Staff users don't have ratings stored
-            const totalCourses = staffData.reduce((acc, f) => acc + (f.subjects?.length || 0), 0);
+            // Calculate average rating from staff with ratings
+            const ratedStaff = staffData.filter(f => f.rating != null);
+            const avgRating = ratedStaff.length > 0
+                ? (ratedStaff.reduce((acc, f) => acc + f.rating, 0) / ratedStaff.length).toFixed(1)
+                : 0;
+            // Calculate total courses from enriched data
+            const totalCourses = staffData.reduce((acc, f) => acc + (f.courses || 0), 0);
             setStats({ total, professors, avgRating, totalCourses });
             return staffData;
         } catch (error) {

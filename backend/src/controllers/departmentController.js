@@ -28,8 +28,7 @@ const getPublicDepartments = async (req, res) => {
 const getDepartmentBySlug = async (req, res) => {
   try {
     const department = await Department.findOne({ slug: req.params.slug })
-      .populate('headOfDepartment', 'name email profileImage');
-    
+    .populate('headOfDepartment', 'name email profileImage');
     if (!department) {
       return res.status(404).json({ message: 'Department not found' });
     }

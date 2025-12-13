@@ -6,9 +6,10 @@ import { getCourses, enrollInCourse, getCourseMaterials } from '../../utils/api'
 import {
   BookOpen, Search, Users, Clock, Star,
   Play, CheckCircle, Filter, BookMarked, Award,
-  FileText, Download, File, X, Folder
+  FileText, Download, File, X, Folder, BrainCircuit
 } from 'lucide-react';
 import Modal from '../../components/Modal';
+import MindMapPreview from '../../components/MindMapPreview';
 
 const StudentCourses = () => {
   /* REMOVED: const { user } = useAuth(); */
@@ -24,6 +25,10 @@ const StudentCourses = () => {
   const [materials, setMaterials] = useState([]);
   const [loadingMaterials, setLoadingMaterials] = useState(false);
   const [courses, setCourses] = useState([]);
+
+  // Mind Map State
+  const [showMindMapModal, setShowMindMapModal] = useState(false);
+  const [selectedMaterial, setSelectedMaterial] = useState(null);
 
   useEffect(() => {
     fetchCourses();
@@ -370,6 +375,18 @@ const StudentCourses = () => {
                           <Download className="w-4 h-4" />
                           <span className="hidden sm:inline">Download</span>
                         </a>
+                        {material.mindMap && (
+                          <button
+                            onClick={() => {
+                              setSelectedMaterial(material);
+                              setShowMindMapModal(true);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-600 text-purple-600 hover:text-white rounded-xl text-sm font-bold transition-all"
+                          >
+                            <BrainCircuit className="w-4 h-4" />
+                            Mind Map
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -425,6 +442,20 @@ const StudentCourses = () => {
           )}
         </Modal>
       </div>
+
+      {/* Mind Map Modal */}
+      {showMindMapModal && selectedCourse && selectedMaterial && (
+        <MindMapPreview
+          courseId={selectedCourse._id}
+          materialId={selectedMaterial._id}
+          onClose={() => {
+            setShowMindMapModal(false);
+            setSelectedMaterial(null);
+          }}
+          readOnly={true}
+          initialMarkdown={selectedMaterial.mindMap}
+        />
+      )}
     </DashboardLayout>
   );
 };

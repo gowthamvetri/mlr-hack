@@ -36,6 +36,7 @@ const StudentCalendar = lazy(() => import('./pages/student/StudentCalendar'));
 const StudentCourses = lazy(() => import('./pages/student/StudentCourses'));
 const StudentCareer = lazy(() => import('./pages/student/StudentCareer'));
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'));
+const StudentCalculators = lazy(() => import('./pages/student/StudentCalculators'));
 
 // Admin Pages
 const AdminExams = lazy(() => import('./pages/admin/AdminExams'));
@@ -66,6 +67,7 @@ const StaffFees = lazy(() => import('./pages/staff/StaffFees'));
 const StaffCareerApprovals = lazy(() => import('./pages/staff/StaffCareerApprovals'));
 const StaffEligibility = lazy(() => import('./pages/staff/StaffEligibility'));
 const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
+const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 
 function App() {
   return (
@@ -139,6 +141,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Student']}>
                   <StudentProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/calculators"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentCalculators />
                 </ProtectedRoute>
               }
             />
@@ -307,6 +317,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
                   <StaffDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/courses"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffCourses />
                 </ProtectedRoute>
               }
             />

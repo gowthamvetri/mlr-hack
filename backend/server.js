@@ -78,6 +78,7 @@ app.use('/api/student-progress', require('./src/routes/studentProgressRoutes'));
 app.use('/api/activities', require('./src/routes/activityRoutes'));
 app.use('/api/career-approvals', require('./src/routes/careerApprovalRoutes'));
 app.use('/api/registration-requests', require('./src/routes/registrationRequestRoutes'));
+app.use('/api/ratings', require('./src/routes/staffRatingRoutes'));
 app.use('/api/staff', require('./src/routes/staffRoutes'));
 app.use('/api/placement-page', require('./src/routes/placementPageRoutes'));
 
