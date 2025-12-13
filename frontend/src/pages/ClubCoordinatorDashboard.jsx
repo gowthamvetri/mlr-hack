@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { selectCurrentUser } from '../../store/slices/authSlice';
+import { selectCurrentUser } from '../store/slices/authSlice';
 import { createEvent, getEvents, getClubProfile, updateClubProfile } from '../utils/api';
 import DashboardLayout from '../components/DashboardLayout';
 import StatCard from '../components/StatCard';
