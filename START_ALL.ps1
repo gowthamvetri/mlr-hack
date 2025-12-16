@@ -80,7 +80,7 @@ Write-Host ""
 Write-Host "🧪 Test the chatbot:" -ForegroundColor Green
 Write-Host "  1. Open http://localhost:5173 in your browser" -ForegroundColor Gray
 Write-Host "  2. Click the chatbot button (bottom-right)" -ForegroundColor Gray
-Write-Host "  3. Ask: 'What companies visited for placements?'" -ForegroundColor Gray
+Write-Host "  3. Ask: `"What companies visited for placements?`"" -ForegroundColor Gray
 Write-Host ""
 
 # Wait for user input

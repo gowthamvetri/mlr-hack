@@ -1,8 +1,8 @@
 """
-LLM Service - Google Gemini Integration
+LLM Service - Groq Integration (Fast Inference)
 """
 from typing import List, Dict, Any, Optional
-import google.generativeai as genai
+from groq import Groq
 from app.config import settings
 import logging
 
@@ -10,18 +10,13 @@ logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    """Service for LLM interactions using Google Gemini"""
+    """Service for LLM interactions using Groq"""
     
     def __init__(self):
-        self.provider = settings.LLM_PROVIDER
-        
-        # Configure Gemini API
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        # Use gemini-1.5-flash-latest (correct model name for API v1beta)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
-        
-        logger.info(f"✅ Initialized LLM Service with Google Gemini")
-        logger.info(f"Model: gemini-1.5-flash-latest (1500 requests/day free tier)")
+        self.client = Groq(api_key=settings.GROQ_API_KEY)
+        self.model = "llama-3.3-70b-versatile"  # Fast and capable model
+        logger.info(f"✅ Initialized LLM Service with Groq")
+        logger.info(f"Model: {self.model}")
     
     def generate_response(
         self,
@@ -31,7 +26,7 @@ class LLMService:
         max_tokens: int = 1000
     ) -> str:
         """
-        Generate response from Google Gemini
+        Generate response from Groq
         
         Args:
             prompt: User prompt
@@ -43,40 +38,24 @@ class LLMService:
             Generated text
         """
         try:
-            # Combine system prompt and user prompt
-            full_prompt = prompt
+            messages = []
             if system_prompt:
-                full_prompt = f"{system_prompt}\n\n{prompt}"
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
             
-            # Configure generation settings
-            generation_config = genai.types.GenerationConfig(
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
                 temperature=temperature,
-                max_output_tokens=max_tokens,
+                max_tokens=max_tokens
             )
             
-            # Generate response
-            response = self.model.generate_content(
-                full_prompt,
-                generation_config=generation_config
-            )
-            
-            # Handle response safely - NEVER use response.text directly
-            if response.candidates and len(response.candidates) > 0:
-                candidate = response.candidates[0]
-                if candidate.content and candidate.content.parts:
-                    # Extract text from parts
-                    text_parts = [part.text for part in candidate.content.parts if hasattr(part, 'text')]
-                    result = ' '.join(text_parts).strip()
-                    if result:
-                        return result
-            
-            # If no valid response, return empty string
-            logger.warning("Gemini returned empty response")
-            return ""
+            result = response.choices[0].message.content.strip()
+            return result if result else ""
             
         except Exception as e:
-            logger.error(f"Error generating Gemini response: {str(e)}")
-            raise Exception(f"Failed to get response from Gemini: {str(e)}")
+            logger.error(f"Error generating Groq response: {str(e)}")
+            raise Exception(f"Failed to get response from Groq: {str(e)}")
     
     def generate_rag_response(
         self,
@@ -206,7 +185,7 @@ Good: "The campus has a central library with physical books, e-resources, NPTEL 
 
 BE NATURAL, FRIENDLY, AND HELPFUL!"""
         
-        # Simplify the context - don't show metadata to Gemini
+        # Simplify the context - don't show metadata to LLM
         simple_context_parts = []
         for i, text in enumerate(retrieved_texts, 1):
             simple_context_parts.append(f"Source {i}:\n{text}")
@@ -229,7 +208,7 @@ Answer naturally and concisely."""
     
     def detect_category(self, question: str) -> str:
         """
-        Detect the category of a user question using Gemini
+        Detect the category of a user question using Groq
         Extracts key topics to match against dynamic categories
         
         Args:

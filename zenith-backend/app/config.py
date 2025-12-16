@@ -21,11 +21,12 @@ class Settings(BaseSettings):
     PINECONE_ENVIRONMENT: str = "us-east-1"
     
     # LLM Provider Configuration
-    LLM_PROVIDER: str = "local_lmstudio"  # local_lmstudio, openai, or gemini
+    LLM_PROVIDER: str = "groq"  # groq, openai, or gemini
     LM_STUDIO_BASE_URL: str = "http://127.0.0.1:1234/v1"
     LM_STUDIO_MODEL: str = "google/gemma-3-12b"
     OPENAI_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
+    GROQ_API_KEY: Optional[str] = None
     
     # Embedding Configuration
     EMBEDDING_MODEL: str = "text-embedding-nomic-embed-text"
