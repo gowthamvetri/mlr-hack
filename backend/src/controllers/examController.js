@@ -168,6 +168,8 @@ const createExamSchedule = async (req, res) => {
   }
 };
 
+const { generateBulkHallTickets } = require('../services/hallTicketService');
+
 // @desc    Generate Hall Tickets for a Batch/Semester
 // @route   PUT /api/exams/generate-hall-tickets-batch
 // @access  Private/Admin
@@ -191,6 +193,21 @@ const generateBatchHallTickets = async (req, res) => {
     if (exams.length === 0) {
       return res.status(404).json({ message: 'No exams found for this criteria' });
     }
+
+    // Find all eligible students
+    const students = await User.find({
+      role: 'Student',
+      department,
+      year: year.toString(),
+      isApproved: true // Only approved students get hall tickets
+    });
+
+    if (students.length === 0) {
+      return res.status(404).json({ message: 'No eligible students found' });
+    }
+
+    // Generate physical PDF files
+    const generationResult = await generateBulkHallTickets(students, exams[0], exams);
 
     // Update all to have hallTicketsGenerated = true
     await Exam.updateMany(
@@ -216,8 +233,13 @@ const generateBatchHallTickets = async (req, res) => {
       });
     }
 
-    res.json({ message: `Hall tickets generated for ${exams.length} exams.`, exams });
+    res.json({
+      message: `Hall tickets generated for ${exams.length} exams.`,
+      exams,
+      stats: generationResult
+    });
   } catch (error) {
+    console.error('Hall ticket generation error:', error);
     res.status(500).json({ message: error.message });
   }
 };
