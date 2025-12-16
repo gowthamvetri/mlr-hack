@@ -95,7 +95,7 @@ const AdminUsers = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <GraduationCap className="w-5 h-5 text-blue-600" />
@@ -106,7 +106,7 @@ const AdminUsers = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
               <Shield className="w-5 h-5 text-red-600" />
@@ -117,7 +117,7 @@ const AdminUsers = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <Building className="w-5 h-5 text-purple-600" />
@@ -128,7 +128,7 @@ const AdminUsers = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <Calendar className="w-5 h-5 text-green-600" />
@@ -142,7 +142,7 @@ const AdminUsers = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="glass-card rounded-xl tilt-card p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -172,7 +172,7 @@ const AdminUsers = () => {
       </div>
 
       {/* Users Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden relative">
+      <div className="glass-card rounded-xl tilt-card overflow-hidden relative">
         {/* Loading overlay for refetching */}
         {isFetching && !isLoading && (
           <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">

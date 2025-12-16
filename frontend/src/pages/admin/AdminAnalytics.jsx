@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import {
   getAdminStats, getDepartments, getCourseStats,
   getPlacementStats, getFacultyStats
@@ -161,15 +162,15 @@ const AdminAnalytics = () => {
       {/* Overview Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
         {overviewStats.map((stat, index) => (
-          <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
+          <div key={index} className="glass-card rounded-xl p-4 sm:p-6 tilt-card">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${index === 0 ? 'bg-primary-100' :
-                  index === 1 ? 'bg-green-100' :
-                    index === 2 ? 'bg-purple-100' : 'bg-blue-100'
+                index === 1 ? 'bg-green-100' :
+                  index === 2 ? 'bg-purple-100' : 'bg-blue-100'
                 }`}>
                 <stat.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${index === 0 ? 'text-primary-600' :
-                    index === 1 ? 'text-green-600' :
-                      index === 2 ? 'text-purple-600' : 'text-blue-600'
+                  index === 1 ? 'text-green-600' :
+                    index === 2 ? 'text-purple-600' : 'text-blue-600'
                   }`} />
               </div>
               <div className={`flex items-center gap-1 text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'
@@ -178,7 +179,7 @@ const AdminAnalytics = () => {
                 {stat.change}
               </div>
             </div>
-            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stat.value}</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800"><AnimatedNumber value={parseInt(stat.value.replace(/[^0-9]/g, '')) || 0} suffix={stat.value.includes('%') ? '%' : ''} /></p>
             <p className="text-xs sm:text-sm text-gray-500 mt-1">{stat.label}</p>
           </div>
         ))}
@@ -186,7 +187,7 @@ const AdminAnalytics = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Department Performance */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="glass-card rounded-xl tilt-card p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-gray-800">Department Performance</h3>
             <BarChart3 className="w-5 h-5 text-gray-400" />
@@ -242,7 +243,7 @@ const AdminAnalytics = () => {
         </div>
 
         {/* Monthly Trends Chart */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="glass-card rounded-xl tilt-card p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-bold text-gray-800">Monthly Trends</h3>
             <TrendingUp className="w-5 h-5 text-gray-400" />
@@ -291,7 +292,7 @@ const AdminAnalytics = () => {
       </div>
 
       {/* Top Courses */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="glass-card rounded-xl tilt-card p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="font-bold text-gray-800">Top Performing Courses</h3>
           <button className="text-primary-600 text-sm font-medium hover:underline">View All</button>

@@ -3,6 +3,7 @@ import Modal from '../../components/Modal';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import {
   getCareerProgress, updateCareerProgress, getSkills, updateSkill,
   submitCareerApproval, getMyApprovalStatus
@@ -286,7 +287,7 @@ const StudentCareer = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-primary-100 text-xs sm:text-sm">Steps Completed</p>
-                <p className="text-2xl sm:text-3xl font-bold mt-1">{getCompletedStepsCount()}/5</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1"><AnimatedNumber value={getCompletedStepsCount()} />/5</p>
               </div>
               <div className="w-10 sm:w-12 h-10 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <Award className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
@@ -297,11 +298,11 @@ const StudentCareer = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-xs sm:text-sm">Career Ready</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{Math.round((getCompletedStepsCount() / 5) * 100)}%</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={Math.round((getCompletedStepsCount() / 5) * 100)} suffix="%" /></p>
               </div>
               <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
@@ -309,11 +310,11 @@ const StudentCareer = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-xs sm:text-sm">Skills Added</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{skills.length}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={skills.length} /></p>
               </div>
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <Brain className="w-5 h-5 text-blue-600" />
@@ -321,11 +322,11 @@ const StudentCareer = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+          <div className="glass-card rounded-xl p-5 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 text-sm">Active Goals</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1">{goals.filter(g => g.status === 'In Progress').length}</p>
+                <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={goals.filter(g => g.status === 'In Progress').length} /></p>
               </div>
               <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
                 <Target className="w-5 h-5 text-purple-600" />
@@ -335,7 +336,7 @@ const StudentCareer = () => {
         </div>
 
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="glass-card rounded-xl tilt-card">
           <div className="border-b border-gray-100">
             <div className="flex overflow-x-auto">
               {tabs.map((tab) => (

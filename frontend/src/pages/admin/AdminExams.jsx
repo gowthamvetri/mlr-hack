@@ -112,8 +112,8 @@ const AdminExams = () => {
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}
           className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${showCreateForm
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-primary-600 text-white hover:bg-primary-700'
+            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
         >
           {showCreateForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
@@ -123,7 +123,7 @@ const AdminExams = () => {
 
       {/* Create Schedule Form */}
       {showCreateForm && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="glass-card rounded-xl tilt-card p-6 mb-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-6">Create New Exam Schedule</h2>
 
           {/* Step 1: Schedule Details */}
@@ -259,7 +259,7 @@ const AdminExams = () => {
       )}
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="glass-card rounded-xl tilt-card p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -290,7 +290,7 @@ const AdminExams = () => {
 
       {/* Hall Ticket Generation by Group */}
       {Object.keys(groupedExams).length > 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+        <div className="glass-card rounded-xl tilt-card p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
               <Ticket className="w-5 h-5 text-purple-600" />
@@ -325,7 +325,7 @@ const AdminExams = () => {
       )}
 
       {/* Exams List */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="glass-card rounded-xl tilt-card overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <h2 className="text-lg font-semibold text-gray-800">All Exams ({filteredExams.length})</h2>
         </div>

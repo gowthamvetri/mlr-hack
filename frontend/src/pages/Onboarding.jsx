@@ -1,19 +1,145 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
+import AnimatedNumber from '../components/AnimatedNumber';
 import {
-  GraduationCap, Building2, Compass, ClipboardCheck,
-  LineChart, Calendar, Users, Award, ArrowRight,
-  CheckCircle, Play, Sparkles, BookOpen, Target,
-  TrendingUp, Shield, Zap, Globe, ChevronRight, Star, Check, Briefcase
+  GraduationCap, Building2, Users, ArrowRight,
+  CheckCircle, Sparkles, Target, Shield, Globe, ChevronRight, Briefcase,
+  ChevronDown, ExternalLink
 } from 'lucide-react';
+
+gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 const API_URL = import.meta.env.VITE_API;
 
 const Onboarding = () => {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('student');
   const [departments, setDepartments] = useState([]);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [activePanel, setActivePanel] = useState(0);
+
+  // Refs
+  const containerRef = useRef(null);
+  const horizontalRef = useRef(null);
+  const panelsRef = useRef([]);
+
+  // Custom navigation that kills ScrollTrigger first
+  const handleNavigation = (path) => {
+    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
+    navigate(path);
+  };
+
+  // Store ScrollTrigger reference for navigation
+  const scrollTriggerRef = useRef(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoaded(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Horizontal Scroll with Stacking Effect
+  useEffect(() => {
+    if (!containerRef.current || !horizontalRef.current) return;
+
+    const panels = panelsRef.current.filter(Boolean);
+
+    const ctx = gsap.context(() => {
+      // Hero entrance animations
+      const heroTl = gsap.timeline({ delay: 0.3 });
+      heroTl
+        .fromTo('.hero-badge', { opacity: 0, y: 40, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.8, ease: 'back.out(1.7)' })
+        .fromTo('.hero-title-1', { opacity: 0, y: 60 }, { opacity: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.4')
+        .fromTo('.hero-title-2', { opacity: 0, y: 60, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: 'elastic.out(1, 0.5)' }, '-=0.6')
+        .fromTo('.hero-subtitle', { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }, '-=0.6')
+        .fromTo('.hero-cta > *', { opacity: 0, y: 30, scale: 0.9 }, { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.15, ease: 'back.out(1.7)' }, '-=0.4')
+        .fromTo('.hero-stats > div', { opacity: 0, y: 40, rotateX: 45 }, { opacity: 1, y: 0, rotateX: 0, duration: 0.7, stagger: 0.1, ease: 'power3.out' }, '-=0.3');
+
+      // Floating animation
+      gsap.to('.float-slow', { y: -20, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut' });
+      gsap.to('.float-fast', { y: -15, duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5 });
+
+      // Horizontal Scroll Animation
+      const totalWidth = horizontalRef.current.scrollWidth - window.innerWidth;
+
+      const horizontalScroll = gsap.to(horizontalRef.current, {
+        x: -totalWidth,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: containerRef.current,
+          start: 'top top',
+          end: () => `+=${totalWidth}`,
+          scrub: 1,
+          pin: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
+          onUpdate: (self) => {
+            const newActivePanel = Math.round(self.progress * (panels.length - 1));
+            if (newActivePanel !== activePanel) {
+              setActivePanel(newActivePanel);
+            }
+          }
+        }
+      });
+
+      // Store the ScrollTrigger reference for navigation
+      scrollTriggerRef.current = horizontalScroll.scrollTrigger;
+
+      // Panel animations
+      panels.forEach((panel, i) => {
+        if (i === 0) return;
+
+        gsap.fromTo(panel,
+          { opacity: 0.3, scale: 0.85, rotateY: -15 },
+          {
+            opacity: 1, scale: 1, rotateY: 0, ease: 'power2.out',
+            scrollTrigger: {
+              trigger: panel,
+              containerAnimation: horizontalScroll,
+              start: 'left 80%',
+              end: 'left 20%',
+              scrub: 1,
+            }
+          }
+        );
+
+        gsap.to(panel, {
+          scale: 0.8, opacity: 0.3, rotateY: 15, ease: 'power2.in',
+          scrollTrigger: {
+            trigger: panel,
+            containerAnimation: horizontalScroll,
+            start: 'right 80%',
+            end: 'right -20%',
+            scrub: 1,
+          }
+        });
+      });
+
+      // Content animations
+      panels.forEach((panel) => {
+        ScrollTrigger.create({
+          trigger: panel,
+          containerAnimation: horizontalScroll,
+          start: 'left 60%',
+          onEnter: () => {
+            const cards = panel.querySelectorAll('.animate-card');
+            if (cards.length > 0) {
+              gsap.fromTo(cards,
+                { opacity: 0, y: 50, scale: 0.9 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.08, ease: 'back.out(1.4)' }
+              );
+            }
+          },
+          once: true
+        });
+      });
+
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, [departments]);
 
   useEffect(() => {
     fetchDepartments();
@@ -21,361 +147,413 @@ const Onboarding = () => {
 
   const fetchDepartments = async () => {
     try {
-      const response = await fetch(`${API_URL}/departments/public`);
+      const response = await fetch(`${API_URL}departments/public`);
       const data = await response.json();
       setDepartments(data);
     } catch (error) {
-      console.error('Error fetching departments:', error);
-      // Use default departments on error
       setDepartments(defaultDepartments);
     }
   };
 
   const defaultDepartments = [
     { name: 'Aeronautical Engineering', slug: 'aeronautical-engineering', image: 'https://images.unsplash.com/photo-1540962351504-03099e0a754b?w=400' },
-    { name: 'Computer Science and Engineering', slug: 'computer-science-and-engineering', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
-    { name: 'Computer Science Engineering - Cyber Security', slug: 'computer-science-engineering-cyber-security', image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' },
-    { name: 'Computer Science Engineering - Data Science', slug: 'computer-science-engineering-data-science', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400' },
-    { name: 'Computer Science and Information Technology', slug: 'computer-science-and-information-technology', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400' },
+    { name: 'Computer Science Engineering', slug: 'computer-science-and-engineering', image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=400' },
+    { name: 'CSE - Cyber Security', slug: 'computer-science-engineering-cyber-security', image: 'https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=400' },
+    { name: 'CSE - Data Science', slug: 'computer-science-engineering-data-science', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400' },
     { name: 'CSE AI & ML', slug: 'cse-ai-ml', image: 'https://images.unsplash.com/photo-1677442135136-760c813a743d?w=400' },
-    { name: 'Electrical And Electronics Engineering', slug: 'electrical-and-electronics-engineering', image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400' },
-    { name: 'Electronics and Communication Engineering', slug: 'electronics-and-communication-engineering', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400' },
-    { name: 'Freshman', slug: 'freshman', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400' },
+    { name: 'Electronics & Communication', slug: 'electronics-and-communication-engineering', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=400' },
+    { name: 'Electrical & Electronics', slug: 'electrical-and-electronics-engineering', image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400' },
     { name: 'Information Technology', slug: 'information-technology', image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400' },
-    { name: 'Master of Business Administration', slug: 'master-of-business-administration', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400' },
     { name: 'Mechanical Engineering', slug: 'mechanical-engineering', image: 'https://images.unsplash.com/photo-1537462715879-360eeb61a0ad?w=400' },
+    { name: 'MBA', slug: 'master-of-business-administration', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400' },
+    { name: 'Freshman', slug: 'freshman', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=400' },
+    { name: 'CSIT', slug: 'computer-science-and-information-technology', image: 'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=400' },
   ];
 
   const stats = [
-    { value: '10K+', label: 'Active Students', icon: Users },
-    { value: '500+', label: 'Partner Institutes', icon: Building2 },
-    { value: '95%', label: 'Placement Rate', icon: Target },
-    { value: '24/7', label: 'Support Available', icon: Shield },
+    { value: 10000, label: 'Active Students', icon: Users, suffix: '+', color: 'from-primary-500 to-primary-600' },
+    { value: 500, label: 'Partner Institutes', icon: Building2, suffix: '+', color: 'from-purple-500 to-indigo-500' },
+    { value: 95, label: 'Placement Rate', icon: Target, suffix: '%', color: 'from-green-500 to-emerald-500' },
+    { value: 24, label: 'Hour Support', icon: Shield, suffix: '/7', color: 'from-orange-500 to-amber-500' },
   ];
 
   const portalTypes = [
     {
       title: 'Student Portal',
-      description: 'Access exams, study resources, and career guidance',
+      description: 'Your complete academic companion with AI-powered features',
       icon: GraduationCap,
-      features: ['View exam schedules & hall tickets', 'Track learning streaks', 'Career roadmap access', 'Club participation'],
+      features: ['Digital hall tickets & exam schedules', 'AI career guidance assistant', 'Learning streak tracking', 'Club & event participation'],
       cta: 'Join as Student',
-      action: () => navigate('/register'),
+      action: () => handleNavigation('/register'),
       primary: true,
     },
     {
       title: 'Admin Portal',
       description: 'Complete institutional management and oversight',
       icon: Shield,
-      features: ['Student & faculty management', 'Analytics dashboard', 'Placement tracking', 'Event approvals'],
+      features: ['Student & faculty management', 'Advanced analytics dashboard', 'Placement tracking system', 'Event approval workflow'],
       cta: 'Admin Login',
-      action: () => navigate('/login'),
+      action: () => handleNavigation('/login'),
       primary: false,
     },
     {
       title: 'Staff Portals',
-      description: 'Specialized access for coordinators and managers',
+      description: 'Specialized tools for coordinators and managers',
       icon: Users,
-      features: ['Club event management', 'Seating allocation', 'Room management', 'Reports & exports'],
+      features: ['Club event management', 'Seating allocation tools', 'Room management system', 'Reports & data exports'],
       cta: 'Staff Login',
-      action: () => navigate('/login'),
+      action: () => handleNavigation('/login'),
       primary: false,
     },
   ];
 
+  const panelNames = ['Welcome', 'Programs', 'Portals', 'Contact'];
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
-      {/* Full-Screen Hero Section with Video Background */}
-      <section className="relative min-h-screen overflow-hidden">
-        {/* Video Background */}
-        <div className="absolute inset-0 w-full h-full">
-          <iframe
-            width="100%"
-            height="100%"
-            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
-            title="MLRIT Academic Portal Introduction"
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            referrerPolicy="strict-origin-when-cross-origin"
-            className="w-full h-full object-cover scale-150"
-            style={{ pointerEvents: 'none' }}
-          />
-        </div>
-
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-r from-gray-900/90 via-gray-900/70 to-gray-900/50"></div>
-
-        {/* Header */}
-        <header className="relative z-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-45">
-              <div className='w-1/32'>
-                
-              </div>
-              <div className="flex items-center gap-3">
-                <img
-                  src="/mlrit-logo.png"
-                  alt="MLRIT Logo"
-                  className="h-42 w-auto object-contain"
-                />
-              </div>
-              <div className="flex items-center gap-4 w-1/18">
-                <button
-                  onClick={() => navigate('/register')}
-                  className="hidden sm:flex items-center gap-2 px-5 py-2.5 text-white hover:text-primary-300 font-medium transition-colors"
-                >
-                  Register
-                </button>
-                <button
-                  onClick={() => navigate('/login')}
-                  className="flex items-center gap-2 px-6 py-2.5 bg-white text-gray-900 rounded-xl hover:bg-gray-100 transition-all font-semibold shadow-lg"
-                >
-                  Login
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+    <div ref={containerRef} className="mesh-gradient-bg overflow-hidden" style={{ perspective: '1500px' }}>
+      {/* Fixed Navigation */}
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <img src="/mlrit-logo.png" alt="MLRIT" className="h-14 w-auto drop-shadow-lg" />
+            <div className="flex items-center gap-3">
+              <button onClick={() => handleNavigation('/register')} className="hidden sm:block px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-all hover:scale-105">
+                Register
+              </button>
+              <button onClick={() => handleNavigation('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-semibold hover:scale-105 shadow-lg shadow-primary-500/25">
+                Login <ArrowRight className="w-4 h-4" />
+              </button>
             </div>
           </div>
-        </header>
+        </div>
+      </nav>
 
-        {/* Hero Content */}
-        <div className="relative z-10 flex items-center min-h-[calc(80vh-5rem)]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-            <div className="max-w-2xl text-center">
+      {/* Bottom Progress Bar - Dark themed for visibility */}
+      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-6 py-3 bg-gray-900/90 backdrop-blur-md rounded-full shadow-2xl border border-gray-700/50">
+        {panelNames.map((name, i) => (
+          <button
+            key={i}
+            onClick={() => {
+              // Use ScrollTrigger's scroll method to navigate to the correct position
+              if (scrollTriggerRef.current) {
+                const targetProgress = i / (panelNames.length - 1);
+                const targetScrollPos = scrollTriggerRef.current.start + (scrollTriggerRef.current.end - scrollTriggerRef.current.start) * targetProgress;
+                gsap.to(window, { scrollTo: targetScrollPos, duration: 1, ease: 'power2.inOut' });
+              }
+            }}
+            className={`flex items-center gap-2 transition-all duration-300 ${activePanel === i ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
+          >
+            <div className={`w-8 h-1.5 rounded-full transition-all duration-500 ${activePanel === i ? 'bg-primary-400 shadow-lg shadow-primary-500/50' : 'bg-gray-600'}`} />
+            <span className={`text-xs font-medium transition-all duration-300 ${activePanel === i ? 'text-white' : 'text-gray-400'}`}>{name}</span>
+          </button>
+        ))}
+      </div>
 
-              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+      {/* Scroll to Top Button - Appears after hero section */}
+      <button
+        onClick={() => {
+          if (scrollTriggerRef.current) {
+            gsap.to(window, { scrollTo: 0, duration: 1, ease: 'power2.inOut' });
+          }
+        }}
+        className={`fixed bottom-24 right-8 z-[100] p-4 bg-primary-500 text-white rounded-full shadow-2xl shadow-primary-500/30 hover:bg-primary-600 hover:scale-110 transition-all duration-300 ${activePanel > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+          }`}
+        aria-label="Scroll to top"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="m18 15-6-6-6 6" />
+        </svg>
+      </button>
+
+      {/* Scroll Hint - Only on hero */}
+      <div className={`fixed bottom-28 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 transition-opacity duration-500 ${activePanel === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <span className="text-xs text-gray-500 uppercase tracking-widest">Scroll to explore</span>
+        <ChevronDown className="w-5 h-5 text-gray-400 animate-bounce" />
+      </div>
+
+      {/* Horizontal Scroll Container */}
+      <div
+        ref={horizontalRef}
+        className="flex h-screen"
+        style={{ width: 'fit-content', transformStyle: 'preserve-3d' }}
+      >
+        {/* ===== PANEL 1: HERO ===== */}
+        <section
+          ref={el => panelsRef.current[0] = el}
+          className="panel w-screen h-screen flex-shrink-0 relative flex items-center justify-center overflow-hidden"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          {/* Video Background */}
+          <div className="absolute inset-0 z-0">
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
+              title="MLRIT"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              className="w-full h-full object-cover scale-150"
+              style={{ pointerEvents: 'none' }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/60" />
+          </div>
+
+          {/* Floating Elements */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            <div className="float-slow absolute top-1/4 left-[10%] w-32 h-32 bg-gradient-to-br from-primary-500/10 to-orange-500/10 rounded-full blur-2xl" />
+            <div className="float-fast absolute top-1/3 right-[15%] w-24 h-24 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-full blur-2xl" />
+            <div className="float-slow absolute bottom-1/3 left-[20%] w-20 h-20 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-2xl" />
+          </div>
+
+          {/* Hero Content */}
+          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+            <h1 className="mb-6">
+              <span className="hero-title-1 block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight">
                 Transform Your
-                <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-blue-400">
-                  Academic Journey
-                </span>
-              </h1>
+              </span>
+              <span className="hero-title-2 block mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold gradient-text">
+                Academic Journey
+              </span>
+            </h1>
 
-              <p className="text-xl text-gray-300 mb-10 leading-relaxed max-w-xl text-center">
-                One unified platform for students, faculty, and administrators.
-                Manage exams, track progress, and explore career paths.
-              </p>
+            <p className="hero-subtitle text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
+              One unified platform for students, faculty, and administrators with
+              <span className="text-gray-900 font-medium"> AI-powered</span> exam management and career guidance.
+            </p>
 
-              <div className="flex flex-col sm:flex-row gap-4 mb-12 items-center justify-center">
-                <button
-                  onClick={() => navigate('/register')}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-xl font-semibold hover:shadow-2xl hover:shadow-primary-500/30 transition-all transform hover:-translate-y-0.5"
+            <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
+              <button
+                onClick={() => handleNavigation('/register')}
+                className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1 hover:scale-105"
+              >
+                Get Started Free
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </button>
+              <button
+                onClick={() => handleNavigation('/placements')}
+                className="group flex items-center justify-center gap-3 px-8 py-4 glass-card text-gray-700 rounded-full font-bold text-lg hover:bg-white/80 transition-all hover:scale-105 shadow-lg"
+              >
+                <Briefcase className="w-5 h-5" />
+                View Placements
+              </button>
+            </div>
+
+            {/* Stats */}
+            <div className="hero-stats grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-6">
+              {stats.map((stat, index) => (
+                <div
+                  key={index}
+                  className="group glass-card rounded-2xl p-5 tilt-card hover:shadow-xl transition-all duration-300"
                 >
-                  Get Started Free
-                  <ArrowRight className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => navigate('/placements')}
-                  className="flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/30 text-white rounded-xl font-semibold hover:bg-white/20 transition-all"
-                >
-                  <Briefcase className="w-5 h-5" />
-                  View Placements
-                </button>
-              </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center p-4 bg-white/5 backdrop-blur-sm rounded-xl border border-white/10">
-                    <p className="text-2xl font-bold text-white">{stat.value}</p>
-                    <p className="text-xs text-gray-400 mt-1">{stat.label}</p>
+                  <div className={`w-10 h-10 mx-auto mb-3 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
+                    <stat.icon className="w-5 h-5 text-white" />
                   </div>
-                ))}
-              </div>
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+                    <AnimatedNumber value={stat.value} duration={2000} />{stat.suffix}
+                  </p>
+                  <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* Scroll Indicator */}
-        <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10">
-          <div className="w-8 h-12 border-2 border-white/30 rounded-full flex justify-center">
-            <div className="w-1.5 h-3 bg-white/60 rounded-full mt-2 animate-bounce"></div>
-          </div>
-        </div>
-      </section>
+        {/* ===== PANEL 2: DEPARTMENTS ===== */}
+        <section
+          ref={el => panelsRef.current[1] = el}
+          className="panel w-screen h-screen flex-shrink-0 relative flex items-center mesh-gradient-bg overflow-hidden"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-purple-600">
+                <Building2 className="w-4 h-4" />
+                Explore Programs
+              </span>
+              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Our <span className="gradient-text">Departments</span>
+              </h2>
+              <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+                Choose from our wide range of undergraduate and postgraduate programs
+              </p>
+            </div>
 
-      {/* Departments Section */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-red-50 text-red-600 rounded-full text-sm font-medium mb-4">
-              <Building2 className="w-4 h-4" />
-              Explore Programs
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-red-600 mb-4">
-              Departments
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Choose from our wide range of undergraduate and postgraduate programs
-            </p>
-          </div>
-
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
-              <Link
-                key={dept._id || index}
-                to={`/departments/${dept.slug}`}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100"
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={dept.image || `https://images.unsplash.com/photo-1562774053-701939374585?w=400`}
-                    alt={dept.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="font-semibold text-gray-800 text-sm text-center leading-tight group-hover:text-red-600 transition-colors">
-                    {dept.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Portal Types Section */}
-      <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-primary-50 text-primary-600 rounded-full text-sm font-medium mb-4">
-              <Globe className="w-4 h-4" />
-              Access Portals
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Choose Your Portal
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Tailored experiences for every role in your institution
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {portalTypes.map((portal, index) => (
-              <div
-                key={index}
-                className={`relative rounded-2xl p-8 transition-all duration-300 hover:shadow-2xl ${portal.primary
-                  ? 'bg-gradient-to-br from-primary-600 to-primary-800 text-white'
-                  : 'bg-white border border-gray-200 hover:border-primary-200'
-                  }`}
-              >
-                {portal.primary && (
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
-                    POPULAR
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
+                <Link
+                  key={dept._id || index}
+                  to={`/departments/${dept.slug}`}
+                  className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={dept.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400'}
+                      alt={dept.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
                   </div>
-                )}
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary
-                  ? 'bg-white/20'
-                  : 'bg-primary-50'
-                  }`}>
-                  <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
-                </div>
-                <h3 className={`text-xl font-bold mb-2 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>
-                  {portal.title}
-                </h3>
-                <p className={`mb-6 ${portal.primary ? 'text-primary-100' : 'text-gray-600'}`}>
-                  {portal.description}
-                </p>
-                <ul className="space-y-3 mb-8">
-                  {portal.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-3">
-                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${portal.primary ? 'text-green-300' : 'text-green-500'
-                        }`} />
-                      <span className={`text-sm ${portal.primary ? 'text-primary-100' : 'text-gray-600'}`}>
-                        {feature}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={portal.action}
-                  className={`w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all ${portal.primary
-                    ? 'bg-white text-primary-600 hover:bg-gray-100'
-                    : 'bg-primary-600 text-white hover:bg-primary-700'
+                  <div className="p-3 bg-white/80">
+                    <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
+                      {dept.name}
+                    </h3>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            <div className="text-center mt-10">
+              <button
+                onClick={() => handleNavigation('/register')}
+                className="animate-card inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl"
+              >
+                Explore All Programs
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* ===== PANEL 3: PORTALS ===== */}
+        <section
+          ref={el => panelsRef.current[2] = el}
+          className="panel w-screen h-screen flex-shrink-0 relative flex items-center mesh-gradient-bg overflow-hidden"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-green-600">
+                <Globe className="w-4 h-4" />
+                Access Portals
+              </span>
+              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+                Choose Your <span className="gradient-text">Portal</span>
+              </h2>
+              <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+                Tailored experiences designed for every role in your academic institution
+              </p>
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+              {portalTypes.map((portal, index) => (
+                <div
+                  key={index}
+                  className={`animate-card group relative rounded-3xl p-8 transition-all duration-500 hover:-translate-y-3 ${portal.primary
+                    ? 'bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 text-white shadow-2xl shadow-primary-500/30'
+                    : 'glass-card tilt-card'
                     }`}
                 >
-                  {portal.cta}
-                  <ChevronRight className="w-4 h-4" />
-                </button>
+                  {portal.primary && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold rounded-full shadow-lg uppercase tracking-wider">
+                      Most Popular
+                    </div>
+                  )}
+
+                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary ? 'bg-white/20' : 'bg-gradient-to-br from-primary-500/10 to-orange-500/10'
+                    }`}>
+                    <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
+                  </div>
+
+                  <h3 className={`text-2xl font-bold mb-3 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>{portal.title}</h3>
+                  <p className={`mb-6 ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                    {portal.description}
+                  </p>
+
+                  <ul className="space-y-3 mb-8">
+                    {portal.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-3">
+                        <CheckCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${portal.primary ? 'text-green-300' : 'text-green-500'
+                          }`} />
+                        <span className={`text-sm ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                          {feature}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={portal.action}
+                    className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${portal.primary
+                      ? 'bg-white text-primary-600 hover:bg-gray-100 shadow-xl'
+                      : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40'
+                      }`}
+                  >
+                    {portal.cta}
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ===== PANEL 4: FOOTER ===== */}
+        <section
+          ref={el => panelsRef.current[3] = el}
+          className="panel w-screen h-screen flex-shrink-0 relative flex items-center bg-gray-900 overflow-hidden"
+          style={{ transformStyle: 'preserve-3d' }}
+        >
+          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-16 items-center">
+              {/* Left - CTA */}
+              <div className="text-center lg:text-left">
+                <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500/20 border border-primary-500/30 rounded-full text-sm font-medium mb-6 text-primary-300">
+                  <Sparkles className="w-4 h-4" />
+                  Get Started Today
+                </span>
+                <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                  Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">Transform</span> Your Institution?
+                </h2>
+                <p className="animate-card text-lg text-gray-400 mb-10 max-w-lg">
+                  Join thousands of students and educators already using MLRIT Academic Portal for a seamless educational experience.
+                </p>
+                <div className="animate-card flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                  <button
+                    onClick={() => handleNavigation('/register')}
+                    className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all hover:scale-105"
+                  >
+                    Start Free Today
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </button>
+                  <button
+                    onClick={() => handleNavigation('/login')}
+                    className="flex items-center justify-center gap-3 px-8 py-4 bg-white/10 border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all"
+                  >
+                    Sign In
+                  </button>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 via-primary-700 to-primary-800 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Transform Your Institution?
-          </h2>
-          <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto">
-            Join thousands of students and educators already using MLRIT Academic Portal
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/register')}
-              className="px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:bg-gray-100 transition-all flex items-center justify-center gap-2 shadow-lg"
-            >
-              Start Free Today
-              <ArrowRight className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => navigate('/login')}
-              className="px-8 py-4 border-2 border-white/30 text-white rounded-xl font-semibold hover:bg-white/10 transition-all flex items-center justify-center gap-2"
-            >
-              Sign In to Dashboard
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 py-8 sm:py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 mb-8">
-            <div className="sm:col-span-2">
-              <div className="flex items-center gap-3 mb-4">
-                <img
-                  src="/mlrit-logo.png"
-                  alt="MLRIT Logo"
-                  className="h-10 w-auto object-contain"
-                />
+              {/* Right - Contact Info */}
+              <div className="animate-card grid grid-cols-2 gap-8">
+                <div>
+                  <h4 className="font-bold text-white mb-5 text-lg">Quick Links</h4>
+                  <ul className="space-y-3 text-sm">
+                    <li><button onClick={() => handleNavigation('/placements')} className="text-gray-400 hover:text-white transition-colors">Placements</button></li>
+                    <li><button onClick={() => handleNavigation('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
+                    <li><button onClick={() => handleNavigation('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
+                    <li><button onClick={() => handleNavigation('/register')} className="text-gray-400 hover:text-white transition-colors">Register</button></li>
+                  </ul>
+                </div>
+                <div>
+                  <h4 className="font-bold text-white mb-5 text-lg">Contact</h4>
+                  <ul className="space-y-3 text-gray-400 text-sm">
+                    <li>MLRIT, Hyderabad</li>
+                    <li>info@mlrit.ac.in</li>
+                    <li>+91 40 2345 6789</li>
+                  </ul>
+                </div>
+                <div className="col-span-2 pt-6 border-t border-white/10">
+                  <img src="/mlrit-logo.png" alt="MLRIT" className="h-12 w-auto mb-4" />
+                  <p className="text-gray-500 text-sm">© 2025 MLRIT. All rights reserved.</p>
+                </div>
               </div>
-              <p className="text-gray-400 max-w-md text-sm sm:text-base">
-                Integrated Academic and Examination Management System for modern educational institutions.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Quick Links</h4>
-              <ul className="space-y-2 text-sm">
-                <li><button onClick={() => navigate('/placements')} className="text-gray-400 hover:text-white transition-colors">Placements</button></li>
-                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
-                <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
-                <li><button onClick={() => navigate('/register')} className="text-gray-400 hover:text-white transition-colors">Register</button></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-3 sm:mb-4 text-sm sm:text-base">Contact</h4>
-              <ul className="space-y-2 text-gray-400 text-sm">
-                <li>MLRIT, Hyderabad</li>
-                <li>info@mlrit.ac.in</li>
-                <li>+91 40 2345 6789</li>
-              </ul>
             </div>
           </div>
-          <div className="border-t border-gray-800 pt-6 sm:pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-gray-500 text-xs sm:text-sm">© 2025 MLRIT. All rights reserved.</p>
-            <div className="flex items-center gap-4 sm:gap-6 text-xs sm:text-sm text-gray-500">
-              <span>Privacy Policy</span>
-              <span>Terms of Service</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+        </section>
+      </div>
 
-      {/* ChatBot Component */}
+      {/* ChatBot */}
       <ChatBot
         apiEndpoint="http://localhost:8000/api/v1/chat/"
         title="MLRIT Assistant"

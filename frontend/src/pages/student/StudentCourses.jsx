@@ -2,7 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getCourses, enrollInCourse, getCourseMaterials } from '../../utils/api';
+import AnimatedNumber from '../../components/AnimatedNumber';
+import { getCourses, enrollInCourse, getCourseMaterials, submitStaffRating, canRateStaff } from '../../utils/api';
 import {
   BookOpen, Search, Users, Clock, Star,
   Play, CheckCircle, Filter, BookMarked, Award,
@@ -29,6 +30,14 @@ const StudentCourses = () => {
   // Mind Map State
   const [showMindMapModal, setShowMindMapModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState(null);
+
+  // Staff Rating State
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [userRating, setUserRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [ratingComment, setRatingComment] = useState('');
+  const [ratingStatus, setRatingStatus] = useState({ canRate: false, hasRated: false, existingRating: 0 });
+  const [submittingRating, setSubmittingRating] = useState(false);
 
   useEffect(() => {
     fetchCourses();
@@ -108,6 +117,85 @@ const StudentCourses = () => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
+  // Handle opening rating modal
+  const handleOpenRating = async (course) => {
+    if (!course.instructorId) {
+      alert('Instructor information not available for this course');
+      return;
+    }
+
+    setShowRatingModal(true);
+    setUserRating(0);
+    setRatingComment('');
+
+    try {
+      const { data } = await canRateStaff(course.instructorId, course._id);
+      setRatingStatus(data);
+      if (data.existingRating) {
+        setUserRating(data.existingRating);
+      }
+    } catch (error) {
+      console.error('Error checking rating status:', error);
+      // Allow rating even if check fails
+      setRatingStatus({ canRate: true, hasRated: false, existingRating: 0 });
+    }
+  };
+
+  // Handle rating submission
+  const handleSubmitRating = async () => {
+    if (!selectedCourse || !userRating) return;
+
+    setSubmittingRating(true);
+    try {
+      await submitStaffRating({
+        staffId: selectedCourse.instructorId,
+        courseId: selectedCourse._id,
+        rating: userRating,
+        comment: ratingComment
+      });
+
+      alert('Rating submitted successfully!');
+      setShowRatingModal(false);
+      setUserRating(0);
+      setRatingComment('');
+      // Refresh courses to update rating display
+      fetchCourses();
+    } catch (error) {
+      console.error('Error submitting rating:', error);
+      alert(error.response?.data?.message || 'Failed to submit rating');
+    } finally {
+      setSubmittingRating(false);
+    }
+  };
+
+  // Star Rating Component
+  const StarRating = ({ rating, onRate, onHover, onLeave, size = 'lg', readonly = false }) => {
+    const stars = [1, 2, 3, 4, 5];
+    const sizeClass = size === 'lg' ? 'w-10 h-10' : 'w-6 h-6';
+
+    return (
+      <div className="flex gap-1" onMouseLeave={onLeave}>
+        {stars.map((star) => (
+          <button
+            key={star}
+            type="button"
+            disabled={readonly}
+            onClick={() => !readonly && onRate?.(star)}
+            onMouseEnter={() => !readonly && onHover?.(star)}
+            className={`${readonly ? '' : 'cursor-pointer hover:scale-110'} transition-transform`}
+          >
+            <Star
+              className={`${sizeClass} ${star <= (hoverRating || rating)
+                ? 'text-yellow-400 fill-yellow-400'
+                : 'text-gray-300'
+                } transition-colors`}
+            />
+          </button>
+        ))}
+      </div>
+    );
+  };
+
   const departments = ['all', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT'];
 
   const filteredCourses = courses.filter(c => {
@@ -145,40 +233,40 @@ const StudentCourses = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-primary-100 font-medium">Total Courses</p>
-                <p className="text-3xl font-bold mt-2">{stats.total}</p>
+                <p className="text-3xl font-bold mt-2"><AnimatedNumber value={stats.total} /></p>
               </div>
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
                 <BookOpen className="w-6 h-6 text-white" />
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover-card">
+          <div className="glass-card rounded-2xl p-6 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Enrolled</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.enrolled}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.enrolled} /></p>
               </div>
               <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                 <BookMarked className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover-card">
+          <div className="glass-card rounded-2xl p-6 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Available</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.available}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.available} /></p>
               </div>
               <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                 <Play className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover-card">
+          <div className="glass-card rounded-2xl p-6 tilt-card">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-gray-500 font-medium">Completed</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2">{stats.completed}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.completed} /></p>
               </div>
               <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                 <Award className="w-6 h-6 text-purple-600" />
@@ -187,7 +275,7 @@ const StudentCourses = () => {
           </div>
         </div>
         {/* Filters */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 animate-slide-in-up hover-card">
+        <div className="glass-card rounded-2xl tilt-card p-5 animate-slide-in-up hover-card">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
             <div className="flex-1">
               <div className="relative group">
@@ -239,7 +327,7 @@ const StudentCourses = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
               {filteredCourses.map((course) => (
-                <div key={course._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
+                <div key={course._id} className="glass-card rounded-2xl tilt-card overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
                   <div className="h-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700"></div>
                   <div className="p-7 flex flex-col flex-1">
                     <div className="flex items-start justify-between mb-4">
@@ -430,12 +518,107 @@ const StudentCourses = () => {
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-gray-100">
+              <div className="pt-4 border-t border-gray-100 flex gap-3">
+                {selectedCourse?.instructorId && (
+                  <button
+                    onClick={() => handleOpenRating(selectedCourse)}
+                    className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-xl font-bold transition-all active:scale-95 border border-primary-200"
+                  >
+                    <Star className="w-5 h-5" />
+                    Rate Instructor
+                  </button>
+                )}
                 <button
                   onClick={() => setShowMaterialsModal(false)}
-                  className="w-full py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
+                  className="flex-1 py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
                 >
                   Close
+                </button>
+              </div>
+            </div>
+          )}
+        </Modal>
+
+        {/* Staff Rating Modal */}
+        <Modal
+          isOpen={showRatingModal && selectedCourse}
+          onClose={() => {
+            setShowRatingModal(false);
+            setUserRating(0);
+            setRatingComment('');
+          }}
+          title="Rate Instructor"
+          size="md"
+        >
+          {selectedCourse && (
+            <div className="space-y-6">
+              {/* Instructor Info */}
+              <div className="text-center pb-4 border-b border-gray-100">
+                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Users className="w-8 h-8 text-primary-600" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900">
+                  {typeof selectedCourse.instructor === 'string' ? selectedCourse.instructor : (selectedCourse.instructor?.name || 'Instructor')}
+                </h3>
+                <p className="text-gray-500 text-sm mt-1">
+                  {selectedCourse.name} ({selectedCourse.code})
+                </p>
+              </div>
+
+              {/* Star Rating */}
+              <div className="flex flex-col items-center py-4">
+                <p className="text-sm font-medium text-gray-600 mb-3">
+                  {ratingStatus.hasRated ? 'Update your rating' : 'How would you rate this instructor?'}
+                </p>
+                <StarRating
+                  rating={userRating}
+                  onRate={setUserRating}
+                  onHover={setHoverRating}
+                  onLeave={() => setHoverRating(0)}
+                />
+                <p className="text-2xl font-bold text-gray-900 mt-3">
+                  {hoverRating || userRating || 0} / 5
+                </p>
+              </div>
+
+              {/* Comment */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Add a comment (optional)
+                </label>
+                <textarea
+                  value={ratingComment}
+                  onChange={(e) => setRatingComment(e.target.value)}
+                  placeholder="Share your experience with this instructor..."
+                  rows={3}
+                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-800 resize-none"
+                />
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={() => setShowRatingModal(false)}
+                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmitRating}
+                  disabled={!userRating || submittingRating}
+                  className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  {submittingRating ? (
+                    <>
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Star className="w-5 h-5" />
+                      {ratingStatus.hasRated ? 'Update Rating' : 'Submit Rating'}
+                    </>
+                  )}
                 </button>
               </div>
             </div>

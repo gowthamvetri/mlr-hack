@@ -2,7 +2,7 @@ import { Calendar, MessageSquare } from 'lucide-react';
 
 const NoticeBoard = ({ notices = [] }) => {
   return (
-    <div className="bg-white rounded-2xl p-6 shadow-sm">
+    <div className="glass-card tilt-card rounded-2xl p-6">
       <h3 className="text-lg font-bold text-gray-800 mb-4">Notice Board</h3>
       <div className="space-y-4">
         {notices.length === 0 ? (

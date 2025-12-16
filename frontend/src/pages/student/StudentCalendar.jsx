@@ -86,7 +86,7 @@ const StudentCalendar = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Calendar */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="glass-card rounded-xl tilt-card overflow-hidden">
             {/* Calendar Header */}
             <div className="p-6 border-b border-gray-100 flex items-center justify-between">
               <div className="flex items-center gap-3">
@@ -179,7 +179,7 @@ const StudentCalendar = () => {
         {/* Sidebar - Selected Date Details / Upcoming */}
         <div className="lg:col-span-1 space-y-6">
           {/* Legend */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="glass-card rounded-xl tilt-card p-6">
             <h3 className="font-semibold text-gray-800 mb-4">Legend</h3>
             <div className="space-y-3">
               <div className="flex items-center gap-3">
@@ -201,7 +201,7 @@ const StudentCalendar = () => {
 
           {/* Selected Date Details */}
           {selectedDate && selectedDateEvents && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+            <div className="glass-card rounded-xl tilt-card overflow-hidden">
               <div className="p-6 border-b border-gray-100 bg-primary-50">
                 <h3 className="font-semibold text-gray-800">
                   {monthNames[currentDate.getMonth()]} {selectedDate}, {currentDate.getFullYear()}
@@ -254,7 +254,7 @@ const StudentCalendar = () => {
           )}
 
           {/* Upcoming Events */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="glass-card rounded-xl tilt-card overflow-hidden">
             <div className="p-6 border-b border-gray-100">
               <h3 className="font-semibold text-gray-800">Upcoming</h3>
             </div>

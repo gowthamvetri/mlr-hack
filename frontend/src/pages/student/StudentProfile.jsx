@@ -161,7 +161,7 @@ const StudentProfile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in delay-100">
         {/* Profile Card */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 h-full group">
+          <div className="glass-card rounded-3xl tilt-card overflow-hidden hover:shadow-xl transition-all duration-300 h-full group">
             <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-10 text-center relative overflow-hidden">
               <div className="absolute top-0 right-0 p-8 opacity-5">
                 <User className="w-64 h-64 text-white -mr-20 -mt-20 transform rotate-12" />
@@ -228,7 +228,7 @@ const StudentProfile = () => {
 
         {/* Edit Form / Details View */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-all duration-300 h-full">
+          <div className="glass-card rounded-3xl tilt-card p-8 hover:shadow-lg transition-all duration-300 h-full">
             <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
               <div className="p-2 bg-primary-50 rounded-lg">
                 <User className="w-6 h-6 text-primary-600" />
@@ -281,75 +281,36 @@ const StudentProfile = () => {
                   )}
                 </div>
 
-                {/* Roll Number */}
+                {/* Roll Number - LOCKED */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Roll Number</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="rollNumber"
-                      value={profile.rollNumber}
-                      onChange={handleChange}
-                      placeholder="Enter roll number"
-                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900"
-                    />
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.rollNumber || '-'}</p>
-                  )}
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Roll Number</label>
+                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">{profile.rollNumber || '-'}</p>
+                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
+                    <Lock className="w-3 h-3" />
+                    Auto-generated, cannot be changed
+                  </p>
                 </div>
 
-                {/* Department */}
+                {/* Department - LOCKED */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Department</label>
-                  {isEditing ? (
-                    <div className="relative">
-                      <select
-                        name="department"
-                        value={profile.department}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900 appearance-none cursor-pointer"
-                      >
-                        <option value="">Select Department</option>
-                        <option value="CSE">Computer Science Engineering (CSE)</option>
-                        <option value="IT">Information Technology (IT)</option>
-                        <option value="ECE">Electronics & Communication (ECE)</option>
-                        <option value="EEE">Electrical & Electronics (EEE)</option>
-                        <option value="MECH">Mechanical Engineering (MECH)</option>
-                        <option value="CIVIL">Civil Engineering (CIVIL)</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <User className="w-5 h-5 text-gray-400" />
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.department || '-'}</p>
-                  )}
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Department</label>
+                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">{profile.department || '-'}</p>
+                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
+                    <Lock className="w-3 h-3" />
+                    Cannot be changed after registration
+                  </p>
                 </div>
 
-                {/* Year */}
+                {/* Year - LOCKED */}
                 <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Year of Study</label>
-                  {isEditing ? (
-                    <div className="relative">
-                      <select
-                        name="year"
-                        value={profile.year}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900 appearance-none cursor-pointer"
-                      >
-                        <option value="">Select Year</option>
-                        <option value="1">1st Year</option>
-                        <option value="2">2nd Year</option>
-                        <option value="3">3rd Year</option>
-                        <option value="4">4th Year</option>
-                      </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <GraduationCap className="w-5 h-5 text-gray-400" />
-                      </div>
-                    </div>
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.year || '-'}</p>
-                  )}
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Year of Study</label>
+                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">
+                    {profile.year ? `${profile.year}${profile.year === '1' ? 'st' : profile.year === '2' ? 'nd' : profile.year === '3' ? 'rd' : 'th'} Year` : '-'}
+                  </p>
+                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
+                    <Lock className="w-3 h-3" />
+                    Cannot be changed after registration
+                  </p>
                 </div>
 
                 {/* Date of Birth */}

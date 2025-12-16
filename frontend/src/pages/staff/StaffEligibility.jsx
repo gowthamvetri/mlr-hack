@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import Modal from '../../components/Modal';
 import {
   Users, Search, CheckCircle, XCircle, AlertTriangle,
@@ -141,29 +142,29 @@ const StaffEligibility = () => {
               </div>
               <div>
                 <p className="text-primary-100 text-xs sm:text-sm">Total Students</p>
-                <p className="text-2xl sm:text-3xl font-bold mt-1">{students.length}</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1"><AnimatedNumber value={students.length} /></p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 rounded-lg">
                 <CheckCircle className="w-5 h-5 text-green-600" />
               </div>
               <div>
                 <p className="text-gray-500 text-xs sm:text-sm">Eligible</p>
-                <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1">{eligibleCount}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1"><AnimatedNumber value={eligibleCount} /></p>
               </div>
             </div>
           </div>
-          <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-red-100 rounded-lg">
                 <XCircle className="w-5 h-5 text-red-600" />
               </div>
               <div>
                 <p className="text-gray-500 text-xs sm:text-sm">Not Eligible</p>
-                <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1">{ineligibleCount}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1"><AnimatedNumber value={ineligibleCount} /></p>
               </div>
             </div>
           </div>

@@ -30,8 +30,8 @@ const generateMindMap = async (req, res) => {
         // Extract text
         const text = await extractText(absolutePath, getMimeType(material.type));
 
-        // Generate Mind Map (Markdown)
-        const markdown = generateMindMapFromText(text);
+        // Generate Mind Map (Markdown) - using AI if available
+        const markdown = await generateMindMapFromText(text);
 
         res.json({ markdown });
     } catch (error) {

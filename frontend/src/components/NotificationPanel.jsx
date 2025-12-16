@@ -1,25 +1,25 @@
 import { useState } from 'react';
-import { 
-  useGetNotificationsQuery, 
-  useMarkNotificationReadMutation, 
-  useMarkAllNotificationsReadMutation, 
-  useDeleteNotificationMutation 
+import {
+  useGetNotificationsQuery,
+  useMarkNotificationReadMutation,
+  useMarkAllNotificationsReadMutation,
+  useDeleteNotificationMutation
 } from '../services/api';
 import { Bell, X, CheckCheck, Trash2, Loader2 } from 'lucide-react';
 
 const NotificationPanel = () => {
   const [isOpen, setIsOpen] = useState(false);
-  
+
   // RTK Query hooks - automatically handles caching, loading states, and refetching
-  const { 
-    data: notifications = [], 
-    isLoading, 
-    isError 
+  const {
+    data: notifications = [],
+    isLoading,
+    isError
   } = useGetNotificationsQuery(undefined, {
     // Poll every minute for new notifications
     pollingInterval: 60000,
   });
-  
+
   const [markRead] = useMarkNotificationReadMutation();
   const [markAllRead] = useMarkAllNotificationsReadMutation();
   const [deleteNotification] = useDeleteNotificationMutation();
@@ -51,52 +51,66 @@ const NotificationPanel = () => {
     }
   };
 
+  // Get notification icon colors based on type
+  const getNotificationColors = (type) => {
+    switch (type) {
+      case 'Exam':
+        return { bg: 'bg-primary-100', icon: 'text-primary-600' };
+      case 'Event':
+        return { bg: 'bg-accent-100', icon: 'text-accent-600' };
+      case 'Seating':
+        return { bg: 'bg-success-100', icon: 'text-success-600' };
+      default:
+        return { bg: 'bg-gray-100', icon: 'text-gray-600' };
+    }
+  };
+
   return (
     <div className="relative">
-      <button onClick={() => setIsOpen(!isOpen)} className="relative p-2 text-gray-600 hover:text-primary-600">
+      <button onClick={() => setIsOpen(!isOpen)} className="relative p-2 text-gray-600 hover:text-primary-600 transition-colors">
         <Bell size={24} />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+          <span className="absolute top-0 right-0 bg-primary-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-medium">
             {unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-96 bg-white rounded-lg shadow-xl border z-50 max-h-[32rem] flex flex-col">
+        <div className="absolute right-0 mt-2 w-96 bg-white rounded-2xl shadow-xl border border-gray-100 z-50 max-h-[32rem] flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="p-4 border-b flex items-center justify-between bg-gray-50">
+          <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-gray-50">
             <h3 className="font-bold text-gray-800">Notifications</h3>
             <div className="flex items-center gap-2">
               {notifications.length > 0 && (
-                <button 
+                <button
                   onClick={handleMarkAllRead}
-                  className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1 px-2 py-1 hover:bg-primary-50 rounded"
+                  className="text-xs text-primary-600 hover:text-primary-700 flex items-center gap-1 px-2 py-1 hover:bg-primary-50 rounded-lg transition-colors"
                   title="Mark all as read"
                 >
                   <CheckCheck className="w-4 h-4" />
                   <span>Clear All</span>
                 </button>
               )}
-              <button 
-                onClick={() => setIsOpen(false)} 
-                className="p-1 hover:bg-gray-200 rounded"
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <X className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
-          
+
           {/* Notification List */}
           <div className="overflow-y-auto flex-1">
             {isLoading ? (
               <div className="p-8 text-center">
-                <Loader2 className="w-8 h-8 text-gray-400 mx-auto animate-spin" />
+                <Loader2 className="w-8 h-8 text-primary-400 mx-auto animate-spin" />
                 <p className="text-gray-500 text-sm mt-2">Loading notifications...</p>
               </div>
             ) : isError ? (
               <div className="p-8 text-center">
-                <p className="text-red-500 text-sm">Failed to load notifications</p>
+                <p className="text-primary-500 text-sm">Failed to load notifications</p>
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-8 text-center">
@@ -105,69 +119,62 @@ const NotificationPanel = () => {
                 <p className="text-gray-400 text-xs mt-1">You're all caught up!</p>
               </div>
             ) : (
-              notifications.map(n => (
-                <div 
-                  key={n._id} 
-                  className="p-4 border-b hover:bg-gray-50 transition-colors group"
-                >
-                  <div className="flex items-start gap-3">
-                    {/* Notification Icon based on type */}
-                    <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      n.type === 'Exam' ? 'bg-red-100' :
-                      n.type === 'Event' ? 'bg-purple-100' :
-                      n.type === 'Seating' ? 'bg-blue-100' :
-                      'bg-gray-100'
-                    }`}>
-                      <Bell className={`w-5 h-5 ${
-                        n.type === 'Exam' ? 'text-red-600' :
-                        n.type === 'Event' ? 'text-purple-600' :
-                        n.type === 'Seating' ? 'text-blue-600' :
-                        'text-gray-600'
-                      }`} />
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-2 mb-1">
-                        <p className="font-semibold text-sm text-gray-800 leading-tight">
-                          {n.title || n.type}
-                        </p>
-                        {/* Unread indicator */}
-                        {!n.read && !n.readBy?.includes(n._id) && (
-                          <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1"></span>
-                        )}
+              notifications.map(n => {
+                const colors = getNotificationColors(n.type);
+                return (
+                  <div
+                    key={n._id}
+                    className="p-4 border-b border-gray-50 hover:bg-gray-50 transition-colors group"
+                  >
+                    <div className="flex items-start gap-3">
+                      {/* Notification Icon based on type */}
+                      <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${colors.bg}`}>
+                        <Bell className={`w-5 h-5 ${colors.icon}`} />
                       </div>
-                      <p className="text-sm text-gray-600 leading-snug mb-2">{n.message}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-gray-400">
-                          {new Date(n.createdAt).toLocaleString('en-US', {
-                            month: 'short',
-                            day: 'numeric',
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </span>
-                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button 
-                            onClick={() => handleMarkRead(n._id)}
-                            className="text-xs text-primary-600 hover:text-primary-700 px-2 py-1 hover:bg-primary-50 rounded"
-                            title="Mark as read"
-                          >
-                            Dismiss
-                          </button>
-                          <button 
-                            onClick={(e) => handleDelete(n._id, e)}
-                            className="p-1 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded"
-                            title="Delete"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+
+                      {/* Content */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <p className="font-semibold text-sm text-gray-800 leading-tight">
+                            {n.title || n.type}
+                          </p>
+                          {/* Unread indicator */}
+                          {!n.read && !n.readBy?.includes(n._id) && (
+                            <span className="w-2 h-2 bg-primary-500 rounded-full flex-shrink-0 mt-1"></span>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 leading-snug mb-2">{n.message}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs text-gray-400">
+                            {new Date(n.createdAt).toLocaleString('en-US', {
+                              month: 'short',
+                              day: 'numeric',
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </span>
+                          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => handleMarkRead(n._id)}
+                              className="text-xs text-primary-600 hover:text-primary-700 px-2 py-1 hover:bg-primary-50 rounded-lg transition-colors"
+                              title="Mark as read"
+                            >
+                              Dismiss
+                            </button>
+                            <button
+                              onClick={(e) => handleDelete(n._id, e)}
+                              className="p-1 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-colors"
+                              title="Delete"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

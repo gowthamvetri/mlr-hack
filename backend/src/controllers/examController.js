@@ -1,5 +1,100 @@
 const Exam = require('../models/Exam');
 const User = require('../models/User');
+const Subject = require('../models/Subject');
+const { scheduleExams, formatTimetable, SESSIONS } = require('../services/examScheduler');
+
+// @desc    Auto-schedule exams using constraint-based algorithm
+// @route   POST /api/exams/auto-schedule
+// @access  Private/Admin
+const autoScheduleExam = async (req, res) => {
+  try {
+    const {
+      year,
+      examType,
+      startDate,
+      endDate,
+      holidays = [],
+      departments = [],
+      semester
+    } = req.body;
+
+    // Validate required fields
+    if (!year || !examType || !startDate || !endDate) {
+      return res.status(400).json({
+        message: 'Missing required fields: year, examType, startDate, endDate'
+      });
+    }
+
+    // Run scheduling algorithm
+    const result = await scheduleExams({
+      year: parseInt(year),
+      examType,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
+      holidays: holidays.map(h => new Date(h)),
+      departments
+    });
+
+    if (!result.success && result.timetable.length === 0) {
+      return res.status(400).json({
+        message: result.error || 'Failed to generate schedule',
+        violations: result.violations
+      });
+    }
+
+    // Create individual exam entries for each subject (no parent schedule record)
+    const createdExams = await Promise.all(
+      result.timetable.map(async (entry) => {
+        const session = SESSIONS[entry.session];
+        const exam = new Exam({
+          courseName: entry.subjectName,
+          courseCode: entry.subjectCode,
+          date: entry.date,
+          startTime: session.start,
+          endTime: session.end,
+          duration: examType === 'Internal' ? 90 : 180,
+          examType,
+          session: entry.session,
+          department: entry.department,
+          semester: semester || `${new Date().getFullYear()}`,
+          year: parseInt(year),
+          batches: [year.toString()],
+          subjectType: entry.subjectType,
+          createdBy: req.user._id
+        });
+        return await exam.save();
+      })
+    );
+
+    // Send notification
+    if (req.io) {
+      req.io.to('role:Student').emit('exam_schedule_released', {
+        year,
+        examType,
+        count: createdExams.length
+      });
+    }
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully scheduled ${result.timetable.length} exams`,
+      timetable: formatTimetable(result.timetable),
+      summary: result.summary,
+      violations: result.violations,
+      exams: createdExams.map(e => ({
+        _id: e._id,
+        courseName: e.courseName,
+        courseCode: e.courseCode,
+        date: e.date,
+        session: e.session,
+        department: e.department
+      }))
+    });
+  } catch (error) {
+    console.error('Auto-schedule error:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 // @desc    Create a new exam schedule (multiple exams)
 // @route   POST /api/exams/schedule
@@ -8,20 +103,47 @@ const createExamSchedule = async (req, res) => {
   try {
     const { department, year, examType, semester, exams } = req.body;
 
-    // exams is an array of { courseName, courseCode, date, startTime, endTime, duration }
+    // Validate required fields
+    if (!department || !year || !examType) {
+      return res.status(400).json({
+        message: 'Missing required fields: department, year, and examType are required'
+      });
+    }
 
+    if (!exams || !Array.isArray(exams) || exams.length === 0) {
+      return res.status(400).json({
+        message: 'At least one exam subject is required'
+      });
+    }
+
+    // Validate each exam entry has required fields
+    for (const e of exams) {
+      if (!e.courseName || !e.date) {
+        return res.status(400).json({
+          message: 'Each exam must have courseName and date'
+        });
+      }
+    }
+
+    // exams is an array of { courseName, courseCode, date, startTime, endTime, duration }
     const createdExams = await Promise.all(exams.map(async (e) => {
+      // Provide default times based on exam type if not specified
+      const defaultTimes = examType === 'Internal'
+        ? { start: '08:30', end: '10:00', duration: 90 }
+        : { start: '09:00', end: '12:00', duration: 180 };
+
       const exam = new Exam({
         courseName: e.courseName,
-        courseCode: e.courseCode,
-        date: e.date,
-        startTime: e.startTime,
-        endTime: e.endTime,
-        duration: e.duration || 180,
+        courseCode: e.courseCode || 'EXAM',
+        date: new Date(e.date),
+        startTime: e.startTime || defaultTimes.start,
+        endTime: e.endTime || defaultTimes.end,
+        duration: e.duration || defaultTimes.duration,
         examType,
         department,
-        semester: semester || e.semester,
-        batches: [year] // Assuming year is passed as batch identifier
+        semester: semester || `${new Date().getFullYear()}`,
+        year: parseInt(year) || undefined,
+        batches: [year.toString()]
       });
       return await exam.save();
     }));
@@ -41,6 +163,7 @@ const createExamSchedule = async (req, res) => {
 
     res.status(201).json(createdExams);
   } catch (error) {
+    console.error('Create exam schedule error:', error);
     res.status(400).json({ message: error.message });
   }
 };
@@ -376,6 +499,7 @@ const checkStudentEligibility = async (req, res) => {
 };
 
 module.exports = {
+  autoScheduleExam,
   createExam,
   createExamSchedule,
   getExams,

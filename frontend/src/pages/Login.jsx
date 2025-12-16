@@ -1,32 +1,82 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useLoginMutation } from '../services/api';
 import { useAppDispatch } from '../store';
 import { setCredentials } from '../store/slices/authSlice';
 import { Lock, Mail, GraduationCap, ArrowRight, Shield, Users, Building, AlertCircle } from 'lucide-react';
+import gsap from 'gsap';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  /* REMOVED DUPLICATE STATE DECLARATIONS */
-  // loading state is now handled by RTK mutation hook
   const [loginMutation, { isLoading }] = useLoginMutation();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
+  // GSAP Refs
+  const containerRef = useRef(null);
+  const heroRef = useRef(null);
+  const formRef = useRef(null);
+  const cardsRef = useRef(null);
+
+  // GSAP Entry Animations - using fromTo for guaranteed visibility
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    // Small delay to ensure DOM is ready
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        // Background blobs animation
+        gsap.to('.bg-blob', {
+          scale: 1.1,
+          duration: 4,
+          ease: 'sine.inOut',
+          yoyo: true,
+          repeat: -1,
+          stagger: 0.5
+        });
+
+        // Hero section animation
+        if (heroRef.current) {
+          gsap.fromTo(heroRef.current.children,
+            { opacity: 0, y: 30 },
+            { opacity: 1, y: 0, duration: 0.8, stagger: 0.15, ease: 'power3.out' }
+          );
+        }
+
+        // Role cards animation
+        if (cardsRef.current) {
+          gsap.fromTo(cardsRef.current.children,
+            { opacity: 0, y: 20, scale: 0.9 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.1, ease: 'back.out(1.4)', delay: 0.3 }
+          );
+        }
+
+        // Form animation - animate the whole card first
+        if (formRef.current) {
+          gsap.fromTo(formRef.current,
+            { opacity: 0, x: 30 },
+            { opacity: 1, x: 0, duration: 0.7, ease: 'power3.out', delay: 0.2 }
+          );
+        }
+      }, containerRef);
+
+      return () => ctx.revert();
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    // setLoading(true); // Handled by isLoading from hook if we used it, but for now we kept local state compatible
-    // Actually, let's use the local state to match the existing return JSX that uses 'loading'
     setLoading(true);
 
     try {
-      // RTK Query mutation expects one argument usually. Assuming it takes { email, password }
       const userData = await loginMutation({ email, password }).unwrap();
-      dispatch(setCredentials({ ...userData, email })); // adjust based on response structure
+      dispatch(setCredentials({ ...userData, email }));
 
       const role = userData.role || userData.user?.role;
       if (role === 'Student') navigate('/student');
@@ -37,29 +87,37 @@ const Login = () => {
     } catch (err) {
       console.error('Login error:', err);
       setError(err.data?.message || err.message || 'Login failed');
+      // Shake animation on error
+      if (formRef.current) {
+        gsap.to(formRef.current, {
+          x: [-10, 10, -10, 10, 0],
+          duration: 0.4,
+          ease: 'power2.out'
+        });
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const roleCards = [
-    { icon: GraduationCap, label: 'Student', color: 'from-blue-500 to-blue-600' },
-    { icon: Shield, label: 'Admin', color: 'from-red-500 to-red-600' },
-    { icon: Users, label: 'Staff', color: 'from-purple-500 to-purple-600' },
+    { icon: GraduationCap, label: 'Student', color: 'from-primary-500 to-primary-600' },
+    { icon: Shield, label: 'Admin', color: 'from-accent-500 to-accent-600' },
+    { icon: Users, label: 'Staff', color: 'from-success-500 to-success-600' },
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50 flex items-center justify-center p-4">
+    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-primary-50 flex items-center justify-center p-4">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 left-10 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute top-40 right-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
-        <div className="absolute -bottom-32 left-1/2 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000"></div>
+        <div className="bg-blob absolute top-20 left-10 w-72 h-72 bg-primary-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+        <div className="bg-blob absolute top-40 right-10 w-72 h-72 bg-accent-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
+        <div className="bg-blob absolute -bottom-32 left-1/2 w-72 h-72 bg-success-200 rounded-full mix-blend-multiply filter blur-xl opacity-30"></div>
       </div>
 
       <div className="relative w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center">
         {/* Left Side - Branding & Info */}
-        <div className="hidden lg:block space-y-8">
+        <div ref={heroRef} className="hidden lg:block space-y-8">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
               <img
@@ -77,33 +135,33 @@ const Login = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          {/* <div ref={cardsRef} className="grid grid-cols-3 gap-4">
             {roleCards.map((role, idx) => (
-              <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+              <div key={idx} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 hover:shadow-lg transition-all duration-300 cursor-pointer">
                 <div className={`w-12 h-12 bg-gradient-to-br ${role.color} rounded-xl flex items-center justify-center mb-3 shadow-lg`}>
                   <role.icon className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-sm font-semibold text-gray-700">{role.label}</p>
               </div>
             ))}
-          </div>
+          </div> */}
 
           <div className="space-y-3">
             <div className="flex items-center gap-3 text-gray-600">
-              <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+              <div className="w-8 h-8 bg-success-100 rounded-full flex items-center justify-center">
+                <div className="w-2 h-2 bg-success-500 rounded-full"></div>
               </div>
               <span>Secure & encrypted login</span>
             </div>
             <div className="flex items-center gap-3 text-gray-600">
-              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <div className="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                <div className="w-2 h-2 bg-primary-500 rounded-full"></div>
               </div>
               <span>24/7 access to your portal</span>
             </div>
             <div className="flex items-center gap-3 text-gray-600">
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
-                <div className="w-2 h-2 bg-purple-500 rounded-full"></div>
+              <div className="w-8 h-8 bg-accent-100 rounded-full flex items-center justify-center">
+                <div className="w-2 h-2 bg-accent-500 rounded-full"></div>
               </div>
               <span>Real-time updates & notifications</span>
             </div>
@@ -111,19 +169,19 @@ const Login = () => {
         </div>
 
         {/* Right Side - Login Form */}
-        <div className="w-full max-w-md mx-auto lg:mx-0">
-          <div className="bg-white/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-100 p-8 lg:p-10">
+        <div ref={formRef} className="w-full max-w-md mx-auto lg:mx-0">
+          <div className="bg-white/90 backdrop-blur-xl rounded-3xl shadow-2xl border border-gray-100 p-8 lg:p-10">
             <div className="mb-8">
               <h2 className="text-3xl font-bold text-gray-800 mb-2">Sign In</h2>
               <p className="text-gray-500">Enter your credentials to access your account</p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="mb-6 p-4 bg-primary-50 border border-primary-100 rounded-xl flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-primary-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-800">Login Failed</p>
-                  <p className="text-sm text-red-600">{error}</p>
+                  <p className="text-sm font-medium text-primary-800">Login Failed</p>
+                  <p className="text-sm text-primary-600">{error}</p>
                 </div>
               </div>
             )}
@@ -180,7 +238,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold py-3.5 px-6 rounded-xl hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all shadow-lg shadow-primary-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold py-3.5 px-6 rounded-xl hover:from-primary-700 hover:to-primary-800 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all shadow-lg shadow-primary-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 btn-glow"
               >
                 {loading ? (
                   <>

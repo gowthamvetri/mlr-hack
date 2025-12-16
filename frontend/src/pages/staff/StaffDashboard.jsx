@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
+import gsap from 'gsap';
 import {
   Users, BookOpen, CreditCard, Calendar, CheckCircle,
   XCircle, AlertTriangle, TrendingUp, Clock, Award
@@ -27,6 +29,31 @@ const StaffDashboard = () => {
 
   // Staff can only see students from their department
   const staffDepartment = user?.department || '';
+
+  // GSAP Animation Refs
+  const pageRef = useRef(null);
+  const statsGridRef = useRef(null);
+
+  // GSAP Entry Animations
+  useEffect(() => {
+    if (!pageRef.current || loading) return;
+
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        if (statsGridRef.current) {
+          const cards = statsGridRef.current.children;
+          gsap.fromTo(cards,
+            { opacity: 0, y: 25, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power3.out' }
+          );
+        }
+      }, pageRef);
+
+      return () => ctx.revert();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -136,7 +163,7 @@ const StaffDashboard = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6">
+      <div ref={pageRef} className="space-y-6">
         {/* Department Warning */}
         {!user?.department && (
           <div className="bg-amber-100 border border-amber-300 rounded-xl p-4 text-amber-800">
@@ -169,16 +196,22 @@ const StaffDashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <div ref={statsGridRef} className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {statCards.map((stat, index) => (
-            <div key={index} className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div key={index} className="stat-card glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <div className="flex items-center justify-between">
                 <div className={`p-2 rounded-lg ${getColorClasses(stat.color)}`}>
                   <stat.icon className="w-5 h-5" />
                 </div>
               </div>
               <div className="mt-3">
-                <p className="text-2xl sm:text-3xl font-bold text-gray-800">{loading ? '...' : stat.value}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-800">
+                  {loading ? '...' : (
+                    typeof stat.value === 'string' && stat.value.includes('%')
+                      ? <AnimatedNumber value={parseInt(stat.value) || 0} suffix="%" />
+                      : <AnimatedNumber value={stat.value || 0} />
+                  )}
+                </p>
                 <p className="text-sm font-medium text-gray-700">{stat.title}</p>
                 <p className="text-xs text-gray-500">{stat.desc}</p>
               </div>
@@ -189,7 +222,7 @@ const StaffDashboard = () => {
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Ineligible Students Alert */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="glass-card rounded-xl p-6 tilt-card">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-800 flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-red-500" />
@@ -227,7 +260,7 @@ const StaffDashboard = () => {
           </div>
 
           {/* Quick Links */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+          <div className="glass-card rounded-xl p-6 tilt-card">
             <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h2>
             <div className="grid grid-cols-2 gap-4">
               <a href="/staff/attendance" className="flex flex-col items-center p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">

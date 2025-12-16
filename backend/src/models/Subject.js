@@ -4,6 +4,17 @@ const subjectSchema = mongoose.Schema({
   name: { type: String, required: true },
   code: { type: String, required: true, unique: true },
   department: { type: String, required: true },
+  year: { type: Number, min: 1, max: 4 }, // Student year (1-4)
+  semester: { type: Number, min: 1, max: 8 }, // Semester number
+
+  // For exam scheduling algorithm
+  subjectType: {
+    type: String,
+    enum: ['HEAVY', 'NONMAJOR'],
+    default: 'HEAVY'
+  },
+  credits: { type: Number, default: 3 },
+
   syllabus: [{
     unit: { type: String, required: true },
     topics: [{
@@ -21,6 +32,9 @@ const subjectSchema = mongoose.Schema({
 }, {
   timestamps: true,
 });
+
+// Index for efficient queries
+subjectSchema.index({ department: 1, year: 1 });
 
 const Subject = mongoose.model('Subject', subjectSchema);
 

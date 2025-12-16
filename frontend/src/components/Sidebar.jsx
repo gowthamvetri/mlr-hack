@@ -19,7 +19,12 @@ import {
   Target,
   ClipboardCheck,
   UserPlus,
-  X
+  X,
+  Ticket,
+  Brain,
+  Wand2,
+  UserCog,
+  ExternalLink
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../store/slices/authSlice';
@@ -41,7 +46,9 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/student/courses', icon: BookOpen, label: 'My Courses' },
           { to: '/student/career', icon: Target, label: 'Career Roadmap' },
           { to: '/student/exams', icon: ClipboardList, label: 'My Exams' },
+          { to: '/student/hall-tickets', icon: Ticket, label: 'Hall Tickets' },
           { to: '/student/study', icon: GraduationCap, label: 'Study Support' },
+          { to: '/student/ai-twin', icon: Brain, label: 'AI Twin' },
           { to: '/student/calendar', icon: Calendar, label: 'Calendar' },
           { to: '/student/calculators', icon: Calculator, label: 'Calculators' },
           { to: '/student/profile', icon: UserCircle, label: 'My Profile' },
@@ -56,7 +63,8 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
           { to: '/admin/placement-page', icon: Building, label: 'Placement Page' },
-          { to: '/admin/exams', icon: ClipboardList, label: 'Exams' },
+          { to: '/admin/exam-scheduling', icon: Wand2, label: 'Exam Management' },
+          { to: '/admin/invigilators', icon: UserCog, label: 'Invigilators' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },
           { to: '/admin/profile', icon: UserCircle, label: 'My Profile' },
         ];
@@ -78,6 +86,8 @@ const Sidebar = ({ isOpen, onClose }) => {
         return [
           { to: '/staff', icon: LayoutDashboard, label: 'Dashboard' },
           { to: '/staff/courses', icon: BookOpen, label: 'My Courses' },
+          { to: '/staff/external-courses', icon: ExternalLink, label: 'External Courses' },
+          { to: '/staff/invigilation', icon: ClipboardCheck, label: 'Invigilation' },
           { to: '/staff/attendance', icon: ClipboardList, label: 'Attendance' },
           { to: '/staff/fees', icon: ClipboardCheck, label: 'Fee Management' },
           { to: '/staff/career-approvals', icon: Target, label: 'Career Approvals' },
@@ -98,13 +108,13 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside className={`
-      fixed left-0 top-0 h-screen w-64 bg-white/95 backdrop-blur-xl border-r border-gray-100 shadow-xl shadow-gray-200/50 z-50 flex flex-col
+      fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 shadow-lg z-50 flex flex-col
       transform transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       lg:translate-x-0
     `}>
       {/* Logo */}
-      <div className="p-6 flex items-center justify-between">
+      <div className="p-6 flex items-center justify-between border-b border-gray-100">
         <div className="flex items-center gap-3">
           <img
             src="/mlrit-logo.png"
@@ -131,17 +141,17 @@ const Sidebar = ({ isOpen, onClose }) => {
             onClick={handleNavClick}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                ? 'bg-primary-50 text-primary-700 font-semibold shadow-sm ring-1 ring-primary-100'
+                ? 'bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200'
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-primary-600' : 'text-gray-400 group-hover:text-gray-600'}`} />
+                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-600'}`} />
                 <span>{item.label}</span>
                 {isActive && (
-                  <div className="ml-auto w-1.5 h-1.5 rounded-full bg-primary-600 shadow-sm" />
+                  <div className="ml-auto w-2 h-2 rounded-full bg-white shadow-sm" />
                 )}
               </>
             )}
@@ -150,10 +160,10 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50/50">
+      <div className="p-4 border-t border-gray-100 bg-gray-50">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-red-50 hover:text-red-600 rounded-xl text-gray-600 shadow-sm border border-gray-200/50 transition-all duration-200 group"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-primary-50 hover:text-primary-600 rounded-xl text-gray-600 shadow-sm border border-gray-200 transition-all duration-200 group"
         >
           <LogOut size={18} className="group-hover:scale-110 transition-transform" />
           <span className="font-medium text-sm">Sign Out</span>

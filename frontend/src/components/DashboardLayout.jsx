@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './Sidebar';
 import NotificationPanel from './NotificationPanel';
 import { Search, UserCircle, Menu, X } from 'lucide-react';
@@ -6,6 +6,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import { useSocket } from '../context/SocketContext';
 import { toast } from 'react-hot-toast';
+import gsap from 'gsap';
 
 const DashboardLayout = ({ children, title }) => {
   /* REMOVED: const { user } = useAuth(); */
@@ -28,8 +29,24 @@ const DashboardLayout = ({ children, title }) => {
     };
   }, [socket]);
 
+  // GSAP page content animation
+  const contentRef = useRef(null);
+
+  useEffect(() => {
+    if (!contentRef.current) return;
+
+    const timer = setTimeout(() => {
+      gsap.fromTo(contentRef.current,
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out' }
+      );
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gray-50 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-50 via-gray-50 to-gray-50">
+    <div className="min-h-screen mesh-gradient-bg">
       {/* Mobile Sidebar Overlay */}
       {sidebarOpen && (
         <div
@@ -86,7 +103,7 @@ const DashboardLayout = ({ children, title }) => {
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 animate-fade-in">
+        <main ref={contentRef} className="flex-1 p-4 sm:p-6 lg:p-8">
           {children}
         </main>
       </div>

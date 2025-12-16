@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useSocket } from '../../context/SocketContext';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import { getCourses, getDepartments, getCourseStats, createCourse, deleteCourse, getCourseById, updateCourse, uploadCourseMaterial, deleteCourseMaterial, getUsers } from '../../utils/api';
 import {
   BookOpen, Search, Plus, Users, Clock, Star,
@@ -276,42 +277,44 @@ const AdminCourses = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-5 text-white">
+        <div className="glass-card rounded-xl p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-primary-100 text-sm">Total Courses</p>
-              <p className="text-3xl font-bold mt-1">{stats.total}</p>
+              <p className="text-gray-500 text-sm">Total Courses</p>
+              <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.total} /></p>
             </div>
-            <BookOpen className="w-10 h-10 text-primary-200" />
+            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-primary-600" />
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Active Courses</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.active}</p>
+              <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.active} /></p>
             </div>
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <BookOpen className="w-5 h-5 text-green-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Total Enrollments</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.students}</p>
+              <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.students} /></p>
             </div>
             <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
               <Users className="w-5 h-5 text-blue-600" />
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-sm">Avg. Rating</p>
-              <p className="text-3xl font-bold text-gray-800 mt-1">{stats.avgRating}</p>
+              <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} /></p>
             </div>
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Star className="w-5 h-5 text-yellow-600" />
@@ -321,7 +324,7 @@ const AdminCourses = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+      <div className="glass-card rounded-xl tilt-card p-4 mb-6">
         <div className="flex flex-wrap items-center gap-4">
           <div className="flex-1 min-w-[200px]">
             <div className="relative">
@@ -361,7 +364,7 @@ const AdminCourses = () => {
       {/* Courses Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCourses.map((course) => (
-          <div key={course._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow">
+          <div key={course._id} className="glass-card rounded-xl tilt-card overflow-hidden hover:shadow-md transition-shadow">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">

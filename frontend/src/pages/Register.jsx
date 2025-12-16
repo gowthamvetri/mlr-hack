@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import gsap from 'gsap';
 
 import {
   User, Mail, Lock, Briefcase, GraduationCap, Building,
@@ -20,6 +21,41 @@ const Register = () => {
   const [pendingApproval, setPendingApproval] = useState(false);
   const navigate = useNavigate();
 
+  // GSAP Animation Refs
+  const containerRef = useRef(null);
+  const formRef = useRef(null);
+  const roleCardsRef = useRef(null);
+
+  // GSAP Entry Animations
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        // Role cards animation
+        if (roleCardsRef.current) {
+          const cards = roleCardsRef.current.querySelectorAll('.role-card');
+          gsap.fromTo(cards,
+            { opacity: 0, y: 20, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.1, ease: 'back.out(1.4)' }
+          );
+        }
+
+        // Form animation
+        if (formRef.current) {
+          gsap.fromTo(formRef.current,
+            { opacity: 0, x: 20 },
+            { opacity: 1, x: 0, duration: 0.6, ease: 'power3.out', delay: 0.2 }
+          );
+        }
+      }, containerRef);
+
+      return () => ctx.revert();
+    }, 50);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -38,13 +74,26 @@ const Register = () => {
         await submitRegistrationRequest(formData);
         setPendingApproval(true);
       } else {
-        // For Student, register directly
-        await registerUser(formData);
-        setSuccess(true);
-        setTimeout(() => navigate('/login'), 2000);
+        // For Student, register but show pending approval (no auto-login)
+        const response = await registerUser(formData);
+        // Check if response indicates pending approval
+        if (response.data?.pendingApproval) {
+          setPendingApproval(true);
+        } else {
+          setSuccess(true);
+          setTimeout(() => navigate('/login'), 2000);
+        }
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
+      // Shake animation on error
+      if (formRef.current) {
+        gsap.to(formRef.current, {
+          x: [-10, 10, -10, 10, 0],
+          duration: 0.4,
+          ease: 'power2.out'
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -282,35 +331,44 @@ const Register = () => {
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <BookOpen className="w-4 h-4 text-gray-400" />
                     </div>
-                    <input
+                    <select
                       name="department"
-                      placeholder="Department (e.g., CSE)"
                       className="w-full pl-10 pr-3 py-2.5 bg-white border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                       onChange={handleChange}
-                    />
+                      value={formData.department}
+                      required
+                    >
+                      <option value="">Select Department</option>
+                      <option value="CSE">CSE</option>
+                      <option value="IT">IT</option>
+                      <option value="ECE">ECE</option>
+                      <option value="EEE">EEE</option>
+                      <option value="MECH">MECH</option>
+                      <option value="CIVIL">CIVIL</option>
+                      <option value="CSD">CSD</option>
+                      <option value="CSM">CSM</option>
+                      <option value="CSC">CSC</option>
+                    </select>
                   </div>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                       <Calendar className="w-4 h-4 text-gray-400" />
                     </div>
-                    <input
+                    <select
                       name="year"
-                      placeholder="Year (e.g., 3rd Year)"
                       className="w-full pl-10 pr-3 py-2.5 bg-white border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
                       onChange={handleChange}
-                    />
+                      value={formData.year}
+                      required
+                    >
+                      <option value="">Select Year</option>
+                      <option value="1">1st Year</option>
+                      <option value="2">2nd Year</option>
+                      <option value="3">3rd Year</option>
+                      <option value="4">4th Year</option>
+                    </select>
                   </div>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Hash className="w-4 h-4 text-gray-400" />
-                    </div>
-                    <input
-                      name="rollNumber"
-                      placeholder="Roll Number"
-                      className="w-full pl-10 pr-3 py-2.5 bg-white border border-blue-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-                      onChange={handleChange}
-                    />
-                  </div>
+                  <p className="text-xs text-blue-600 italic">Roll number will be auto-generated upon approval.</p>
                 </div>
               )}
 

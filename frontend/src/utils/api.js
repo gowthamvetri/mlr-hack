@@ -52,6 +52,8 @@ export const updateClubProfile = (data) => API.post('/clubs/profile', data);
 export const getClubStats = () => API.get('/clubs/stats');
 
 export const getAdminStats = () => API.get('/analytics/admin');
+export const getPerformanceMetrics = () => API.get('/analytics/performance-metrics');
+export const getDepartmentDistribution = () => API.get('/analytics/department-distribution');
 
 // User management
 export const getUsers = (params) => API.get('/users', { params });
@@ -150,6 +152,12 @@ export const rejectCareerRequest = (id, data) => API.put(`/career-approvals/reje
 export const getProfile = () => API.get('/users/profile');
 export const updateProfile = (data) => API.put('/users/profile', data);
 
+// Student Approval (Admin/Staff)
+export const getPendingStudents = () => API.get('/users/pending');
+export const approveStudent = (id) => API.put(`/users/${id}/approve`);
+export const rejectStudent = (id) => API.delete(`/users/${id}/reject`);
+
+
 // Placement Page (Admin)
 export const getAdminPlacementSlides = () => API.get('/placement-page/admin/slides');
 export const createPlacementSlide = (data) => API.post('/placement-page/admin/slides', data);
@@ -171,5 +179,47 @@ export const submitStaffRating = (data) => API.post('/ratings', data);
 export const getStaffRatings = (staffId) => API.get(`/ratings/staff/${staffId}`);
 export const canRateStaff = (staffId, courseId) => API.get(`/ratings/can-rate/${staffId}/${courseId}`);
 export const getStaffAverageRating = (staffId) => API.get(`/ratings/average/${staffId}`);
+
+// External Courses (Free Certifications)
+export const getExternalCourses = (params) => API.get('/external-courses', { params });
+export const createExternalCourse = (data) => API.post('/external-courses', data);
+export const updateExternalCourse = (id, data) => API.put(`/external-courses/${id}`, data);
+export const deleteExternalCourse = (id) => API.delete(`/external-courses/${id}`);
+export const markExternalCourseComplete = (id) => API.post(`/external-courses/${id}/complete`);
+export const getMyCompletedExternalCourses = () => API.get('/external-courses/my-completed');
+
+// Exam Scheduling (Admin)
+export const autoScheduleExam = (data) => API.post('/exams/auto-schedule', data);
+
+// Hall Tickets (New System)
+export const generateSingleHallTicket = (data) => API.post('/hall-tickets/generate', data);
+export const generateBulkHallTicketsNew = (data) => API.post('/hall-tickets/generate-bulk', data);
+export const generateConsolidatedHallTickets = (data) => API.post('/hall-tickets/generate-consolidated', data);
+export const authorizeHallTickets = (examId) => API.put(`/hall-tickets/authorize/${examId}`);
+export const authorizeConsolidatedHallTickets = (data) => API.put('/hall-tickets/authorize-consolidated', data);
+export const getExamHallTickets = (examId) => API.get(`/hall-tickets/exam/${examId}`);
+export const getMyHallTickets = () => API.get('/hall-tickets/my-tickets');
+export const getMyHallTicket = (examId) => API.get(`/hall-tickets/my-ticket/${examId}`);
+export const downloadHallTicket = (ticketId) => API.get(`/hall-tickets/download/${ticketId}`, { responseType: 'blob' });
+
+// Attendance (QR-based)
+export const scanQRAttendance = (data) => API.post('/attendance/scan-qr', data);
+export const markManualAttendance = (data) => API.post('/attendance/manual', data);
+export const getExamAttendance = (examId, params) => API.get(`/attendance/exam/${examId}`, { params });
+export const getMyAttendance = () => API.get('/attendance/my-attendance');
+export const getPendingAttendance = (examId) => API.get(`/attendance/pending/${examId}`);
+
+// Enhanced Seating (MLR-Hackathon style)
+export const getAvailableRoomsForExam = (params) => API.get('/seating/available-rooms', { params });
+export const allocateSeatingMLR = (data) => API.post('/seating/allocate', data);
+export const assignInvigilators = (data) => API.post('/seating/assign-invigilators', data);
+export const getSeatingSchedule = (examId) => API.get(`/seating/schedule/${examId}`);
+export const getAllSeatingRooms = () => API.get('/seating/rooms');
+export const createSeatingRoom = (data) => API.post('/seating/rooms', data);
+export const updateSeatingRoom = (id, data) => API.put(`/seating/rooms/${id}`, data);
+export const deleteSeatingRoom = (id) => API.delete(`/seating/rooms/${id}`);
+export const getMyInvigilation = () => API.get('/seating/my-invigilation');
+export const getMySeating = () => API.get('/seating/my-seat');
+export const getAvailableInvigilators = () => API.get('/seating/invigilators');
 
 export default API;

@@ -5,32 +5,32 @@ import { X, CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
 
 const toastStyles = {
   success: {
-    bg: 'bg-green-50 border-green-200',
+    bg: 'bg-success-50 border-success-200',
     icon: CheckCircle,
-    iconColor: 'text-green-500',
-    titleColor: 'text-green-800',
-    textColor: 'text-green-700',
+    iconColor: 'text-success-500',
+    titleColor: 'text-success-800',
+    textColor: 'text-success-700',
   },
   error: {
-    bg: 'bg-red-50 border-red-200',
+    bg: 'bg-primary-50 border-primary-200',
     icon: AlertCircle,
-    iconColor: 'text-red-500',
-    titleColor: 'text-red-800',
-    textColor: 'text-red-700',
+    iconColor: 'text-primary-500',
+    titleColor: 'text-primary-800',
+    textColor: 'text-primary-700',
   },
   warning: {
-    bg: 'bg-yellow-50 border-yellow-200',
+    bg: 'bg-accent-50 border-accent-200',
     icon: AlertTriangle,
-    iconColor: 'text-yellow-500',
-    titleColor: 'text-yellow-800',
-    textColor: 'text-yellow-700',
+    iconColor: 'text-accent-500',
+    titleColor: 'text-accent-800',
+    textColor: 'text-accent-700',
   },
   info: {
-    bg: 'bg-blue-50 border-blue-200',
+    bg: 'bg-gray-50 border-gray-200',
     icon: Info,
-    iconColor: 'text-blue-500',
-    titleColor: 'text-blue-800',
-    textColor: 'text-blue-700',
+    iconColor: 'text-gray-500',
+    titleColor: 'text-gray-800',
+    textColor: 'text-gray-700',
   },
 };
 
@@ -86,7 +86,7 @@ const GlobalToast = () => {
   if (toasts.length === 0) return null;
 
   return (
-    <div 
+    <div
       className="fixed top-4 right-4 z-[9998] flex flex-col gap-3"
       aria-live="polite"
       aria-label="Notifications"

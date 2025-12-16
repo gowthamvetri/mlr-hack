@@ -1,11 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../store/slices/authSlice';
 import {
   getEvents, updateEventStatus, getExams, getAdminStats, getUsers,
-  getDepartments, getCourseStats, getFacultyStats, getPlacementStats, getRecentActivities
+  getDepartments, getCourseStats, getFacultyStats, getPlacementStats, getRecentActivities,
+  getPerformanceMetrics, getDepartmentDistribution
 } from '../utils/api';
 import DashboardLayout from '../components/DashboardLayout';
+import AnimatedNumber from '../components/AnimatedNumber';
+import gsap from 'gsap';
 import {
   Users, FileText, Calendar, Clock, Check, X, AlertTriangle,
   GraduationCap, Building, TrendingUp, BookOpen, Award,
@@ -29,6 +32,32 @@ const AdminDashboard = () => {
   const [facultyCount, setFacultyCount] = useState(0);
   const [courseCount, setCourseCount] = useState(0);
   const [placementRate, setPlacementRate] = useState(0);
+
+  // GSAP Animation Refs
+  const pageRef = useRef(null);
+  const statsGridRef = useRef(null);
+
+  // GSAP Entry Animations
+  useEffect(() => {
+    if (!pageRef.current || loading) return;
+
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        // Stats cards animation
+        if (statsGridRef.current) {
+          const cards = statsGridRef.current.querySelectorAll('.stat-card');
+          gsap.fromTo(cards,
+            { opacity: 0, y: 25, scale: 0.95 },
+            { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power3.out' }
+          );
+        }
+      }, pageRef);
+
+      return () => ctx.revert();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [loading]);
 
   // Activity icon mapping
   const getActivityIcon = (type) => {
@@ -59,23 +88,30 @@ const AdminDashboard = () => {
 
       // Fetch additional dynamic data
       try {
-        const [departmentsRes, courseStatsRes, facultyStatsRes, placementStatsRes, activitiesRes] = await Promise.all([
-          getDepartments(),
+        const [deptDistRes, perfMetricsRes, courseStatsRes, facultyStatsRes, placementStatsRes, activitiesRes] = await Promise.all([
+          getDepartmentDistribution(),
+          getPerformanceMetrics(),
           getCourseStats(),
           getFacultyStats(),
           getPlacementStats(),
           getRecentActivities(10)
         ]);
 
-        // Process department data
-        if (departmentsRes.data) {
-          const depts = departmentsRes.data.slice(0, 4);
-          const totalStudents = depts.reduce((sum, d) => sum + (d.totalStudents || 0), 0) || 1;
-          setDepartmentData(depts.map(d => ({
-            name: d.name,
-            count: d.totalStudents || 0,
-            percentage: Math.round(((d.totalStudents || 0) / totalStudents) * 100)
-          })));
+        // Process department distribution (now from dedicated API)
+        if (deptDistRes.data && deptDistRes.data.length > 0) {
+          setDepartmentData(deptDistRes.data.slice(0, 4));
+        }
+
+        // Process performance metrics (now dynamic)
+        if (perfMetricsRes.data && perfMetricsRes.data.length > 0) {
+          // Update job placement rate from placement stats
+          const metricsWithPlacement = perfMetricsRes.data.map(m => {
+            if (m.label === 'Job Placement Rate') {
+              return { ...m, value: placementStatsRes.data?.placementRate || m.value };
+            }
+            return m;
+          });
+          setPerformanceMetrics(metricsWithPlacement);
         }
 
         // Process course stats
@@ -91,12 +127,6 @@ const AdminDashboard = () => {
         // Process placement stats
         if (placementStatsRes.data) {
           setPlacementRate(placementStatsRes.data.placementRate || 0);
-          setPerformanceMetrics([
-            { label: 'Course Completion Rate', value: 87, trend: '+5%', color: 'primary' },
-            { label: 'Student Satisfaction', value: 92, trend: '+8%', color: 'primary' },
-            { label: 'Job Placement Rate', value: placementStatsRes.data.placementRate || 0, trend: '+12%', color: 'green' },
-            { label: 'Skill Assessment Score', value: 85, trend: '+3%', color: 'primary' },
-          ]);
         }
 
         // Process activities
@@ -116,17 +146,9 @@ const AdminDashboard = () => {
         }
       } catch (additionalError) {
         console.log('Additional stats not available:', additionalError.message);
-        // Set fallback data
-        setDepartmentData([
-          { name: 'Engineering', count: 847, percentage: 46 },
-          { name: 'Business', count: 523, percentage: 28 },
-          { name: 'Arts', count: 312, percentage: 17 },
-          { name: 'Science', count: 165, percentage: 9 },
-        ]);
-        setRecentActivities([
-          { type: 'enrollment', icon: UserPlus, title: 'New student enrolled', description: 'John Doe joined Computer Science', time: '2 minutes ago', color: 'blue' },
-          { type: 'course', icon: CheckCircle, title: 'Course completed', description: 'Advanced AI course completed by 15 students', time: '1 hour ago', color: 'green' },
-        ]);
+        // Show empty state when APIs fail - no static fallback data
+        setDepartmentData([]);
+        setRecentActivities([]);
       }
     } catch (error) {
       console.error('Error fetching admin data:', error);
@@ -166,92 +188,103 @@ const AdminDashboard = () => {
   return (
     <DashboardLayout role="admin" userName={user?.name}>
       {/* Top Stats Row */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        {/* Total Students - Featured */}
-        <div className="col-span-2 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-4 sm:p-6 text-white shadow-lg">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold text-primary-100">Total Students</h3>
-            <GraduationCap className="w-6 h-6 text-primary-200" />
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+        {/* Total Students */}
+        <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-medium text-gray-500">Total Students</h3>
+            <div className="w-9 h-9 bg-primary-100 rounded-lg flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-primary-600" />
+            </div>
           </div>
-          <p className="text-4xl font-bold mb-1">{stats?.totalStudents || 0}</p>
-          <p className="text-primary-200 text-sm">Enrolled students</p>
+          <p className="text-3xl font-bold text-gray-800"><AnimatedNumber value={stats?.totalStudents || 0} /></p>
+          <p className="text-xs text-gray-500">Enrolled students</p>
         </div>
 
         {/* Departments */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-gray-500">Departments</h3>
-            <Building className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Departments</h3>
+            <Building className="w-5 h-5 text-gray-400" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">{departmentData.length || 0}</p>
+          <p className="text-3xl font-bold text-gray-800"><AnimatedNumber value={departmentData.length || 0} /></p>
           <p className="text-xs text-gray-500">Active departments</p>
         </div>
 
         {/* Faculty */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-gray-500">Faculty</h3>
-            <Users className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Faculty</h3>
+            <Users className="w-5 h-5 text-gray-400" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">{facultyCount || 0}</p>
+          <p className="text-3xl font-bold text-gray-800"><AnimatedNumber value={facultyCount || 0} /></p>
           <p className="text-xs text-gray-500">Teaching faculty</p>
         </div>
 
         {/* Avg Growth */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-gray-500">Avg Growth</h3>
-            <TrendingUp className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Avg Growth</h3>
+            <TrendingUp className="w-5 h-5 text-gray-400" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">89%</p>
+          <p className="text-3xl font-bold text-gray-800"><AnimatedNumber value={stats?.avgGrowth || 0} suffix="%" /></p>
           <p className="text-xs text-gray-500">Skill improvement</p>
         </div>
+      </div>
 
-        {/* Placement Rate - Blue gradient */}
-        <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl p-4 text-white">
+      {/* Second Stats Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 sm:mb-8">
+        {/* Placement Rate */}
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-blue-100">Placement Rate</h3>
-            <Award className="w-4 h-4 text-blue-200" />
+            <h3 className="text-sm font-medium text-gray-500">Placement Rate</h3>
+            <div className="w-9 h-9 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Award className="w-5 h-5 text-blue-600" />
+            </div>
           </div>
-          <p className="text-2xl font-bold">{placementRate || 0}%</p>
-          <p className="text-xs text-blue-200">Job placements</p>
+          <p className="text-3xl font-bold text-blue-600"><AnimatedNumber value={placementRate || 0} suffix="%" /></p>
+          <p className="text-xs text-gray-500">Job placements</p>
         </div>
 
-        {/* Pending Approvals - Highlighted */}
-        <div className="bg-gradient-to-br from-yellow-500 to-amber-600 rounded-2xl p-4 text-white">
+        {/* Pending Events */}
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-yellow-100">Pending Events</h3>
-            <AlertTriangle className="w-4 h-4 text-yellow-200" />
+            <h3 className="text-sm font-medium text-gray-500">Pending Events</h3>
+            <div className="w-9 h-9 bg-amber-100 rounded-lg flex items-center justify-center">
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+            </div>
           </div>
-          <p className="text-2xl font-bold">{pendingEvents.length || 0}</p>
-          <p className="text-xs text-yellow-200">Awaiting review</p>
+          <p className="text-3xl font-bold text-amber-600"><AnimatedNumber value={pendingEvents.length || 0} /></p>
+          <p className="text-xs text-gray-500">Awaiting review</p>
         </div>
 
         {/* Active Courses */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-gray-500">Active Courses</h3>
-            <BookOpen className="w-4 h-4 text-gray-400" />
+            <h3 className="text-sm font-medium text-gray-500">Active Courses</h3>
+            <BookOpen className="w-5 h-5 text-gray-400" />
           </div>
-          <p className="text-2xl font-bold text-gray-800">{courseCount || 0}</p>
+          <p className="text-3xl font-bold text-gray-800"><AnimatedNumber value={courseCount || 0} /></p>
           <p className="text-xs text-gray-500">Running courses</p>
         </div>
 
-        {/* Graduation Rate - Blue gradient */}
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-2xl p-4 text-white">
+        {/* Graduation Rate */}
+        <div className="glass-card rounded-2xl p-5 tilt-card">
           <div className="flex items-center justify-between mb-3">
-            <h3 className="text-xs font-medium text-green-100">Graduation Rate</h3>
-            <GraduationCap className="w-4 h-4 text-green-200" />
+            <h3 className="text-sm font-medium text-gray-500">Graduation Rate</h3>
+            <div className="w-9 h-9 bg-green-100 rounded-lg flex items-center justify-center">
+              <GraduationCap className="w-5 h-5 text-green-600" />
+            </div>
           </div>
-          <p className="text-2xl font-bold">92%</p>
-          <p className="text-xs text-green-200">Success rate</p>
+          <p className="text-3xl font-bold text-green-600"><AnimatedNumber value={stats?.graduationRate || 0} suffix="%" /></p>
+          <p className="text-xs text-gray-500">Success rate</p>
         </div>
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         {/* Department Distribution */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="glass-card rounded-2xl p-6 tilt-card">
           <div className="flex items-center gap-3 mb-6">
             <Clock className="w-5 h-5 text-gray-500" />
             <h3 className="font-bold text-gray-800">Department Distribution</h3>
@@ -275,7 +308,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Performance Metrics */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="glass-card rounded-2xl p-6 tilt-card">
           <div className="flex items-center gap-3 mb-6">
             <TrendingUp className="w-5 h-5 text-gray-500" />
             <h3 className="font-bold text-gray-800">Performance Metrics</h3>
@@ -309,7 +342,7 @@ const AdminDashboard = () => {
       {/* Recent Activity Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Recent Activity */}
-        <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div className="lg:col-span-2 glass-card rounded-2xl p-6 tilt-card">
           <div className="flex items-center gap-3 mb-6">
             <Clock className="w-5 h-5 text-gray-500" />
             <h3 className="font-bold text-gray-800">Recent Activity</h3>
@@ -348,7 +381,7 @@ const AdminDashboard = () => {
         </div>
 
         {/* Pending Approvals */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="glass-card rounded-2xl tilt-card overflow-hidden">
           <div className="p-6 border-b border-gray-100">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">

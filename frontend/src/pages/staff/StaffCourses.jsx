@@ -99,7 +99,7 @@ const StaffCourses = () => {
             {/* Courses Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {filteredCourses.map(course => (
-                    <div key={course._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                    <div key={course._id} className="glass-card rounded-xl p-6 tilt-card">
                         <div className="flex justify-between items-start mb-4">
                             <div>
                                 <h3 className="text-lg font-bold text-gray-800">{course.name}</h3>

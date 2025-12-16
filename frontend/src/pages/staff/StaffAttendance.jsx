@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import {
   Users, Search, Filter, Save, Check, X,
   AlertTriangle, ChevronDown, RefreshCw
@@ -185,21 +186,21 @@ const StaffAttendance = () => {
         {/* Summary Cards */}
         {summary && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Total Students</p>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{summary.totalStudents}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={summary.totalStudents} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Eligible (≥75%)</p>
-              <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1">{summary.aboveThreshold}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1"><AnimatedNumber value={summary.aboveThreshold} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Below Threshold</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1">{summary.belowThreshold}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1"><AnimatedNumber value={summary.belowThreshold} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Average Attendance</p>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-1">{summary.averageAttendance}%</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-1"><AnimatedNumber value={summary.averageAttendance} suffix="%" /></p>
             </div>
           </div>
         )}

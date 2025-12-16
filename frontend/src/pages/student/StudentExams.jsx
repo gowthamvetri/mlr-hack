@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import { getStudentExams, getHallTicket, getSemesterHallTicket } from '../../utils/api';
+import { getStudentExams, getHallTicket, getSemesterHallTicket, getMySeating } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import Modal from '../../components/Modal';
-import { FileText, Download, Calendar, Clock, MapPin, CheckCircle, AlertCircle, XCircle, AlertTriangle, List } from 'lucide-react';
+import gsap from 'gsap';
+import { FileText, Download, Calendar, Clock, MapPin, CheckCircle, AlertCircle, XCircle, AlertTriangle, List, Building } from 'lucide-react';
 
 import { useSocket } from '../../context/SocketContext';
 
@@ -12,12 +13,38 @@ const StudentExams = () => {
   const socket = useSocket();
   const user = useSelector(selectCurrentUser);
   const [exams, setExams] = useState([]);
+  const [seatingData, setSeatingData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedExam, setSelectedExam] = useState(null);
   const [hallTicket, setHallTicket] = useState(null);
   const [semesterHallTicket, setSemesterHallTicket] = useState(null);
   const [showSemesterModal, setShowSemesterModal] = useState(false);
   const [eligibilityError, setEligibilityError] = useState(null);
+
+  // GSAP Animation Refs
+  const pageRef = useRef(null);
+  const cardsRef = useRef(null);
+
+  // GSAP Entry Animations
+  useEffect(() => {
+    if (!pageRef.current || loading) return;
+
+    const timer = setTimeout(() => {
+      const ctx = gsap.context(() => {
+        if (cardsRef.current) {
+          const cards = cardsRef.current.querySelectorAll('.exam-card');
+          gsap.fromTo(cards,
+            { opacity: 0, y: 20 },
+            { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: 'power2.out' }
+          );
+        }
+      }, pageRef);
+
+      return () => ctx.revert();
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [loading, exams]);
 
   useEffect(() => {
     fetchExams();
@@ -42,13 +69,22 @@ const StudentExams = () => {
 
   const fetchExams = async () => {
     try {
-      const { data } = await getStudentExams();
-      setExams(data);
+      const [examsRes, seatingRes] = await Promise.all([
+        getStudentExams(),
+        getMySeating().catch(() => ({ data: [] }))
+      ]);
+      setExams(examsRes.data || []);
+      setSeatingData(Array.isArray(seatingRes.data) ? seatingRes.data : [seatingRes.data].filter(Boolean));
     } catch (error) {
       console.error('Error fetching exams:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Helper to get seat info for a specific exam
+  const getSeatForExam = (examId) => {
+    return seatingData.find(s => s?.exam?._id === examId || s?.exam === examId);
   };
 
   const handleViewHallTicket = async (examId) => {
@@ -189,7 +225,7 @@ const StudentExams = () => {
       )}
 
       {/* Upcoming Exams */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 mb-8 animate-fade-in hover-card">
+      <div className="glass-card rounded-2xl tilt-card mb-8 animate-fade-in hover-card">
         <div className="p-8 border-b border-gray-100">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-primary-50 rounded-xl flex items-center justify-center">
@@ -225,7 +261,7 @@ const StudentExams = () => {
                           {exam.courseCode}
                         </span>
                       </div>
-                      <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                      <div className="flex flex-wrap items-center gap-3 text-sm text-gray-500">
                         <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
                           <Calendar className="w-4 h-4 text-gray-400" />
                           {new Date(exam.date).toLocaleDateString('en-US', { weekday: 'short', month: 'long', day: 'numeric' })}
@@ -234,10 +270,26 @@ const StudentExams = () => {
                           <Clock className="w-4 h-4 text-gray-400" />
                           {exam.startTime} - {exam.endTime}
                         </span>
-                        <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
-                          <MapPin className="w-4 h-4 text-gray-400" />
-                          {exam.venue || 'TBA'}
-                        </span>
+                        {(() => {
+                          const seat = getSeatForExam(exam._id);
+                          return seat ? (
+                            <>
+                              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg">
+                                <Building className="w-4 h-4" />
+                                Room {seat.roomNumber || seat.room?.roomNumber || 'TBD'}
+                              </span>
+                              <span className="flex items-center gap-1.5 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg">
+                                <MapPin className="w-4 h-4" />
+                                Seat {seat.seatNumber || 'TBD'}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg">
+                              <MapPin className="w-4 h-4 text-gray-400" />
+                              TBA
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
                     <div className="flex items-center gap-3 w-full md:w-auto">
@@ -265,7 +317,7 @@ const StudentExams = () => {
       </div>
 
       {/* Past Exams */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 animate-fade-in hover-card">
+      <div className="glass-card rounded-2xl tilt-card animate-fade-in hover-card">
         <div className="p-8 border-b border-gray-100">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center">

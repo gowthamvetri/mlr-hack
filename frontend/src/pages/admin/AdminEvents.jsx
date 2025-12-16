@@ -88,7 +88,7 @@ const AdminEvents = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4">
+        <div className="glass-card rounded-xl tilt-card p-3 sm:p-4">
           <div className="flex items-center gap-2 sm:gap-3">
             <div className="w-8 sm:w-10 h-8 sm:h-10 bg-gray-100 rounded-lg flex items-center justify-center">
               <Calendar className="w-4 sm:w-5 h-4 sm:h-5 text-gray-600" />
@@ -99,7 +99,7 @@ const AdminEvents = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
               <Clock className="w-5 h-5 text-yellow-600" />
@@ -110,7 +110,7 @@ const AdminEvents = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
               <Check className="w-5 h-5 text-green-600" />
@@ -121,7 +121,7 @@ const AdminEvents = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="glass-card rounded-xl tilt-card p-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
               <X className="w-5 h-5 text-red-600" />
@@ -135,7 +135,7 @@ const AdminEvents = () => {
       </div>
 
       {/* Search and Filter */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 mb-6">
+      <div className="glass-card rounded-xl tilt-card p-6 mb-6">
         <div className="flex flex-col md:flex-row gap-4">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -187,7 +187,7 @@ const AdminEvents = () => {
       {/* Events Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredEvents.map(event => (
-          <div key={event._id} className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+          <div key={event._id} className="glass-card rounded-xl tilt-card overflow-hidden">
             <div className="p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
@@ -258,7 +258,7 @@ const AdminEvents = () => {
       </div>
 
       {filteredEvents.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+        <div className="glass-card rounded-xl tilt-card p-12 text-center">
           <Calendar className="w-12 h-12 mx-auto mb-3 text-gray-300" />
           <p className="text-gray-500 font-medium">No events found</p>
           <p className="text-gray-400 text-sm">Try adjusting your filters</p>

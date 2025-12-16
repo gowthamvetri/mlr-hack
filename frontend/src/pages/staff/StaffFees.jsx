@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import Modal from '../../components/Modal';
 import {
   CreditCard, Search, Save, Check, X,
@@ -191,21 +192,21 @@ const StaffFees = () => {
         {/* Summary Cards */}
         {summary && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Total Students</p>
-              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{summary.totalStudents}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={summary.totalStudents} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Fees Cleared</p>
-              <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1">{summary.feesPaidCount}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-green-600 mt-1"><AnimatedNumber value={summary.feesPaidCount} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Fees Pending</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1">{summary.feesPendingCount}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-red-600 mt-1"><AnimatedNumber value={summary.feesPendingCount} /></p>
             </div>
-            <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+            <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
               <p className="text-xs sm:text-sm text-gray-500">Clearance Rate</p>
-              <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-1">{summary.clearanceRate}%</p>
+              <p className="text-2xl sm:text-3xl font-bold text-blue-600 mt-1"><AnimatedNumber value={summary.clearanceRate} suffix="%" /></p>
             </div>
           </div>
         )}

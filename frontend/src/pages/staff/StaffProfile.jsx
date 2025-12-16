@@ -175,7 +175,7 @@ const StaffProfile = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in delay-100">
                 {/* Profile Card */}
                 <div className="lg:col-span-1">
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 h-full group">
+                    <div className="glass-card rounded-3xl tilt-card overflow-hidden h-full group">
                         <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-10 text-center relative overflow-hidden">
                             <div className="absolute top-0 right-0 p-8 opacity-5">
                                 <User className="w-64 h-64 text-white -mr-20 -mt-20 transform rotate-12" />
@@ -242,7 +242,7 @@ const StaffProfile = () => {
 
                 {/* Edit Form / Details View */}
                 <div className="lg:col-span-2">
-                    <div className="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 hover:shadow-lg transition-all duration-300 h-full">
+                    <div className="glass-card rounded-3xl p-8 tilt-card h-full">
                         <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
                             <div className="p-2 bg-primary-50 rounded-lg">
                                 <User className="w-6 h-6 text-primary-600" />

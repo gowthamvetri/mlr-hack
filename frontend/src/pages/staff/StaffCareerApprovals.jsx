@@ -186,7 +186,7 @@ const StaffCareerApprovals = () => {
             </div>
           ) : (
             filteredApprovals.map(approval => (
-              <div key={approval._id} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div key={approval._id} className="glass-card rounded-xl p-6 tilt-card">
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                   <div className="flex items-start gap-4">
                     <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 font-semibold text-lg">

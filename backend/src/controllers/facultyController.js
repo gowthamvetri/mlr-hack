@@ -178,8 +178,15 @@ const deleteFaculty = async (req, res) => {
 // Get faculty stats
 const getFacultyStats = async (req, res) => {
   try {
-    const totalFaculty = await Faculty.countDocuments({});
-    const activeFaculty = await Faculty.countDocuments({ status: 'Active' });
+    // Count from Faculty model
+    let totalFaculty = await Faculty.countDocuments({});
+    let activeFaculty = await Faculty.countDocuments({ status: 'Active' });
+
+    // If Faculty model is empty, count Staff users from User model
+    if (totalFaculty === 0) {
+      totalFaculty = await User.countDocuments({ role: 'Staff' });
+      activeFaculty = totalFaculty; // All staff users are considered active
+    }
 
     // Count professors
     const professors = await Faculty.countDocuments({

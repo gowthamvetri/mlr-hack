@@ -152,7 +152,7 @@ const AdminProfile = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Card */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="glass-card rounded-2xl tilt-card overflow-hidden">
             <div className="bg-gradient-to-r from-red-600 to-red-700 p-8 text-center">
               <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
                 <Shield className="w-12 h-12 text-red-600" />
@@ -210,7 +210,7 @@ const AdminProfile = () => {
 
         {/* Edit Form / Details View */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+          <div className="glass-card rounded-2xl p-6 tilt-card">
             <h3 className="text-lg font-semibold text-gray-800 mb-6">Personal Information</h3>
 
             <form onSubmit={handleSubmit} className="space-y-6">

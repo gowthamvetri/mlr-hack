@@ -165,7 +165,7 @@ const AdminStudents = () => {
             <Users className="w-8 sm:w-10 h-8 sm:h-10 text-primary-200" />
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-xs sm:text-sm">Active Students</p>
@@ -176,7 +176,7 @@ const AdminStudents = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-xs sm:text-sm">Departments</p>
@@ -187,7 +187,7 @@ const AdminStudents = () => {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-500 text-xs sm:text-sm">Avg. Attendance</p>
@@ -201,7 +201,7 @@ const AdminStudents = () => {
       </div>
 
       {/* Filters */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-3 sm:p-4 mb-6">
+      <div className="glass-card rounded-xl p-3 sm:p-4 mb-6 tilt-card">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:gap-4">
           <div className="flex-1">
             <div className="relative">
@@ -241,7 +241,7 @@ const AdminStudents = () => {
       </div>
 
       {/* Students Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="glass-card rounded-xl tilt-card overflow-hidden">
         {loading ? (
           <div className="p-8 text-center text-gray-500">Loading students...</div>
         ) : (

@@ -7,10 +7,10 @@ import GlobalToast from './components/GlobalToast';
 
 // Loading component for Suspense fallback
 const LoadingSpinner = () => (
-  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+  <div className="min-h-screen flex items-center justify-center bg-white">
     <div className="flex flex-col items-center gap-4">
-      <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-      <p className="text-gray-600 text-sm">Loading...</p>
+      <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin"></div>
+      <p className="text-gray-600 text-sm font-medium">Loading...</p>
     </div>
   </div>
 );
@@ -37,9 +37,10 @@ const StudentCourses = lazy(() => import('./pages/student/StudentCourses'));
 const StudentCareer = lazy(() => import('./pages/student/StudentCareer'));
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'));
 const StudentCalculators = lazy(() => import('./pages/student/StudentCalculators'));
+const StudentAITwin = lazy(() => import('./pages/student/StudentAITwin'));
+const StudentHallTickets = lazy(() => import('./pages/student/StudentHallTickets'));
 
 // Admin Pages
-const AdminExams = lazy(() => import('./pages/admin/AdminExams'));
 const AdminEvents = lazy(() => import('./pages/admin/AdminEvents'));
 const AdminUsers = lazy(() => import('./pages/admin/AdminUsers'));
 const AdminStudents = lazy(() => import('./pages/admin/AdminStudents'));
@@ -50,6 +51,9 @@ const AdminPlacements = lazy(() => import('./pages/admin/AdminPlacements'));
 const AdminRegistrationRequests = lazy(() => import('./pages/admin/AdminRegistrationRequests'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 const AdminPlacementPage = lazy(() => import('./pages/admin/AdminPlacementPage'));
+const AdminExternalCourses = lazy(() => import('./pages/admin/AdminExternalCourses'));
+const AdminExamScheduling = lazy(() => import('./pages/admin/AdminExamScheduling'));
+const AdminInvigilators = lazy(() => import('./pages/admin/AdminInvigilators'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));
@@ -68,6 +72,8 @@ const StaffCareerApprovals = lazy(() => import('./pages/staff/StaffCareerApprova
 const StaffEligibility = lazy(() => import('./pages/staff/StaffEligibility'));
 const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
+const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
+const StaffInvigilation = lazy(() => import('./pages/staff/StaffInvigilation'));
 
 function App() {
   return (
@@ -152,6 +158,23 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/student/ai-twin"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentAITwin />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/student/hall-tickets"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentHallTickets />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Admin Routes */}
             <Route
@@ -211,10 +234,10 @@ function App() {
               }
             />
             <Route
-              path="/admin/exams"
+              path="/admin/external-courses"
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
-                  <AdminExams />
+                  <AdminExternalCourses />
                 </ProtectedRoute>
               }
             />
@@ -247,6 +270,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <AdminProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/exam-scheduling"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminExamScheduling />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/invigilators"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminInvigilators />
                 </ProtectedRoute>
               }
             />
@@ -329,6 +368,14 @@ function App() {
               }
             />
             <Route
+              path="/staff/external-courses"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffExternalCourses />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/staff/attendance"
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
@@ -357,6 +404,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
                   <StaffEligibility />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/invigilation"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffInvigilation />
                 </ProtectedRoute>
               }
             />

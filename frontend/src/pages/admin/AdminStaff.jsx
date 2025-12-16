@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import { getUsers, getDepartments, registerUser, deleteUser } from '../../utils/api';
 import {
     Users, Search, UserPlus, Download, Mail, Phone,
@@ -159,52 +160,54 @@ const AdminStaff = () => {
 
             {/* Stats Cards */}
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
+                <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
                     <div className="flex items-center justify-between">
                         <div>
-                            <p className="text-primary-100 text-xs sm:text-sm">Total Staff</p>
-                            <p className="text-2xl sm:text-3xl font-bold mt-1">{stats.total}</p>
+                            <p className="text-gray-500 text-xs sm:text-sm">Total Staff</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.total} /></p>
                         </div>
-                        <School className="w-8 sm:w-10 h-8 sm:h-10 text-primary-200" />
+                        <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+                            <School className="w-5 h-5 text-primary-600" />
+                        </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+                <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-500 text-xs sm:text-sm">Professors</p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{stats.professors}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.professors} /></p>
                         </div>
-                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                            <Award className="w-4 sm:w-5 h-4 sm:h-5 text-purple-600" />
+                        <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                            <Award className="w-5 h-5 text-purple-600" />
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+                <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-500 text-xs sm:text-sm">Avg. Rating</p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{stats.avgRating}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} /></p>
                         </div>
-                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
-                            <Star className="w-4 sm:w-5 h-4 sm:h-5 text-yellow-600" />
+                        <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                            <Star className="w-5 h-5 text-yellow-600" />
                         </div>
                     </div>
                 </div>
-                <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
+                <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
                     <div className="flex items-center justify-between">
                         <div>
                             <p className="text-gray-500 text-xs sm:text-sm">Active Courses</p>
-                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1">{stats.totalCourses}</p>
+                            <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={stats.totalCourses} /></p>
                         </div>
-                        <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                            <BookOpen className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
+                        <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                            <BookOpen className="w-5 h-5 text-green-600" />
                         </div>
                     </div>
                 </div>
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
+            <div className="glass-card rounded-xl shadow-sm border border-gray-100 p-4 mb-6">
                 <div className="flex flex-wrap items-center gap-4">
                     <div className="flex-1 min-w-[200px]">
                         <div className="relative">
@@ -234,7 +237,7 @@ const AdminStaff = () => {
             {/* Staff Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredStaff.map((member) => (
-                    <div key={member._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+                    <div key={member._id} className="glass-card rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-4">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 rounded-full flex items-center justify-center">

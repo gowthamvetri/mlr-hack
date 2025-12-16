@@ -3,6 +3,7 @@ import { useSelector } from 'react-redux';
 import { useSocket } from '../../context/SocketContext';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
+import AnimatedNumber from '../../components/AnimatedNumber';
 import Modal from '../../components/Modal';
 import { getPlacements, getPlacementStats, createPlacement, updatePlacement, deletePlacement } from '../../utils/api';
 import {
@@ -372,39 +373,49 @@ const AdminPlacements = () => {
 
       {/* Stats Cards */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="col-span-2 sm:col-span-1 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
+        <div className="col-span-2 sm:col-span-1 glass-card rounded-xl p-4 sm:p-5 tilt-card">
           <div className="flex items-center justify-between mb-2">
-            <Users className="w-6 sm:w-8 h-6 sm:h-8 text-primary-200" />
-            <span className="text-xs bg-white/20 px-2 py-1 rounded-full">This Year</span>
+            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-primary-600" />
+            </div>
+            <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full">This Year</span>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold">{stats.totalPlaced}</p>
-          <p className="text-primary-100 text-xs sm:text-sm">Students Placed</p>
+          <p className="text-2xl sm:text-3xl font-bold text-gray-800"><AnimatedNumber value={stats.totalPlaced} /></p>
+          <p className="text-gray-500 text-xs sm:text-sm">Students Placed</p>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
-          <DollarSign className="w-6 sm:w-8 h-6 sm:h-8 text-green-500 mb-2" />
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
+          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-2">
+            <DollarSign className="w-5 h-5 text-green-600" />
+          </div>
           <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.averagePackage}</p>
           <p className="text-gray-500 text-xs sm:text-sm">Avg Package</p>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
-          <Award className="w-6 sm:w-8 h-6 sm:h-8 text-yellow-500 mb-2" />
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
+          <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-2">
+            <Award className="w-5 h-5 text-yellow-600" />
+          </div>
           <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.highestPackage}</p>
           <p className="text-gray-500 text-xs sm:text-sm">Top Package</p>
         </div>
-        <div className="bg-white rounded-xl p-4 sm:p-5 border border-gray-100 shadow-sm">
-          <Building className="w-6 sm:w-8 h-6 sm:h-8 text-blue-500 mb-2" />
-          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.companiesVisited}</p>
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
+          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
+            <Building className="w-5 h-5 text-blue-600" />
+          </div>
+          <p className="text-xl sm:text-2xl font-bold text-gray-800"><AnimatedNumber value={stats.companiesVisited} /></p>
           <p className="text-gray-500 text-xs sm:text-sm">Companies</p>
         </div>
-        <div className="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-4 sm:p-5 text-white">
-          <TrendingUp className="w-6 sm:w-8 h-6 sm:h-8 text-green-200 mb-2" />
-          <p className="text-2xl sm:text-3xl font-bold">{stats.placementRate}%</p>
-          <p className="text-green-100 text-xs sm:text-sm">Placement Rate</p>
+        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
+          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-2">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+          </div>
+          <p className="text-2xl sm:text-3xl font-bold text-emerald-600"><AnimatedNumber value={stats.placementRate} suffix="%" /></p>
+          <p className="text-gray-500 text-xs sm:text-sm">Placement Rate</p>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         {/* Top Recruiters */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="lg:col-span-2 glass-card rounded-xl tilt-card p-4 sm:p-6">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h3 className="font-bold text-gray-800">Top Recruiters</h3>
             <button className="text-primary-600 text-sm font-medium hover:underline">View All</button>
@@ -430,7 +441,7 @@ const AdminPlacements = () => {
         </div>
 
         {/* Department-wise Stats */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+        <div className="glass-card rounded-xl tilt-card p-4 sm:p-6">
           <h3 className="font-bold text-gray-800 mb-6">Department Wise</h3>
           <div className="space-y-4">
             {departmentStats.map((dept, index) => (
@@ -455,7 +466,7 @@ const AdminPlacements = () => {
       </div>
 
       {/* Upcoming Drives */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="glass-card rounded-xl tilt-card overflow-hidden">
         <div className="p-6 border-b border-gray-100">
           <div className="flex items-center justify-between">
             <h3 className="font-bold text-gray-800">Upcoming Placement Drives</h3>

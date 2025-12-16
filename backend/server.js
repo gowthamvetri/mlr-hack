@@ -81,6 +81,9 @@ app.use('/api/registration-requests', require('./src/routes/registrationRequestR
 app.use('/api/ratings', require('./src/routes/staffRatingRoutes'));
 app.use('/api/staff', require('./src/routes/staffRoutes'));
 app.use('/api/placement-page', require('./src/routes/placementPageRoutes'));
+app.use('/api/external-courses', require('./src/routes/externalCourseRoutes'));
+app.use('/api/hall-tickets', require('./src/routes/hallTicketRoutes'));
+app.use('/api/attendance', require('./src/routes/attendanceRoutes'));
 
 const PORT = process.env.PORT || 5000;
 
