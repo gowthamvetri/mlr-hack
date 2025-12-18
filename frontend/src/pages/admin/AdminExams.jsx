@@ -28,9 +28,10 @@ const AdminExams = () => {
   const fetchExams = async () => {
     try {
       const { data } = await getExams();
-      setExams(data);
+      setExams(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching exams:', error);
+      setExams([]);
     } finally {
       setLoading(false);
     }
@@ -112,8 +113,8 @@ const AdminExams = () => {
         <button
           onClick={() => setShowCreateForm(!showCreateForm)}
           className={`flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors ${showCreateForm
-              ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              : 'bg-primary-600 text-white hover:bg-primary-700'
+            ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            : 'bg-primary-600 text-white hover:bg-primary-700'
             }`}
         >
           {showCreateForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}

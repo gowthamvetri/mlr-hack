@@ -172,4 +172,7 @@ export const getStaffRatings = (staffId) => API.get(`/ratings/staff/${staffId}`)
 export const canRateStaff = (staffId, courseId) => API.get(`/ratings/can-rate/${staffId}/${courseId}`);
 export const getStaffAverageRating = (staffId) => API.get(`/ratings/average/${staffId}`);
 
+// Chatbot Content
+export const addChatbotContent = (data) => API.post('/chat/content', data);
+
 export default API;

@@ -19,6 +19,7 @@ import {
   Target,
   ClipboardCheck,
   UserPlus,
+  MessageSquarePlus,
   X
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
@@ -58,6 +59,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/admin/placement-page', icon: Building, label: 'Placement Page' },
           { to: '/admin/exams', icon: ClipboardList, label: 'Exams' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },
+          { to: '/admin/chatbot-content', icon: MessageSquarePlus, label: 'Chatbot Content' },
           { to: '/admin/profile', icon: UserCircle, label: 'My Profile' },
         ];
       case 'SeatingManager':

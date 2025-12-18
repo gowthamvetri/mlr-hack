@@ -80,7 +80,7 @@ const AdminCourses = () => {
     try {
       // Fetch departments
       const { data } = await getDepartments();
-      const deptCodes = data.map(d => d.code);
+      const deptCodes = Array.isArray(data) ? data.map(d => d.code) : [];
       setDepartments(['all', ...deptCodes]);
 
       // Fetch staff list for instructor selection
@@ -117,10 +117,10 @@ const AdminCourses = () => {
       if (filterDept !== 'all') params.department = filterDept;
       if (filterStatus !== 'all') params.status = filterStatus;
       const { data } = await getCourses(params);
-      setCourses(data);
+      const courseData = Array.isArray(data) ? data : [];
+      setCourses(courseData);
 
       // Calculate stats from data
-      const courseData = data;
       setStats({
         total: courseData.length,
         active: courseData.filter(c => c.status === 'Active' || c.status === 'active').length,

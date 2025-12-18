@@ -7,6 +7,7 @@ import uuid
 from datetime import datetime
 from app.rag.embeddings import vector_store
 from app.rag.llm import llm_service
+from app.rag.intent_handler import intent_handler
 from app.config import settings
 from app.database import Namespaces
 import logging
@@ -45,6 +46,25 @@ class RAGChatService:
             # Generate conversation ID if not provided
             if not conversation_id:
                 conversation_id = str(uuid.uuid4())
+            
+            # ============================================
+            # STEP 0: Check for simple intents (greetings, farewells, etc.)
+            # This handles common phrases WITHOUT calling LLM/RAG
+            # ============================================
+            was_handled, instant_response = intent_handler.handle_message(question)
+            
+            if was_handled:
+                logger.info(f"✅ Intent handled locally - no LLM/RAG needed")
+                return {
+                    "answer": instant_response,
+                    "sources": [],
+                    "images": [],
+                    "category": "greeting",
+                    "conversation_id": conversation_id,
+                    "timestamp": datetime.utcnow(),
+                    "used_rag": False,
+                    "handled_locally": True
+                }
             
             if use_rag:
                 # Step 1: Detect category using Gemini

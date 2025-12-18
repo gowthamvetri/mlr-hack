@@ -50,6 +50,7 @@ const AdminPlacements = lazy(() => import('./pages/admin/AdminPlacements'));
 const AdminRegistrationRequests = lazy(() => import('./pages/admin/AdminRegistrationRequests'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
 const AdminPlacementPage = lazy(() => import('./pages/admin/AdminPlacementPage'));
+const AdminChatbotContent = lazy(() => import('./pages/admin/AdminChatbotContent'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));
@@ -207,6 +208,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <AdminPlacementPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/chatbot-content"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminChatbotContent />
                 </ProtectedRoute>
               }
             />

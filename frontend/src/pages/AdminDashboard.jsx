@@ -55,7 +55,8 @@ const AdminDashboard = () => {
         getEvents('Pending')
       ]);
       setStats(statsRes.data);
-      setPendingEvents(eventsRes.data);
+      // Ensure pendingEvents is always an array
+      setPendingEvents(Array.isArray(eventsRes.data) ? eventsRes.data : []);
 
       // Fetch additional dynamic data
       try {
@@ -68,7 +69,7 @@ const AdminDashboard = () => {
         ]);
 
         // Process department data
-        if (departmentsRes.data) {
+        if (departmentsRes.data && Array.isArray(departmentsRes.data)) {
           const depts = departmentsRes.data.slice(0, 4);
           const totalStudents = depts.reduce((sum, d) => sum + (d.totalStudents || 0), 0) || 1;
           setDepartmentData(depts.map(d => ({
@@ -100,7 +101,7 @@ const AdminDashboard = () => {
         }
 
         // Process activities
-        if (activitiesRes.data) {
+        if (activitiesRes.data && Array.isArray(activitiesRes.data)) {
           setRecentActivities(activitiesRes.data.map(activity => {
             const { icon, color } = getActivityIcon(activity.type);
             const timeAgo = getTimeAgo(activity.createdAt);
@@ -361,7 +362,7 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="p-4 space-y-3 max-h-[400px] overflow-y-auto">
-            {pendingEvents.length > 0 ? pendingEvents.slice(0, 5).map(event => (
+            {Array.isArray(pendingEvents) && pendingEvents.length > 0 ? pendingEvents.slice(0, 5).map(event => (
               <div key={event._id} className="p-4 bg-yellow-50 rounded-xl border border-yellow-100">
                 <div className="flex items-start justify-between mb-2">
                   <h4 className="font-semibold text-gray-800 text-sm">{event.title}</h4>

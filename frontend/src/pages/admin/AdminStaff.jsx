@@ -60,7 +60,7 @@ const AdminStaff = () => {
         try {
             // Fetch departments
             const { data } = await getDepartments();
-            const deptCodes = data.map(d => d.code);
+            const deptCodes = Array.isArray(data) ? data.map(d => d.code) : [];
             setDepartments(['all', ...deptCodes]);
         } catch (error) {
             console.log('Using default departments');

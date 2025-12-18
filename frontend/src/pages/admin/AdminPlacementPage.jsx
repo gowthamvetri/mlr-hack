@@ -32,11 +32,16 @@ const AdminPlacementPage = () => {
         getAdminRecruiters(),
         getAdminTrainingContent(),
       ]);
-      setSlides(slidesRes.data);
-      setRecruiters(recruitersRes.data);
-      setTraining(trainingRes.data);
+      // Ensure all data is always an array
+      setSlides(Array.isArray(slidesRes.data) ? slidesRes.data : []);
+      setRecruiters(Array.isArray(recruitersRes.data) ? recruitersRes.data : []);
+      setTraining(Array.isArray(trainingRes.data) ? trainingRes.data : []);
     } catch (error) {
       console.error('Error fetching data:', error);
+      // Set empty arrays on error
+      setSlides([]);
+      setRecruiters([]);
+      setTraining([]);
     } finally {
       setLoading(false);
     }
@@ -163,8 +168,8 @@ const AdminPlacementPage = () => {
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-colors ${activeTab === tab.id
-                    ? 'bg-red-600 text-white'
-                    : 'bg-white text-gray-600 hover:bg-gray-100'
+                  ? 'bg-red-600 text-white'
+                  : 'bg-white text-gray-600 hover:bg-gray-100'
                   }`}
               >
                 <tab.icon className="w-4 h-4" />

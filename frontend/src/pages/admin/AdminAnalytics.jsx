@@ -81,8 +81,9 @@ const AdminAnalytics = () => {
       ]);
 
       // Process department performance
-      if (departmentsData.data?.length > 0) {
-        setDepartmentPerformance(departmentsData.data.map(dept => ({
+      const deptArray = Array.isArray(departmentsData.data) ? departmentsData.data : [];
+      if (deptArray.length > 0) {
+        setDepartmentPerformance(deptArray.map(dept => ({
           dept: dept.name,
           students: dept.totalStudents || 0,
           completion: 85 + Math.floor(Math.random() * 10),
@@ -164,12 +165,12 @@ const AdminAnalytics = () => {
           <div key={index} className="bg-white rounded-xl p-4 sm:p-6 shadow-sm border border-gray-100">
             <div className="flex items-center justify-between mb-3 sm:mb-4">
               <div className={`w-10 sm:w-12 h-10 sm:h-12 rounded-lg sm:rounded-xl flex items-center justify-center ${index === 0 ? 'bg-primary-100' :
-                  index === 1 ? 'bg-green-100' :
-                    index === 2 ? 'bg-purple-100' : 'bg-blue-100'
+                index === 1 ? 'bg-green-100' :
+                  index === 2 ? 'bg-purple-100' : 'bg-blue-100'
                 }`}>
                 <stat.icon className={`w-5 sm:w-6 h-5 sm:h-6 ${index === 0 ? 'text-primary-600' :
-                    index === 1 ? 'text-green-600' :
-                      index === 2 ? 'text-purple-600' : 'text-blue-600'
+                  index === 1 ? 'text-green-600' :
+                    index === 2 ? 'text-purple-600' : 'text-blue-600'
                   }`} />
               </div>
               <div className={`flex items-center gap-1 text-xs font-medium ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'

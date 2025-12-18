@@ -20,9 +20,10 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const { data } = await getEvents();
-      setEvents(data);
+      setEvents(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Error fetching events:', error);
+      setEvents([]);
     } finally {
       setLoading(false);
     }
