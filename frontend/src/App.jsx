@@ -54,6 +54,7 @@ const AdminPlacementPage = lazy(() => import('./pages/admin/AdminPlacementPage')
 const AdminExternalCourses = lazy(() => import('./pages/admin/AdminExternalCourses'));
 const AdminExamScheduling = lazy(() => import('./pages/admin/AdminExamScheduling'));
 const AdminInvigilators = lazy(() => import('./pages/admin/AdminInvigilators'));
+const AdminSubjects = lazy(() => import('./pages/admin/AdminSubjects'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));
@@ -74,6 +75,7 @@ const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
 const StaffInvigilation = lazy(() => import('./pages/staff/StaffInvigilation'));
+const StaffRegistrationRequests = lazy(() => import('./pages/staff/StaffRegistrationRequests'));
 
 function App() {
   return (
@@ -218,6 +220,14 @@ function App() {
               }
             />
             <Route
+              path="/admin/subjects"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminSubjects />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/admin/placements"
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
@@ -356,6 +366,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
                   <StaffDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/registration-requests"
+              element={
+                <ProtectedRoute allowedRoles={['Staff']}>
+                  <StaffRegistrationRequests />
                 </ProtectedRoute>
               }
             />

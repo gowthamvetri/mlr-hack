@@ -60,6 +60,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/admin/staff', icon: School, label: 'Staff' },
           { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
           { to: '/admin/courses', icon: BookOpen, label: 'Courses' },
+          { to: '/admin/subjects', icon: BookOpen, label: 'Subjects' },
           { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
           { to: '/admin/placement-page', icon: Building, label: 'Placement Page' },
@@ -85,6 +86,7 @@ const Sidebar = ({ isOpen, onClose }) => {
       case 'Faculty':
         return [
           { to: '/staff', icon: LayoutDashboard, label: 'Dashboard' },
+          { to: '/staff/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/staff/courses', icon: BookOpen, label: 'My Courses' },
           { to: '/staff/external-courses', icon: ExternalLink, label: 'External Courses' },
           { to: '/staff/invigilation', icon: ClipboardCheck, label: 'Invigilation' },

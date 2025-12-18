@@ -1,703 +1,321 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useSocket } from '../../context/SocketContext';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import AnimatedNumber from '../../components/AnimatedNumber';
 import Modal from '../../components/Modal';
 import { getPlacements, getPlacementStats, createPlacement, updatePlacement, deletePlacement } from '../../utils/api';
+import gsap from 'gsap';
 import {
   Briefcase, Search, Plus, Building, TrendingUp, Users,
-  Award, MapPin, DollarSign, Calendar, ExternalLink, Filter,
-  X, AlertTriangle, CheckCircle, Download, Trash2, Edit
+  Award, MapPin, DollarSign, Calendar, Download, Trash2, Edit, X, AlertTriangle, CheckCircle
 } from 'lucide-react';
+
+// Animated Counter
+const AnimatedNumber = ({ value, suffix = '' }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const prevValue = useRef(0);
+
+  useEffect(() => {
+    const end = typeof value === 'number' ? value : parseFloat(value) || 0;
+    const start = prevValue.current;
+    const duration = 500;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const newVal = start + (end - start) * eased;
+      setDisplayValue(suffix === '%' ? parseFloat(newVal.toFixed(1)) : Math.round(newVal));
+      if (progress < 1) requestAnimationFrame(animate);
+      else prevValue.current = end;
+    };
+    requestAnimationFrame(animate);
+  }, [value, suffix]);
+
+  return <span className="tabular-nums">{displayValue}{suffix}</span>;
+};
 
 const AdminPlacements = () => {
   const socket = useSocket();
   const user = useSelector(selectCurrentUser);
-  const [activeTab, setActiveTab] = useState('overview');
+  const pageRef = useRef(null);
   const [placements, setPlacements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDrive, setSelectedDrive] = useState(null);
-  const [formData, setFormData] = useState({
-    company: '',
-    position: '',
-    driveDate: '',
-    minPackage: '',
-    maxPackage: '',
-    location: '',
-    type: 'Full-time',
-    eligibility: '',
-    description: '',
-    status: 'Upcoming',
-    totalSelected: 0
-  });
+  const [formData, setFormData] = useState({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0 });
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
-  const [stats, setStats] = useState({
-    totalPlaced: 0,
-    averagePackage: '0 LPA',
-    highestPackage: '0 LPA',
-    companiesVisited: 0,
-    placementRate: 0,
-  });
-
+  const [stats, setStats] = useState({ totalPlaced: 0, averagePackage: '0 LPA', highestPackage: '0 LPA', companiesVisited: 0, placementRate: 0 });
   const [topRecruiters, setTopRecruiters] = useState([]);
-  const [upcomingDrives, setUpcomingDrives] = useState([]);
   const [departmentStats, setDepartmentStats] = useState([]);
 
+  useEffect(() => { fetchPlacementData(); }, []);
+
   useEffect(() => {
-    fetchPlacementData();
-  }, []);
+    if (pageRef.current && !loading) {
+      gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+    }
+  }, [loading]);
 
   useEffect(() => {
     if (!socket) return;
-
-    socket.on('placement_created', () => {
-      fetchPlacementData();
-    });
-
-    socket.on('placement_updated', () => {
-      fetchPlacementData();
-    });
-
-    socket.on('placement_deleted', () => {
-      fetchPlacementData();
-    });
-
-    return () => {
-      socket.off('placement_created');
-      socket.off('placement_updated');
-      socket.off('placement_deleted');
-    };
+    socket.on('placement_created', fetchPlacementData);
+    socket.on('placement_updated', fetchPlacementData);
+    socket.on('placement_deleted', fetchPlacementData);
+    return () => { socket.off('placement_created'); socket.off('placement_updated'); socket.off('placement_deleted'); };
   }, [socket]);
-
-
 
   const fetchPlacementData = async () => {
     try {
       setLoading(true);
-
-      // Fetch placements
       const { data: placementsData } = await getPlacements();
       setPlacements(placementsData || []);
 
-      // Process upcoming drives from placements
-      const upcoming = (placementsData || [])
-        .filter(p => p.status === 'Upcoming' || p.status === 'Ongoing')
-        .slice(0, 4)
-        .map(p => ({
-          company: p.company,
-          date: p.driveDate,
-          roles: [p.position],
-          eligibility: p.eligibility || 'All Branches',
-          package: p.packageRange || (p.package ? `${p.package} LPA` : 'Not specified'),
-          status: p.status === 'Ongoing' ? 'Registrations Open' : 'Coming Soon'
-        }));
-      setUpcomingDrives(upcoming);
-
-      // Fetch placement stats
       try {
         const { data: statsData } = await getPlacementStats();
         setStats({
           totalPlaced: statsData.totalPlaced || 0,
-          averagePackage: typeof statsData.averagePackage === 'number'
-            ? `${statsData.averagePackage} LPA`
-            : statsData.averagePackage || '0 LPA',
-          highestPackage: typeof statsData.highestPackage === 'number'
-            ? `${statsData.highestPackage} LPA`
-            : statsData.highestPackage || '0 LPA',
+          averagePackage: typeof statsData.averagePackage === 'number' ? `${statsData.averagePackage} LPA` : statsData.averagePackage || '0 LPA',
+          highestPackage: typeof statsData.highestPackage === 'number' ? `${statsData.highestPackage} LPA` : statsData.highestPackage || '0 LPA',
           companiesVisited: statsData.companiesVisited || statsData.totalDrives || placementsData.length || 0,
           placementRate: statsData.placementRate || 0,
         });
-
-        // Process top recruiters from stats
-        if (statsData.topRecruiters?.length > 0) {
-          const colors = ['bg-red-100 text-red-600', 'bg-blue-100 text-blue-600', 'bg-yellow-100 text-yellow-700', 'bg-green-100 text-green-600', 'bg-purple-100 text-purple-600', 'bg-indigo-100 text-indigo-600'];
-          setTopRecruiters(statsData.topRecruiters.map((r, i) => ({
-            name: r.name,
-            logo: r.name?.charAt(0) || 'C',
-            offers: r.offers || 0,
-            avgPackage: r.avgPackage || 'N/A',
-            color: colors[i % colors.length]
-          })));
-        } else {
-          // Generate top recruiters from placement data
-          const companyMap = {};
-          (placementsData || []).forEach(p => {
-            if (!companyMap[p.company]) {
-              companyMap[p.company] = {
-                name: p.company,
-                offers: p.totalSelected || 0,
-                packages: []
-              };
-            } else {
-              companyMap[p.company].offers += p.totalSelected || 0;
-            }
-            if (p.package) {
-              companyMap[p.company].packages.push(p.package);
-            }
-          });
-
-          const recruiters = Object.values(companyMap)
-            .filter(c => c.offers > 0)
-            .sort((a, b) => b.offers - a.offers)
-            .slice(0, 6)
-            .map((c, i) => {
-              const colors = ['bg-red-100 text-red-600', 'bg-blue-100 text-blue-600', 'bg-yellow-100 text-yellow-700', 'bg-green-100 text-green-600', 'bg-purple-100 text-purple-600', 'bg-indigo-100 text-indigo-600'];
-              const avgPkg = c.packages.length > 0
-                ? (c.packages.reduce((a, b) => a + b, 0) / c.packages.length).toFixed(1) + ' LPA'
-                : 'N/A';
-              return {
-                name: c.name,
-                logo: c.name?.charAt(0) || 'C',
-                offers: c.offers,
-                avgPackage: avgPkg,
-                color: colors[i % colors.length]
-              };
-            });
-          setTopRecruiters(recruiters);
+        if (statsData.topRecruiters?.length) {
+          const colors = ['bg-red-50 text-red-600', 'bg-blue-50 text-blue-600', 'bg-amber-50 text-amber-600', 'bg-emerald-50 text-emerald-600', 'bg-violet-50 text-violet-600'];
+          setTopRecruiters(statsData.topRecruiters.map((r, i) => ({ name: r.name, logo: r.name?.charAt(0) || 'C', offers: r.offers || 0, avgPackage: r.avgPackage || 'N/A', color: colors[i % colors.length] })));
         }
-
-        // Process department stats from placement data
-        if (statsData.departmentStats?.length > 0) {
-          setDepartmentStats(statsData.departmentStats);
-        } else {
-          setDepartmentStats([]);
-        }
+        if (statsData.departmentStats?.length) setDepartmentStats(statsData.departmentStats);
       } catch (e) {
-        console.log('Stats API not available:', e.message);
-        setStats({
-          totalPlaced: 0,
-          averagePackage: '0 LPA',
-          highestPackage: '0 LPA',
-          companiesVisited: placementsData?.length || 0,
-          placementRate: 0,
-        });
-        setTopRecruiters([]);
-        setDepartmentStats([]);
+        setStats({ totalPlaced: 0, averagePackage: '0 LPA', highestPackage: '0 LPA', companiesVisited: placementsData?.length || 0, placementRate: 0 });
       }
-    } catch (error) {
-      console.error('Error fetching placement data:', error);
-      setPlacements([]);
-      setUpcomingDrives([]);
-      setTopRecruiters([]);
-      setDepartmentStats([]);
-      setStats({
-        totalPlaced: 0,
-        averagePackage: '0 LPA',
-        highestPackage: '0 LPA',
-        companiesVisited: 0,
-        placementRate: 0,
-      });
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { console.error('Error:', error); setPlacements([]); }
+    finally { setLoading(false); }
   };
 
   const handleAddDrive = async (e) => {
     e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
-
-    if (!formData.company || !formData.position) {
-      setFormError('Please fill company and position');
-      return;
-    }
-
+    setFormError(''); setFormSuccess('');
+    if (!formData.company || !formData.position) { setFormError('Fill required fields'); return; }
     try {
-      // Transform data to match backend model
-      const placementData = {
-        company: formData.company,
-        position: formData.position,
-        driveDate: formData.driveDate || undefined,
-        location: formData.location || undefined,
-        type: formData.type,
-        eligibility: formData.eligibility || undefined,
-        description: formData.description || undefined,
-        status: formData.status,
-      };
-
-      // Add package data
-      if (formData.minPackage && formData.maxPackage) {
-        placementData.packageRange = `${formData.minPackage}-${formData.maxPackage} LPA`;
-        placementData.package = parseFloat(formData.maxPackage);
-      } else if (formData.maxPackage) {
-        placementData.package = parseFloat(formData.maxPackage);
-      }
-
+      const placementData = { company: formData.company, position: formData.position, driveDate: formData.driveDate || undefined, location: formData.location, type: formData.type, eligibility: formData.eligibility, description: formData.description, status: formData.status };
+      if (formData.minPackage && formData.maxPackage) { placementData.packageRange = `${formData.minPackage}-${formData.maxPackage} LPA`; placementData.package = parseFloat(formData.maxPackage); }
+      else if (formData.maxPackage) placementData.package = parseFloat(formData.maxPackage);
       await createPlacement(placementData);
-      setFormSuccess('Placement drive added!');
-      setTimeout(() => {
-        setShowAddModal(false);
-        setFormData({
-          company: '',
-          position: '',
-          driveDate: '',
-          minPackage: '',
-          maxPackage: '',
-          location: '',
-          type: 'Full-time',
-          eligibility: '',
-          description: '',
-          status: 'Upcoming',
-          totalSelected: 0
-        });
-        setFormSuccess('');
-        fetchPlacementData();
-      }, 1500);
-    } catch (error) {
-      setFormError(error.response?.data?.message || 'Error adding drive');
-    }
+      setFormSuccess('Added!');
+      setTimeout(() => { setShowAddModal(false); setFormData({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0 }); setFormSuccess(''); fetchPlacementData(); }, 1000);
+    } catch (error) { setFormError(error.response?.data?.message || 'Error'); }
   };
 
-  const handleEditClick = (drive) => {
-    setSelectedDrive(drive);
-    setFormData({
-      company: drive.company || '',
-      position: drive.position || '',
-      driveDate: drive.driveDate ? drive.driveDate.split('T')[0] : '',
-      minPackage: '',
-      maxPackage: drive.package || '',
-      location: drive.location || '',
-      type: drive.type || 'Full-time',
-      eligibility: drive.eligibility || '',
-      description: drive.description || '',
-      status: drive.status || 'Upcoming',
-      totalSelected: drive.totalSelected || 0
-    });
-    setShowEditModal(true);
-  };
+  const handleEditClick = (drive) => { setSelectedDrive(drive); setFormData({ company: drive.company || '', position: drive.position || '', driveDate: drive.driveDate ? drive.driveDate.split('T')[0] : '', minPackage: '', maxPackage: drive.package || '', location: drive.location || '', type: drive.type || 'Full-time', eligibility: drive.eligibility || '', description: drive.description || '', status: drive.status || 'Upcoming', totalSelected: drive.totalSelected || 0 }); setShowEditModal(true); };
 
   const handleUpdateDrive = async (e) => {
     e.preventDefault();
-    setFormError('');
-    setFormSuccess('');
-
-    if (!formData.company || !formData.position) {
-      setFormError('Please fill company and position');
-      return;
-    }
-
+    setFormError(''); setFormSuccess('');
+    if (!formData.company || !formData.position) { setFormError('Fill required fields'); return; }
     try {
-      const placementData = {
-        company: formData.company,
-        position: formData.position,
-        driveDate: formData.driveDate || undefined,
-        location: formData.location || undefined,
-        type: formData.type,
-        eligibility: formData.eligibility || undefined,
-        description: formData.description || undefined,
-        status: formData.status,
-        totalSelected: parseInt(formData.totalSelected) || 0,
-      };
-
-      if (formData.minPackage && formData.maxPackage) {
-        placementData.packageRange = `${formData.minPackage}-${formData.maxPackage} LPA`;
-        placementData.package = parseFloat(formData.maxPackage);
-      } else if (formData.maxPackage) {
-        placementData.package = parseFloat(formData.maxPackage);
-      }
-
+      const placementData = { company: formData.company, position: formData.position, driveDate: formData.driveDate || undefined, location: formData.location, type: formData.type, eligibility: formData.eligibility, description: formData.description, status: formData.status, totalSelected: parseInt(formData.totalSelected) || 0 };
+      if (formData.minPackage && formData.maxPackage) { placementData.packageRange = `${formData.minPackage}-${formData.maxPackage} LPA`; placementData.package = parseFloat(formData.maxPackage); }
+      else if (formData.maxPackage) placementData.package = parseFloat(formData.maxPackage);
       await updatePlacement(selectedDrive._id, placementData);
-      setFormSuccess('Placement drive updated!');
-      setTimeout(() => {
-        setShowEditModal(false);
-        setSelectedDrive(null);
-        setFormData({
-          company: '',
-          position: '',
-          driveDate: '',
-          minPackage: '',
-          maxPackage: '',
-          location: '',
-          type: 'Full-time',
-          eligibility: '',
-          description: '',
-          status: 'Upcoming',
-          totalSelected: 0
-        });
-        setFormSuccess('');
-        fetchPlacementData();
-      }, 1500);
-    } catch (error) {
-      setFormError(error.response?.data?.message || 'Error updating drive');
-    }
-  };
-
-  const handleDeleteClick = (drive) => {
-    setSelectedDrive(drive);
-    setShowDeleteModal(true);
+      setFormSuccess('Updated!');
+      setTimeout(() => { setShowEditModal(false); setSelectedDrive(null); setFormData({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0 }); setFormSuccess(''); fetchPlacementData(); }, 1000);
+    } catch (error) { setFormError(error.response?.data?.message || 'Error'); }
   };
 
   const handleDeleteDrive = async () => {
     if (!selectedDrive) return;
-    try {
-      await deletePlacement(selectedDrive._id);
-      setShowDeleteModal(false);
-      setSelectedDrive(null);
-      fetchPlacementData();
-    } catch (error) {
-      alert('Error deleting drive');
-    }
+    try { await deletePlacement(selectedDrive._id); setShowDeleteModal(false); setSelectedDrive(null); fetchPlacementData(); }
+    catch (error) { alert('Error deleting'); }
   };
 
   const handleExport = () => {
-    const headers = ['Company', 'Position', 'Date', 'Package Range', 'Status'];
-    const csvContent = [headers.join(','), ...upcomingDrives.map(d => [d.company, d.roles?.join(';'), d.date, d.package, d.status].join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `placements_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+    const headers = ['Company', 'Position', 'Date', 'Package', 'Status'];
+    const csvContent = [headers.join(','), ...placements.map(d => [d.company, d.position, d.driveDate, d.package, d.status].join(','))].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `placements_${new Date().toISOString().split('T')[0]}.csv`; a.click();
   };
 
   return (
     <DashboardLayout role="admin" userName={user?.name}>
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Placement Management</h1>
-          <p className="text-sm sm:text-base text-gray-500">Track and manage campus placements</p>
+      <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Placement Management</h1>
+            <p className="text-zinc-500 text-sm mt-0.5">Track and manage campus placements</p>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleExport} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all"><Download className="w-4 h-4" />Export</button>
+            <button onClick={() => setShowAddModal(true)} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all"><Plus className="w-4 h-4" />Add Drive</button>
+          </div>
         </div>
-        <div className="flex gap-2 sm:gap-3">
-          <button onClick={handleExport} className="flex items-center gap-2 px-3 sm:px-4 py-2 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors text-sm sm:text-base">
-            <Download className="w-4 h-4" />
-            <span className="hidden sm:inline">Export</span>
-          </button>
-          <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-3 sm:px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors text-sm sm:text-base">
-            <Plus className="w-4 h-4" />
-            <span className="hidden sm:inline">Add Drive</span>
-          </button>
-        </div>
-      </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="col-span-2 sm:col-span-1 glass-card rounded-xl p-4 sm:p-5 tilt-card">
-          <div className="flex items-center justify-between mb-2">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-primary-600" />
+        {/* Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {[
+            { label: 'Students Placed', value: stats.totalPlaced, icon: Users, color: 'violet' },
+            { label: 'Avg Package', value: stats.averagePackage, icon: DollarSign, color: 'emerald', isString: true },
+            { label: 'Top Package', value: stats.highestPackage, icon: Award, color: 'amber', isString: true },
+            { label: 'Companies', value: stats.companiesVisited, icon: Building, color: 'blue' },
+            { label: 'Placement Rate', value: stats.placementRate, icon: TrendingUp, color: 'emerald', suffix: '%' },
+          ].map((stat, i) => {
+            const colorMap = { violet: 'bg-violet-50 text-violet-500', emerald: 'bg-emerald-50 text-emerald-500', amber: 'bg-amber-50 text-amber-500', blue: 'bg-blue-50 text-blue-500' };
+            return (
+              <div key={i} className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+                <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center mb-3`}>
+                  <stat.icon className={`w-4.5 h-4.5 ${colorMap[stat.color].split(' ')[1]}`} strokeWidth={1.5} />
+                </div>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">{stat.label}</p>
+                <p className="text-xl font-semibold text-zinc-900">{stat.isString ? stat.value : <AnimatedNumber value={stat.value} suffix={stat.suffix || ''} />}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Top Recruiters */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-zinc-100 p-5">
+            <h3 className="font-semibold text-zinc-900 mb-4">Top Recruiters</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              {topRecruiters.slice(0, 6).map((c, i) => (
+                <div key={i} className="p-4 bg-zinc-50 rounded-xl hover:bg-zinc-100 transition-colors">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-semibold text-sm ${c.color}`}>{c.logo}</div>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium text-zinc-900 text-sm truncate">{c.name}</p>
+                      <p className="text-[10px] text-zinc-500">{c.offers} offers</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-zinc-500">Avg: <span className="font-medium text-zinc-700">{c.avgPackage}</span></p>
+                </div>
+              ))}
             </div>
-            <span className="text-xs bg-primary-100 text-primary-700 px-2 py-1 rounded-full">This Year</span>
           </div>
-          <p className="text-2xl sm:text-3xl font-bold text-gray-800"><AnimatedNumber value={stats.totalPlaced} /></p>
-          <p className="text-gray-500 text-xs sm:text-sm">Students Placed</p>
-        </div>
-        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
-          <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mb-2">
-            <DollarSign className="w-5 h-5 text-green-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.averagePackage}</p>
-          <p className="text-gray-500 text-xs sm:text-sm">Avg Package</p>
-        </div>
-        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
-          <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mb-2">
-            <Award className="w-5 h-5 text-yellow-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-gray-800">{stats.highestPackage}</p>
-          <p className="text-gray-500 text-xs sm:text-sm">Top Package</p>
-        </div>
-        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-2">
-            <Building className="w-5 h-5 text-blue-600" />
-          </div>
-          <p className="text-xl sm:text-2xl font-bold text-gray-800"><AnimatedNumber value={stats.companiesVisited} /></p>
-          <p className="text-gray-500 text-xs sm:text-sm">Companies</p>
-        </div>
-        <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
-          <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-2">
-            <TrendingUp className="w-5 h-5 text-emerald-600" />
-          </div>
-          <p className="text-2xl sm:text-3xl font-bold text-emerald-600"><AnimatedNumber value={stats.placementRate} suffix="%" /></p>
-          <p className="text-gray-500 text-xs sm:text-sm">Placement Rate</p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-        {/* Top Recruiters */}
-        <div className="lg:col-span-2 glass-card rounded-xl tilt-card p-4 sm:p-6">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <h3 className="font-bold text-gray-800">Top Recruiters</h3>
-            <button className="text-primary-600 text-sm font-medium hover:underline">View All</button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {topRecruiters.map((company, index) => (
-              <div key={index} className="p-3 sm:p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
-                <div className="flex items-center gap-3 mb-2 sm:mb-3">
-                  <div className={`w-8 sm:w-10 h-8 sm:h-10 rounded-lg flex items-center justify-center font-bold text-sm sm:text-base ${company.color}`}>
-                    {company.logo}
+          {/* Department Stats */}
+          <div className="bg-white rounded-xl border border-zinc-100 p-5">
+            <h3 className="font-semibold text-zinc-900 mb-4">Department Wise</h3>
+            <div className="space-y-3">
+              {departmentStats.map((d, i) => (
+                <div key={i}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-medium text-zinc-600">{d.dept}</span>
+                    <span className="text-[10px] text-zinc-500">{d.placed}/{d.total}</span>
                   </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-gray-800 text-sm sm:text-base truncate">{company.name}</p>
-                    <p className="text-xs text-gray-500">{company.offers} offers</p>
+                  <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className={`h-full rounded-full ${d.percentage >= 90 ? 'bg-emerald-500' : d.percentage >= 75 ? 'bg-blue-500' : 'bg-amber-500'}`} style={{ width: `${d.percentage}%` }} />
                   </div>
                 </div>
-                <p className="text-xs sm:text-sm text-gray-600">
-                  Avg: <span className="font-semibold text-gray-800">{company.avgPackage}</span>
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Department-wise Stats */}
-        <div className="glass-card rounded-xl tilt-card p-4 sm:p-6">
-          <h3 className="font-bold text-gray-800 mb-6">Department Wise</h3>
-          <div className="space-y-4">
-            {departmentStats.map((dept, index) => (
-              <div key={index}>
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium text-gray-700">{dept.dept}</span>
-                  <span className="text-sm text-gray-500">{dept.placed}/{dept.total}</span>
-                </div>
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${dept.percentage >= 90 ? 'bg-green-500' :
-                      dept.percentage >= 75 ? 'bg-blue-500' :
-                        'bg-yellow-500'
-                      }`}
-                    style={{ width: `${dept.percentage}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Upcoming Drives */}
-      <div className="glass-card rounded-xl tilt-card overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
-          <div className="flex items-center justify-between">
-            <h3 className="font-bold text-gray-800">Upcoming Placement Drives</h3>
-            <div className="flex gap-2">
-              <button className="px-3 py-1.5 bg-primary-100 text-primary-700 rounded-lg text-sm font-medium">
-                All
-              </button>
-              <button className="px-3 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg text-sm font-medium">
-                This Week
-              </button>
-              <button className="px-3 py-1.5 text-gray-500 hover:bg-gray-100 rounded-lg text-sm font-medium">
-                This Month
-              </button>
+              ))}
             </div>
           </div>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* Placements Table */}
+        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+          <div className="p-5 border-b border-zinc-100">
+            <h3 className="font-semibold text-zinc-900">All Placement Drives</h3>
+          </div>
           <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Company</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Date</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Roles</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Eligibility</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Package</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Status</th>
-                <th className="text-left py-4 px-6 font-semibold text-gray-600 text-sm">Actions</th>
+            <thead>
+              <tr className="border-b border-zinc-100">
+                <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Company</th>
+                <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Position</th>
+                <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Date</th>
+                <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Package</th>
+                <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Status</th>
+                <th className="px-6 py-3 text-right text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
-              {placements.map((drive, index) => (
-                <tr key={drive._id || index} className="hover:bg-gray-50 transition-colors">
-                  <td className="py-4 px-6">
+            <tbody className="divide-y divide-zinc-50">
+              {placements.map(d => (
+                <tr key={d._id} className="hover:bg-zinc-50 transition-colors">
+                  <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center font-bold text-gray-600">
-                        {drive.company.charAt(0)}
-                      </div>
-                      <span className="font-medium text-gray-800">{drive.company}</span>
+                      <div className="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center font-semibold text-zinc-600 text-sm">{d.company.charAt(0)}</div>
+                      <span className="font-medium text-zinc-900 text-sm">{d.company}</span>
                     </div>
                   </td>
-                  <td className="py-4 px-6">
-                    <span className="text-gray-600">{new Date(drive.date).toLocaleDateString()}</span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex flex-wrap gap-1">
-                      {drive?.roles?.map((role, roleIndex) => (
-                        <span key={roleIndex} className="px-2 py-1 bg-primary-100 text-primary-700 rounded text-xs font-medium">
-                          {role}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="text-gray-600">{drive.eligibility}</span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className="font-medium text-green-600">{drive.package}</span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${drive.status === 'Completed'
-                      ? 'bg-gray-100 text-gray-700'
-                      : drive.status === 'Ongoing'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700'
-                      }`}>
-                      {drive.status}
-                    </span>
-                  </td>
-                  <td className="py-4 px-6">
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => handleEditClick(drive)}
-                        className="p-2 hover:bg-primary-50 text-primary-600 rounded-lg transition-colors"
-                        title="Edit Drive"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteClick(drive)}
-                        className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                        title="Delete Drive"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                  <td className="px-6 py-4 text-sm text-zinc-600">{d.position}</td>
+                  <td className="px-6 py-4 text-xs text-zinc-500">{d.driveDate ? new Date(d.driveDate).toLocaleDateString() : '-'}</td>
+                  <td className="px-6 py-4 text-sm font-medium text-emerald-600">{d.package ? `${d.package} LPA` : d.packageRange || '-'}</td>
+                  <td className="px-6 py-4"><span className={`px-2 py-1 rounded-full text-[10px] font-medium ${d.status === 'Completed' ? 'bg-zinc-100 text-zinc-600' : d.status === 'Ongoing' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600'}`}>{d.status}</span></td>
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => handleEditClick(d)} className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"><Edit className="w-4 h-4" /></button>
+                      <button onClick={() => { setSelectedDrive(d); setShowDeleteModal(true); }} className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>
               ))}
+              {placements.length === 0 && <tr><td colSpan="6" className="px-6 py-12 text-center text-sm text-zinc-500">No placement drives yet</td></tr>}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* Add Placement Drive Modal */}
-      <Modal
-        isOpen={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        title="Add Placement Drive"
-        size="lg"
-      >
+      {/* Add Modal */}
+      <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Placement Drive" size="lg">
         <form onSubmit={handleAddDrive} className="space-y-4">
-          {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-          {formSuccess && <div className="p-3 bg-green-50 text-green-600 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label><input type="text" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Google" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Position *</label><input type="text" value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., Software Engineer" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Drive Date</label><input type="date" value={formData.driveDate} onChange={(e) => setFormData({ ...formData, driveDate: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Location</label><input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., Bangalore, Hyderabad" /></div>
+          {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-xs flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
+          {formSuccess && <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg text-xs flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Company *</label><input type="text" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Position *</label><input type="text" value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Min Package (LPA)</label><input type="number" step="0.1" value={formData.minPackage} onChange={(e) => setFormData({ ...formData, minPackage: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., 8" /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Max Package (LPA)</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., 12" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Date</label><input type="date" value={formData.driveDate} onChange={(e) => setFormData({ ...formData, driveDate: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Location</label><input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           </div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Job Type</label><select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="Full-time">Full-time</option><option value="Internship">Internship</option><option value="Contract">Contract</option></select></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Eligibility Criteria</label><input type="text" value={formData.eligibility} onChange={(e) => setFormData({ ...formData, eligibility: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., CSE, IT, ECE - Min CGPA 7.0" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg resize-none" rows="3" placeholder="Brief description about the role and company..." /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button type="submit" className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Add Drive</button>
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Min Package (LPA)</label><input type="number" step="0.1" value={formData.minPackage} onChange={(e) => setFormData({ ...formData, minPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Max Package (LPA)</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+          </div>
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
+          <div className="flex gap-2 pt-4">
+            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2 text-sm text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Add Drive</button>
           </div>
         </form>
       </Modal>
 
-      {/* Edit Placement Drive Modal */}
-      <Modal
-        isOpen={showEditModal && !!selectedDrive}
-        onClose={() => setShowEditModal(false)}
-        title="Edit Placement Drive"
-        size="lg"
-      >
+      {/* Edit Modal */}
+      <Modal isOpen={showEditModal && !!selectedDrive} onClose={() => setShowEditModal(false)} title="Edit Placement Drive" size="lg">
         <form onSubmit={handleUpdateDrive} className="space-y-4">
-          {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-          {formSuccess && <div className="p-3 bg-green-50 text-green-600 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Company Name *</label><input type="text" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Google" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Position *</label><input type="text" value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., Software Engineer" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Drive Date</label><input type="date" value={formData.driveDate} onChange={(e) => setFormData({ ...formData, driveDate: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Location</label><input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., Bangalore, Hyderabad" /></div>
+          {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-xs flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
+          {formSuccess && <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg text-xs flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Company *</label><input type="text" value={formData.company} onChange={(e) => setFormData({ ...formData, company: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Position *</label><input type="text" value={formData.position} onChange={(e) => setFormData({ ...formData, position: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           <div className="grid grid-cols-2 gap-4">
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Min Package (LPA)</label><input type="number" step="0.1" value={formData.minPackage} onChange={(e) => setFormData({ ...formData, minPackage: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., 8" /></div>
-            <div><label className="block text-sm font-medium text-gray-700 mb-1">Max Package (LPA)</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., 12" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Date</label><input type="date" value={formData.driveDate} onChange={(e) => setFormData({ ...formData, driveDate: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Location</label><input type="text" value={formData.location} onChange={(e) => setFormData({ ...formData, location: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           </div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Job Type</label><select value={formData.type} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="Full-time">Full-time</option><option value="Internship">Internship</option><option value="Contract">Contract</option></select></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Eligibility Criteria</label><input type="text" value={formData.eligibility} onChange={(e) => setFormData({ ...formData, eligibility: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" placeholder="e.g., CSE, IT, ECE - Min CGPA 7.0" /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Description</label><textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg resize-none" rows="3" placeholder="Brief description about the role and company..." /></div>
-          <div><label className="block text-sm font-medium text-gray-700 mb-1">Status *</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
-
-          {/* Students Placed Field - Quick Fix for Placement Rate */}
-          {/* 
-            QUICK FIX IMPLEMENTATION (Current):
-            - Manual number input for students placed
-            - Updates totalSelected field directly
-            - Affects placement rate calculation immediately
-            
-            FUTURE ENHANCEMENT - Student Selection Feature:
-            To implement the complete solution, add:
-            1. "Select Students" button below this field
-            2. Modal with searchable student list (use getEligibleStudents API)
-            3. Multi-select checkboxes for student selection
-            4. Call addSelectedStudents API with selected student IDs
-            5. Auto-update totalSelected based on selection
-            6. Show list of selected students with remove option
-            
-            Backend API ready:
-            - GET /placements/eligible-students (filter by dept, year, placement status)
-            - POST /placements/:id/select-students (adds students, updates User.isPlaced)
-            
-            Benefits of complete solution:
-            - Track individual student placements
-            - Student profiles show placement status
-            - Generate placement reports per student
-            - Prevent double-counting (one student = one placement)
-          */}
-          <div className="border-t pt-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Students Placed
-              <span className="text-xs text-gray-500 ml-2">(Affects placement rate)</span>
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={formData.totalSelected}
-              onChange={(e) => setFormData({ ...formData, totalSelected: e.target.value })}
-              className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500"
-              placeholder="Number of students placed"
-            />
-            <p className="text-xs text-gray-500 mt-1">Enter the total number of students who got placed in this drive</p>
-            {/* TODO: Add "Select Students" button here for future feature */}
+          <div className="grid grid-cols-2 gap-4">
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Min Package</label><input type="number" step="0.1" value={formData.minPackage} onChange={(e) => setFormData({ ...formData, minPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+            <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Max Package</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           </div>
-
-          <div className="flex gap-3 pt-4">
-            <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button type="submit" className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700">Update Drive</button>
+          <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
+          <div className="border-t border-zinc-100 pt-4"><label className="block text-xs font-medium text-zinc-500 mb-1.5">Students Placed</label><input type="number" min="0" value={formData.totalSelected} onChange={(e) => setFormData({ ...formData, totalSelected: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
+          <div className="flex gap-2 pt-4">
+            <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
+            <button type="submit" className="flex-1 px-4 py-2 text-sm text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Update</button>
           </div>
         </form>
       </Modal>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        isOpen={showDeleteModal && !!selectedDrive}
-        onClose={() => setShowDeleteModal(false)}
-        title="Delete Placement Drive"
-        size="md"
-      >
+      {/* Delete Modal */}
+      <Modal isOpen={showDeleteModal && !!selectedDrive} onClose={() => setShowDeleteModal(false)} title="Delete Drive" size="md">
         {selectedDrive && (
-          <div>
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
-              </div>
-              <div>
-                <h2 className="text-lg font-bold text-gray-800">Delete Placement Drive</h2>
-                <p className="text-sm text-gray-500">This action cannot be undone</p>
-              </div>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4 mb-4">
-              <p className="text-sm text-gray-600 mb-1">You are about to delete:</p>
-              <p className="font-medium text-gray-800">{selectedDrive.company}</p>
-              <p className="text-sm text-gray-600">{selectedDrive.position}</p>
-            </div>
-            <div className="flex gap-3">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteDrive}
-                className="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                Delete Drive
-              </button>
+          <div className="text-center py-4">
+            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4"><AlertTriangle className="w-6 h-6 text-red-500" /></div>
+            <p className="text-sm text-zinc-600 mb-1">Delete <span className="font-medium text-zinc-900">{selectedDrive.company}</span>?</p>
+            <p className="text-xs text-zinc-500 mb-4">{selectedDrive.position}</p>
+            <div className="flex gap-2">
+              <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2 text-sm bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
+              <button onClick={handleDeleteDrive} className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">Delete</button>
             </div>
           </div>
         )}

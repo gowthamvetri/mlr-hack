@@ -175,6 +175,10 @@ body {
   animation: shimmer 2s infinite;
 }
 
+.animate-shimmer {
+  animation: shimmer 2s infinite ease-in-out;
+}
+
 /* Number counter animation */
 @keyframes count-up {
   from {

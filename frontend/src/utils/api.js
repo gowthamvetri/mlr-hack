@@ -27,8 +27,25 @@ export const updateEventStatus = (id, statusData) => API.put(`/events/${id}/stat
 export const allocateSeating = (data) => API.post('/seating/allocate', data);
 export const getMySeat = () => API.get('/seating/my-seat');
 
-export const getSubjects = () => API.get('/subjects');
+// Subject Management API
+export const getSubjects = (filters = {}) => {
+  const params = new URLSearchParams();
+  if (filters.department) params.append('department', filters.department);
+  if (filters.year) params.append('year', filters.year);
+  if (filters.semester) params.append('semester', filters.semester);
+  if (filters.search) params.append('search', filters.search);
+  return API.get(`/subjects?${params.toString()}`);
+};
+export const getSubjectById = (id) => API.get(`/subjects/${id}`);
 export const createSubject = (data) => API.post('/subjects', data);
+export const updateSubject = (id, data) => API.put(`/subjects/${id}`, data);
+export const deleteSubject = (id) => API.delete(`/subjects/${id}`);
+export const bulkImportSubjects = (subjects) => API.post('/subjects/bulk-import', { subjects });
+export const getSubjectsForExam = (filters) => {
+  const params = new URLSearchParams(filters);
+  return API.get(`/subjects/for-exam?${params.toString()}`);
+};
+export const getSubjectDepartments = () => API.get('/subjects/departments');
 
 export const getNotifications = () => API.get('/notifications');
 export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`);

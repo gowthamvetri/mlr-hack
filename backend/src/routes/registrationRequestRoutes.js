@@ -8,16 +8,16 @@ const {
   rejectRegistrationRequest,
   checkRequestStatus
 } = require('../controllers/registrationRequestController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const { protect, admin, authorize } = require('../middleware/authMiddleware');
 
 // Public routes
 router.post('/', submitRegistrationRequest);
 router.get('/check/:email', checkRequestStatus);
 
-// Admin routes
-router.get('/', protect, admin, getAllRegistrationRequests);
-router.get('/stats', protect, admin, getRegistrationStats);
-router.put('/:id/approve', protect, admin, approveRegistrationRequest);
-router.put('/:id/reject', protect, admin, rejectRegistrationRequest);
+// Admin & Staff routes (Staff can now approve students)
+router.get('/', protect, authorize('Admin', 'Staff'), getAllRegistrationRequests);
+router.get('/stats', protect, authorize('Admin', 'Staff'), getRegistrationStats);
+router.put('/:id/approve', protect, authorize('Admin', 'Staff'), approveRegistrationRequest);
+router.put('/:id/reject', protect, authorize('Admin', 'Staff'), rejectRegistrationRequest);
 
 module.exports = router;

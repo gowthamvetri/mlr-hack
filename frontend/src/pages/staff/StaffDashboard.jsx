@@ -6,7 +6,7 @@ import AnimatedNumber from '../../components/AnimatedNumber';
 import gsap from 'gsap';
 import {
   Users, BookOpen, CreditCard, Calendar, CheckCircle,
-  XCircle, AlertTriangle, TrendingUp, Clock, Award
+  XCircle, AlertTriangle, TrendingUp, Clock, Award, UserPlus
 } from 'lucide-react';
 import {
   getAttendanceSummary, getFeeSummary,
@@ -278,6 +278,10 @@ const StaffDashboard = () => {
               <a href="/staff/eligibility" className="flex flex-col items-center p-4 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors">
                 <CheckCircle className="w-8 h-8 text-amber-600 mb-2" />
                 <span className="text-sm font-medium text-gray-800">Check Eligibility</span>
+              </a>
+              <a href="/staff/registration-requests" className="flex flex-col items-center p-4 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                <UserPlus className="w-8 h-8 text-orange-600 mb-2" />
+                <span className="text-sm font-medium text-gray-800">Registrations</span>
               </a>
             </div>
           </div>

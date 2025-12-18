@@ -295,7 +295,7 @@ const Onboarding = () => {
               className="w-full h-full object-cover scale-150"
               style={{ pointerEvents: 'none' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/95 via-white/80 to-white/60" />
+            <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-white/50 to-white/50" />
           </div>
 
           {/* Floating Elements */}

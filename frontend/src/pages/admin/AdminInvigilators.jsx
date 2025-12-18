@@ -1,20 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
-import {
-    getExams,
-    getSeatingSchedule,
-    assignInvigilators,
-    getUsers
-} from '../../utils/api';
+import { getExams, getSeatingSchedule, assignInvigilators, getUsers } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
-import {
-    Users, Building, CalendarDays, Clock, CheckCircle,
-    UserPlus, Save, AlertCircle
-} from 'lucide-react';
+import gsap from 'gsap';
+import { Users, Building, CalendarDays, CheckCircle, UserPlus, Save, AlertCircle } from 'lucide-react';
 
 const AdminInvigilators = () => {
     const user = useSelector(selectCurrentUser);
+    const pageRef = useRef(null);
     const [exams, setExams] = useState([]);
     const [faculty, setFaculty] = useState([]);
     const [selectedExam, setSelectedExam] = useState('');
@@ -23,28 +17,21 @@ const AdminInvigilators = () => {
     const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useEffect(() => { fetchData(); }, []);
+    useEffect(() => { if (selectedExam) fetchSchedule(); }, [selectedExam]);
 
     useEffect(() => {
-        if (selectedExam) {
-            fetchSchedule();
+        if (pageRef.current && exams.length > 0) {
+            gsap.fromTo('.exam-item', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, stagger: 0.04, ease: 'power2.out' });
         }
-    }, [selectedExam]);
+    }, [exams]);
 
     const fetchData = async () => {
         try {
-            const [examsRes, usersRes] = await Promise.all([
-                getExams(),
-                getUsers({ role: 'Staff' })
-            ]);
-            // Only show exams with seating allocated
+            const [examsRes, usersRes] = await Promise.all([getExams(), getUsers({ role: 'Staff' })]);
             setExams((examsRes.data || []).filter(e => e.seatingPublished));
             setFaculty(usersRes.data?.users || usersRes.data || []);
-        } catch (err) {
-            console.error('Error fetching data:', err);
-        }
+        } catch (err) { console.error('Error:', err); }
     };
 
     const fetchSchedule = async () => {
@@ -52,95 +39,65 @@ const AdminInvigilators = () => {
         try {
             const { data } = await getSeatingSchedule(selectedExam);
             setSchedule(data);
-
-            // Initialize assignments from existing data
             const existingAssignments = {};
-            data.schedule?.forEach(room => {
-                if (room.invigilator) {
-                    existingAssignments[room.roomNumber] = room.invigilator.id;
-                }
-            });
+            data.schedule?.forEach(room => { if (room.invigilator) existingAssignments[room.roomNumber] = room.invigilator.id; });
             setAssignments(existingAssignments);
-        } catch (err) {
-            console.error('Error fetching schedule:', err);
-        } finally {
-            setLoading(false);
-        }
+        } catch (err) { console.error('Error:', err); }
+        finally { setLoading(false); }
     };
 
     const handleAssign = (roomNumber, invigilatorId) => {
-        setAssignments(prev => ({
-            ...prev,
-            [roomNumber]: invigilatorId
-        }));
+        setAssignments(prev => ({ ...prev, [roomNumber]: invigilatorId }));
     };
 
     const handleSave = async () => {
         setSaving(true);
         try {
-            const assignmentsList = Object.entries(assignments)
-                .filter(([_, invigilatorId]) => invigilatorId)
-                .map(([roomNumber, invigilatorId]) => ({
-                    roomNumber,
-                    invigilatorId
-                }));
-
-            await assignInvigilators({
-                examId: selectedExam,
-                assignments: assignmentsList
-            });
-
+            const assignmentsList = Object.entries(assignments).filter(([_, id]) => id).map(([roomNumber, invigilatorId]) => ({ roomNumber, invigilatorId }));
+            await assignInvigilators({ examId: selectedExam, assignments: assignmentsList });
             alert('Invigilators assigned successfully!');
             fetchSchedule();
-        } catch (err) {
-            alert('Error: ' + (err.response?.data?.message || err.message));
-        } finally {
-            setSaving(false);
-        }
+        } catch (err) { alert('Error: ' + (err.response?.data?.message || err.message)); }
+        finally { setSaving(false); }
     };
 
     const selectedExamDetails = exams.find(e => e._id === selectedExam);
 
     return (
         <DashboardLayout role="admin" userName={user?.name}>
-            <div className="space-y-6 animate-fade-in">
+            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
                 {/* Header */}
                 <div>
-                    <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Invigilator Assignment</h1>
-                    <p className="text-gray-500 mt-1 text-lg">
-                        Assign faculty members to exam rooms for invigilation duties
-                    </p>
+                    <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Invigilator Assignment</h1>
+                    <p className="text-zinc-500 text-sm mt-0.5">Assign faculty members to exam rooms</p>
                 </div>
 
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-6">
                     {/* Exam Selection */}
                     <div className="xl:col-span-1">
-                        <div className="glass-card rounded-2xl tilt-card overflow-hidden">
-                            <div className="p-6 border-b border-gray-100">
-                                <h2 className="text-lg font-bold text-gray-900">Select Exam</h2>
-                                <p className="text-sm text-gray-500">{exams.length} exams with seating</p>
+                        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+                            <div className="p-5 border-b border-zinc-100">
+                                <h2 className="font-semibold text-zinc-900 text-sm">Select Exam</h2>
+                                <p className="text-xs text-zinc-500 mt-0.5">{exams.length} exams with seating</p>
                             </div>
-                            <div className="p-4 space-y-2 max-h-[400px] overflow-y-auto">
+                            <div className="p-3 space-y-2 max-h-[400px] overflow-y-auto">
                                 {exams.length > 0 ? exams.map(exam => (
                                     <button
                                         key={exam._id}
                                         onClick={() => setSelectedExam(exam._id)}
-                                        className={`w-full text-left p-4 rounded-xl border-2 transition-all ${selectedExam === exam._id
-                                            ? 'bg-primary-50 border-primary-300 shadow-md'
-                                            : 'bg-gray-50 border-transparent hover:bg-gray-100'
-                                            }`}
+                                        className={`exam-item w-full text-left p-4 rounded-lg border transition-all ${selectedExam === exam._id
+                                            ? 'bg-violet-50 border-violet-200'
+                                            : 'bg-zinc-50 border-transparent hover:bg-zinc-100'}`}
                                     >
-                                        <p className="font-semibold text-gray-800 truncate">{exam.courseName}</p>
-                                        <p className="text-xs text-gray-500 flex items-center gap-1 mt-1">
-                                            <CalendarDays className="w-3 h-3" />
-                                            {new Date(exam.date).toLocaleDateString()}
+                                        <p className="font-medium text-zinc-900 text-sm truncate">{exam.courseName}</p>
+                                        <p className="text-[10px] text-zinc-500 flex items-center gap-1 mt-1">
+                                            <CalendarDays className="w-3 h-3" />{new Date(exam.date).toLocaleDateString()}
                                         </p>
                                     </button>
                                 )) : (
-                                    <div className="text-center py-8 text-gray-500">
-                                        <AlertCircle className="w-10 h-10 mx-auto mb-2 text-gray-300" />
-                                        <p>No exams with seating</p>
-                                        <p className="text-xs">Allocate seating first</p>
+                                    <div className="text-center py-8 text-zinc-500">
+                                        <AlertCircle className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
+                                        <p className="text-xs">No exams with seating</p>
                                     </div>
                                 )}
                             </div>
@@ -149,77 +106,61 @@ const AdminInvigilators = () => {
 
                     {/* Assignment Area */}
                     <div className="xl:col-span-3">
-                        <div className="glass-card rounded-2xl tilt-card overflow-hidden">
-                            <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+                            <div className="p-5 border-b border-zinc-100 flex items-center justify-between">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center">
-                                        <UserPlus className="w-5 h-5 text-blue-600" />
+                                    <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                                        <UserPlus className="w-4.5 h-4.5 text-blue-500" strokeWidth={1.5} />
                                     </div>
                                     <div>
-                                        <h2 className="text-lg font-bold text-gray-900">Room Assignments</h2>
-                                        <p className="text-sm text-gray-500">
-                                            {selectedExamDetails ? selectedExamDetails.courseName : 'Select an exam'}
-                                        </p>
+                                        <h2 className="font-semibold text-zinc-900 text-sm">Room Assignments</h2>
+                                        <p className="text-xs text-zinc-500">{selectedExamDetails ? selectedExamDetails.courseName : 'Select an exam'}</p>
                                     </div>
                                 </div>
                                 {schedule && (
-                                    <button
-                                        onClick={handleSave}
-                                        disabled={saving}
-                                        className="flex items-center gap-2 px-6 py-2.5 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 text-white rounded-xl font-semibold transition-all"
-                                    >
-                                        {saving ? (
-                                            <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                                        ) : (
-                                            <Save className="w-5 h-5" />
-                                        )}
-                                        Save Assignments
+                                    <button onClick={handleSave} disabled={saving} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-emerald-600 rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-all">
+                                        {saving ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-4 h-4" />}Save
                                     </button>
                                 )}
                             </div>
 
-                            <div className="p-6">
+                            <div className="p-5">
                                 {loading ? (
                                     <div className="text-center py-12">
-                                        <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-                                        <p className="text-gray-500">Loading schedule...</p>
+                                        <div className="w-8 h-8 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-3" />
+                                        <p className="text-sm text-zinc-500">Loading...</p>
                                     </div>
                                 ) : !selectedExam ? (
                                     <div className="text-center py-12">
-                                        <Users className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                                        <p className="text-gray-500">Select an exam to assign invigilators</p>
+                                        <Users className="w-12 h-12 mx-auto mb-4 text-zinc-200" />
+                                        <p className="text-sm text-zinc-500">Select an exam to assign invigilators</p>
                                     </div>
                                 ) : schedule ? (
                                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                         {schedule.schedule?.map((room, idx) => (
-                                            <div key={idx} className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+                                            <div key={idx} className="p-4 bg-zinc-50 rounded-xl border border-zinc-100 hover:border-zinc-200 transition-colors">
                                                 <div className="flex items-center gap-2 mb-3">
-                                                    <Building className="w-5 h-5 text-primary-600" />
-                                                    <span className="font-bold text-gray-800">Room {room.roomNumber}</span>
+                                                    <Building className="w-4 h-4 text-violet-500" />
+                                                    <span className="font-semibold text-zinc-900 text-sm">Room {room.roomNumber}</span>
                                                 </div>
-                                                <div className="text-sm text-gray-500 mb-3">
+                                                <div className="text-xs text-zinc-500 mb-3">
                                                     <p>{room.studentCount} students</p>
-                                                    <p className="text-xs">{room.departments?.join(', ')}</p>
+                                                    <p className="text-[10px]">{room.departments?.join(', ')}</p>
                                                 </div>
                                                 <div>
-                                                    <label className="block text-xs font-medium text-gray-600 mb-1">Invigilator</label>
+                                                    <label className="block text-[10px] font-medium text-zinc-400 uppercase tracking-wide mb-1.5">Invigilator</label>
                                                     <select
                                                         value={assignments[room.roomNumber] || ''}
                                                         onChange={(e) => handleAssign(room.roomNumber, e.target.value)}
-                                                        className="w-full px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                                        className="w-full px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100"
                                                     >
-                                                        <option value="">-- Select Faculty --</option>
-                                                        {faculty.map(f => (
-                                                            <option key={f._id} value={f._id}>
-                                                                {f.name} ({f.department || 'No dept'})
-                                                            </option>
-                                                        ))}
+                                                        <option value="">-- Select --</option>
+                                                        {faculty.map(f => <option key={f._id} value={f._id}>{f.name} ({f.department || 'No dept'})</option>)}
                                                     </select>
                                                 </div>
                                                 {room.invigilator && (
-                                                    <div className="mt-2 flex items-center gap-1 text-green-600 text-xs">
-                                                        <CheckCircle className="w-3 h-3" />
-                                                        Currently: {room.invigilator.name}
+                                                    <div className="mt-2 flex items-center gap-1 text-emerald-600 text-[10px]">
+                                                        <CheckCircle className="w-3 h-3" />Currently: {room.invigilator.name}
                                                     </div>
                                                 )}
                                             </div>

@@ -1,52 +1,63 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import {
-    getExternalCourses,
-    createExternalCourse,
-    updateExternalCourse,
-    deleteExternalCourse,
-    getDepartments
-} from '../../utils/api';
-import {
-    Plus, Search, Edit2, Trash2, ExternalLink as LinkIcon,
-    Award, Filter, BookOpen, Globe, Users, CheckCircle, X
-} from 'lucide-react';
+import { getExternalCourses, createExternalCourse, updateExternalCourse, deleteExternalCourse, getDepartments } from '../../utils/api';
+import gsap from 'gsap';
+import { Plus, Search, Edit2, Trash2, ExternalLink as LinkIcon, Award, Filter, BookOpen, Globe, CheckCircle, X } from 'lucide-react';
 import Modal from '../../components/Modal';
+
+// Animated Counter
+const AnimatedNumber = ({ value }) => {
+    const [displayValue, setDisplayValue] = useState(0);
+    const prevValue = useRef(0);
+
+    useEffect(() => {
+        const end = typeof value === 'number' ? value : 0;
+        const start = prevValue.current;
+        const duration = 400;
+        const startTime = Date.now();
+
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setDisplayValue(Math.round(start + (end - start) * eased));
+            if (progress < 1) requestAnimationFrame(animate);
+            else prevValue.current = end;
+        };
+        requestAnimationFrame(animate);
+    }, [value]);
+
+    return <span className="tabular-nums">{displayValue}</span>;
+};
 
 const AdminExternalCourses = () => {
     const user = useSelector(selectCurrentUser);
+    const pageRef = useRef(null);
     const [courses, setCourses] = useState([]);
     const [departments, setDepartments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [filterCategory, setFilterCategory] = useState('all');
     const [filterProvider, setFilterProvider] = useState('all');
-
-    // Modal states
     const [showAddModal, setShowAddModal] = useState(false);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [submitting, setSubmitting] = useState(false);
-
-    // Form state
-    const [formData, setFormData] = useState({
-        title: '',
-        description: '',
-        provider: 'Other',
-        url: '',
-        category: 'Other',
-        department: ''
-    });
+    const [formData, setFormData] = useState({ title: '', description: '', provider: 'Other', url: '', category: 'Other', department: '' });
 
     const providers = ['Coursera', 'NPTEL', 'Udemy', 'edX', 'LinkedIn Learning', 'Google', 'Microsoft', 'AWS', 'Other'];
     const categories = ['AI/ML', 'Web Development', 'Mobile Development', 'Data Science', 'Cloud Computing', 'Cybersecurity', 'Soft Skills', 'Programming', 'Database', 'Other'];
 
+    useEffect(() => { fetchData(); }, [filterCategory, filterProvider]);
+
     useEffect(() => {
-        fetchData();
-    }, [filterCategory, filterProvider]);
+        if (pageRef.current && !loading) {
+            gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+        }
+    }, [loading]);
 
     const fetchData = async () => {
         try {
@@ -57,11 +68,8 @@ const AdminExternalCourses = () => {
             ]);
             setCourses(coursesRes.data);
             setDepartments(deptsRes.data);
-        } catch (error) {
-            console.error('Error fetching data:', error);
-        } finally {
-            setLoading(false);
-        }
+        } catch (error) { console.error('Error:', error); }
+        finally { setLoading(false); }
     };
 
     const handleAddCourse = async (e) => {
@@ -72,12 +80,8 @@ const AdminExternalCourses = () => {
             setShowAddModal(false);
             resetForm();
             fetchData();
-        } catch (error) {
-            console.error('Error creating course:', error);
-            alert(error.response?.data?.message || 'Failed to create course');
-        } finally {
-            setSubmitting(false);
-        }
+        } catch (error) { alert(error.response?.data?.message || 'Failed'); }
+        finally { setSubmitting(false); }
     };
 
     const handleUpdateCourse = async (e) => {
@@ -88,12 +92,8 @@ const AdminExternalCourses = () => {
             setShowEditModal(false);
             resetForm();
             fetchData();
-        } catch (error) {
-            console.error('Error updating course:', error);
-            alert(error.response?.data?.message || 'Failed to update course');
-        } finally {
-            setSubmitting(false);
-        }
+        } catch (error) { alert(error.response?.data?.message || 'Failed'); }
+        finally { setSubmitting(false); }
     };
 
     const handleDeleteCourse = async () => {
@@ -103,367 +103,223 @@ const AdminExternalCourses = () => {
             setShowDeleteModal(false);
             setSelectedCourse(null);
             fetchData();
-        } catch (error) {
-            console.error('Error deleting course:', error);
-            alert(error.response?.data?.message || 'Failed to delete course');
-        } finally {
-            setSubmitting(false);
-        }
+        } catch (error) { alert(error.response?.data?.message || 'Failed'); }
+        finally { setSubmitting(false); }
     };
 
     const openEditModal = (course) => {
         setSelectedCourse(course);
-        setFormData({
-            title: course.title,
-            description: course.description || '',
-            provider: course.provider,
-            url: course.url,
-            category: course.category,
-            department: course.department?._id || ''
-        });
+        setFormData({ title: course.title, description: course.description || '', provider: course.provider, url: course.url, category: course.category, department: course.department?._id || '' });
         setShowEditModal(true);
     };
 
     const resetForm = () => {
-        setFormData({
-            title: '',
-            description: '',
-            provider: 'Other',
-            url: '',
-            category: 'Other',
-            department: ''
-        });
+        setFormData({ title: '', description: '', provider: 'Other', url: '', category: 'Other', department: '' });
         setSelectedCourse(null);
     };
 
-    const filteredCourses = courses.filter(c =>
-        c.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        c.provider?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const filteredCourses = courses.filter(c => c.title?.toLowerCase().includes(searchQuery.toLowerCase()) || c.provider?.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const getProviderColor = (provider) => {
         const colors = {
-            'Coursera': 'bg-blue-100 text-blue-700',
-            'NPTEL': 'bg-orange-100 text-orange-700',
-            'Udemy': 'bg-purple-100 text-purple-700',
-            'edX': 'bg-red-100 text-red-700',
-            'Google': 'bg-green-100 text-green-700',
-            'Microsoft': 'bg-cyan-100 text-cyan-700',
-            'AWS': 'bg-yellow-100 text-yellow-700',
+            'Coursera': 'bg-blue-50 text-blue-600', 'NPTEL': 'bg-orange-50 text-orange-600', 'Udemy': 'bg-violet-50 text-violet-600',
+            'edX': 'bg-red-50 text-red-600', 'Google': 'bg-emerald-50 text-emerald-600', 'Microsoft': 'bg-cyan-50 text-cyan-600', 'AWS': 'bg-amber-50 text-amber-600',
         };
-        return colors[provider] || 'bg-gray-100 text-gray-700';
+        return colors[provider] || 'bg-zinc-100 text-zinc-600';
     };
 
+    const hasActiveFilters = searchQuery || filterCategory !== 'all' || filterProvider !== 'all';
+    const clearFilters = () => { setSearchQuery(''); setFilterCategory('all'); setFilterProvider('all'); };
+
     const CourseForm = ({ onSubmit, isEdit = false }) => (
-        <form onSubmit={onSubmit} className="space-y-5">
+        <form onSubmit={onSubmit} className="space-y-4">
             <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Course Title *</label>
-                <input
-                    type="text"
-                    required
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="e.g., Machine Learning Fundamentals"
-                />
+                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Title *</label>
+                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" placeholder="ML Fundamentals" />
             </div>
-
             <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
-                <textarea
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                    rows={3}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-                    placeholder="Brief description of the course..."
-                />
+                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Description</label>
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={2} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none" placeholder="Brief description..." />
             </div>
-
             <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Course URL *</label>
-                <input
-                    type="url"
-                    required
-                    value={formData.url}
-                    onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                    placeholder="https://coursera.org/learn/..."
-                />
+                <label className="block text-xs font-medium text-zinc-500 mb-1.5">URL *</label>
+                <input type="url" required value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" placeholder="https://..." />
             </div>
-
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Provider</label>
-                    <select
-                        value={formData.provider}
-                        onChange={(e) => setFormData({ ...formData, provider: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Provider</label>
+                    <select value={formData.provider} onChange={(e) => setFormData({ ...formData, provider: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white">
                         {providers.map(p => <option key={p} value={p}>{p}</option>)}
                     </select>
                 </div>
-
                 <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
-                    <select
-                        value={formData.category}
-                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                    >
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Category</label>
+                    <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white">
                         {categories.map(c => <option key={c} value={c}>{c}</option>)}
                     </select>
                 </div>
             </div>
-
-            <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">Department (Optional)</label>
-                <select
-                    value={formData.department}
-                    onChange={(e) => setFormData({ ...formData, department: e.target.value })}
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
-                >
-                    <option value="">All Departments</option>
-                    {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
-                </select>
-            </div>
-
-            <div className="flex gap-3 pt-4">
-                <button
-                    type="button"
-                    onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }}
-                    className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-                >
-                    Cancel
-                </button>
-                <button
-                    type="submit"
-                    disabled={submitting}
-                    className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all disabled:opacity-50"
-                >
-                    {submitting ? 'Saving...' : (isEdit ? 'Update Course' : 'Add Course')}
-                </button>
+            <div className="flex justify-end gap-2 pt-4">
+                <button type="button" onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }} className="px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
+                <button type="submit" disabled={submitting} className="px-4 py-2 text-sm text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 disabled:opacity-50 transition-colors">{submitting ? 'Saving...' : (isEdit ? 'Update' : 'Add')}</button>
             </div>
         </form>
     );
 
     return (
         <DashboardLayout title="External Courses">
-            <div className="space-y-6 animate-fade-in">
+            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Free Certifications</h1>
-                        <p className="text-gray-500 mt-1">Manage external course links for students</p>
+                        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Free Certifications</h1>
+                        <p className="text-zinc-500 text-sm mt-0.5">Manage external course links for students</p>
                     </div>
-                    <button
-                        onClick={() => { resetForm(); setShowAddModal(true); }}
-                        className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all shadow-lg shadow-primary-200"
-                    >
-                        <Plus className="w-5 h-5" />
-                        Add Course
+                    <button onClick={() => { resetForm(); setShowAddModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all">
+                        <Plus className="w-4 h-4" />Add Course
                     </button>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-6 text-white shadow-lg">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-primary-100 font-medium">Total Courses</p>
-                                <p className="text-3xl font-bold mt-2">{courses.length}</p>
+                    {[
+                        { label: 'Total Courses', value: courses.length, icon: BookOpen, color: 'violet' },
+                        { label: 'Providers', value: [...new Set(courses.map(c => c.provider))].length, icon: Globe, color: 'blue' },
+                        { label: 'Categories', value: [...new Set(courses.map(c => c.category))].length, icon: Filter, color: 'amber' },
+                        { label: 'Completions', value: courses.reduce((a, c) => a + (c.completedBy?.length || 0), 0), icon: Award, color: 'emerald' },
+                    ].map((stat, i) => {
+                        const colorMap = { violet: 'bg-violet-50 text-violet-500', blue: 'bg-blue-50 text-blue-500', amber: 'bg-amber-50 text-amber-500', emerald: 'bg-emerald-50 text-emerald-500' };
+                        return (
+                            <div key={i} className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                                <div className="flex items-start justify-between mb-3">
+                                    <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center`}>
+                                        <stat.icon className={`w-4.5 h-4.5 ${colorMap[stat.color].split(' ')[1]}`} strokeWidth={1.5} />
+                                    </div>
+                                </div>
+                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">{stat.label}</p>
+                                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stat.value} /></p>
                             </div>
-                            <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                                <BookOpen className="w-6 h-6 text-white" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium">Providers</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">{[...new Set(courses.map(c => c.provider))].length}</p>
-                            </div>
-                            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                <Globe className="w-6 h-6 text-blue-600" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium">Categories</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">{[...new Set(courses.map(c => c.category))].length}</p>
-                            </div>
-                            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                                <Filter className="w-6 h-6 text-purple-600" />
-                            </div>
-                        </div>
-                    </div>
-                    <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-sm">
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium">Completions</p>
-                                <p className="text-3xl font-bold text-gray-900 mt-2">{courses.reduce((a, c) => a + (c.completedBy?.length || 0), 0)}</p>
-                            </div>
-                            <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                                <Award className="w-6 h-6 text-green-600" />
-                            </div>
-                        </div>
-                    </div>
+                        );
+                    })}
                 </div>
 
                 {/* Filters */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+                <div className="bg-white rounded-xl border border-zinc-100 p-4">
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
                         <div className="flex-1 relative">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-                            <input
-                                type="text"
-                                placeholder="Search courses..."
-                                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-primary-500"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                            <input type="text" placeholder="Search courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 text-zinc-700" />
                         </div>
-                        <select
-                            value={filterProvider}
-                            onChange={(e) => setFilterProvider(e.target.value)}
-                            className="px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-primary-500"
-                        >
+                        <select value={filterProvider} onChange={(e) => setFilterProvider(e.target.value)} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
                             <option value="all">All Providers</option>
                             {providers.map(p => <option key={p} value={p}>{p}</option>)}
                         </select>
-                        <select
-                            value={filterCategory}
-                            onChange={(e) => setFilterCategory(e.target.value)}
-                            className="px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:outline-none focus:bg-white focus:border-primary-500"
-                        >
+                        <select value={filterCategory} onChange={(e) => setFilterCategory(e.target.value)} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
                             <option value="all">All Categories</option>
                             {categories.map(c => <option key={c} value={c}>{c}</option>)}
                         </select>
+                        {hasActiveFilters && (
+                            <button onClick={clearFilters} className="p-2.5 text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors">
+                                <X className="w-4 h-4" />
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* Courses Table */}
+                {/* Table */}
                 {loading ? (
-                    <div className="text-center py-24">
-                        <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
-                        <p className="text-gray-500">Loading courses...</p>
+                    <div className="text-center py-12">
+                        <div className="w-8 h-8 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-3" />
+                        <p className="text-sm text-zinc-500">Loading...</p>
                     </div>
                 ) : filteredCourses.length === 0 ? (
-                    <div className="text-center py-20 bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-                        <BookOpen className="w-20 h-20 mx-auto mb-6 text-gray-200" />
-                        <p className="text-xl font-bold text-gray-900">No courses found</p>
-                        <p className="text-gray-500 mt,2">Add your first external course to get started.</p>
+                    <div className="text-center py-16 bg-white rounded-xl border border-zinc-100">
+                        <BookOpen className="w-12 h-12 mx-auto mb-4 text-zinc-200" />
+                        <p className="font-medium text-zinc-600">No courses found</p>
+                        <p className="text-xs text-zinc-400 mt-1">Add your first course to get started</p>
                     </div>
                 ) : (
-                    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="overflow-x-auto">
-                            <table className="w-full">
-                                <thead className="bg-gray-50 border-b border-gray-100">
-                                    <tr>
-                                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Course</th>
-                                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Provider</th>
-                                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Category</th>
-                                        <th className="text-left py-4 px-6 font-semibold text-gray-700">Completions</th>
-                                        <th className="text-right py-4 px-6 font-semibold text-gray-700">Actions</th>
+                    <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+                        <table className="w-full">
+                            <thead>
+                                <tr className="border-b border-zinc-100">
+                                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Course</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Provider</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Category</th>
+                                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Completions</th>
+                                    <th className="px-6 py-3 text-right text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-50">
+                                {filteredCourses.map(course => (
+                                    <tr key={course._id} className="hover:bg-zinc-50 transition-colors">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
+                                                    <BookOpen className="w-4 h-4 text-violet-500" />
+                                                </div>
+                                                <div>
+                                                    <p className="font-medium text-zinc-900 text-sm">{course.title}</p>
+                                                    <p className="text-xs text-zinc-500 truncate max-w-[180px]">{course.description}</p>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-medium ${getProviderColor(course.provider)}`}>{course.provider}</span>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm text-zinc-600">{course.category}</td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-1.5 text-sm">
+                                                <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
+                                                <span className="font-medium text-zinc-700">{course.completedBy?.length || 0}</span>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center justify-end gap-1">
+                                                <a href={course.url} target="_blank" rel="noopener noreferrer" className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                                                    <LinkIcon className="w-4 h-4" />
+                                                </a>
+                                                <button onClick={() => openEditModal(course)} className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors">
+                                                    <Edit2 className="w-4 h-4" />
+                                                </button>
+                                                <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </td>
                                     </tr>
-                                </thead>
-                                <tbody className="divide-y divide-gray-50">
-                                    {filteredCourses.map((course) => (
-                                        <tr key={course._id} className="hover:bg-gray-50 transition-colors">
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center">
-                                                        <BookOpen className="w-5 h-5 text-primary-600" />
-                                                    </div>
-                                                    <div>
-                                                        <p className="font-bold text-gray-900">{course.title}</p>
-                                                        <p className="text-sm text-gray-500 truncate max-w-[200px]">{course.description}</p>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className={`px-3 py-1 rounded-full text-xs font-bold ${getProviderColor(course.provider)}`}>
-                                                    {course.provider}
-                                                </span>
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <span className="text-sm text-gray-600">{course.category}</span>
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center gap-2">
-                                                    <CheckCircle className="w-4 h-4 text-green-500" />
-                                                    <span className="font-medium">{course.completedBy?.length || 0}</span>
-                                                </div>
-                                            </td>
-                                            <td className="py-4 px-6">
-                                                <div className="flex items-center justify-end gap-2">
-                                                    <a
-                                                        href={course.url}
-                                                        target="_blank"
-                                                        rel="noopener noreferrer"
-                                                        className="p-2 hover:bg-blue-50 text-blue-600 rounded-lg transition-colors"
-                                                        title="Open Course"
-                                                    >
-                                                        <LinkIcon className="w-4 h-4" />
-                                                    </a>
-                                                    <button
-                                                        onClick={() => openEditModal(course)}
-                                                        className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg transition-colors"
-                                                        title="Edit"
-                                                    >
-                                                        <Edit2 className="w-4 h-4" />
-                                                    </button>
-                                                    <button
-                                                        onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }}
-                                                        className="p-2 hover:bg-red-50 text-red-600 rounded-lg transition-colors"
-                                                        title="Delete"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+
+                {/* Results */}
+                {filteredCourses.length > 0 && (
+                    <div className="text-center">
+                        <p className="text-xs text-zinc-500">Showing <span className="font-medium text-zinc-700">{filteredCourses.length}</span> courses</p>
                     </div>
                 )}
             </div>
 
-            {/* Add Modal */}
-            <Modal isOpen={showAddModal} onClose={() => { setShowAddModal(false); resetForm(); }} title="Add External Course" size="lg">
+            {/* Modals */}
+            <Modal isOpen={showAddModal} onClose={() => { setShowAddModal(false); resetForm(); }} title="Add Course" size="lg">
                 <CourseForm onSubmit={handleAddCourse} />
             </Modal>
 
-            {/* Edit Modal */}
-            <Modal isOpen={showEditModal} onClose={() => { setShowEditModal(false); resetForm(); }} title="Edit External Course" size="lg">
-                <CourseForm onSubmit={handleUpdateCourse} isEdit={true} />
+            <Modal isOpen={showEditModal} onClose={() => { setShowEditModal(false); resetForm(); }} title="Edit Course" size="lg">
+                <CourseForm onSubmit={handleUpdateCourse} isEdit />
             </Modal>
 
-            {/* Delete Confirmation Modal */}
             <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Course" size="sm">
                 <div className="text-center py-4">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <Trash2 className="w-8 h-8 text-red-600" />
+                    <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <Trash2 className="w-6 h-6 text-red-500" />
                     </div>
-                    <p className="text-gray-600 mb-6">Are you sure you want to delete <span className="font-bold">"{selectedCourse?.title}"</span>?</p>
-                    <div className="flex gap-3">
-                        <button
-                            onClick={() => setShowDeleteModal(false)}
-                            className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold"
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            onClick={handleDeleteCourse}
-                            disabled={submitting}
-                            className="flex-1 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold disabled:opacity-50"
-                        >
-                            {submitting ? 'Deleting...' : 'Delete'}
-                        </button>
+                    <p className="text-sm text-zinc-600 mb-4">Delete "{selectedCourse?.title}"?</p>
+                    <div className="flex gap-2">
+                        <button onClick={() => setShowDeleteModal(false)} className="flex-1 px-4 py-2 text-sm bg-zinc-100 text-zinc-700 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
+                        <button onClick={handleDeleteCourse} disabled={submitting} className="flex-1 px-4 py-2 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 disabled:opacity-50 transition-colors">{submitting ? 'Deleting...' : 'Delete'}</button>
                     </div>
                 </div>
             </Modal>
