@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getUsers, getDepartments, registerUser, deleteUser } from '../../utils/api';
+import { getUsers, getDepartments, createUserByAdmin, deleteUser } from '../../utils/api';
 import {
     Users, Search, UserPlus, Download, Mail,
     Building, Star, BookOpen, X, Trash2, Edit, AlertTriangle, CheckCircle,
@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { useSocket } from '../../context/SocketContext';
+import PremiumFilterBar, { FilterTriggerButton } from '../../components/PremiumFilterBar';
 import gsap from 'gsap';
 
 // Premium Animated Counter - Smooth count-up with easing
@@ -122,6 +123,7 @@ const AdminStaff = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterDept, setFilterDept] = useState('all');
     const [viewMode, setViewMode] = useState('grid');
+    const [filterPanelOpen, setFilterPanelOpen] = useState(false);
     const [departments, setDepartments] = useState(['all']);
     const [stats, setStats] = useState({ total: 0, professors: 0, avgRating: 0, totalCourses: 0 });
     const [showAddModal, setShowAddModal] = useState(false);
@@ -197,7 +199,7 @@ const AdminStaff = () => {
         if (!formData.name || !formData.email || !formData.password) { setFormError('Please fill in all required fields'); return; }
         if (formData.password.length < 6) { setFormError('Password must be at least 6 characters'); return; }
         try {
-            await registerUser({ ...formData, role: 'Staff' });
+            await createUserByAdmin({ ...formData, role: 'Staff' });
             setFormSuccess('Staff member added successfully!');
             setTimeout(() => { setShowAddModal(false); setFormData({ name: '', email: '', password: '', department: 'CSE', designation: 'Assistant Professor', experience: '', phone: '', subjects: [] }); setFormSuccess(''); fetchStaff(); }, 1500);
         } catch (error) { setFormError(error.response?.data?.message || 'Error adding staff member'); }
@@ -244,6 +246,11 @@ const AdminStaff = () => {
                         <p className="text-zinc-500 text-sm mt-0.5">Manage faculty members across departments</p>
                     </div>
                     <div className="flex items-center gap-2.5">
+                        <FilterTriggerButton
+                            isOpen={filterPanelOpen}
+                            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+                            activeFiltersCount={(filterDept !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)}
+                        />
                         <button
                             onClick={handleExport}
                             className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
@@ -381,71 +388,30 @@ const AdminStaff = () => {
                     )}
                 </div>
 
-                {/* Filter Bar - Clean and functional */}
-                <div className="filter-bar bg-white rounded-xl border border-zinc-100 p-4">
-                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
-                        {/* Search */}
-                        <div className="flex-1 relative">
-                            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" strokeWidth={1.5} />
-                            <input
-                                type="text"
-                                placeholder="Search staff..."
-                                className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 focus:bg-white transition-all text-zinc-700 placeholder-zinc-400"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                            />
-                            {searchQuery && (
-                                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-zinc-200 rounded transition-colors">
-                                    <X className="w-3.5 h-3.5 text-zinc-400" />
-                                </button>
-                            )}
-                        </div>
+                {/* Collapsible Premium Filter Panel */}
+                <PremiumFilterBar
+                    isOpen={filterPanelOpen}
+                    onClose={() => setFilterPanelOpen(false)}
 
-                        {/* View Toggle */}
-                        <div className="flex items-center gap-1 p-1 bg-zinc-100 rounded-lg">
-                            <button
-                                onClick={() => setViewMode('grid')}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${viewMode === 'grid' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
-                            >
-                                <Grid3X3 className="w-3.5 h-3.5" />
-                                Grid
-                            </button>
-                            <button
-                                onClick={() => setViewMode('list')}
-                                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${viewMode === 'list' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
-                            >
-                                <List className="w-3.5 h-3.5" />
-                                List
-                            </button>
-                        </div>
-                    </div>
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    searchPlaceholder="Search by name, email, department..."
 
-                    {/* Department Pills */}
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-zinc-50">
-                        <span className="text-xs font-medium text-zinc-400 uppercase tracking-wide mr-1">Department</span>
-                        {departments.map((d) => (
-                            <button
-                                key={d}
-                                onClick={() => setFilterDept(d)}
-                                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterDept === d
-                                    ? 'bg-zinc-900 text-white'
-                                    : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-                                    }`}
-                            >
-                                {d === 'all' ? 'All' : d}
-                            </button>
-                        ))}
-                        {hasActiveFilters && (
-                            <button
-                                onClick={clearFilters}
-                                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-full transition-colors"
-                            >
-                                <X className="w-3 h-3" />
-                                Clear
-                            </button>
-                        )}
-                    </div>
-                </div>
+                    departments={departments}
+                    filterDept={filterDept}
+                    setFilterDept={setFilterDept}
+                    deptCounts={deptDistribution.reduce((acc, d) => ({ ...acc, [d.name]: d.count }), {})}
+
+                    viewMode={viewMode}
+                    setViewMode={setViewMode}
+                    showViewToggle={true}
+
+                    onClearFilters={clearFilters}
+                    hasActiveFilters={hasActiveFilters}
+
+                    filteredCount={filteredStaff.length}
+                    totalCount={staff.length}
+                />
 
                 {/* Staff Display */}
                 {loading ? (

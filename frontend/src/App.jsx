@@ -50,11 +50,11 @@ const AdminCourses = lazy(() => import('./pages/admin/AdminCourses'));
 const AdminPlacements = lazy(() => import('./pages/admin/AdminPlacements'));
 const AdminRegistrationRequests = lazy(() => import('./pages/admin/AdminRegistrationRequests'));
 const AdminProfile = lazy(() => import('./pages/admin/AdminProfile'));
-const AdminPlacementPage = lazy(() => import('./pages/admin/AdminPlacementPage'));
 const AdminExternalCourses = lazy(() => import('./pages/admin/AdminExternalCourses'));
 const AdminExamScheduling = lazy(() => import('./pages/admin/AdminExamScheduling'));
 const AdminInvigilators = lazy(() => import('./pages/admin/AdminInvigilators'));
 const AdminSubjects = lazy(() => import('./pages/admin/AdminSubjects'));
+const AdminDepartments = lazy(() => import('./pages/admin/AdminDepartments'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));
@@ -75,7 +75,7 @@ const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
 const StaffInvigilation = lazy(() => import('./pages/staff/StaffInvigilation'));
-const StaffRegistrationRequests = lazy(() => import('./pages/staff/StaffRegistrationRequests'));
+
 
 function App() {
   return (
@@ -235,14 +235,8 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/admin/placement-page"
-              element={
-                <ProtectedRoute allowedRoles={['Admin']}>
-                  <AdminPlacementPage />
-                </ProtectedRoute>
-              }
-            />
+            {/* Redirect old placement-page route to placements */}
+            <Route path="/admin/placement-page" element={<Navigate to="/admin/placements" replace />} />
             <Route
               path="/admin/external-courses"
               element={
@@ -296,6 +290,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <AdminInvigilators />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/departments"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminDepartments />
                 </ProtectedRoute>
               }
             />
@@ -369,14 +371,7 @@ function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/staff/registration-requests"
-              element={
-                <ProtectedRoute allowedRoles={['Staff']}>
-                  <StaffRegistrationRequests />
-                </ProtectedRoute>
-              }
-            />
+
             <Route
               path="/staff/courses"
               element={

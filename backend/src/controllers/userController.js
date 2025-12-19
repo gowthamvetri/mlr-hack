@@ -3,6 +3,38 @@ const Course = require('../models/Course');
 const StaffRating = require('../models/StaffRating');
 const generateToken = require('../utils/generateToken');
 
+// Helper function to generate roll number in format: xxMLRIDyyzz
+// xx = last 2 digits of joining year, yy = department code, zz = sequential number
+const generateRollNumber = async (department, joiningYear) => {
+  // Get the year code (last 2 digits of joining year, or current year if not provided)
+  const year = joiningYear || new Date().getFullYear();
+  const yearCode = year.toString().slice(-2);
+
+  // Get department code (uppercase, max 3 chars)
+  const deptCode = (department || 'CSE').toUpperCase().slice(0, 3);
+
+  // Count existing students with same year and department to get next sequence
+  const existingCount = await User.countDocuments({
+    role: 'Student',
+    rollNumber: { $regex: `^${yearCode}MLRID${deptCode}` }
+  });
+
+  // Generate sequential number (3 digits, zero-padded)
+  const sequenceNumber = (existingCount + 1).toString().padStart(3, '0');
+
+  // Format: xxMLRIDyyzz (e.g., 24MLRIDCSE001)
+  const rollNumber = `${yearCode}MLRID${deptCode}${sequenceNumber}`;
+
+  // Verify uniqueness (edge case handling)
+  const exists = await User.findOne({ rollNumber });
+  if (exists) {
+    // If somehow exists, add a random suffix
+    return `${rollNumber}${Math.random().toString(36).slice(-2).toUpperCase()}`;
+  }
+
+  return rollNumber;
+};
+
 // @desc    Auth user & get token
 // @route   POST /api/users/login
 // @access  Public
@@ -57,11 +89,10 @@ const registerUser = async (req, res) => {
     return;
   }
 
-  // Auto-generate roll number: DEPT + YEAR + timestamp-based unique number
-  const timestamp = Date.now().toString().slice(-6);
-  const deptCode = (department || 'STU').toUpperCase().slice(0, 3);
-  const yearCode = (year || '1').replace(/[^0-9]/g, '') || '1';
-  const autoRollNumber = `${deptCode}${yearCode}${timestamp}`;
+  // Auto-generate roll number in format: xxMLRIDyyzz
+  // xx = year of joining (2 digits), yy = department code, zz = sequential number
+  const joiningYear = new Date().getFullYear(); // Use current year as joining year
+  const autoRollNumber = await generateRollNumber(department, joiningYear);
 
   const user = await User.create({
     name,
@@ -71,6 +102,7 @@ const registerUser = async (req, res) => {
     department,
     year,
     rollNumber: autoRollNumber,
+    joiningYear, // Store joining year for reference
     clubName,
     office,
     isApproved: false // Students need approval
@@ -93,6 +125,80 @@ const registerUser = async (req, res) => {
     });
   } else {
     res.status(400).json({ message: 'Invalid user data' });
+  }
+};
+
+// @desc    Create any user (Admin only - for Staff, SeatingManager, ClubCoordinator, etc.)
+// @route   POST /api/users/admin/create
+// @access  Private/Admin
+const createUserByAdmin = async (req, res) => {
+  try {
+    const { name, email, password, role, department, year, clubName, office, designation, experience, phone, subjects } = req.body;
+
+    // Validate required fields
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Name, email, and password are required' });
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters' });
+    }
+
+    // Check if user exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ message: 'User with this email already exists' });
+    }
+
+    // Prepare user data based on role
+    const userData = {
+      name,
+      email,
+      password,
+      role: role || 'Staff',
+      department: department || 'CSE',
+      isApproved: true // Admin-created users are pre-approved
+    };
+
+    // Add role-specific fields
+    if (role === 'Staff') {
+      userData.designation = designation || 'Assistant Professor';
+      userData.experience = experience;
+      userData.phone = phone;
+      userData.subjects = subjects || [];
+    } else if (role === 'Student') {
+      userData.year = year || '1';
+      const joiningYear = new Date().getFullYear();
+      userData.rollNumber = await generateRollNumber(department, joiningYear);
+      userData.joiningYear = joiningYear;
+    } else if (role === 'ClubCoordinator') {
+      userData.clubName = clubName;
+    } else if (role === 'SeatingManager') {
+      userData.office = office;
+    }
+
+    const user = await User.create(userData);
+
+    if (req.io) {
+      req.io.to('role:Admin').emit('user_created', user);
+    }
+
+    res.status(201).json({
+      message: `${role || 'Staff'} member created successfully`,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        department: user.department,
+        designation: user.designation,
+        isApproved: user.isApproved
+      }
+    });
+  } catch (error) {
+    console.error('Admin create user error:', error);
+    res.status(500).json({ message: error.message });
   }
 };
 
@@ -353,4 +459,124 @@ const rejectStudent = async (req, res) => {
   }
 };
 
-module.exports = { authUser, registerUser, getUsers, getUserById, deleteUser, getProfile, updateProfile, getPendingStudents, approveStudent, rejectStudent };
+// @desc    Bulk import students
+// @route   POST /api/users/bulk-import
+// @access  Private/Admin
+const bulkImportStudents = async (req, res) => {
+  try {
+    const { students } = req.body;
+
+    if (!students || !Array.isArray(students) || students.length === 0) {
+      return res.status(400).json({ message: 'Please provide an array of students' });
+    }
+
+    const results = {
+      success: [],
+      failed: [],
+      duplicates: []
+    };
+
+    for (const studentData of students) {
+      try {
+        const { name, department, year, rollNumber } = studentData;
+        let { email } = studentData;
+
+        // Validate required fields - only name is required, email can be auto-generated
+        if (!name) {
+          results.failed.push({ data: studentData, error: 'Name is required' });
+          continue;
+        }
+
+        const deptCode = (department || 'CSE').toUpperCase();
+
+        // Auto-generate email if not provided: firstname.lastname.department@mlrit.ac.in
+        if (!email) {
+          const nameParts = name.toLowerCase().trim().split(/\s+/);
+          const firstName = nameParts[0].replace(/[^a-z]/g, '');
+          const lastName = nameParts.length > 1 ? nameParts[nameParts.length - 1].replace(/[^a-z]/g, '') : '';
+          const baseEmail = lastName
+            ? `${firstName}.${lastName}.${deptCode.toLowerCase()}@mlrit.ac.in`
+            : `${firstName}.${deptCode.toLowerCase()}@mlrit.ac.in`;
+
+          // Check if this generated email exists, if so add a number suffix
+          let generatedEmail = baseEmail;
+          let emailSuffix = 1;
+          while (await User.findOne({ email: generatedEmail })) {
+            const emailBase = baseEmail.split('@')[0];
+            generatedEmail = `${emailBase}${emailSuffix}@mlrit.ac.in`;
+            emailSuffix++;
+          }
+          email = generatedEmail;
+        }
+
+        // Check if email already exists
+        const existingUser = await User.findOne({ email });
+        if (existingUser) {
+          results.duplicates.push({ email, name });
+          continue;
+        }
+
+        // Get joining year from data or use current year
+        const joiningYear = studentData.joiningYear || new Date().getFullYear();
+
+        // Auto-generate roll number if not provided using new format: xxMLRIDyyzz
+        let finalRollNumber = rollNumber;
+        if (!finalRollNumber) {
+          finalRollNumber = await generateRollNumber(department || 'CSE', joiningYear);
+        } else {
+          // If roll number provided, verify uniqueness
+          const existingRollNumber = await User.findOne({ rollNumber: finalRollNumber });
+          if (existingRollNumber) {
+            finalRollNumber = await generateRollNumber(department || 'CSE', joiningYear);
+          }
+        }
+
+        // Create student with custom password or default (email prefix or 'password123')
+        const studentPassword = studentData.password || email.split('@')[0].replace(/\./g, '') || 'password123';
+
+        const user = await User.create({
+          name,
+          email,
+          password: studentPassword,
+          role: 'Student',
+          department: department || 'CSE',
+          year: year || '1',
+          rollNumber: finalRollNumber,
+          joiningYear,
+          isApproved: true // Bulk imported students are pre-approved
+        });
+
+        results.success.push({
+          _id: user._id,
+          name: user.name,
+          email: user.email,
+          rollNumber: user.rollNumber,
+          department: user.department,
+          year: user.year
+        });
+
+      } catch (error) {
+        results.failed.push({ data: studentData, error: error.message });
+      }
+    }
+
+    // Emit socket event for new students
+    if (req.io && results.success.length > 0) {
+      req.io.to('role:Admin').emit('students_bulk_imported', results.success);
+    }
+
+    res.status(201).json({
+      message: `Imported ${results.success.length} students successfully`,
+      totalProcessed: students.length,
+      successful: results.success.length,
+      duplicates: results.duplicates.length,
+      failed: results.failed.length,
+      results
+    });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+module.exports = { authUser, registerUser, createUserByAdmin, getUsers, getUserById, deleteUser, getProfile, updateProfile, getPendingStudents, approveStudent, rejectStudent, bulkImportStudents };

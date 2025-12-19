@@ -234,7 +234,6 @@ const StaffDashboard = () => {
                 { label: 'Fee Status', path: '/staff/fees', icon: CreditCard, color: 'teal', desc: 'Check student fees' },
                 { label: 'Career Requests', path: '/staff/career-approvals', icon: Award, color: 'violet', desc: 'Approve certificates' },
                 { label: 'Eligibility Check', path: '/staff/eligibility', icon: CheckCircle, color: 'emerald', desc: 'Exam eligibility' },
-                { label: 'Registrations', path: '/staff/registration-requests', icon: UserPlus, color: 'orange', desc: 'New enrollments' },
               ].map((action, i) => (
                 <a key={i} href={action.path} className="flex items-center gap-4 p-3 rounded-lg border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50 group transition-all">
                   <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors bg-${action.color}-50 text-${action.color}-600 group-hover:bg-${action.color}-100`}>

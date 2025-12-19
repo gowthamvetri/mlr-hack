@@ -3,6 +3,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import Modal from '../../components/Modal';
 import DataTable from '../../components/DataTable';
 import { getSubjects, createSubject, updateSubject, deleteSubject, bulkImportSubjects, getSubjectDepartments } from '../../utils/api';
+import PremiumFilterBar, { FilterTriggerButton } from '../../components/PremiumFilterBar';
 import gsap from 'gsap';
 import { Plus, Search, Upload, Edit, Trash2, BookOpen, Filter, Download, CheckCircle, XCircle } from 'lucide-react';
 
@@ -43,6 +44,7 @@ const AdminSubjects = () => {
     const [filters, setFilters] = useState({ department: '', year: '', semester: '', search: '' });
     const [formData, setFormData] = useState({ code: '', name: '', department: '', year: 1, semester: 1, credits: 3, subjectType: 'HEAVY' });
     const pageRef = useRef(null);
+    const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
     useEffect(() => { fetchData(); }, [filters]);
 
@@ -136,6 +138,11 @@ const AdminSubjects = () => {
                         <p className="text-zinc-500 text-sm mt-0.5">Manage subjects, credits, and semesters</p>
                     </div>
                     <div className="flex gap-2">
+                        <FilterTriggerButton
+                            isOpen={filterPanelOpen}
+                            onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+                            activeFiltersCount={(filters.department ? 1 : 0) + (filters.year ? 1 : 0) + (filters.semester ? 1 : 0) + (filters.search ? 1 : 0)}
+                        />
                         <button onClick={() => setShowBulkModal(true)} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all">
                             <Upload className="w-4 h-4" />Bulk Import
                         </button>
@@ -168,31 +175,35 @@ const AdminSubjects = () => {
                     })}
                 </div>
 
-                {/* Filters */}
-                <div className="bg-white rounded-xl border border-zinc-100 p-4">
-                    <div className="flex items-center gap-2 mb-3">
-                        <Filter className="w-4 h-4 text-zinc-400" />
-                        <span className="text-xs font-medium text-zinc-500 uppercase tracking-wide">Filters</span>
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="relative">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                            <input type="text" placeholder="Search..." value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 text-zinc-700" />
-                        </div>
-                        <select value={filters.department} onChange={(e) => setFilters({ ...filters, department: e.target.value })} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
-                            <option value="">All Depts</option>
-                            {departments.map(d => <option key={d} value={d}>{d}</option>)}
-                        </select>
-                        <select value={filters.year} onChange={(e) => setFilters({ ...filters, year: e.target.value })} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
-                            <option value="">All Years</option>
-                            {[1, 2, 3, 4].map(y => <option key={y} value={y}>Year {y}</option>)}
-                        </select>
-                        <select value={filters.semester} onChange={(e) => setFilters({ ...filters, semester: e.target.value })} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
-                            <option value="">All Semesters</option>
-                            {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Sem {s}</option>)}
-                        </select>
-                    </div>
-                </div>
+                {/* Collapsible Premium Filter Panel */}
+                <PremiumFilterBar
+                    isOpen={filterPanelOpen}
+                    onClose={() => setFilterPanelOpen(false)}
+
+                    searchQuery={filters.search}
+                    setSearchQuery={(val) => setFilters({ ...filters, search: val })}
+                    searchPlaceholder="Search by code or name..."
+
+                    departments={['', ...departments]}
+                    filterDept={filters.department}
+                    setFilterDept={(val) => setFilters({ ...filters, department: val })}
+
+                    years={['', '1', '2', '3', '4']}
+                    filterYear={filters.year}
+                    setFilterYear={(val) => setFilters({ ...filters, year: val })}
+
+                    semesters={['', '1', '2', '3', '4', '5', '6', '7', '8']}
+                    filterSemester={filters.semester}
+                    setFilterSemester={(val) => setFilters({ ...filters, semester: val })}
+
+                    showViewToggle={false}
+
+                    onClearFilters={() => setFilters({ department: '', year: '', semester: '', search: '' })}
+                    hasActiveFilters={filters.search || filters.department || filters.year || filters.semester}
+
+                    filteredCount={subjects.length}
+                    totalCount={subjects.length}
+                />
 
                 {/* Table */}
                 <DataTable columns={columns} data={subjects} emptyMessage="No subjects found. Add your first subject!" />

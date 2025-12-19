@@ -14,6 +14,7 @@ const userSchema = mongoose.Schema({
   department: { type: String },
   year: { type: String },
   rollNumber: { type: String },
+  joiningYear: { type: Number }, // Year when student joined (for roll number format)
 
   // Approval status (for students - must be approved by admin/staff before login)
   isApproved: { type: Boolean, default: false },

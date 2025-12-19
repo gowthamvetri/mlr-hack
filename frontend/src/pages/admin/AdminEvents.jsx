@@ -5,7 +5,7 @@ import { getEvents, updateEventStatus } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
 import {
   Calendar, Check, X, Clock, Search, Users, MapPin, AlertTriangle,
-  ArrowUpRight, Laptop, Music, Trophy, PartyPopper
+  ArrowUpRight, Laptop, Music, Trophy, PartyPopper, Sparkles, RefreshCw, Filter
 } from 'lucide-react';
 import gsap from 'gsap';
 
@@ -35,59 +35,30 @@ const AnimatedNumber = ({ value, suffix = '' }) => {
   return <span className="tabular-nums tracking-tight">{displayValue}{suffix}</span>;
 };
 
-// Minimal Progress Ring
-const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6' }) => {
-  const radius = (size - strokeWidth) / 2;
+// Radial Progress
+const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) => {
+  const radius = (size - thickness) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
+  const offset = circumference - (value / 100) * circumference;
 
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-zinc-100" />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={thickness}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
-          className="transition-all duration-700 ease-out" />
+          className="transition-all duration-1000 ease-out" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-semibold text-zinc-600">{percentage}%</span>
+        <span className="text-xs font-bold" style={{ color }}>{value}%</span>
       </div>
     </div>
   );
 };
 
-// Skeleton Components
-const SkeletonCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
-    <div className="animate-pulse">
-      <div className="flex items-start justify-between mb-6">
-        <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
-        <div className="w-16 h-5 bg-zinc-100 rounded-full" />
-      </div>
-      <div className="space-y-2">
-        <div className="h-3 w-20 bg-zinc-100 rounded" />
-        <div className="h-8 w-14 bg-zinc-100 rounded" />
-      </div>
-    </div>
-  </div>
-);
-
-const SkeletonEventCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
-    <div className="animate-pulse">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-zinc-100 rounded-lg" />
-        <div className="space-y-2 flex-1">
-          <div className="h-4 w-40 bg-zinc-100 rounded" />
-          <div className="h-3 w-24 bg-zinc-100 rounded" />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <div className="h-3 w-full bg-zinc-100 rounded" />
-        <div className="h-3 w-2/3 bg-zinc-100 rounded" />
-      </div>
-    </div>
-  </div>
+// Skeleton
+const SkeletonPulse = ({ className }) => (
+  <div className={`animate-pulse bg-gradient-to-r from-zinc-100 via-zinc-50 to-zinc-100 rounded ${className}`} />
 );
 
 const AdminEvents = () => {
@@ -98,21 +69,20 @@ const AdminEvents = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCategory, setFilterCategory] = useState('all');
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => { fetchEvents(); }, []);
 
-  // Refined GSAP Animations
+  // Premium GSAP Animations
   useEffect(() => {
     if (!pageRef.current || loading) return;
-    const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
-        gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
-        gsap.fromTo('.filter-bar', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.3, delay: 0.2, ease: 'power2.out' });
-        gsap.fromTo('.event-item', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, delay: 0.25, ease: 'power2.out' });
-      }, pageRef);
-      return () => ctx.revert();
-    }, 50);
-    return () => clearTimeout(timer);
+    const ctx = gsap.context(() => {
+      gsap.fromTo('.hero-section', { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+      gsap.fromTo('.insight-panel', { opacity: 0, y: 20, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out', delay: 0.15 });
+      gsap.fromTo('.filter-bar', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+      gsap.fromTo('.event-item', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.04, ease: 'power2.out', delay: 0.4 });
+    }, pageRef);
+    return () => ctx.revert();
   }, [loading]);
 
   const fetchEvents = async () => {
@@ -125,6 +95,8 @@ const AdminEvents = () => {
       setLoading(false);
     }
   };
+
+  const handleRefresh = async () => { setRefreshing(true); await fetchEvents(); setTimeout(() => setRefreshing(false), 400); };
 
   const handleApprove = async (id) => {
     try {
@@ -181,126 +153,152 @@ const AdminEvents = () => {
   const clearFilters = () => { setSearchQuery(''); setFilterStatus('all'); setFilterCategory('all'); };
   const hasActiveFilters = searchQuery || filterStatus !== 'all' || filterCategory !== 'all';
 
+  // Category distribution
+  const categoryDist = categories.slice(1).map(cat => ({
+    name: cat, count: events.filter(e => e.category === cat).length
+  }));
+
+  // Loading skeleton
+  if (loading) {
+    return (
+      <DashboardLayout role="admin" userName={user?.name}>
+        <div className="max-w-[1400px] mx-auto space-y-6 animate-pulse">
+          <SkeletonPulse className="h-24 rounded-2xl" />
+          <div className="grid grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => <SkeletonPulse key={i} className="h-32 rounded-xl" />)}
+          </div>
+          <SkeletonPulse className="h-16 rounded-xl" />
+          {[1, 2, 3].map(i => <SkeletonPulse key={i} className="h-24 rounded-xl" />)}
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout role="admin" userName={user?.name}>
       <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
 
-        {/* Premium Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Event Management</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Review and manage club event proposals</p>
+        {/* ================================================================
+            HERO SECTION - Primary insight with pending alert
+            ================================================================ */}
+        <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 lg:p-8">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-3">
+                {pendingCount > 0 && (
+                  <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full text-[11px] font-medium animate-pulse">
+                    <AlertTriangle className="w-3 h-3" />
+                    {pendingCount} pending
+                  </span>
+                )}
+              </div>
+
+              <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
+                {events.length} Club Events
+              </h1>
+              <p className="text-white/50 text-sm">
+                {approvedCount} approved • {pendingCount} pending review • {rejectedCount} rejected
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button onClick={handleRefresh} disabled={refreshing}
+                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white/80 bg-white/10 hover:bg-white/15 rounded-lg transition-all disabled:opacity-50">
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              {pendingCount > 0 && (
+                <button onClick={() => setFilterStatus('Pending')}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-900 bg-amber-400 hover:bg-amber-300 rounded-lg transition-all shadow-lg shadow-amber-500/20">
+                  <Clock className="w-4 h-4" />
+                  Review {pendingCount} Pending
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Pending Alert Banner */}
-        {pendingCount > 0 && (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 flex items-center gap-4">
-            <div className="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 text-amber-600" />
-            </div>
-            <div className="flex-1">
-              <p className="font-medium text-amber-800 text-sm">Action Required</p>
-              <p className="text-amber-700 text-xs">{pendingCount} event{pendingCount > 1 ? 's' : ''} awaiting your approval</p>
-            </div>
-            <button onClick={() => setFilterStatus('Pending')} className="px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-medium hover:bg-amber-700 transition-colors">
-              Review Now
-            </button>
-          </div>
-        )}
-
-        {/* Metric Cards */}
+        {/* ================================================================
+            INSIGHTS ROW - Status & Category overview
+            ================================================================ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {loading ? (
-            <><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></>
-          ) : (
-            <>
-              {/* Total Events */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
-                    <Calendar className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <ArrowUpRight className="w-3 h-3" />
-                    <span>5</span>
-                  </div>
-                </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Events</p>
-                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={events.length} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="flex gap-2">
-                    {categories.slice(1).map((cat) => {
-                      const count = events.filter(e => e.category === cat).length;
-                      return (
-                        <span key={cat} className="text-[10px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
-                          {cat}: {count}
-                        </span>
-                      );
-                    })}
-                  </div>
-                </div>
+          {/* Total Events */}
+          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center">
+                <Calendar className="w-4.5 h-4.5 text-zinc-600" />
               </div>
+              <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                <ArrowUpRight className="w-3 h-3" />
+                <span>+5</span>
+              </div>
+            </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Events</p>
+            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={events.length} /></p>
+            <div className="mt-3 pt-3 border-t border-zinc-50 flex gap-1.5">
+              {categoryDist.map((cat, i) => (
+                <span key={cat.name} className="text-[9px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
+                  {cat.name}: {cat.count}
+                </span>
+              ))}
+            </div>
+          </div>
 
-              {/* Pending */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                    <Clock className="w-4.5 h-4.5 text-amber-500" strokeWidth={1.5} />
-                  </div>
-                  <ProgressRing percentage={events.length > 0 ? Math.round((pendingCount / events.length) * 100) : 0} color="#f59e0b" />
-                </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Pending Review</p>
-                <p className="text-2xl font-semibold text-amber-600"><AnimatedNumber value={pendingCount} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-zinc-500">Awaiting action</span>
-                    {pendingCount > 0 && (
-                      <span className="text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded animate-pulse">
-                        ACTION
-                      </span>
-                    )}
-                  </div>
-                </div>
+          {/* Pending */}
+          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-amber-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Clock className="w-4.5 h-4.5 text-amber-600" />
               </div>
+              <RadialProgress value={events.length > 0 ? Math.round((pendingCount / events.length) * 100) : 0} color="#f59e0b" />
+            </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Pending</p>
+            <p className="text-2xl font-semibold text-amber-600"><AnimatedNumber value={pendingCount} /></p>
+            <div className="mt-3 pt-3 border-t border-zinc-50">
+              {pendingCount > 0 ? (
+                <span className="text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded animate-pulse">Needs Review</span>
+              ) : (
+                <span className="text-xs text-zinc-500">All caught up!</span>
+              )}
+            </div>
+          </div>
 
-              {/* Approved */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                    <Check className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
-                  </div>
-                  <ProgressRing percentage={events.length > 0 ? Math.round((approvedCount / events.length) * 100) : 0} color="#10b981" />
-                </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Approved</p>
-                <p className="text-2xl font-semibold text-emerald-600"><AnimatedNumber value={approvedCount} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs text-zinc-500">Live events</span>
-                  </div>
-                </div>
+          {/* Approved */}
+          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-emerald-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <Check className="w-4.5 h-4.5 text-emerald-600" />
               </div>
+              <RadialProgress value={events.length > 0 ? Math.round((approvedCount / events.length) * 100) : 0} color="#10b981" />
+            </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Approved</p>
+            <p className="text-2xl font-semibold text-emerald-600"><AnimatedNumber value={approvedCount} /></p>
+            <div className="mt-3 pt-3 border-t border-zinc-50 flex items-center gap-2">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+              </span>
+              <span className="text-xs text-zinc-500">Live events</span>
+            </div>
+          </div>
 
-              {/* Rejected */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
-                    <X className="w-4.5 h-4.5 text-red-500" strokeWidth={1.5} />
-                  </div>
-                  <ProgressRing percentage={events.length > 0 ? Math.round((rejectedCount / events.length) * 100) : 0} color="#ef4444" />
-                </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Rejected</p>
-                <p className="text-2xl font-semibold text-red-600"><AnimatedNumber value={rejectedCount} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <span className="text-xs text-zinc-500">Not approved</span>
-                </div>
+          {/* Rejected */}
+          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-red-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
+                <X className="w-4.5 h-4.5 text-red-600" />
               </div>
-            </>
-          )}
+              <RadialProgress value={events.length > 0 ? Math.round((rejectedCount / events.length) * 100) : 0} color="#ef4444" />
+            </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Rejected</p>
+            <p className="text-2xl font-semibold text-red-600"><AnimatedNumber value={rejectedCount} /></p>
+            <div className="mt-3 pt-3 border-t border-zinc-50">
+              <span className="text-xs text-zinc-500">Not approved</span>
+            </div>
+          </div>
         </div>
 
         {/* Filter Bar */}
@@ -340,133 +338,137 @@ const AdminEvents = () => {
         </div>
 
         {/* Events List */}
-        {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map(i => <SkeletonEventCard key={i} />)}
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {filteredEvents.length > 0 ? filteredEvents.map((event) => {
-              const CategoryIcon = getCategoryIcon(event.category);
-              const categoryColor = getCategoryColor(event.category);
+        {
+          loading ? (
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => <SkeletonEventCard key={i} />)}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredEvents.length > 0 ? filteredEvents.map((event) => {
+                const CategoryIcon = getCategoryIcon(event.category);
+                const categoryColor = getCategoryColor(event.category);
 
-              return (
-                <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                    {/* Event Info */}
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                        <CategoryIcon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
+                return (
+                  <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      {/* Event Info */}
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                          <CategoryIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
                               event.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' :
                                 'bg-red-50 text-red-700'
-                            }`}>
-                            <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
+                              }`}>
+                              <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
                                 event.status === 'Approved' ? 'bg-emerald-500' :
                                   'bg-red-500'
-                              }`} />
-                            {event.status}
-                          </span>
-                        </div>
-                        <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
-                            {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
-                          {event.time && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.time}
+                                }`} />
+                              {event.status}
                             </span>
-                          )}
-                          {event.venue && (
+                          </div>
+                          <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.venue}
+                              <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                          )}
-                          {event.expectedParticipants > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.expectedParticipants} expected
-                            </span>
-                          )}
+                            {event.time && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.time}
+                              </span>
+                            )}
+                            {event.venue && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.venue}
+                              </span>
+                            )}
+                            {event.expectedParticipants > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.expectedParticipants} expected
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
+
+                      {/* Actions */}
+                      {event.status === 'Pending' && (
+                        <div className="flex items-center gap-2 lg:ml-4">
+                          <button onClick={() => handleApprove(event._id)} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
+                            <Check className="w-4 h-4" />
+                            Approve
+                          </button>
+                          <button onClick={() => handleReject(event._id)} className="flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
+                            <X className="w-4 h-4" />
+                            Reject
+                          </button>
+                        </div>
+                      )}
+
+                      {event.status !== 'Pending' && event.adminComments && (
+                        <div className="lg:ml-4 px-3 py-2 bg-zinc-50 rounded-lg max-w-xs">
+                          <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Admin Note</p>
+                          <p className="text-xs text-zinc-600">{event.adminComments}</p>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Actions */}
-                    {event.status === 'Pending' && (
-                      <div className="flex items-center gap-2 lg:ml-4">
-                        <button onClick={() => handleApprove(event._id)} className="flex items-center gap-1.5 px-4 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">
-                          <Check className="w-4 h-4" />
-                          Approve
-                        </button>
-                        <button onClick={() => handleReject(event._id)} className="flex items-center gap-1.5 px-4 py-2 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 transition-colors">
-                          <X className="w-4 h-4" />
-                          Reject
-                        </button>
-                      </div>
-                    )}
-
-                    {event.status !== 'Pending' && event.adminComments && (
-                      <div className="lg:ml-4 px-3 py-2 bg-zinc-50 rounded-lg max-w-xs">
-                        <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Admin Note</p>
-                        <p className="text-xs text-zinc-600">{event.adminComments}</p>
+                    {/* Coordinator */}
+                    {event.coordinator && (
+                      <div className="mt-4 pt-4 border-t border-zinc-100">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
+                            <span className="text-white text-[10px] font-medium">
+                              {event.coordinator.name?.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div>
+                            <p className="text-xs font-medium text-zinc-700">{event.coordinator.name}</p>
+                            <p className="text-[10px] text-zinc-400">{event.coordinator.email}</p>
+                          </div>
+                        </div>
                       </div>
                     )}
                   </div>
-
-                  {/* Coordinator */}
-                  {event.coordinator && (
-                    <div className="mt-4 pt-4 border-t border-zinc-100">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
-                          <span className="text-white text-[10px] font-medium">
-                            {event.coordinator.name?.charAt(0).toUpperCase()}
-                          </span>
-                        </div>
-                        <div>
-                          <p className="text-xs font-medium text-zinc-700">{event.coordinator.name}</p>
-                          <p className="text-[10px] text-zinc-400">{event.coordinator.email}</p>
-                        </div>
-                      </div>
-                    </div>
+                );
+              }) : (
+                <div className="text-center py-16 bg-white rounded-xl border border-zinc-100">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
+                    <Calendar className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                  </div>
+                  <h3 className="text-sm font-medium text-zinc-700 mb-1">No events found</h3>
+                  <p className="text-xs text-zinc-500 mb-4">Try adjusting your filters</p>
+                  {hasActiveFilters && (
+                    <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors">
+                      <X className="w-3 h-3" />Clear filters
+                    </button>
                   )}
                 </div>
-              );
-            }) : (
-              <div className="text-center py-16 bg-white rounded-xl border border-zinc-100">
-                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                  <Calendar className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-medium text-zinc-700 mb-1">No events found</h3>
-                <p className="text-xs text-zinc-500 mb-4">Try adjusting your filters</p>
-                {hasActiveFilters && (
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors">
-                    <X className="w-3 h-3" />Clear filters
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        )}
+              )}
+            </div>
+          )
+        }
 
         {/* Results Count */}
-        {filteredEvents.length > 0 && (
-          <div className="text-center">
-            <p className="text-xs text-zinc-500">
-              Showing <span className="font-medium text-zinc-700">{filteredEvents.length}</span> of <span className="font-medium text-zinc-700">{events.length}</span> events
-            </p>
-          </div>
-        )}
-      </div>
-    </DashboardLayout>
+        {
+          filteredEvents.length > 0 && (
+            <div className="text-center">
+              <p className="text-xs text-zinc-500">
+                Showing <span className="font-medium text-zinc-700">{filteredEvents.length}</span> of <span className="font-medium text-zinc-700">{events.length}</span> events
+              </p>
+            </div>
+          )
+        }
+      </div >
+    </DashboardLayout >
   );
 };
 

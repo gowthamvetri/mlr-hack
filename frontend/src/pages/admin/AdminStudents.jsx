@@ -1,19 +1,23 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import { useGetUsersQuery, useGetDepartmentsQuery, useDeleteUserMutation, useCreateUserMutation } from '../../services/api';
+import { bulkImportStudents, approveStudent, rejectStudent } from '../../utils/api';
 import { useAppDispatch } from '../../store';
 import { showSuccessToast, showErrorToast } from '../../store/slices/uiSlice';
 import {
   Users, Search, UserPlus, Download,
   GraduationCap, Building, Trash2, Edit, Eye, AlertTriangle,
-  ArrowUpRight, X, Grid3X3, List, Calendar,
-  Mail, Hash, BookOpen, Target, CheckCircle, MoreHorizontal
+  ArrowUpRight, X, Grid3X3, List, Calendar, Upload,
+  Mail, Hash, BookOpen, Target, CheckCircle, MoreHorizontal, FileSpreadsheet, Table, RefreshCw,
+  UserCheck, XCircle, Clock
 } from 'lucide-react';
 import Modal from '../../components/Modal';
 import { useSocket } from '../../context/SocketContext';
+import PremiumFilterBar, { FilterTriggerButton } from '../../components/PremiumFilterBar';
 import gsap from 'gsap';
+import * as XLSX from 'xlsx';
 
 // Premium Animated Counter - Smooth count-up with easing
 const AnimatedNumber = ({ value, suffix = '', prefix = '' }) => {
@@ -109,13 +113,26 @@ const AdminStudents = () => {
   const [filterDept, setFilterDept] = useState('all');
   const [filterYear, setFilterYear] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [formData, setFormData] = useState({
-    name: '', email: '', password: '', department: 'CSE', year: '1', rollNumber: '', role: 'Student'
+    name: '', email: '', password: '', department: 'CSE', year: '1', role: 'Student'
   });
   const [formError, setFormError] = useState('');
+
+  // Bulk import state
+  const [showBulkModal, setShowBulkModal] = useState(false);
+  const [bulkData, setBulkData] = useState('');
+  const [bulkResult, setBulkResult] = useState(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  // Excel import state
+  const [excelPreview, setExcelPreview] = useState([]);
+  const [uploadMode, setUploadMode] = useState('excel'); // 'excel' or 'json'
+  const [dragActive, setDragActive] = useState(false);
+  const fileInputRef = useRef(null);
 
   const years = ['all', '1', '2', '3', '4'];
 
@@ -165,7 +182,8 @@ const AdminStudents = () => {
   const handleAddStudent = async (e) => {
     e.preventDefault();
     setFormError('');
-    if (!formData.name || !formData.email || !formData.password || !formData.rollNumber) {
+    // Roll number is now auto-generated on backend, so only check name, email, password
+    if (!formData.name || !formData.email || !formData.password) {
       setFormError('Please fill in all required fields');
       return;
     }
@@ -173,7 +191,7 @@ const AdminStudents = () => {
       await createUser(formData).unwrap();
       dispatch(showSuccessToast('Student added successfully!'));
       setShowAddModal(false);
-      setFormData({ name: '', email: '', password: '', department: 'CSE', year: '1', rollNumber: '', role: 'Student' });
+      setFormData({ name: '', email: '', password: '', department: 'CSE', year: '1', role: 'Student' });
     } catch (error) {
       setFormError(error?.data?.message || error?.message || 'Error adding student');
     }
@@ -191,16 +209,212 @@ const AdminStudents = () => {
     }
   };
 
+  // Student Approval Handlers
+  const [approvingId, setApprovingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
+
+  const handleApproveStudent = async (studentId, studentName) => {
+    setApprovingId(studentId);
+    try {
+      await approveStudent(studentId);
+      dispatch(showSuccessToast(`${studentName} has been approved!`));
+      refetch();
+    } catch (error) {
+      dispatch(showErrorToast(error?.response?.data?.message || 'Error approving student'));
+    } finally {
+      setApprovingId(null);
+    }
+  };
+
+  const handleRejectStudent = async (studentId, studentName) => {
+    if (!window.confirm(`Are you sure you want to reject and remove ${studentName}? This cannot be undone.`)) {
+      return;
+    }
+    setRejectingId(studentId);
+    try {
+      await rejectStudent(studentId);
+      dispatch(showSuccessToast(`${studentName} has been rejected and removed.`));
+      refetch();
+    } catch (error) {
+      dispatch(showErrorToast(error?.response?.data?.message || 'Error rejecting student'));
+    } finally {
+      setRejectingId(null);
+    }
+  };
+
   const handleExport = () => {
-    const headers = ['Name', 'Email', 'Roll Number', 'Department', 'Year', 'Status'];
+    const headers = ['Name', 'Email', 'Roll Number', 'Department', 'Year', 'Status', 'Approved'];
     const csvContent = [headers.join(','), ...filteredStudents.map(s =>
-      [s.name, s.email, s.rollNumber, s.department, s.year, s.status || 'Active'].join(',')
+      [s.name, s.email, s.rollNumber, s.department, s.year, s.status || 'Active', s.isApproved ? 'Yes' : 'No'].join(',')
     )].join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a'); a.href = url;
     a.download = `students_${new Date().toISOString().split('T')[0]}.csv`;
     a.click(); window.URL.revokeObjectURL(url);
+  };
+
+  // Bulk import handler
+  const handleBulkImport = async () => {
+    if (!bulkData.trim()) {
+      setBulkResult({ error: 'Please enter student data' });
+      return;
+    }
+    try {
+      setBulkLoading(true);
+      setBulkResult(null);
+      const parsed = JSON.parse(bulkData);
+      const studentsArray = Array.isArray(parsed) ? parsed : [parsed];
+      const { data } = await bulkImportStudents(studentsArray);
+      setBulkResult(data);
+      refetch();
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        setBulkResult({ error: 'Invalid JSON format. Please check your data.' });
+      } else {
+        setBulkResult({ error: error.response?.data?.message || 'Error importing students' });
+      }
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const downloadTemplate = () => {
+    const template = [
+      { name: 'John Doe', email: '', department: 'CSE', year: '1', joiningYear: 2024 },
+      { name: 'Jane Smith', email: 'jane.custom@gmail.com', department: 'ECE', year: '2', joiningYear: 2023 }
+    ];
+    // Note in template: email is optional, auto-generated as firstname.lastname.dept@mlrit.ac.in
+    const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'students_template.json';
+    a.click();
+  };
+
+  // Download Excel template
+  const downloadExcelTemplate = () => {
+    const templateData = [
+      { Name: 'John Doe', Email: '', Password: '', Department: 'CSE', Year: '1', JoiningYear: 2024 },
+      { Name: 'Jane Smith', Email: '', Password: 'jane456', Department: 'ECE', Year: '2', JoiningYear: 2023 },
+      { Name: 'Bob Wilson', Email: 'bob.custom@gmail.com', Password: 'bob123', Department: 'MECH', Year: '3', JoiningYear: 2022 }
+    ];
+
+    const ws = XLSX.utils.json_to_sheet(templateData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Students');
+
+    // Set column widths
+    ws['!cols'] = [
+      { wch: 20 }, // Name
+      { wch: 35 }, // Email (wider to show auto-generated format)
+      { wch: 15 }, // Password
+      { wch: 12 }, // Department
+      { wch: 8 },  // Year
+      { wch: 12 }  // JoiningYear
+    ];
+
+    XLSX.writeFile(wb, 'students_template.xlsx');
+  };
+
+  // Handle Excel file upload
+  const handleExcelUpload = (file) => {
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheetName = workbook.SheetNames[0];
+        const worksheet = workbook.Sheets[sheetName];
+        const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+        // Normalize column names (handle case variations)
+        const normalizedData = jsonData.map(row => {
+          const normalized = {};
+          Object.keys(row).forEach(key => {
+            const lowerKey = key.toLowerCase();
+            if (lowerKey === 'name') normalized.name = row[key];
+            else if (lowerKey === 'email') normalized.email = row[key];
+            else if (lowerKey === 'password' || lowerKey === 'pass') normalized.password = row[key];
+            else if (lowerKey === 'department' || lowerKey === 'dept') normalized.department = row[key];
+            else if (lowerKey === 'year') normalized.year = String(row[key]);
+            else if (lowerKey === 'joiningyear' || lowerKey === 'joining year') normalized.joiningYear = row[key];
+          });
+          return normalized;
+        });
+
+        setExcelPreview(normalizedData);
+        setBulkResult(null);
+      } catch (error) {
+        console.error('Excel parse error:', error);
+        setBulkResult({ error: 'Failed to parse Excel file. Please check the format.' });
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  };
+
+  // Handle file input change
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleExcelUpload(file);
+    }
+  };
+
+  // Handle drag and drop
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === 'dragenter' || e.type === 'dragover') {
+      setDragActive(true);
+    } else if (e.type === 'dragleave') {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls'))) {
+      handleExcelUpload(file);
+    } else {
+      setBulkResult({ error: 'Please upload an Excel file (.xlsx or .xls)' });
+    }
+  };
+
+  // Import from Excel preview
+  const handleExcelImport = async () => {
+    if (excelPreview.length === 0) {
+      setBulkResult({ error: 'No data to import' });
+      return;
+    }
+
+    try {
+      setBulkLoading(true);
+      setBulkResult(null);
+      const { data } = await bulkImportStudents(excelPreview);
+      setBulkResult(data);
+      setExcelPreview([]);
+      refetch();
+    } catch (error) {
+      setBulkResult({ error: error.response?.data?.message || 'Error importing students' });
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  // Clear Excel preview
+  const clearExcelPreview = () => {
+    setExcelPreview([]);
+    setBulkResult(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
   };
 
   const clearFilters = () => {
@@ -219,12 +433,20 @@ const AdminStudents = () => {
     return matchesSearch && matchesYear;
   });
 
-  // Calculate stats
+  // Calculate stats from real data
   const stats = {
     total: students.length,
-    active: students.filter(s => s.status === 'Active' || !s.status).length,
+    approved: students.filter(s => s.isApproved).length,
+    pending: students.filter(s => !s.isApproved).length,
     departments: departments.length - 1,
-    avgAttendance: 87
+    // Calculate real average attendance from student data
+    avgAttendance: students.length > 0
+      ? Math.round(students.reduce((sum, s) => sum + (s.attendance || 0), 0) / students.length)
+      : 0,
+    // Calculate students with fees paid
+    feesPaid: students.filter(s => s.feesPaid).length,
+    // Calculate placed students
+    placed: students.filter(s => s.isPlaced).length
   };
 
   // Year distribution for mini chart
@@ -251,6 +473,18 @@ const AdminStudents = () => {
             <p className="text-zinc-500 text-sm mt-0.5">Manage enrolled students across departments</p>
           </div>
           <div className="flex items-center gap-2.5">
+            <FilterTriggerButton
+              isOpen={filterPanelOpen}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+              activeFiltersCount={(filterDept !== 'all' ? 1 : 0) + (filterYear !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)}
+            />
+            <button
+              onClick={() => setShowBulkModal(true)}
+              className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
+            >
+              <Upload className="w-4 h-4" />
+              <span className="hidden sm:inline">Bulk Import</span>
+            </button>
             <button
               onClick={handleExport}
               className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
@@ -280,10 +514,9 @@ const AdminStudents = () => {
                   <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
                     <Users className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <ArrowUpRight className="w-3 h-3" />
-                    <span>12%</span>
-                  </div>
+                  {stats.placed > 0 && (
+                    <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{stats.placed} placed</span>
+                  )}
                 </div>
                 <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Students</p>
                 <p className="text-2xl font-semibold text-zinc-900">
@@ -310,26 +543,31 @@ const AdminStudents = () => {
                 </div>
               </div>
 
-              {/* Active Students */}
+              {/* Approved Students */}
               <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
                     <GraduationCap className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
                   </div>
-                  <ProgressRing percentage={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0} color="#10b981" />
+                  <ProgressRing percentage={stats.total > 0 ? Math.round((stats.approved / stats.total) * 100) : 0} color="#10b981" />
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Active Students</p>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Approved Students</p>
                 <p className="text-2xl font-semibold text-zinc-900">
-                  <AnimatedNumber value={stats.active} />
+                  <AnimatedNumber value={stats.approved} />
                 </p>
 
                 <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs text-zinc-500">All enrolled</span>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                      </span>
+                      <span className="text-xs text-zinc-500">Enrolled</span>
+                    </div>
+                    {stats.pending > 0 && (
+                      <span className="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">{stats.pending} pending</span>
+                    )}
                   </div>
                 </div>
               </div>
@@ -367,10 +605,9 @@ const AdminStudents = () => {
                   <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
                     <Target className="w-4.5 h-4.5 text-violet-500" strokeWidth={1.5} />
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
-                    <ArrowUpRight className="w-3 h-3" />
-                    <span>3%</span>
-                  </div>
+                  {stats.feesPaid > 0 && (
+                    <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">{stats.feesPaid} fees paid</span>
+                  )}
                 </div>
                 <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Avg. Attendance</p>
                 <p className="text-2xl font-semibold text-zinc-900">
@@ -399,90 +636,35 @@ const AdminStudents = () => {
           )}
         </div>
 
-        {/* Filter Bar - Clean and functional */}
-        <div className="filter-bar bg-white rounded-xl border border-zinc-100 p-4">
-          <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
-            {/* Search */}
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" strokeWidth={1.5} />
-              <input
-                type="text"
-                placeholder="Search students..."
-                className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 focus:bg-white transition-all text-zinc-700 placeholder-zinc-400"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-              {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-zinc-200 rounded transition-colors">
-                  <X className="w-3.5 h-3.5 text-zinc-400" />
-                </button>
-              )}
-            </div>
+        {/* Collapsible Premium Filter Panel */}
+        <PremiumFilterBar
+          isOpen={filterPanelOpen}
+          onClose={() => setFilterPanelOpen(false)}
 
-            {/* View Toggle */}
-            <div className="flex items-center gap-1 p-1 bg-zinc-100 rounded-lg">
-              <button
-                onClick={() => setViewMode('grid')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${viewMode === 'grid' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
-              >
-                <Grid3X3 className="w-3.5 h-3.5" />
-                Grid
-              </button>
-              <button
-                onClick={() => setViewMode('list')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 ${viewMode === 'list' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-700'}`}
-              >
-                <List className="w-3.5 h-3.5" />
-                List
-              </button>
-            </div>
-          </div>
+          searchQuery={searchQuery}
+          setSearchQuery={setSearchQuery}
+          searchPlaceholder="Search by name, email, roll number..."
 
-          {/* Filter Pills */}
-          <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-zinc-50">
-            {/* Department Pills */}
-            <span className="text-xs font-medium text-zinc-400 uppercase tracking-wide mr-1">Dept</span>
-            {departments.map((d) => (
-              <button
-                key={d}
-                onClick={() => setFilterDept(d)}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterDept === d
-                  ? 'bg-zinc-900 text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-                  }`}
-              >
-                {d === 'all' ? 'All' : d}
-              </button>
-            ))}
+          departments={departments}
+          filterDept={filterDept}
+          setFilterDept={setFilterDept}
+          deptCounts={deptDistribution.reduce((acc, d) => ({ ...acc, [d.name]: d.count }), {})}
 
-            <div className="w-px h-5 bg-zinc-200 mx-1" />
+          years={years}
+          filterYear={filterYear}
+          setFilterYear={setFilterYear}
+          yearCounts={yearDistribution.reduce((acc, y) => ({ ...acc, [y.year]: y.count }), {})}
 
-            {/* Year Pills */}
-            <span className="text-xs font-medium text-zinc-400 uppercase tracking-wide mr-1">Year</span>
-            {years.map(y => (
-              <button
-                key={y}
-                onClick={() => setFilterYear(y)}
-                className={`w-8 h-8 rounded-lg text-xs font-medium transition-all duration-200 flex items-center justify-center ${filterYear === y
-                  ? 'bg-violet-600 text-white'
-                  : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'
-                  }`}
-              >
-                {y === 'all' ? '✦' : y}
-              </button>
-            ))}
+          viewMode={viewMode}
+          setViewMode={setViewMode}
+          showViewToggle={true}
 
-            {hasActiveFilters && (
-              <button
-                onClick={clearFilters}
-                className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-full transition-colors ml-auto"
-              >
-                <X className="w-3 h-3" />
-                Clear
-              </button>
-            )}
-          </div>
-        </div>
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+
+          filteredCount={filteredStudents.length}
+          totalCount={students.length}
+        />
 
         {/* Students Display */}
         {loading ? (
@@ -564,21 +746,52 @@ const AdminStudents = () => {
                     </div>
                   </div>
 
-                  {/* Footer */}
+                  {/* Footer with Approval Status */}
                   <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
-                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium ${(student.status === 'Active' || !student.status)
-                      ? 'bg-emerald-50 text-emerald-700'
-                      : 'bg-zinc-100 text-zinc-600'
-                      }`}>
-                      <span className={`w-1.5 h-1.5 rounded-full ${(student.status === 'Active' || !student.status) ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
-                      {student.status || 'Active'}
-                    </span>
+                    {/* Approval Status Badge */}
+                    {student.isApproved ? (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                        <CheckCircle className="w-3 h-3" />
+                        Approved
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700">
+                        <Clock className="w-3 h-3" />
+                        Pending
+                      </span>
+                    )}
                     <div className="flex items-center gap-0.5">
+                      {/* Approve/Reject buttons for pending students */}
+                      {!student.isApproved && (
+                        <>
+                          <button
+                            onClick={() => handleApproveStudent(student._id, student.name)}
+                            disabled={approvingId === student._id}
+                            className="p-1.5 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors disabled:opacity-50"
+                            title="Approve Student"
+                          >
+                            {approvingId === student._id ? (
+                              <div className="w-3.5 h-3.5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                            ) : (
+                              <UserCheck className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                          <button
+                            onClick={() => handleRejectStudent(student._id, student.name)}
+                            disabled={rejectingId === student._id}
+                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                            title="Reject Student"
+                          >
+                            {rejectingId === student._id ? (
+                              <div className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                            ) : (
+                              <XCircle className="w-3.5 h-3.5" />
+                            )}
+                          </button>
+                        </>
+                      )}
                       <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
                         <Eye className="w-3.5 h-3.5" />
-                      </button>
-                      <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
-                        <Edit className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
@@ -643,18 +856,51 @@ const AdminStudents = () => {
                       </td>
                       <td className="py-3 px-5 text-sm text-zinc-600">Year {student.year}</td>
                       <td className="py-3 px-5">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${(student.status === 'Active' || !student.status) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                          <span className={`w-1 h-1 rounded-full ${(student.status === 'Active' || !student.status) ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
-                          {student.status || 'Active'}
-                        </span>
+                        {student.isApproved ? (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                            <CheckCircle className="w-3 h-3" />
+                            Approved
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700">
+                            <Clock className="w-3 h-3" />
+                            Pending
+                          </span>
+                        )}
                       </td>
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-0.5">
+                          {/* Approve/Reject buttons for pending */}
+                          {!student.isApproved && (
+                            <>
+                              <button
+                                onClick={() => handleApproveStudent(student._id, student.name)}
+                                disabled={approvingId === student._id}
+                                className="p-1.5 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors disabled:opacity-50"
+                                title="Approve"
+                              >
+                                {approvingId === student._id ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                                ) : (
+                                  <UserCheck className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                              <button
+                                onClick={() => handleRejectStudent(student._id, student.name)}
+                                disabled={rejectingId === student._id}
+                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                                title="Reject"
+                              >
+                                {rejectingId === student._id ? (
+                                  <div className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                                ) : (
+                                  <XCircle className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </>
+                          )}
                           <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
                             <Eye className="w-3.5 h-3.5" />
-                          </button>
-                          <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
-                            <Edit className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
@@ -708,9 +954,12 @@ const AdminStudents = () => {
               <label className="block text-xs font-medium text-zinc-600 mb-1.5">Password *</label>
               <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Min 6 characters" />
             </div>
-            <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Roll Number *</label>
-              <input type="text" value={formData.rollNumber} onChange={(e) => setFormData({ ...formData, rollNumber: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="e.g., 20CS101" />
+            <div className="p-3 bg-violet-50 rounded-lg border border-violet-100">
+              <div className="flex items-center gap-2 text-violet-700">
+                <Hash className="w-4 h-4" />
+                <span className="text-xs font-medium">Roll Number Auto-Generated</span>
+              </div>
+              <p className="text-[10px] text-violet-600 mt-1">Format: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
@@ -761,6 +1010,235 @@ const AdminStudents = () => {
               </div>
             </div>
           )}
+        </Modal>
+
+        {/* Bulk Import Modal */}
+        <Modal isOpen={showBulkModal} onClose={() => { setShowBulkModal(false); setBulkResult(null); setBulkData(''); setExcelPreview([]); clearExcelPreview(); }} title="Bulk Import Students" size="xl">
+          <div className="space-y-5">
+            {/* Mode Toggle */}
+            <div className="flex gap-2 p-1 bg-zinc-100 rounded-lg w-fit">
+              <button
+                onClick={() => setUploadMode('excel')}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'excel' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
+                  }`}
+              >
+                <FileSpreadsheet className="w-4 h-4" />
+                Excel Upload
+              </button>
+              <button
+                onClick={() => setUploadMode('json')}
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'json' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
+                  }`}
+              >
+                <Hash className="w-4 h-4" />
+                JSON Paste
+              </button>
+            </div>
+
+            {/* Excel Upload Mode */}
+            {uploadMode === 'excel' && (
+              <>
+                {/* Instructions */}
+                <div className="p-4 bg-violet-50 rounded-xl border border-violet-100">
+                  <div className="flex items-start gap-3">
+                    <FileSpreadsheet className="w-5 h-5 text-violet-600 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-violet-900 mb-1">Excel File Format</h4>
+                      <p className="text-xs text-violet-700">Columns: <span className="font-medium">Name (required), Email (optional), Password (optional), Department, Year, JoiningYear</span></p>
+                      <div className="mt-2 text-[10px] text-violet-600 space-y-0.5">
+                        <p>📧 <strong>Email:</strong> If empty, auto-generated as <code className="bg-violet-100 px-1 rounded">firstname.lastname.dept@mlrit.ac.in</code></p>
+                        <p>🔑 <strong>Password:</strong> If empty, uses email prefix without dots</p>
+                        <p>🎫 <strong>Roll Number:</strong> Auto-generated as 24MLRIDCSE001</p>
+                      </div>
+                      <button onClick={downloadExcelTemplate} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-violet-700 hover:text-violet-900 bg-violet-100 px-2.5 py-1.5 rounded-md transition-colors">
+                        <Download className="w-3.5 h-3.5" />
+                        Download Sample Excel Template
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Drag & Drop Upload Zone */}
+                {excelPreview.length === 0 && (
+                  <div
+                    onDragEnter={handleDrag}
+                    onDragLeave={handleDrag}
+                    onDragOver={handleDrag}
+                    onDrop={handleDrop}
+                    onClick={() => fileInputRef.current?.click()}
+                    className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive
+                      ? 'border-violet-400 bg-violet-50'
+                      : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                      }`}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept=".xlsx,.xls"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <div className="flex flex-col items-center gap-3">
+                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${dragActive ? 'bg-violet-100' : 'bg-zinc-100'
+                        }`}>
+                        <Upload className={`w-6 h-6 ${dragActive ? 'text-violet-600' : 'text-zinc-400'}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-zinc-700">
+                          {dragActive ? 'Drop your Excel file here' : 'Drag & drop Excel file here'}
+                        </p>
+                        <p className="text-xs text-zinc-500 mt-1">or click to browse (.xlsx, .xls)</p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Excel Preview Table */}
+                {excelPreview.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Table className="w-4 h-4 text-emerald-600" />
+                        <span className="text-sm font-medium text-zinc-700">Preview ({excelPreview.length} students)</span>
+                      </div>
+                      <button
+                        onClick={clearExcelPreview}
+                        className="text-xs text-zinc-500 hover:text-zinc-700 flex items-center gap-1"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        Upload Different File
+                      </button>
+                    </div>
+                    <div className="max-h-[300px] overflow-auto border border-zinc-200 rounded-xl">
+                      <table className="w-full text-sm">
+                        <thead className="bg-zinc-50 sticky top-0">
+                          <tr>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">#</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Name</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Email</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Password</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Department</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Year</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-zinc-100">
+                          {excelPreview.slice(0, 50).map((student, idx) => (
+                            <tr key={idx} className="hover:bg-zinc-50">
+                              <td className="px-4 py-2.5 text-zinc-400 text-xs">{idx + 1}</td>
+                              <td className="px-4 py-2.5 font-medium text-zinc-900">{student.name || <span className="text-red-500">Missing</span>}</td>
+                              <td className="px-4 py-2.5 text-zinc-600">
+                                {student.email
+                                  ? student.email
+                                  : <span className="text-blue-600 italic text-xs">Auto: {student.name ? `${student.name.toLowerCase().split(' ')[0]}.${(student.department || 'cse').toLowerCase()}@mlrit.ac.in` : '...'}</span>
+                                }
+                              </td>
+                              <td className="px-4 py-2.5 text-zinc-600">{student.password ? <span className="text-emerald-600">Set</span> : <span className="text-zinc-400 italic">Default</span>}</td>
+                              <td className="px-4 py-2.5 text-zinc-600">{student.department || '-'}</td>
+                              <td className="px-4 py-2.5 text-zinc-600">{student.year || '-'}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      {excelPreview.length > 50 && (
+                        <div className="p-3 bg-zinc-50 text-center text-xs text-zinc-500 border-t border-zinc-200">
+                          Showing first 50 of {excelPreview.length} students
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* JSON Mode */}
+            {uploadMode === 'json' && (
+              <>
+                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                  <div className="flex items-start gap-3">
+                    <Hash className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-medium text-blue-900 mb-1">JSON Format</h4>
+                      <p className="text-xs text-blue-700">Paste a JSON array with fields: name, email, department, year, joiningYear (optional)</p>
+                      <p className="text-[10px] text-blue-600 mt-1">Roll numbers auto-generated as: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
+                      <button onClick={downloadTemplate} className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline">Download JSON template</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Student Data (JSON)</label>
+                  <textarea
+                    value={bulkData}
+                    onChange={(e) => setBulkData(e.target.value)}
+                    rows={10}
+                    className="w-full px-3 py-2.5 text-sm font-mono border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all"
+                    placeholder={`[\n  { "name": "John Doe", "email": "john@example.com", "department": "CSE", "year": "1", "joiningYear": 2024 },\n  { "name": "Jane Smith", "email": "jane@example.com", "department": "ECE", "year": "2" }\n]`}
+                  />
+                </div>
+              </>
+            )}
+
+            {/* Result Display */}
+            {bulkResult && (
+              <div className={`p-4 rounded-xl border ${bulkResult.error ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
+                {bulkResult.error ? (
+                  <div className="flex items-center gap-2 text-red-700">
+                    <AlertTriangle className="w-4 h-4" />
+                    <span className="text-sm">{bulkResult.error}</span>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-700">
+                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">{bulkResult.message}</span>
+                    </div>
+                    <div className="text-xs text-emerald-600">
+                      <p>✓ {bulkResult.successful} imported successfully</p>
+                      {bulkResult.duplicates > 0 && <p>⚠ {bulkResult.duplicates} duplicates skipped</p>}
+                      {bulkResult.failed > 0 && <p>✗ {bulkResult.failed} failed</p>}
+                    </div>
+                    <p className="text-[10px] text-emerald-600 mt-2">Note: Default password is the email prefix (before @)</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Actions */}
+            <div className="flex gap-2.5 pt-2">
+              <button
+                type="button"
+                onClick={() => { setShowBulkModal(false); setBulkResult(null); setBulkData(''); setExcelPreview([]); }}
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
+              >
+                Close
+              </button>
+              {uploadMode === 'excel' ? (
+                <button
+                  onClick={handleExcelImport}
+                  disabled={bulkLoading || excelPreview.length === 0}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {bulkLoading ? (
+                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing...</>
+                  ) : (
+                    <><Upload className="w-4 h-4" /> Import {excelPreview.length} Students</>
+                  )}
+                </button>
+              ) : (
+                <button
+                  onClick={handleBulkImport}
+                  disabled={bulkLoading || !bulkData.trim()}
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                >
+                  {bulkLoading ? (
+                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing...</>
+                  ) : (
+                    <><Upload className="w-4 h-4" /> Import Students</>
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
         </Modal>
       </div>
     </DashboardLayout>

@@ -5,6 +5,7 @@ import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import Modal from '../../components/Modal';
 import { useSocket } from '../../context/SocketContext';
+import PremiumFilterBar, { FilterTriggerButton } from '../../components/PremiumFilterBar';
 import gsap from 'gsap';
 import {
   Users, Building, CheckCircle, XCircle, Clock,
@@ -50,6 +51,7 @@ const AdminRegistrationRequests = () => {
   const [comment, setComment] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
   const socket = useSocket();
+  const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
   useEffect(() => { fetchStats(); fetchRequests(); }, []);
 
@@ -149,9 +151,16 @@ const AdminRegistrationRequests = () => {
             <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Registration Requests</h1>
             <p className="text-zinc-500 text-sm mt-0.5">Review and approve new user registrations</p>
           </div>
-          <button onClick={() => { fetchStats(); fetchRequests(); }} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all">
-            <RefreshCw className="w-4 h-4" />Refresh
-          </button>
+          <div className="flex gap-2">
+            <FilterTriggerButton
+              isOpen={filterPanelOpen}
+              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
+              activeFiltersCount={(filters.status !== 'all' ? 1 : 0) + (filters.search ? 1 : 0)}
+            />
+            <button onClick={() => { fetchStats(); fetchRequests(); }} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all">
+              <RefreshCw className="w-4 h-4" />Refresh
+            </button>
+          </div>
         </div>
 
         {/* Stats */}
@@ -177,33 +186,28 @@ const AdminRegistrationRequests = () => {
           })}
         </div>
 
-        {/* Filters */}
-        <div className="bg-white rounded-xl border border-zinc-100 p-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" strokeWidth={1.5} />
-              <input type="text" placeholder="Search..." value={filters.search} onChange={(e) => setFilters({ ...filters, search: e.target.value })} className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 focus:bg-white text-zinc-700 placeholder-zinc-400" />
-            </div>
-            <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })} className="px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="approved">Approved</option>
-              <option value="rejected">Rejected</option>
-            </select>
-            <div className="flex items-center gap-2">
-              <select value={filters.role} onChange={(e) => setFilters({ ...filters, role: e.target.value })} className="flex-1 px-4 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white text-zinc-700">
-                <option value="all">All Roles</option>
-                <option value="SeatingManager">Seating Manager</option>
-                <option value="ClubCoordinator">Club Coordinator</option>
-              </select>
-              {hasActiveFilters && (
-                <button onClick={clearFilters} className="p-2.5 text-violet-600 bg-violet-50 rounded-lg hover:bg-violet-100 transition-colors">
-                  <X className="w-4 h-4" />
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
+        {/* Collapsible Premium Filter Panel */}
+        <PremiumFilterBar
+          isOpen={filterPanelOpen}
+          onClose={() => setFilterPanelOpen(false)}
+
+          searchQuery={filters.search}
+          setSearchQuery={(val) => setFilters({ ...filters, search: val })}
+          searchPlaceholder="Search by name or email..."
+
+          statuses={['all', 'pending', 'approved', 'rejected']}
+          filterStatus={filters.status}
+          setFilterStatus={(val) => setFilters({ ...filters, status: val })}
+          statusCounts={{ pending: stats.pending, approved: stats.approved, rejected: stats.rejected }}
+
+          showViewToggle={false}
+
+          onClearFilters={clearFilters}
+          hasActiveFilters={hasActiveFilters}
+
+          filteredCount={requests.length}
+          totalCount={stats.total}
+        />
 
         {/* Table */}
         <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">

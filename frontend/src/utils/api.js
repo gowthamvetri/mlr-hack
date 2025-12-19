@@ -77,14 +77,15 @@ export const getUsers = (params) => API.get('/users', { params });
 export const getUserById = (id) => API.get(`/users/${id}`);
 export const deleteUser = (id) => API.delete(`/users/${id}`);
 export const updateUser = (id, data) => API.put(`/users/${id}`, data);
+export const createUserByAdmin = (data) => API.post('/users/admin/create', data);
 
 // Department management
-export const getDepartments = () => API.get('/departments');
-export const getDepartmentById = (id) => API.get(`/departments/${id}`);
-export const createDepartment = (data) => API.post('/departments', data);
-export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
-export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
-export const getDepartmentStats = () => API.get('/departments/stats');
+// export const getDepartments = () => API.get('/departments');
+// export const getDepartmentById = (id) => API.get(`/departments/${id}`);
+// export const createDepartment = (data) => API.post('/departments', data);
+// export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
+// export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
+// export const getDepartmentStats = () => API.get('/departments/stats'); 
 
 // Course management
 export const getCourses = (params) => API.get('/courses', { params });
@@ -173,6 +174,7 @@ export const updateProfile = (data) => API.put('/users/profile', data);
 export const getPendingStudents = () => API.get('/users/pending');
 export const approveStudent = (id) => API.put(`/users/${id}/approve`);
 export const rejectStudent = (id) => API.delete(`/users/${id}/reject`);
+export const bulkImportStudents = (students) => API.post('/users/bulk-import', { students });
 
 
 // Placement Page (Admin)
@@ -238,5 +240,13 @@ export const deleteSeatingRoom = (id) => API.delete(`/seating/rooms/${id}`);
 export const getMyInvigilation = () => API.get('/seating/my-invigilation');
 export const getMySeating = () => API.get('/seating/my-seat');
 export const getAvailableInvigilators = () => API.get('/seating/invigilators');
+
+// Department Management API
+export const getDepartments = () => API.get('/departments');
+export const getDepartmentById = (id) => API.get(`/departments/${id}`); // Get department by ID
+export const createDepartment = (data) => API.post('/departments', data);
+export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
+export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
+export const getDepartmentStats = () => API.get('/departments/stats');
 
 export default API;

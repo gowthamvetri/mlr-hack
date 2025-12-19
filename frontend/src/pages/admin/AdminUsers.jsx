@@ -6,7 +6,7 @@ import { useGetUsersQuery, useDeleteUserMutation } from '../../services/api';
 import { useAppDispatch } from '../../store';
 import { showSuccessToast, showErrorToast } from '../../store/slices/uiSlice';
 import gsap from 'gsap';
-import { Users, Search, Filter, UserPlus, Edit, Trash2, Shield, GraduationCap, Building, Calendar, Loader2, X } from 'lucide-react';
+import { Users, Search, Filter, UserPlus, Edit, Trash2, Shield, GraduationCap, Building, Calendar, Loader2, X, RefreshCw, Sparkles } from 'lucide-react';
 
 // Animated Counter
 const AnimatedNumber = ({ value }) => {
@@ -33,6 +33,11 @@ const AnimatedNumber = ({ value }) => {
   return <span className="tabular-nums">{displayValue}</span>;
 };
 
+// Skeleton
+const SkeletonPulse = ({ className }) => (
+  <div className={`animate-pulse bg-gradient-to-r from-zinc-100 via-zinc-50 to-zinc-100 rounded ${className}`} />
+);
+
 const AdminUsers = () => {
   const user = useSelector(selectCurrentUser);
   const dispatch = useAppDispatch();
@@ -41,7 +46,7 @@ const AdminUsers = () => {
   const [filterRole, setFilterRole] = useState('all');
   const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const { data: users = [], isLoading, isFetching, isError } = useGetUsersQuery({
+  const { data: users = [], isLoading, isFetching, isError, refetch } = useGetUsersQuery({
     role: filterRole !== 'all' ? filterRole : undefined,
     search: debouncedSearch || undefined
   });
@@ -55,7 +60,12 @@ const AdminUsers = () => {
 
   useEffect(() => {
     if (pageRef.current && !isLoading) {
-      gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+      const ctx = gsap.context(() => {
+        gsap.fromTo('.hero-section', { opacity: 0, y: -16 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power3.out' });
+        gsap.fromTo('.insight-panel', { opacity: 0, y: 20, scale: 0.98 }, { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.08, ease: 'power2.out', delay: 0.15 });
+        gsap.fromTo('.filter-bar', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, ease: 'power2.out', delay: 0.3 });
+      }, pageRef);
+      return () => ctx.revert();
     }
   }, [isLoading]);
 
@@ -100,18 +110,53 @@ const AdminUsers = () => {
   const hasActiveFilters = searchQuery || filterRole !== 'all';
   const clearFilters = () => { setSearchQuery(''); setFilterRole('all'); };
 
+  // Loading skeleton
+  if (isLoading) {
+    return (
+      <DashboardLayout role="admin" userName={user?.name}>
+        <div className="max-w-[1400px] mx-auto space-y-6">
+          <SkeletonPulse className="h-28 rounded-2xl" />
+          <div className="grid grid-cols-4 gap-4">
+            {[1, 2, 3, 4].map(i => <SkeletonPulse key={i} className="h-24 rounded-xl" />)}
+          </div>
+          <SkeletonPulse className="h-16 rounded-xl" />
+          <SkeletonPulse className="h-64 rounded-xl" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   return (
     <DashboardLayout role="admin" userName={user?.name}>
       <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">User Management</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Manage all system users and their roles</p>
+
+        {/* ================================================================
+            HERO SECTION - User summary with role breakdown
+            ================================================================ */}
+        <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 lg:p-8">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div className="flex-1">
+              <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
+                {users.length} System Users
+              </h1>
+              <p className="text-white/50 text-sm">
+                {studentCount} students • {adminCount} admins • {managerCount} managers • {coordinatorCount} coordinators
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2.5">
+              <button onClick={() => refetch()} disabled={isFetching} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white/80 bg-white/10 hover:bg-white/15 rounded-lg transition-all disabled:opacity-50">
+                <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-900 bg-white hover:bg-zinc-100 rounded-lg transition-all shadow-lg">
+                <UserPlus className="w-4 h-4" />Add User
+              </button>
+            </div>
           </div>
-          <button className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all">
-            <UserPlus className="w-4 h-4" />Add User
-          </button>
         </div>
 
         {/* Stats */}
@@ -124,7 +169,7 @@ const AdminUsers = () => {
           ].map((stat, i) => {
             const colorMap = { blue: 'bg-blue-50 text-blue-500', red: 'bg-red-50 text-red-500', violet: 'bg-violet-50 text-violet-500', emerald: 'bg-emerald-50 text-emerald-500' };
             return (
-              <div key={i} className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div key={i} className="insight-panel group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
                 <div className="flex items-start justify-between mb-3">
                   <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center`}>
                     <stat.icon className={`w-4.5 h-4.5 ${colorMap[stat.color].split(' ')[1]}`} strokeWidth={1.5} />
