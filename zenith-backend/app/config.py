@@ -21,9 +21,9 @@ class Settings(BaseSettings):
     PINECONE_ENVIRONMENT: str = "us-east-1"
     
     # LLM Provider Configuration
-    LLM_PROVIDER: str = "local_lmstudio"  # local_lmstudio, openai, gemini, or groq
-    LM_STUDIO_BASE_URL: str = "http://127.0.0.1:1234/v1"
-    LM_STUDIO_MODEL: str = "qwen2.5-7b-instruct-1m"
+    LLM_PROVIDER: str = "aws_mistral"  # aws_mistral, local_lmstudio, openai, gemini, or groq
+    LM_STUDIO_BASE_URL: str = "http://44.222.205.167:8000/v1"  # AWS Mistral LLM
+    LM_STUDIO_MODEL: str = "mistral-7b-instruct-v0.2.Q4_0.gguf"
     OPENAI_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
     GROQ_API_KEY: Optional[str] = None

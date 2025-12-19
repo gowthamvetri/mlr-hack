@@ -1,6 +1,6 @@
 """
-LLM Service - Local LM Studio Integration
-Uses OpenAI-compatible API to connect to local LLM
+LLM Service - AWS Mistral Integration
+Uses OpenAI-compatible API to connect to AWS-deployed Mistral LLM
 """
 from typing import List, Dict, Any, Optional
 from openai import OpenAI
@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    """Service for LLM interactions using Local LM Studio"""
+    """Service for LLM interactions using AWS Mistral"""
     
     def __init__(self):
         self.provider = settings.LLM_PROVIDER
@@ -19,11 +19,11 @@ class LLMService:
         # Configure OpenAI-compatible client for LM Studio
         self.client = OpenAI(
             base_url=settings.LM_STUDIO_BASE_URL,
-            api_key="lm-studio"  # LM Studio doesn't require real API key
+            api_key="not-needed"  # AWS Mistral doesn't require API key
         )
         self.model = settings.LM_STUDIO_MODEL
         
-        logger.info(f"✅ Initialized LLM Service with Local LM Studio")
+        logger.info(f"✅ Initialized LLM Service with AWS Mistral")
         logger.info(f"Model: {self.model} at {settings.LM_STUDIO_BASE_URL}")
     
     def generate_response(
