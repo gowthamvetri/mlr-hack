@@ -22,6 +22,7 @@ from app.routers.chat import chat_router, pdf_router
 from app.routers.documents import documents_router
 from app.routers.admin import router as admin_router
 from app.routers.images import router as images_router
+from app.routers.content import content_router
 
 # Configure logging
 logging.basicConfig(
@@ -180,6 +181,7 @@ app.include_router(pdf_router, prefix=settings.API_V1_PREFIX)
 app.include_router(documents_router, prefix=settings.API_V1_PREFIX)
 app.include_router(admin_router)  # Admin content management
 app.include_router(images_router)  # Image serving
+app.include_router(content_router)  # Chatbot content management
 
 
 # Log all registered routes

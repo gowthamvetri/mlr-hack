@@ -23,7 +23,7 @@ class Settings(BaseSettings):
     # LLM Provider Configuration
     LLM_PROVIDER: str = "local_lmstudio"  # local_lmstudio, openai, gemini, or groq
     LM_STUDIO_BASE_URL: str = "http://127.0.0.1:1234/v1"
-    LM_STUDIO_MODEL: str = "google/gemma-3-12b"
+    LM_STUDIO_MODEL: str = "qwen2.5-7b-instruct-1m"
     OPENAI_API_KEY: Optional[str] = None
     GEMINI_API_KEY: Optional[str] = None
     GROQ_API_KEY: Optional[str] = None

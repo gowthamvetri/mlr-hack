@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { 
-  MessageCircle, X, Send, Bot, User, Minimize2, 
-  Maximize2, Loader2, Sparkles, RefreshCw 
+import ReactMarkdown from 'react-markdown';
+import {
+  MessageCircle, X, Send, Bot, User, Minimize2,
+  Maximize2, Loader2, Sparkles, RefreshCw
 } from 'lucide-react';
 
-const ChatBot = ({ 
+const ChatBot = ({
   apiEndpoint = 'http://localhost:8000/api/v1/chat/', // Zenith RAG API endpoint
   title = 'MLRIT Assistant',
   subtitle = 'Ask me anything about academics!',
@@ -67,7 +68,7 @@ const ChatBot = ({
           role: msg.type === 'user' ? 'user' : 'assistant',
           content: msg.text
         }));
-      
+
       // Add current user message
       conversationHistory.push({
         role: 'user',
@@ -90,7 +91,7 @@ const ChatBot = ({
       }
 
       const data = await response.json();
-      
+
       const botMessage = {
         id: Date.now() + 1,
         type: 'bot',
@@ -105,7 +106,7 @@ const ChatBot = ({
     } catch (error) {
       console.error('Chatbot error:', error);
       setConnectionError(true);
-      
+
       const errorMessage = {
         id: Date.now() + 1,
         type: 'bot',
@@ -113,7 +114,7 @@ const ChatBot = ({
         isError: true,
         timestamp: new Date()
       };
-      
+
       setMessages(prev => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
@@ -154,8 +155,8 @@ const ChatBot = ({
   };
 
   // Position classes
-  const positionClasses = position === 'bottom-left' 
-    ? 'left-4 sm:left-6' 
+  const positionClasses = position === 'bottom-left'
+    ? 'left-4 sm:left-6'
     : 'right-4 sm:right-6';
 
   return (
@@ -170,12 +171,12 @@ const ChatBot = ({
           <div className="relative">
             {/* Pulse animation */}
             <div className="absolute inset-0 bg-primary-500 rounded-full animate-ping opacity-25"></div>
-            
+
             {/* Main button */}
             <div className="relative w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-500 to-primary-700 rounded-full flex items-center justify-center shadow-lg hover:shadow-xl transition-all transform hover:scale-105 group-hover:from-primary-600 group-hover:to-primary-800">
               <MessageCircle className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
             </div>
-            
+
             {/* Tooltip */}
             <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 px-3 py-1.5 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
               Chat with us!
@@ -187,12 +188,11 @@ const ChatBot = ({
 
       {/* Chat Window */}
       {isOpen && (
-        <div 
-          className={`fixed bottom-4 sm:bottom-6 ${positionClasses} z-50 flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ${
-            isMinimized 
-              ? 'w-72 sm:w-80 h-16' 
+        <div
+          className={`fixed bottom-4 sm:bottom-6 ${positionClasses} z-50 flex flex-col bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden transition-all duration-300 ${isMinimized
+              ? 'w-72 sm:w-80 h-16'
               : 'w-[calc(100vw-2rem)] sm:w-96 h-[calc(100vh-8rem)] sm:h-[600px] max-h-[600px]'
-          }`}
+            }`}
         >
           {/* Header */}
           <div className="bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-3 flex items-center justify-between flex-shrink-0">
@@ -207,16 +207,16 @@ const ChatBot = ({
                 )}
               </div>
             </div>
-            
+
             <div className="flex items-center gap-1 sm:gap-2">
-              <button 
+              <button
                 onClick={clearChat}
                 className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors"
                 title="Clear chat"
               >
                 <RefreshCw className="w-4 h-4 text-white" />
               </button>
-              <button 
+              <button
                 onClick={() => setIsMinimized(!isMinimized)}
                 className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors"
                 title={isMinimized ? 'Maximize' : 'Minimize'}
@@ -227,7 +227,7 @@ const ChatBot = ({
                   <Minimize2 className="w-4 h-4 text-white" />
                 )}
               </button>
-              <button 
+              <button
                 onClick={() => setIsOpen(false)}
                 className="p-1.5 sm:p-2 hover:bg-white/20 rounded-lg transition-colors"
                 title="Close"
@@ -243,47 +243,60 @@ const ChatBot = ({
               {/* Messages Area */}
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
                 {messages.map((message) => (
-                  <div 
-                    key={message.id} 
+                  <div
+                    key={message.id}
                     className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
                   >
-                    <div className={`flex items-start gap-2 max-w-[90%] ${
-                      message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
-                    }`}>
-                      {/* Avatar */}
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.type === 'user' 
-                          ? 'bg-primary-100' 
-                          : message.isError 
-                            ? 'bg-red-100' 
-                            : 'bg-gradient-to-br from-primary-500 to-primary-700'
+                    <div className={`flex items-start gap-2 max-w-[90%] ${message.type === 'user' ? 'flex-row-reverse' : 'flex-row'
                       }`}>
+                      {/* Avatar */}
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.type === 'user'
+                          ? 'bg-primary-100'
+                          : message.isError
+                            ? 'bg-red-100'
+                            : 'bg-gradient-to-br from-primary-500 to-primary-700'
+                        }`}>
                         {message.type === 'user' ? (
                           <User className="w-4 h-4 text-primary-600" />
                         ) : (
                           <Bot className={`w-4 h-4 ${message.isError ? 'text-red-600' : 'text-white'}`} />
                         )}
                       </div>
-                      
+
                       {/* Message Bubble */}
-                      <div className={`rounded-2xl px-4 py-2.5 break-words ${
-                        message.type === 'user'
+                      <div className={`rounded-2xl px-4 py-2.5 break-words ${message.type === 'user'
                           ? 'bg-primary-600 text-white rounded-tr-md'
                           : message.isError
                             ? 'bg-red-50 text-red-700 border border-red-200 rounded-tl-md'
                             : 'bg-white text-gray-800 shadow-sm border border-gray-100 rounded-tl-md'
-                      }`}>
-                        <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.text}</p>
-                        <p className={`text-xs mt-1 ${
-                          message.type === 'user' ? 'text-primary-200' : 'text-gray-400'
                         }`}>
+                        {message.type === 'bot' && !message.isError ? (
+                          <div className="text-sm leading-relaxed prose prose-sm max-w-none
+                            prose-p:my-1 prose-strong:text-gray-900 prose-em:text-gray-700
+                            prose-a:text-primary-600 prose-a:no-underline hover:prose-a:underline">
+                            <ReactMarkdown
+                              components={{
+                                p: ({ children }) => <p className="mb-2 last:mb-0">{children}</p>,
+                                strong: ({ children }) => <strong className="font-semibold text-gray-900">{children}</strong>,
+                                em: ({ children }) => <em className="italic text-gray-700">{children}</em>,
+                                a: ({ href, children }) => <a href={href} target="_blank" rel="noopener noreferrer" className="text-primary-600 hover:underline">{children}</a>,
+                              }}
+                            >
+                              {message.text}
+                            </ReactMarkdown>
+                          </div>
+                        ) : (
+                          <p className="text-sm leading-relaxed whitespace-pre-wrap break-words overflow-wrap-anywhere">{message.text}</p>
+                        )}
+                        <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-primary-200' : 'text-gray-400'
+                          }`}>
                           {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </p>
                       </div>
                     </div>
                   </div>
                 ))}
-                
+
                 {/* Loading indicator */}
                 {isLoading && (
                   <div className="flex justify-start">
@@ -301,7 +314,7 @@ const ChatBot = ({
                     </div>
                   </div>
                 )}
-                
+
                 <div ref={messagesEndRef} />
               </div>
 
@@ -350,7 +363,7 @@ const ChatBot = ({
                     )}
                   </button>
                 </div>
-                
+
                 {/* Connection error banner */}
                 {connectionError && (
                   <p className="text-xs text-amber-600 mt-2 flex items-center gap-1">

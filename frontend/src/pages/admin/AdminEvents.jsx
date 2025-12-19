@@ -88,7 +88,8 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const { data } = await getEvents();
-      setEvents(data || []);
+      // Ensure events is always an array
+      setEvents(Array.isArray(data) ? data : (data?.events || []));
     } catch (error) {
       setEvents([]);
     } finally {
@@ -349,55 +350,55 @@ const AdminEvents = () => {
                 const CategoryIcon = getCategoryIcon(event.category);
                 const categoryColor = getCategoryColor(event.category);
 
-                return (
-                  <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
-                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                      {/* Event Info */}
-                      <div className="flex items-start gap-4 flex-1">
-                        <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                          <CategoryIcon className="w-6 h-6 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-1">
-                            <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
-                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
+              return (
+                <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                    {/* Event Info */}
+                    <div className="flex items-start gap-4 flex-1">
+                      <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                        <CategoryIcon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
                               event.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' :
                                 'bg-red-50 text-red-700'
-                              }`}>
-                              <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
+                            }`}>
+                            <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
                                 event.status === 'Approved' ? 'bg-emerald-500' :
                                   'bg-red-500'
-                                }`} />
-                              {event.status}
-                            </span>
-                          </div>
-                          <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
-                          <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
+                              }`} />
+                            {event.status}
+                          </span>
+                        </div>
+                        <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
+                        <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
+                          <span className="flex items-center gap-1">
+                            <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
+                            {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </span>
+                          {event.time && (
                             <span className="flex items-center gap-1">
-                              <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              {event.time}
                             </span>
-                            {event.time && (
-                              <span className="flex items-center gap-1">
-                                <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                                {event.time}
-                              </span>
-                            )}
-                            {event.venue && (
-                              <span className="flex items-center gap-1">
-                                <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-                                {event.venue}
-                              </span>
-                            )}
-                            {event.expectedParticipants > 0 && (
-                              <span className="flex items-center gap-1">
-                                <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
-                                {event.expectedParticipants} expected
-                              </span>
-                            )}
-                          </div>
+                          )}
+                          {event.venue && (
+                            <span className="flex items-center gap-1">
+                              <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              {event.venue}
+                            </span>
+                          )}
+                          {event.expectedParticipants > 0 && (
+                            <span className="flex items-center gap-1">
+                              <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              {event.expectedParticipants} expected
+                            </span>
+                          )}
                         </div>
                       </div>
+                    </div>
 
                       {/* Actions */}
                       {event.status === 'Pending' && (

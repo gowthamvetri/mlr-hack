@@ -58,9 +58,13 @@ const AdminSubjects = () => {
         try {
             setLoading(true);
             const [subjectsRes, deptsRes] = await Promise.all([getSubjects(filters), getSubjectDepartments()]);
-            setSubjects(subjectsRes.data);
-            setDepartments(deptsRes.data);
-        } catch (error) { console.error('Error:', error); }
+            // Ensure subjects is always an array
+            const subjectsData = subjectsRes.data;
+            setSubjects(Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []));
+            // Ensure departments is always an array
+            const deptsData = deptsRes.data;
+            setDepartments(Array.isArray(deptsData) ? deptsData : (deptsData?.departments || []));
+        } catch (error) { console.error('Error:', error); setSubjects([]); setDepartments([]); }
         finally { setLoading(false); }
     };
 

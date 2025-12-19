@@ -181,9 +181,12 @@ const AdminDashboard = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [statsRes, eventsRes] = await Promise.all([getAdminStats(), getEvents('Pending')]);
+      const [statsRes, eventsRes] = await Promise.all([
+        getAdminStats(),
+        getEvents('Pending')
+      ]);
       setStats(statsRes.data);
-      setPendingEvents(eventsRes.data || []);
+      setPendingEvents(eventsRes.data);
 
       try {
         const [deptDistRes, perfMetricsRes, courseStatsRes, facultyStatsRes, placementStatsRes, activitiesRes] = await Promise.all([

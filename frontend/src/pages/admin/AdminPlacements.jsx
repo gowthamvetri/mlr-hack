@@ -109,15 +109,17 @@ const AdminPlacements = () => {
     try {
       setLoading(true);
       const { data: placementsData } = await getPlacements();
-      setPlacements(placementsData || []);
+      // Ensure placements is always an array
+      setPlacements(Array.isArray(placementsData) ? placementsData : (placementsData?.placements || []));
 
       try {
         const { data: statsData } = await getPlacementStats();
+        const placementsArray = Array.isArray(placementsData) ? placementsData : (placementsData?.placements || []);
         setStats({
           totalPlaced: statsData.totalPlaced || 0,
           averagePackage: typeof statsData.averagePackage === 'number' ? `${statsData.averagePackage} LPA` : statsData.averagePackage || '0 LPA',
           highestPackage: typeof statsData.highestPackage === 'number' ? `${statsData.highestPackage} LPA` : statsData.highestPackage || '0 LPA',
-          companiesVisited: statsData.companiesVisited || statsData.totalDrives || placementsData.length || 0,
+          companiesVisited: statsData.companiesVisited || statsData.totalDrives || placementsArray.length || 0,
           placementRate: statsData.placementRate || 0,
         });
         if (statsData.topRecruiters?.length) {
@@ -126,7 +128,8 @@ const AdminPlacements = () => {
         }
         if (statsData.departmentStats?.length) setDepartmentStats(statsData.departmentStats);
       } catch (e) {
-        setStats({ totalPlaced: 0, averagePackage: '0 LPA', highestPackage: '0 LPA', companiesVisited: placementsData?.length || 0, placementRate: 0 });
+        const placementsArray = Array.isArray(placementsData) ? placementsData : [];
+        setStats({ totalPlaced: 0, averagePackage: '0 LPA', highestPackage: '0 LPA', companiesVisited: placementsArray.length || 0, placementRate: 0 });
       }
     } catch (error) { console.error('Error:', error); setPlacements([]); }
     finally { setLoading(false); }

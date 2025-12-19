@@ -98,11 +98,19 @@ const StudentDashboard = () => {
           getSubjects()
         ]);
 
-        setExams(examsRes.data);
-        setEvents(eventsRes.data);
-        setSeats(seatsRes.data);
-        setSubjects(subjectsRes.data);
-        if (subjectsRes.data.length > 0) setSelectedSubject(subjectsRes.data[0]);
+        // Ensure all responses are arrays
+        const examsData = examsRes.data;
+        const eventsData = eventsRes.data;
+        const seatsData = seatsRes.data;
+        const subjectsData = subjectsRes.data;
+
+        setExams(Array.isArray(examsData) ? examsData : (examsData?.exams || []));
+        setEvents(Array.isArray(eventsData) ? eventsData : (eventsData?.events || []));
+        setSeats(Array.isArray(seatsData) ? seatsData : (seatsData?.seats || []));
+        setSubjects(Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []));
+
+        const subjectsArray = Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []);
+        if (subjectsArray.length > 0) setSelectedSubject(subjectsArray[0]);
 
         // Fetch student progress data (streak, skills, career)
         try {

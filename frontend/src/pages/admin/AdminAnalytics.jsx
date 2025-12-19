@@ -113,8 +113,11 @@ const AdminAnalytics = () => {
         { label: 'Active Courses', value: courseStats.data?.totalCourses || 156, change: '+8', trend: 'up', icon: BookOpen, color: 'blue' },
       ]);
 
-      if (departmentsData.data?.length > 0) {
-        setDepartmentPerformance(departmentsData.data.slice(0, 4).map((dept, i) => ({
+      // Ensure departmentsData is an array before using
+      const deptsArray = Array.isArray(departmentsData.data) ? departmentsData.data : (departmentsData.data?.departments || []);
+
+      if (deptsArray.length > 0) {
+        setDepartmentPerformance(deptsArray.slice(0, 4).map((dept, i) => ({
           dept: dept.name,
           students: dept.totalStudents || [847, 523, 312, 165][i],
           completion: 85 + Math.floor(Math.random() * 10),
@@ -393,8 +396,8 @@ const AdminAnalytics = () => {
                   </div>
 
                   <div className={`w-7 h-7 rounded-lg flex items-center justify-center ${course.trend === 'up' ? 'bg-emerald-50 text-emerald-600' :
-                      course.trend === 'down' ? 'bg-red-50 text-red-600' :
-                        'bg-zinc-100 text-zinc-600'
+                    course.trend === 'down' ? 'bg-red-50 text-red-600' :
+                      'bg-zinc-100 text-zinc-600'
                     }`}>
                     {course.trend === 'up' ? <TrendingUp className="w-3.5 h-3.5" /> :
                       course.trend === 'down' ? <ArrowDownRight className="w-3.5 h-3.5" /> :
