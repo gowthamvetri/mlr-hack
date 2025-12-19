@@ -411,7 +411,7 @@ const AdminDashboard = () => {
                 { label: 'Student Satisfaction', value: 92, trend: '+3%' },
                 { label: 'Placement Rate', value: placementRate || 85, trend: '+8%' },
               ]).slice(0, 3).map((metric, i) => (
-                <div key={i} className="p-4 bg-white/10 backdrop-blur-sm rounded-lg">
+                <div key={i} className="p-4 bg-gray-100 backdrop-blur-sm rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs text-black/60">{metric.label}</span>
                     <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded">{metric.trend}</span>

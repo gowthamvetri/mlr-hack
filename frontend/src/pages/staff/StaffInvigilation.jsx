@@ -1,23 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import { getMyInvigilation } from '../../utils/api';
 import DashboardLayout from '../../components/DashboardLayout';
-import AnimatedNumber from '../../components/AnimatedNumber';
+import gsap from 'gsap';
 import {
     Calendar, Building, Clock, CheckCircle, AlertCircle,
-    MapPin, Users, ClipboardCheck
+    MapPin, ClipboardCheck, Loader
 } from 'lucide-react';
+
+// Animated counter
+const AnimatedNumber = ({ value }) => {
+    const [displayValue, setDisplayValue] = useState(0);
+    useEffect(() => {
+        const duration = 500;
+        const start = displayValue;
+        const end = typeof value === 'number' ? value : parseInt(value) || 0;
+        const startTime = Date.now();
+        const animate = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const eased = 1 - Math.pow(1 - progress, 3);
+            setDisplayValue(Math.round(start + (end - start) * eased));
+            if (progress < 1) requestAnimationFrame(animate);
+        };
+        requestAnimationFrame(animate);
+    }, [value]);
+    return <span className="tabular-nums">{displayValue}</span>;
+};
 
 const StaffInvigilation = () => {
     const user = useSelector(selectCurrentUser);
+    const pageRef = useRef(null);
     const [assignments, setAssignments] = useState([]);
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState('upcoming');
 
+    useEffect(() => { fetchAssignments(); }, []);
+
     useEffect(() => {
-        fetchAssignments();
-    }, []);
+        if (pageRef.current && !loading) {
+            gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+            gsap.fromTo('.assignment-item', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, delay: 0.2, ease: 'power2.out' });
+        }
+    }, [loading]);
 
     const fetchAssignments = async () => {
         try {
@@ -37,197 +63,103 @@ const StaffInvigilation = () => {
     const filteredAssignments = assignments.filter(a => {
         const assignmentDate = new Date(a.date);
         assignmentDate.setHours(0, 0, 0, 0);
-
-        if (filter === 'upcoming') {
-            return assignmentDate >= today;
-        } else if (filter === 'past') {
-            return assignmentDate < today;
-        }
+        if (filter === 'upcoming') return assignmentDate >= today;
+        if (filter === 'past') return assignmentDate < today;
         return true;
     });
 
-    const upcomingCount = assignments.filter(a => {
-        const d = new Date(a.date);
-        d.setHours(0, 0, 0, 0);
-        return d >= today;
-    }).length;
-
+    const upcomingCount = assignments.filter(a => { const d = new Date(a.date); d.setHours(0, 0, 0, 0); return d >= today; }).length;
     const pastCount = assignments.length - upcomingCount;
+    const thisWeekCount = assignments.filter(a => { const d = new Date(a.date); const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + 7); return d >= today && d <= weekEnd; }).length;
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
-            <div className="space-y-6 animate-fade-in">
+            <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div>
-                        <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Invigilation Duties</h1>
-                        <p className="text-gray-500 mt-1 text-lg">
-                            View your assigned exam invigilation schedule
-                        </p>
+                        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Invigilation Duties</h1>
+                        <p className="text-zinc-500 text-sm mt-0.5">View your assigned exam invigilation schedule</p>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-full font-semibold text-sm">
-                            {upcomingCount} upcoming
-                        </span>
-                        <span className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-full font-semibold text-sm">
-                            {pastCount} past
-                        </span>
+                        <span className="px-2.5 py-1 bg-blue-50 text-blue-700 rounded text-xs font-medium border border-blue-100">{upcomingCount} upcoming</span>
+                        <span className="px-2.5 py-1 bg-zinc-100 text-zinc-600 rounded text-xs font-medium border border-zinc-200">{pastCount} past</span>
                     </div>
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-5 text-white shadow-lg shadow-blue-200">
+                    <div className="metric-card bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl p-5 text-white">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-blue-100 font-medium text-sm">Total Duties</p>
-                                <p className="text-3xl font-bold mt-1"><AnimatedNumber value={assignments.length} /></p>
-                            </div>
-                            <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center">
-                                <ClipboardCheck className="w-5 h-5 text-white" />
-                            </div>
+                            <div><p className="text-blue-200 text-xs">Total Duties</p><p className="text-2xl font-semibold mt-1"><AnimatedNumber value={assignments.length} /></p></div>
+                            <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><ClipboardCheck className="w-5 h-5 text-white" /></div>
                         </div>
                     </div>
-                    <div className="glass-card rounded-2xl p-5 tilt-card">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium text-sm">Upcoming</p>
-                                <p className="text-3xl font-bold text-green-600 mt-1"><AnimatedNumber value={upcomingCount} /></p>
-                            </div>
-                            <div className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center">
-                                <Calendar className="w-5 h-5 text-green-600" />
-                            </div>
+                            <div><p className="text-zinc-500 text-xs">Upcoming</p><p className="text-2xl font-semibold text-emerald-600 mt-1"><AnimatedNumber value={upcomingCount} /></p></div>
+                            <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center"><Calendar className="w-5 h-5 text-emerald-500" /></div>
                         </div>
                     </div>
-                    <div className="glass-card rounded-2xl p-5 tilt-card">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium text-sm">Completed</p>
-                                <p className="text-3xl font-bold text-gray-600 mt-1"><AnimatedNumber value={pastCount} /></p>
-                            </div>
-                            <div className="w-11 h-11 bg-gray-100 rounded-xl flex items-center justify-center">
-                                <CheckCircle className="w-5 h-5 text-gray-600" />
-                            </div>
+                            <div><p className="text-zinc-500 text-xs">Completed</p><p className="text-2xl font-semibold text-zinc-600 mt-1"><AnimatedNumber value={pastCount} /></p></div>
+                            <div className="w-10 h-10 bg-zinc-100 rounded-lg flex items-center justify-center"><CheckCircle className="w-5 h-5 text-zinc-500" /></div>
                         </div>
                     </div>
-                    <div className="glass-card rounded-2xl p-5 tilt-card">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100">
                         <div className="flex items-center justify-between">
-                            <div>
-                                <p className="text-gray-500 font-medium text-sm">This Week</p>
-                                <p className="text-3xl font-bold text-primary-600 mt-1">
-                                    {assignments.filter(a => {
-                                        const d = new Date(a.date);
-                                        const weekEnd = new Date(today);
-                                        weekEnd.setDate(weekEnd.getDate() + 7);
-                                        return d >= today && d <= weekEnd;
-                                    }).length}
-                                </p>
-                            </div>
-                            <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
-                                <Clock className="w-5 h-5 text-primary-600" />
-                            </div>
+                            <div><p className="text-zinc-500 text-xs">This Week</p><p className="text-2xl font-semibold text-violet-600 mt-1"><AnimatedNumber value={thisWeekCount} /></p></div>
+                            <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center"><Clock className="w-5 h-5 text-violet-500" /></div>
                         </div>
                     </div>
                 </div>
 
                 {/* Filter Tabs */}
                 <div className="flex gap-2">
-                    {[
-                        { key: 'upcoming', label: 'Upcoming' },
-                        { key: 'past', label: 'Past' },
-                        { key: 'all', label: 'All' }
-                    ].map(tab => (
-                        <button
-                            key={tab.key}
-                            onClick={() => setFilter(tab.key)}
-                            className={`px-4 py-2 rounded-xl font-medium transition-all ${filter === tab.key
-                                ? 'bg-primary-600 text-white'
-                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                                }`}
-                        >
+                    {[{ key: 'upcoming', label: 'Upcoming' }, { key: 'past', label: 'Past' }, { key: 'all', label: 'All' }].map(tab => (
+                        <button key={tab.key} onClick={() => setFilter(tab.key)} className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${filter === tab.key ? 'bg-violet-600 text-white' : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'}`}>
                             {tab.label}
                         </button>
                     ))}
                 </div>
 
                 {/* Assignments List */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
                     {loading ? (
-                        <div className="text-center py-12">
-                            <div className="w-10 h-10 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-3" />
-                            <p className="text-gray-500">Loading assignments...</p>
-                        </div>
+                        <div className="flex items-center justify-center h-48"><Loader className="w-6 h-6 text-violet-500 animate-spin" /></div>
                     ) : filteredAssignments.length > 0 ? (
-                        <div className="divide-y divide-gray-100">
+                        <div className="divide-y divide-zinc-50">
                             {filteredAssignments.map((assignment, idx) => {
                                 const assignmentDate = new Date(assignment.date);
                                 const isToday = assignmentDate.toDateString() === today.toDateString();
                                 const isPast = assignmentDate < today;
-
                                 return (
-                                    <div
-                                        key={idx}
-                                        className={`p-6 hover:bg-gray-50 transition-all ${isToday ? 'bg-yellow-50 border-l-4 border-l-yellow-400' : ''
-                                            }`}
-                                    >
+                                    <div key={idx} className={`assignment-item p-5 hover:bg-zinc-50/50 transition-colors ${isToday ? 'bg-amber-50/50 border-l-2 border-l-amber-400' : ''}`}>
                                         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                                             <div className="flex-1">
-                                                <div className="flex items-center gap-3 mb-2">
-                                                    {isToday && (
-                                                        <span className="px-2 py-1 bg-yellow-100 text-yellow-700 rounded text-xs font-bold">
-                                                            TODAY
-                                                        </span>
-                                                    )}
-                                                    {isPast && (
-                                                        <span className="px-2 py-1 bg-gray-100 text-gray-500 rounded text-xs font-bold">
-                                                            COMPLETED
-                                                        </span>
-                                                    )}
-                                                    <span className={`px-2 py-1 rounded text-xs font-bold uppercase ${assignment.session === 'FN'
-                                                        ? 'bg-blue-100 text-blue-700'
-                                                        : 'bg-purple-100 text-purple-700'
-                                                        }`}>
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    {isToday && <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold border border-amber-200">TODAY</span>}
+                                                    {isPast && <span className="px-1.5 py-0.5 bg-zinc-100 text-zinc-500 rounded text-[10px] font-bold border border-zinc-200">COMPLETED</span>}
+                                                    <span className={`px-1.5 py-0.5 rounded text-[10px] font-bold uppercase border ${assignment.session === 'FN' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-violet-50 text-violet-700 border-violet-100'}`}>
                                                         {assignment.session === 'FN' ? 'Morning' : 'Afternoon'}
                                                     </span>
                                                 </div>
-                                                <h3 className="text-lg font-bold text-gray-800">
-                                                    {assignment.exam?.courseName || 'Exam'}
-                                                </h3>
-                                                <p className="text-sm text-gray-500">
-                                                    {assignment.exam?.courseCode || 'N/A'}
-                                                </p>
+                                                <h3 className="text-sm font-semibold text-zinc-900">{assignment.exam?.courseName || 'Exam'}</h3>
+                                                <p className="text-xs text-zinc-500">{assignment.exam?.courseCode || 'N/A'}</p>
                                             </div>
-
-                                            <div className="flex items-center gap-6">
-                                                <div className="text-center">
-                                                    <div className="flex items-center gap-1 text-gray-500 text-sm">
-                                                        <Calendar className="w-4 h-4" />
-                                                        <span>{assignmentDate.toLocaleDateString()}</span>
-                                                    </div>
-                                                    <div className="flex items-center gap-1 text-gray-500 text-sm mt-1">
-                                                        <Clock className="w-4 h-4" />
-                                                        <span>{assignment.exam?.startTime || '9:00'} - {assignment.exam?.endTime || '12:00'}</span>
-                                                    </div>
+                                            <div className="flex items-center gap-4">
+                                                <div className="text-right">
+                                                    <div className="flex items-center gap-1 text-zinc-500 text-xs"><Calendar className="w-3.5 h-3.5" /><span>{assignmentDate.toLocaleDateString()}</span></div>
+                                                    <div className="flex items-center gap-1 text-zinc-500 text-xs mt-1"><Clock className="w-3.5 h-3.5" /><span>{assignment.exam?.startTime || '9:00'} - {assignment.exam?.endTime || '12:00'}</span></div>
                                                 </div>
-
-                                                <div className="text-center px-4 py-3 bg-primary-50 rounded-xl">
-                                                    <div className="flex items-center gap-1 text-primary-600 font-bold">
-                                                        <Building className="w-4 h-4" />
-                                                        <span>Room {assignment.room?.roomNumber || 'TBD'}</span>
-                                                    </div>
-                                                    <div className="text-xs text-gray-500 mt-1">
-                                                        <MapPin className="w-3 h-3 inline" /> {assignment.room?.building || 'Main Block'}
-                                                    </div>
+                                                <div className="text-center px-3 py-2 bg-violet-50 rounded-lg border border-violet-100">
+                                                    <div className="flex items-center gap-1 text-violet-700 font-semibold text-xs"><Building className="w-3.5 h-3.5" /><span>Room {assignment.room?.roomNumber || 'TBD'}</span></div>
+                                                    <div className="text-[10px] text-zinc-500 mt-0.5"><MapPin className="w-3 h-3 inline" /> {assignment.room?.building || 'Main Block'}</div>
                                                 </div>
-
-                                                <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${assignment.status === 'Completed'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : assignment.status === 'Confirmed'
-                                                        ? 'bg-blue-100 text-blue-700'
-                                                        : 'bg-yellow-100 text-yellow-700'
-                                                    }`}>
+                                                <span className={`px-2 py-1 rounded text-[10px] font-bold ${assignment.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : assignment.status === 'Confirmed' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
                                                     {assignment.status}
-                                                </div>
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
@@ -236,11 +168,9 @@ const StaffInvigilation = () => {
                         </div>
                     ) : (
                         <div className="text-center py-12">
-                            <AlertCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
-                            <p className="font-semibold text-gray-800">No invigilation duties found</p>
-                            <p className="text-sm text-gray-500">
-                                {filter === 'upcoming' ? 'No upcoming duties assigned' : 'No past duties'}
-                            </p>
+                            <div className="w-14 h-14 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4"><AlertCircle className="w-6 h-6 text-zinc-400" /></div>
+                            <p className="font-medium text-zinc-900 text-sm">No Invigilation Duties</p>
+                            <p className="text-xs text-zinc-500 mt-1">{filter === 'upcoming' ? 'No upcoming duties assigned' : 'No past duties'}</p>
                         </div>
                     )}
                 </div>
