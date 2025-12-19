@@ -165,18 +165,18 @@ const StudentProfile = () => {
 
   return (
     <DashboardLayout>
-      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
+      <div ref={pageRef} className="min-h-screen bg-dark-900 p-6 lg:p-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">My Profile</h1>
-            <p className="text-sm text-zinc-500 mt-1">Manage your personal information</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">My Profile</h1>
+            <p className="text-sm text-dark-400 mt-1">Manage your personal information</p>
           </div>
           <div className="flex gap-3">
             {!isEditing ? (
               <button
                 onClick={() => setIsEditing(true)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+                className="flex items-center gap-2 px-4 py-2.5 bg-dark-800 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors border border-dark-700"
               >
                 <Edit className="w-4 h-4" />
                 Edit Profile
@@ -185,7 +185,7 @@ const StudentProfile = () => {
               <>
                 <button
                   onClick={handleCancel}
-                  className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 text-zinc-600 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors"
                 >
                   <X className="w-4 h-4" />
                   Cancel
@@ -193,7 +193,7 @@ const StudentProfile = () => {
                 <button
                   onClick={handleSubmit}
                   disabled={saving}
-                  className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-50"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 transition-colors disabled:opacity-50 shadow-lg shadow-primary-500/20"
                 >
                   {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                   Save Changes
@@ -205,7 +205,7 @@ const StudentProfile = () => {
 
         {/* Message */}
         {message.text && (
-          <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 border ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'
+          <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 border ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-red-500/10 text-red-400 border-red-500/20'
             }`}>
             <CheckCircle className="w-5 h-5" />
             <p className="text-sm font-medium">{message.text}</p>
@@ -216,56 +216,56 @@ const StudentProfile = () => {
           {/* Left Column - Profile Card */}
           <div className="lg:col-span-1 space-y-6">
             {/* Avatar Card */}
-            <div className="profile-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
-              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 p-8 text-center">
-                <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
-                  <User className="w-12 h-12 text-zinc-700" />
+            <div className="profile-card glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
+              <div className="bg-gradient-to-br from-dark-800 to-dark-900 p-8 text-center border-b border-dark-700">
+                <div className="w-24 h-24 bg-dark-800 rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg ring-4 ring-dark-700">
+                  <User className="w-12 h-12 text-dark-400" />
                 </div>
-                <h2 className="text-lg font-semibold text-white">{profile.name}</h2>
-                <span className="inline-block mt-2 px-3 py-1 bg-white/10 text-zinc-300 rounded-full text-xs font-medium">
+                <h2 className="text-lg font-bold text-white">{profile.name}</h2>
+                <span className="inline-block mt-2 px-3 py-1 bg-dark-700/50 text-dark-300 rounded-full text-xs font-bold border border-dark-600">
                   {profile.rollNumber || 'Student'}
                 </span>
               </div>
               <div className="p-5 space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
-                    <Mail className="w-4 h-4 text-blue-500" />
+                  <div className="w-9 h-9 bg-blue-500/10 rounded-lg flex items-center justify-center border border-blue-500/20">
+                    <Mail className="w-4 h-4 text-blue-400" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Email</p>
-                    <p className="text-sm text-zinc-900 truncate">{profile.email}</p>
+                    <p className="text-[10px] font-medium text-dark-500 uppercase tracking-wide">Email</p>
+                    <p className="text-sm text-white truncate">{profile.email}</p>
                   </div>
                 </div>
                 {profile.phone && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
-                      <Phone className="w-4 h-4 text-emerald-500" />
+                    <div className="w-9 h-9 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
+                      <Phone className="w-4 h-4 text-emerald-400" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Phone</p>
-                      <p className="text-sm text-zinc-900">{profile.phone}</p>
+                      <p className="text-[10px] font-medium text-dark-500 uppercase tracking-wide">Phone</p>
+                      <p className="text-sm text-white">{profile.phone}</p>
                     </div>
                   </div>
                 )}
                 {profile.department && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
-                      <GraduationCap className="w-4 h-4 text-violet-500" />
+                    <div className="w-9 h-9 bg-primary-500/10 rounded-lg flex items-center justify-center border border-primary-500/20">
+                      <GraduationCap className="w-4 h-4 text-primary-400" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Department</p>
-                      <p className="text-sm text-zinc-900">{profile.department}</p>
+                      <p className="text-[10px] font-medium text-dark-500 uppercase tracking-wide">Department</p>
+                      <p className="text-sm text-white">{profile.department}</p>
                     </div>
                   </div>
                 )}
                 {profile.year && (
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
-                      <BookOpen className="w-4 h-4 text-amber-500" />
+                    <div className="w-9 h-9 bg-amber-500/10 rounded-lg flex items-center justify-center border border-amber-500/20">
+                      <BookOpen className="w-4 h-4 text-amber-400" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Year</p>
-                      <p className="text-sm text-zinc-900">{profile.year}{profile.year === '1' ? 'st' : profile.year === '2' ? 'nd' : profile.year === '3' ? 'rd' : 'th'} Year</p>
+                      <p className="text-[10px] font-medium text-dark-500 uppercase tracking-wide">Year</p>
+                      <p className="text-sm text-white">{profile.year}{profile.year === '1' ? 'st' : profile.year === '2' ? 'nd' : profile.year === '3' ? 'rd' : 'th'} Year</p>
                     </div>
                   </div>
                 )}
@@ -273,10 +273,10 @@ const StudentProfile = () => {
             </div>
 
             {/* Profile Completion */}
-            <div className="profile-card bg-white rounded-xl border border-zinc-100 p-6">
+            <div className="profile-card glass-card-dark rounded-xl border border-dark-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-medium text-zinc-900">Profile Completion</h3>
-                <ProgressRing percentage={profileCompletion} size={64} strokeWidth={5} />
+                <h3 className="font-bold text-white">Profile Completion</h3>
+                <ProgressRing percentage={profileCompletion} size={64} strokeWidth={5} color="#8b5cf6" />
               </div>
               <div className="space-y-2">
                 {[
@@ -287,10 +287,10 @@ const StudentProfile = () => {
                   { label: 'Bio & Address', done: !!(profile.bio && profile.address) }
                 ].map((item, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
-                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${item.done ? 'bg-emerald-100' : 'bg-zinc-100'}`}>
-                      {item.done ? <CheckCircle className="w-3 h-3 text-emerald-600" /> : <div className="w-2 h-2 bg-zinc-300 rounded-full" />}
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${item.done ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-dark-800 border border-dark-700'}`}>
+                      {item.done ? <CheckCircle className="w-3 h-3 text-emerald-400" /> : <div className="w-2 h-2 bg-dark-600 rounded-full" />}
                     </div>
-                    <span className={item.done ? 'text-zinc-700' : 'text-zinc-400'}>{item.label}</span>
+                    <span className={item.done ? 'text-gray-300' : 'text-dark-500'}>{item.label}</span>
                   </div>
                 ))}
               </div>
@@ -299,76 +299,76 @@ const StudentProfile = () => {
 
           {/* Right Column - Edit Form */}
           <div className="lg:col-span-2">
-            <div className="profile-card bg-white rounded-xl border border-zinc-100 p-6">
-              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-100">
-                <div className="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
-                  <User className="w-4 h-4 text-violet-500" />
+            <div className="profile-card glass-card-dark rounded-xl border border-dark-700 p-6">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-dark-700">
+                <div className="w-9 h-9 bg-primary-500/10 rounded-lg flex items-center justify-center border border-primary-500/20">
+                  <User className="w-4 h-4 text-primary-400" />
                 </div>
-                <h3 className="font-semibold text-zinc-900">Personal Information</h3>
+                <h3 className="font-bold text-white">Personal Information</h3>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Name */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Full Name</label>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Full Name</label>
                     {isEditing ? (
                       <input type="text" name="name" value={profile.name} onChange={handleChange}
-                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                        className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50" />
                     ) : (
-                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.name || '-'}</p>
+                      <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">{profile.name || '-'}</p>
                     )}
                   </div>
 
                   {/* Email - Locked */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Email Address</label>
-                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.email}</p>
-                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot be changed</p>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Email Address</label>
+                    <p className="px-4 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">{profile.email}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-400/70 mt-1.5"><Lock className="w-3 h-3" />Cannot be changed</p>
                   </div>
 
                   {/* Phone */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Phone Number</label>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Phone Number</label>
                     {isEditing ? (
                       <input type="tel" name="phone" value={profile.phone} onChange={handleChange} placeholder="Enter phone"
-                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                        className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50" />
                     ) : (
-                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.phone || '-'}</p>
+                      <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">{profile.phone || '-'}</p>
                     )}
                   </div>
 
                   {/* Roll Number - Locked */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Roll Number</label>
-                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.rollNumber || '-'}</p>
-                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Auto-generated</p>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Roll Number</label>
+                    <p className="px-4 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">{profile.rollNumber || '-'}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-400/70 mt-1.5"><Lock className="w-3 h-3" />Auto-generated</p>
                   </div>
 
                   {/* Department - Locked */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.department || '-'}</p>
-                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
+                    <p className="px-4 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">{profile.department || '-'}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-400/70 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
                   </div>
 
                   {/* Year - Locked */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Year of Study</label>
-                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Year of Study</label>
+                    <p className="px-4 py-2.5 bg-blue-500/10 border border-blue-500/20 rounded-lg text-sm text-blue-400">
                       {profile.year ? `${profile.year}${['st', 'nd', 'rd'][profile.year - 1] || 'th'} Year` : '-'}
                     </p>
-                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-400/70 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
                   </div>
 
                   {/* Date of Birth */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Date of Birth</label>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Date of Birth</label>
                     {isEditing ? (
                       <input type="date" name="dateOfBirth" value={profile.dateOfBirth} onChange={handleChange}
-                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                        className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50" />
                     ) : (
-                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">
+                      <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">
                         {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-IN') : '-'}
                       </p>
                     )}
@@ -376,49 +376,49 @@ const StudentProfile = () => {
 
                   {/* Gender */}
                   <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Gender</label>
+                    <label className="block text-xs font-medium text-dark-400 mb-1.5">Gender</label>
                     {isEditing ? (
                       <select name="gender" value={profile.gender} onChange={handleChange}
-                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+                        className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50">
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </select>
                     ) : (
-                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.gender || '-'}</p>
+                      <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">{profile.gender || '-'}</p>
                     )}
                   </div>
                 </div>
 
                 {/* Address */}
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Address</label>
+                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Address</label>
                   {isEditing ? (
                     <textarea name="address" value={profile.address} onChange={handleChange} rows={2} placeholder="Enter address"
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 resize-none" />
+                      className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 resize-none placeholder-dark-500" />
                   ) : (
-                    <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.address || '-'}</p>
+                    <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">{profile.address || '-'}</p>
                   )}
                 </div>
 
                 {/* Bio */}
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Bio</label>
+                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Bio</label>
                   {isEditing ? (
                     <textarea name="bio" value={profile.bio} onChange={handleChange} rows={3} placeholder="Tell us about yourself..."
-                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 resize-none" />
+                      className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 resize-none placeholder-dark-500" />
                   ) : (
-                    <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.bio || '-'}</p>
+                    <p className="px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-gray-300">{profile.bio || '-'}</p>
                   )}
                 </div>
               </form>
 
               {/* Password Change Section */}
-              <div className="mt-8 pt-6 border-t border-zinc-100">
+              <div className="mt-8 pt-6 border-t border-dark-700">
                 <button
                   onClick={() => setShowPasswordSection(!showPasswordSection)}
-                  className="flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-violet-600 transition-colors"
+                  className="flex items-center gap-2 text-sm font-medium text-dark-300 hover:text-primary-400 transition-colors"
                 >
                   <Key className="w-4 h-4" />
                   Change Password
@@ -430,12 +430,12 @@ const StudentProfile = () => {
                 </button>
 
                 {showPasswordSection && (
-                  <form onSubmit={handlePasswordChange} className="mt-4 p-4 bg-zinc-50 rounded-xl border border-zinc-100 space-y-4">
+                  <form onSubmit={handlePasswordChange} className="mt-4 p-4 bg-dark-800 rounded-xl border border-dark-700 space-y-4">
                     {/* Password Message */}
                     {passwordMessage.text && (
                       <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${passwordMessage.type === 'success'
-                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
-                          : 'bg-red-50 text-red-700 border border-red-100'
+                        ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                        : 'bg-red-500/10 text-red-400 border border-red-500/20'
                         }`}>
                         <CheckCircle className="w-4 h-4" />
                         {passwordMessage.text}
@@ -444,19 +444,19 @@ const StudentProfile = () => {
 
                     {/* New Password */}
                     <div>
-                      <label className="block text-xs font-medium text-zinc-600 mb-1.5">New Password</label>
+                      <label className="block text-xs font-medium text-dark-400 mb-1.5">New Password</label>
                       <div className="relative">
                         <input
                           type={showNewPassword ? 'text' : 'password'}
                           value={passwordData.newPassword}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
                           placeholder="Enter new password (min 6 characters)"
-                          className="w-full px-4 py-2.5 pr-10 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                          className="w-full px-4 py-2.5 pr-10 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 placeholder-dark-500"
                         />
                         <button
                           type="button"
                           onClick={() => setShowNewPassword(!showNewPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-white"
                         >
                           {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -465,19 +465,19 @@ const StudentProfile = () => {
 
                     {/* Confirm Password */}
                     <div>
-                      <label className="block text-xs font-medium text-zinc-600 mb-1.5">Confirm New Password</label>
+                      <label className="block text-xs font-medium text-dark-400 mb-1.5">Confirm New Password</label>
                       <div className="relative">
                         <input
                           type={showConfirmPassword ? 'text' : 'password'}
                           value={passwordData.confirmPassword}
                           onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
                           placeholder="Confirm new password"
-                          className="w-full px-4 py-2.5 pr-10 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                          className="w-full px-4 py-2.5 pr-10 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 placeholder-dark-500"
                         />
                         <button
                           type="button"
                           onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-dark-400 hover:text-white"
                         >
                           {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -489,7 +489,7 @@ const StudentProfile = () => {
                       <button
                         type="submit"
                         disabled={savingPassword || !passwordData.newPassword || !passwordData.confirmPassword}
-                        className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-primary-500/20"
                       >
                         {savingPassword ? (
                           <Loader className="w-4 h-4 animate-spin" />
@@ -505,7 +505,7 @@ const StudentProfile = () => {
                           setPasswordData({ newPassword: '', confirmPassword: '' });
                           setPasswordMessage({ type: '', text: '' });
                         }}
-                        className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-800 transition-colors"
+                        className="px-4 py-2 text-sm font-medium text-dark-400 hover:text-white transition-colors"
                       >
                         Cancel
                       </button>

@@ -44,7 +44,7 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-zinc-100" />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-dark-700" />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={thickness}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
           className="transition-all duration-1000 ease-out" />
@@ -58,7 +58,7 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
 
 // Skeleton
 const SkeletonPulse = ({ className }) => (
-  <div className={`animate-pulse bg-gradient-to-r from-zinc-100 via-zinc-50 to-zinc-100 rounded ${className}`} />
+  <div className={`animate-pulse bg-gradient-to-r from-dark-800 via-dark-700 to-dark-800 rounded ${className}`} />
 );
 
 const AdminEvents = () => {
@@ -227,21 +227,21 @@ const AdminEvents = () => {
             ================================================================ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Events */}
-          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+          <div className="insight-panel glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center">
-                <Calendar className="w-4.5 h-4.5 text-zinc-600" />
+              <div className="w-9 h-9 rounded-lg bg-dark-700 flex items-center justify-center">
+                <Calendar className="w-4.5 h-4.5 text-dark-300" />
               </div>
-              <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+              <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                 <ArrowUpRight className="w-3 h-3" />
                 <span>+5</span>
               </div>
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Events</p>
-            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={events.length} /></p>
-            <div className="mt-3 pt-3 border-t border-zinc-50 flex gap-1.5">
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Events</p>
+            <p className="text-2xl font-semibold text-white"><AnimatedNumber value={events.length} /></p>
+            <div className="mt-3 pt-3 border-t border-dark-700 flex gap-1.5">
               {categoryDist.map((cat, i) => (
-                <span key={cat.name} className="text-[9px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
+                <span key={cat.name} className="text-[9px] text-dark-400 bg-dark-700 px-1.5 py-0.5 rounded">
                   {cat.name}: {cat.count}
                 </span>
               ))}
@@ -249,89 +249,89 @@ const AdminEvents = () => {
           </div>
 
           {/* Pending */}
-          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-amber-200 hover:shadow-sm transition-all">
+          <div className="insight-panel glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-amber-500/30 hover:shadow-lg transition-all">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                <Clock className="w-4.5 h-4.5 text-amber-600" />
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                <Clock className="w-4.5 h-4.5 text-amber-400" />
               </div>
               <RadialProgress value={events.length > 0 ? Math.round((pendingCount / events.length) * 100) : 0} color="#f59e0b" />
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Pending</p>
-            <p className="text-2xl font-semibold text-amber-600"><AnimatedNumber value={pendingCount} /></p>
-            <div className="mt-3 pt-3 border-t border-zinc-50">
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Pending</p>
+            <p className="text-2xl font-semibold text-amber-400"><AnimatedNumber value={pendingCount} /></p>
+            <div className="mt-3 pt-3 border-t border-dark-700">
               {pendingCount > 0 ? (
-                <span className="text-[10px] text-amber-600 font-medium bg-amber-50 px-2 py-0.5 rounded animate-pulse">Needs Review</span>
+                <span className="text-[10px] text-amber-400 font-medium bg-amber-500/10 px-2 py-0.5 rounded animate-pulse border border-amber-500/20">Needs Review</span>
               ) : (
-                <span className="text-xs text-zinc-500">All caught up!</span>
+                <span className="text-xs text-dark-400">All caught up!</span>
               )}
             </div>
           </div>
 
           {/* Approved */}
-          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-emerald-200 hover:shadow-sm transition-all">
+          <div className="insight-panel glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-emerald-500/30 hover:shadow-lg transition-all">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <Check className="w-4.5 h-4.5 text-emerald-600" />
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Check className="w-4.5 h-4.5 text-emerald-400" />
               </div>
               <RadialProgress value={events.length > 0 ? Math.round((approvedCount / events.length) * 100) : 0} color="#10b981" />
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Approved</p>
-            <p className="text-2xl font-semibold text-emerald-600"><AnimatedNumber value={approvedCount} /></p>
-            <div className="mt-3 pt-3 border-t border-zinc-50 flex items-center gap-2">
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Approved</p>
+            <p className="text-2xl font-semibold text-emerald-400"><AnimatedNumber value={approvedCount} /></p>
+            <div className="mt-3 pt-3 border-t border-dark-700 flex items-center gap-2">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
               </span>
-              <span className="text-xs text-zinc-500">Live events</span>
+              <span className="text-xs text-dark-400">Live events</span>
             </div>
           </div>
 
           {/* Rejected */}
-          <div className="insight-panel bg-white rounded-xl p-5 border border-zinc-100 hover:border-red-200 hover:shadow-sm transition-all">
+          <div className="insight-panel glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-red-500/30 hover:shadow-lg transition-all">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-red-50 flex items-center justify-center">
-                <X className="w-4.5 h-4.5 text-red-600" />
+              <div className="w-9 h-9 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                <X className="w-4.5 h-4.5 text-red-400" />
               </div>
               <RadialProgress value={events.length > 0 ? Math.round((rejectedCount / events.length) * 100) : 0} color="#ef4444" />
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Rejected</p>
-            <p className="text-2xl font-semibold text-red-600"><AnimatedNumber value={rejectedCount} /></p>
-            <div className="mt-3 pt-3 border-t border-zinc-50">
-              <span className="text-xs text-zinc-500">Not approved</span>
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Rejected</p>
+            <p className="text-2xl font-semibold text-red-400"><AnimatedNumber value={rejectedCount} /></p>
+            <div className="mt-3 pt-3 border-t border-dark-700">
+              <span className="text-xs text-dark-400">Not approved</span>
             </div>
           </div>
         </div>
 
         {/* Filter Bar */}
-        <div className="filter-bar bg-white rounded-xl border border-zinc-100 p-4">
+        <div className="filter-bar glass-card-dark rounded-xl border border-dark-700 p-4">
           <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-zinc-400 w-4 h-4" strokeWidth={1.5} />
-              <input type="text" placeholder="Search events..." className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border-0 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 focus:bg-white transition-all text-zinc-700 placeholder-zinc-400" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-dark-400 w-4 h-4" strokeWidth={1.5} />
+              <input type="text" placeholder="Search events..." className="w-full pl-10 pr-4 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 text-white placeholder-dark-500" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
               {searchQuery && (
-                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-zinc-200 rounded transition-colors">
-                  <X className="w-3.5 h-3.5 text-zinc-400" />
+                <button onClick={() => setSearchQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 p-0.5 hover:bg-dark-700 rounded transition-colors">
+                  <X className="w-3.5 h-3.5 text-dark-400" />
                 </button>
               )}
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-zinc-50">
-            <span className="text-xs font-medium text-zinc-400 uppercase tracking-wide mr-1">Status</span>
+          <div className="flex flex-wrap items-center gap-3 mt-4 pt-4 border-t border-dark-700">
+            <span className="text-xs font-medium text-dark-400 uppercase tracking-wide mr-1">Status</span>
             {statuses.map((s) => (
-              <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterStatus === s ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
+              <button key={s} onClick={() => setFilterStatus(s)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterStatus === s ? 'bg-violet-600 text-white' : 'bg-dark-700 text-dark-300 hover:bg-dark-600 hover:text-white'}`}>
                 {s === 'all' ? 'All' : s}
               </button>
             ))}
-            <div className="w-px h-5 bg-zinc-200 mx-1" />
-            <span className="text-xs font-medium text-zinc-400 uppercase tracking-wide mr-1">Category</span>
+            <div className="w-px h-5 bg-dark-700 mx-1" />
+            <span className="text-xs font-medium text-dark-400 uppercase tracking-wide mr-1">Category</span>
             {categories.map(c => (
-              <button key={c} onClick={() => setFilterCategory(c)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterCategory === c ? 'bg-violet-600 text-white' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
+              <button key={c} onClick={() => setFilterCategory(c)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterCategory === c ? 'bg-violet-600 text-white' : 'bg-dark-700 text-dark-300 hover:bg-dark-600 hover:text-white'}`}>
                 {c === 'all' ? 'All' : c}
               </button>
             ))}
             {hasActiveFilters && (
-              <button onClick={clearFilters} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-600 hover:text-violet-700 bg-violet-50 hover:bg-violet-100 rounded-full transition-colors ml-auto">
+              <button onClick={clearFilters} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-400 hover:text-violet-300 bg-violet-500/10 hover:bg-violet-500/20 rounded-full transition-colors ml-auto border border-violet-500/20">
                 <X className="w-3 h-3" />Clear
               </button>
             )}
@@ -350,55 +350,55 @@ const AdminEvents = () => {
                 const CategoryIcon = getCategoryIcon(event.category);
                 const categoryColor = getCategoryColor(event.category);
 
-              return (
-                <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
-                  <div className="flex flex-col lg:flex-row lg:items-center gap-4">
-                    {/* Event Info */}
-                    <div className="flex items-start gap-4 flex-1">
-                      <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
-                        <CategoryIcon className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
-                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
+                return (
+                  <div key={event._id} className="event-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+                    <div className="flex flex-col lg:flex-row lg:items-center gap-4">
+                      {/* Event Info */}
+                      <div className="flex items-start gap-4 flex-1">
+                        <div className={`w-12 h-12 bg-gradient-to-br ${categoryColor} rounded-xl flex items-center justify-center flex-shrink-0`}>
+                          <CategoryIcon className="w-6 h-6 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
+                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
                               event.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' :
                                 'bg-red-50 text-red-700'
-                            }`}>
-                            <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
+                              }`}>
+                              <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
                                 event.status === 'Approved' ? 'bg-emerald-500' :
                                   'bg-red-500'
-                              }`} />
-                            {event.status}
-                          </span>
-                        </div>
-                        <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
-                        <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
-                          <span className="flex items-center gap-1">
-                            <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
-                            {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                          </span>
-                          {event.time && (
-                            <span className="flex items-center gap-1">
-                              <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.time}
+                                }`} />
+                              {event.status}
                             </span>
-                          )}
-                          {event.venue && (
+                          </div>
+                          <p className="text-xs text-zinc-500 line-clamp-1 mb-2">{event.description}</p>
+                          <div className="flex flex-wrap items-center gap-4 text-xs text-zinc-500">
                             <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.venue}
+                              <Calendar className="w-3.5 h-3.5" strokeWidth={1.5} />
+                              {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                             </span>
-                          )}
-                          {event.expectedParticipants > 0 && (
-                            <span className="flex items-center gap-1">
-                              <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
-                              {event.expectedParticipants} expected
-                            </span>
-                          )}
+                            {event.time && (
+                              <span className="flex items-center gap-1">
+                                <Clock className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.time}
+                              </span>
+                            )}
+                            {event.venue && (
+                              <span className="flex items-center gap-1">
+                                <MapPin className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.venue}
+                              </span>
+                            )}
+                            {event.expectedParticipants > 0 && (
+                              <span className="flex items-center gap-1">
+                                <Users className="w-3.5 h-3.5" strokeWidth={1.5} />
+                                {event.expectedParticipants} expected
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
 
                       {/* Actions */}
                       {event.status === 'Pending' && (

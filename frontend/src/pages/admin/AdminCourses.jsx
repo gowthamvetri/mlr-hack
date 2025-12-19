@@ -49,13 +49,13 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#27272a" strokeWidth={strokeWidth} />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
           className="transition-all duration-700 ease-out" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-semibold text-zinc-600">{percentage}%</span>
+        <span className="text-[10px] font-semibold text-dark-400">{percentage}%</span>
       </div>
     </div>
   );
@@ -63,33 +63,33 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
 
 // Skeleton Components
 const SkeletonCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
+  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
     <div className="animate-pulse">
       <div className="flex items-start justify-between mb-6">
-        <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
-        <div className="w-16 h-5 bg-zinc-100 rounded-full" />
+        <div className="w-9 h-9 bg-dark-700 rounded-lg" />
+        <div className="w-16 h-5 bg-dark-700 rounded-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-3 w-20 bg-zinc-100 rounded" />
-        <div className="h-8 w-14 bg-zinc-100 rounded" />
+        <div className="h-3 w-20 bg-dark-700 rounded" />
+        <div className="h-8 w-14 bg-dark-700 rounded" />
       </div>
     </div>
   </div>
 );
 
 const SkeletonCourseCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
+  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
     <div className="animate-pulse">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-zinc-100 rounded-lg" />
+        <div className="w-10 h-10 bg-dark-700 rounded-lg" />
         <div className="space-y-2 flex-1">
-          <div className="h-4 w-32 bg-zinc-100 rounded" />
-          <div className="h-3 w-20 bg-zinc-100 rounded" />
+          <div className="h-4 w-32 bg-dark-700 rounded" />
+          <div className="h-3 w-20 bg-dark-700 rounded" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 w-full bg-zinc-100 rounded" />
-        <div className="h-3 w-2/3 bg-zinc-100 rounded" />
+        <div className="h-3 w-full bg-dark-700 rounded" />
+        <div className="h-3 w-2/3 bg-dark-700 rounded" />
       </div>
     </div>
   </div>
@@ -308,8 +308,8 @@ const AdminCourses = () => {
         {/* Premium Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Course Catalog</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Manage courses and curriculum</p>
+            <h1 className="text-2xl font-semibold text-white tracking-tight">Course Catalog</h1>
+            <p className="text-dark-400 text-sm mt-0.5">Manage courses and curriculum</p>
           </div>
           <div className="flex items-center gap-2.5">
             <FilterTriggerButton
@@ -317,11 +317,11 @@ const AdminCourses = () => {
               onClick={() => setFilterPanelOpen(!filterPanelOpen)}
               activeFiltersCount={(filterDept !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)}
             />
-            <button onClick={handleExport} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200">
+            <button onClick={handleExport} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-400 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all duration-200">
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Export</span>
             </button>
-            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all duration-200 shadow-sm">
+            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-all duration-200 shadow-sm shadow-violet-500/20">
               <Plus className="w-4 h-4" />
               <span>Add Course</span>
             </button>
@@ -335,82 +335,82 @@ const AdminCourses = () => {
           ) : (
             <>
               {/* Total Courses */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
-                    <BookOpen className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
+                  <div className="w-9 h-9 rounded-lg bg-dark-700/50 flex items-center justify-center border border-white/5">
+                    <BookOpen className="w-4.5 h-4.5 text-dark-400" strokeWidth={1.5} />
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                     <ArrowUpRight className="w-3 h-3" />
                     <span>8</span>
                   </div>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Courses</p>
-                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.total} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Courses</p>
+                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.total} /></p>
+                <div className="mt-4 pt-3 border-t border-white/5">
                   <div className="flex flex-wrap gap-1">
                     {deptDistribution.slice(0, 3).map((d) => (
-                      <span key={d.name} className="text-[10px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">{d.name}: {d.count}</span>
+                      <span key={d.name} className="text-[10px] text-dark-400 bg-dark-700/50 px-1.5 py-0.5 rounded border border-white/5">{d.name}: {d.count}</span>
                     ))}
                   </div>
                 </div>
               </div>
 
               {/* Active Courses */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                    <BookOpen className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/10">
+                    <BookOpen className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
                   </div>
                   <ProgressRing percentage={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0} color="#10b981" />
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Active Courses</p>
-                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.active} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Active Courses</p>
+                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.active} /></p>
+                <div className="mt-4 pt-3 border-t border-white/5">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                     </span>
-                    <span className="text-xs text-zinc-500">Currently taught</span>
+                    <span className="text-xs text-dark-400">Currently taught</span>
                   </div>
                 </div>
               </div>
 
               {/* Enrolled Students */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <Users className="w-4.5 h-4.5 text-blue-500" strokeWidth={1.5} />
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/10">
+                    <Users className="w-4.5 h-4.5 text-blue-400" strokeWidth={1.5} />
                   </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                     <ArrowUpRight className="w-3 h-3" />
                     <span>12%</span>
                   </div>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Enrolled</p>
-                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.students} /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <p className="text-[10px] text-zinc-400">Across all courses</p>
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Enrolled</p>
+                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.students} /></p>
+                <div className="mt-4 pt-3 border-t border-white/5">
+                  <p className="text-[10px] text-dark-400">Across all courses</p>
                 </div>
               </div>
 
               {/* Avg Rating */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                    <Star className="w-4.5 h-4.5 text-amber-500" strokeWidth={1.5} />
+                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/10">
+                    <Star className="w-4.5 h-4.5 text-amber-400" strokeWidth={1.5} />
                   </div>
                   <div className="flex items-center gap-0.5">
                     {[1, 2, 3, 4, 5].map(i => (
-                      <Star key={i} className={`w-3 h-3 transition-colors ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-zinc-200'}`} />
+                      <Star key={i} className={`w-3 h-3 transition-colors ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-dark-600'}`} />
                     ))}
                   </div>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Avg. Rating</p>
-                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} suffix="/5" /></p>
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="relative h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg. Rating</p>
+                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} suffix="/5" /></p>
+                <div className="mt-4 pt-3 border-t border-white/5">
+                  <div className="relative h-1.5 bg-dark-700 rounded-full overflow-hidden">
                     <div className="absolute h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full transition-all duration-700" style={{ width: `${((parseFloat(stats.avgRating) || 0) / 5) * 100}%` }} />
                   </div>
                 </div>
@@ -456,74 +456,74 @@ const AdminCourses = () => {
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {filteredCourses.length > 0 ? filteredCourses.map((course) => (
-              <div key={course._id} className="course-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+              <div key={course._id} className="course-item group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                      <BookOpen className="w-5 h-5 text-white" strokeWidth={1.5} />
+                    <div className="w-10 h-10 bg-gradient-to-br from-violet-600/20 to-violet-600/10 rounded-lg flex items-center justify-center border border-violet-500/20">
+                      <BookOpen className="w-5 h-5 text-violet-300" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors line-clamp-1">{course.name}</h3>
-                      <p className="text-xs text-zinc-500 font-mono">{course.code}</p>
+                      <h3 className="font-medium text-white text-sm group-hover:text-violet-400 transition-colors line-clamp-1">{course.name}</h3>
+                      <p className="text-xs text-dark-400 font-mono">{course.code}</p>
                     </div>
                   </div>
-                  <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+                  <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
                     <MoreHorizontal className="w-4 h-4" />
                   </button>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Dept</p>
-                    <p className="text-xs font-medium text-zinc-700">{typeof course.department === 'object' ? course.department?.code : course.department}</p>
+                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
+                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Dept</p>
+                    <p className="text-xs font-medium text-dark-300">{typeof course.department === 'object' ? course.department?.code : course.department}</p>
                   </div>
-                  <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Credits</p>
-                    <p className="text-xs font-medium text-zinc-700">{course.credits || 3}</p>
+                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
+                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Credits</p>
+                    <p className="text-xs font-medium text-dark-300">{course.credits || 3}</p>
                   </div>
-                  <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                    <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Students</p>
-                    <p className="text-xs font-medium text-zinc-700">{course.enrolledStudents?.length || course.students || 0}</p>
+                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
+                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Students</p>
+                    <p className="text-xs font-medium text-dark-300">{course.enrolledStudents?.length || course.students || 0}</p>
                   </div>
                 </div>
 
                 {course.rating > 0 && (
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-[10px] mb-1">
-                      <span className="text-zinc-400">Rating</span>
+                      <span className="text-dark-400">Rating</span>
                       <div className="flex items-center gap-0.5">
                         <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                        <span className="font-medium text-zinc-700">{course.rating}</span>
+                        <span className="font-medium text-dark-300">{course.rating}</span>
                       </div>
                     </div>
-                    <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-1 bg-dark-700 rounded-full overflow-hidden">
                       <div className="h-full bg-amber-400 rounded-full transition-all duration-700" style={{ width: `${(course.rating / 5) * 100}%` }} />
                     </div>
                   </div>
                 )}
 
-                <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
-                  <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium ${course.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : course.status === 'Upcoming' ? 'bg-blue-50 text-blue-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : course.status === 'Upcoming' ? 'bg-blue-500' : 'bg-zinc-400'}`} />
+                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                  <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium border border-white/5 ${course.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : course.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-400' : 'bg-dark-700 text-dark-400'}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : course.status === 'Upcoming' ? 'bg-blue-500' : 'bg-dark-500'}`} />
                     {course.status || 'Active'}
                   </span>
                   <div className="flex items-center gap-0.5">
-                    <button onClick={() => handleViewClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleEditClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => openMaterialModal(course)} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"><FileText className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleViewClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => handleEditClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => openMaterialModal(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><FileText className="w-3.5 h-3.5" /></button>
+                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                   </div>
                 </div>
               </div>
             )) : (
               <div className="col-span-full text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-sm font-medium text-zinc-700 mb-1">No courses found</h3>
-                <p className="text-xs text-zinc-500 mb-4">Try adjusting your filters</p>
+                <h3 className="text-sm font-medium text-white mb-1">No courses found</h3>
+                <p className="text-xs text-dark-400 mb-4">Try adjusting your filters</p>
                 {hasActiveFilters && (
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors">
+                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark-700 text-dark-300 rounded-lg text-xs font-medium hover:bg-dark-600 transition-colors">
                     <X className="w-3 h-3" />Clear filters
                   </button>
                 )}
@@ -531,52 +531,52 @@ const AdminCourses = () => {
             )}
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+          <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-zinc-50 border-b border-zinc-100">
+                <thead className="bg-dark-800/50 border-b border-dark-700">
                   <tr>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Course</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Department</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Credits</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Rating</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Status</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Actions</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Course</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Department</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Credits</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Rating</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Status</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-50">
+                <tbody className="divide-y divide-dark-700">
                   {filteredCourses.map((course) => (
-                    <tr key={course._id} className="course-item group hover:bg-zinc-50 transition-colors">
+                    <tr key={course._id} className="course-item group hover:bg-dark-800/30 transition-colors">
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-white" strokeWidth={1.5} />
+                          <div className="w-9 h-9 bg-gradient-to-br from-violet-600/20 to-violet-600/10 border border-violet-500/20 rounded-lg flex items-center justify-center">
+                            <BookOpen className="w-4 h-4 text-violet-300" strokeWidth={1.5} />
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-zinc-900">{course.name}</p>
-                            <p className="text-xs text-zinc-500 font-mono">{course.code}</p>
+                            <p className="text-sm font-medium text-white">{course.name}</p>
+                            <p className="text-xs text-dark-400 font-mono">{course.code}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-5"><span className="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-xs font-medium">{typeof course.department === 'object' ? course.department?.code : course.department}</span></td>
-                      <td className="py-3 px-5 text-sm text-zinc-600">{course.credits || 3}</td>
+                      <td className="py-3 px-5"><span className="px-2 py-1 bg-dark-700/50 text-dark-300 border border-white/5 rounded text-xs font-medium">{typeof course.department === 'object' ? course.department?.code : course.department}</span></td>
+                      <td className="py-3 px-5 text-sm text-dark-400">{course.credits || 3}</td>
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-1">
                           <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-medium text-zinc-700">{course.rating || '—'}</span>
+                          <span className="text-sm font-medium text-dark-300">{course.rating || '—'}</span>
                         </div>
                       </td>
                       <td className="py-3 px-5">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${course.status === 'Active' ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                          <span className={`w-1 h-1 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/5 ${course.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-dark-700 text-dark-400'}`}>
+                          <span className={`w-1 h-1 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : 'bg-dark-500'}`} />
                           {course.status || 'Active'}
                         </span>
                       </td>
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-0.5">
-                          <button onClick={() => handleViewClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleEditClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleViewClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleEditClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                       </td>
                     </tr>
@@ -586,15 +586,15 @@ const AdminCourses = () => {
             </div>
             {filteredCourses.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
+                  <BookOpen className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-sm font-medium text-zinc-700 mb-1">No courses found</h3>
+                <h3 className="text-sm font-medium text-white mb-1">No courses found</h3>
               </div>
             )}
             {filteredCourses.length > 0 && (
-              <div className="px-5 py-3 bg-zinc-50 border-t border-zinc-100">
-                <p className="text-xs text-zinc-500">Showing <span className="font-medium text-zinc-700">{filteredCourses.length}</span> of <span className="font-medium text-zinc-700">{courses.length}</span> courses</p>
+              <div className="px-5 py-3 bg-dark-800/30 border-t border-dark-700">
+                <p className="text-xs text-dark-500">Showing <span className="font-medium text-white">{filteredCourses.length}</span> of <span className="font-medium text-white">{courses.length}</span> courses</p>
               </div>
             )}
           </div>
@@ -603,35 +603,35 @@ const AdminCourses = () => {
         {/* Add Course Modal */}
         <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Course" size="md">
           <form onSubmit={handleAddCourse} className="space-y-4">
-            {formError && <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-            {formSuccess && <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
+            {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
+            {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Enter course name" />
+              <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Name *</label>
+              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="Enter course name" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course Code *</label>
-                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all font-mono" placeholder="CS101" />
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Code *</label>
+                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all font-mono" placeholder="CS101" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Credits</label>
-                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" min="1" max="6" />
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Credits</label>
+                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white transition-all" min="1" max="6" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
+                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-800">{d}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Status</label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  <option>Active</option>
-                  <option>Upcoming</option>
-                  <option>Completed</option>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Status</label>
+                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  <option className="bg-dark-800">Active</option>
+                  <option className="bg-dark-800">Upcoming</option>
+                  <option className="bg-dark-800">Completed</option>
                 </select>
               </div>
             </div>
@@ -642,21 +642,21 @@ const AdminCourses = () => {
               });
               return filteredStaff.length > 0 ? (
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Instructor <span className="text-zinc-400 font-normal">({filteredStaff.length} in {formData.department})</span></label>
-                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                    <option value="">Select instructor</option>
-                    {filteredStaff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Instructor <span className="text-dark-500 font-normal">({filteredStaff.length} in {formData.department})</span></label>
+                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                    <option value="" className="bg-dark-800">Select instructor</option>
+                    {filteredStaff.map(s => <option key={s._id} value={s._id} className="bg-dark-800">{s.name}</option>)}
                   </select>
                 </div>
               ) : (
-                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                  <p className="text-xs text-amber-700">No staff available in {formData.department} department</p>
+                <div className="p-3 bg-amber-500/10 border border-amber-500/10 rounded-lg">
+                  <p className="text-xs text-amber-400">No staff available in {formData.department} department</p>
                 </div>
               );
             })()}
             <div className="flex gap-2.5 pt-3">
-              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
-              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Add Course</button>
+              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Add Course</button>
             </div>
           </form>
         </Modal>
@@ -664,35 +664,35 @@ const AdminCourses = () => {
         {/* Edit Course Modal */}
         <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Course" size="md">
           <form onSubmit={handleUpdateCourse} className="space-y-4">
-            {formError && <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-            {formSuccess && <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
+            {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
+            {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" />
+              <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Name *</label>
+              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course Code *</label>
-                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all font-mono" />
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Code *</label>
+                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all font-mono" />
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Credits</label>
-                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" min="1" max="6" />
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Credits</label>
+                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white transition-all" min="1" max="6" />
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
+                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-800">{d}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Status</label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  <option>Active</option>
-                  <option>Upcoming</option>
-                  <option>Completed</option>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Status</label>
+                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  <option className="bg-dark-800">Active</option>
+                  <option className="bg-dark-800">Upcoming</option>
+                  <option className="bg-dark-800">Completed</option>
                 </select>
               </div>
             </div>
@@ -703,21 +703,21 @@ const AdminCourses = () => {
               });
               return filteredStaff.length > 0 ? (
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Instructor <span className="text-zinc-400 font-normal">({filteredStaff.length} in {formData.department})</span></label>
-                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                    <option value="">Select instructor</option>
-                    {filteredStaff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Instructor <span className="text-dark-500 font-normal">({filteredStaff.length} in {formData.department})</span></label>
+                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                    <option value="" className="bg-dark-800">Select instructor</option>
+                    {filteredStaff.map(s => <option key={s._id} value={s._id} className="bg-dark-800">{s.name}</option>)}
                   </select>
                 </div>
               ) : (
-                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
-                  <p className="text-xs text-amber-700">No staff available in {formData.department} department</p>
+                <div className="p-3 bg-amber-500/10 border border-amber-500/10 rounded-lg">
+                  <p className="text-xs text-amber-400">No staff available in {formData.department} department</p>
                 </div>
               );
             })()}
             <div className="flex gap-2.5 pt-3">
-              <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
-              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Update Course</button>
+              <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
+              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Update Course</button>
             </div>
           </form>
         </Modal>
@@ -726,37 +726,37 @@ const AdminCourses = () => {
         <Modal isOpen={showViewModal} onClose={() => setShowViewModal(false)} title="Course Details" size="md">
           {viewCourse && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center">
+              <div className="flex items-center gap-3 pb-4 border-b border-white/5">
+                <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center">
                   <BookOpen className="w-6 h-6 text-white" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-zinc-900">{viewCourse.name}</h3>
-                  <p className="text-sm text-zinc-500 font-mono">{viewCourse.code}</p>
+                  <h3 className="font-semibold text-white">{viewCourse.name}</h3>
+                  <p className="text-sm text-dark-400 font-mono">{viewCourse.code}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Department</p>
-                  <p className="text-sm font-medium text-zinc-700">{typeof viewCourse.department === 'object' ? viewCourse.department?.name : viewCourse.department}</p>
+                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
+                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Department</p>
+                  <p className="text-sm font-medium text-dark-300">{typeof viewCourse.department === 'object' ? viewCourse.department?.name : viewCourse.department}</p>
                 </div>
-                <div className="p-3 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Credits</p>
-                  <p className="text-sm font-medium text-zinc-700">{viewCourse.credits || 3}</p>
+                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
+                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Credits</p>
+                  <p className="text-sm font-medium text-dark-300">{viewCourse.credits || 3}</p>
                 </div>
-                <div className="p-3 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Instructor</p>
-                  <p className="text-sm font-medium text-zinc-700">{viewCourse.instructor?.name || 'Not assigned'}</p>
+                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
+                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Instructor</p>
+                  <p className="text-sm font-medium text-dark-300">{viewCourse.instructor?.name || 'Not assigned'}</p>
                 </div>
-                <div className="p-3 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Status</p>
-                  <p className="text-sm font-medium text-zinc-700">{viewCourse.status || 'Active'}</p>
+                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
+                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Status</p>
+                  <p className="text-sm font-medium text-dark-300">{viewCourse.status || 'Active'}</p>
                 </div>
               </div>
               {viewCourse.description && (
-                <div className="p-3 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-400 uppercase tracking-wide mb-1">Description</p>
-                  <p className="text-sm text-zinc-600">{viewCourse.description}</p>
+                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
+                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Description</p>
+                  <p className="text-sm text-dark-400">{viewCourse.description}</p>
                 </div>
               )}
             </div>
@@ -767,13 +767,13 @@ const AdminCourses = () => {
         <Modal isOpen={showDeleteModal && selectedCourse} onClose={() => setShowDeleteModal(false)} size="sm">
           {selectedCourse && (
             <div className="text-center py-2">
-              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/10">
+                <AlertTriangle className="w-6 h-6 text-red-500" />
               </div>
-              <h3 className="text-lg font-semibold text-zinc-900 mb-2">Delete Course?</h3>
-              <p className="text-sm text-zinc-500 mb-6">Are you sure you want to delete <strong className="text-zinc-700">{selectedCourse.name}</strong>?</p>
+              <h3 className="text-lg font-semibold text-white mb-2">Delete Course?</h3>
+              <p className="text-sm text-dark-400 mb-6">Are you sure you want to delete <strong className="text-white">{selectedCourse.name}</strong>?</p>
               <div className="flex gap-2.5">
-                <button onClick={() => { setShowDeleteModal(false); setSelectedCourse(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
+                <button onClick={() => { setShowDeleteModal(false); setSelectedCourse(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
                 <button onClick={handleDeleteCourse} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">Delete</button>
               </div>
             </div>
@@ -784,50 +784,50 @@ const AdminCourses = () => {
         <Modal isOpen={showMaterialModal} onClose={() => { setShowMaterialModal(false); setSelectedCourse(null); }} title="Course Materials" size="lg">
           {selectedCourse && (
             <div className="space-y-4">
-              <form onSubmit={handleUploadMaterial} className="p-4 bg-zinc-50 rounded-xl">
+              <form onSubmit={handleUploadMaterial} className="p-4 bg-dark-700/30 rounded-xl border border-white/5">
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <input type="text" value={materialName} onChange={(e) => setMaterialName(e.target.value)} placeholder="Material name (optional)" className="flex-1 px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
-                  <label className="flex items-center gap-2 px-4 py-2.5 bg-white border border-zinc-200 rounded-lg cursor-pointer hover:bg-zinc-50 transition-colors">
-                    <Upload className="w-4 h-4 text-zinc-500" />
-                    <span className="text-sm text-zinc-600">{materialFile ? materialFile.name : 'Choose file'}</span>
+                  <input type="text" value={materialName} onChange={(e) => setMaterialName(e.target.value)} placeholder="Material name (optional)" className="flex-1 px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500" />
+                  <label className="flex items-center gap-2 px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg cursor-pointer hover:bg-dark-700 transition-colors">
+                    <Upload className="w-4 h-4 text-dark-400" />
+                    <span className="text-sm text-dark-300">{materialFile ? materialFile.name : 'Choose file'}</span>
                     <input type="file" className="hidden" onChange={(e) => setMaterialFile(e.target.files[0])} />
                   </label>
-                  <button type="submit" disabled={!materialFile || uploadingMaterial} className="px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 disabled:opacity-50 transition-colors">
+                  <button type="submit" disabled={!materialFile || uploadingMaterial} className="px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 disabled:opacity-50 transition-colors">
                     {uploadingMaterial ? 'Uploading...' : 'Upload'}
                   </button>
                 </div>
               </form>
 
-              {formError && <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm">{formError}</div>}
-              {formSuccess && <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm">{formSuccess}</div>}
+              {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm">{formError}</div>}
+              {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm">{formSuccess}</div>}
 
               <div className="space-y-2">
                 {selectedCourse.materials?.length > 0 ? selectedCourse.materials.map((material) => (
-                  <div key={material._id} className="flex items-center justify-between p-3 bg-white border border-zinc-100 rounded-lg hover:border-zinc-200 transition-colors">
+                  <div key={material._id} className="flex items-center justify-between p-3 bg-dark-800 border border-dark-700 rounded-lg hover:border-dark-600 transition-colors">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-zinc-100 rounded-lg flex items-center justify-center">
-                        <File className="w-4 h-4 text-zinc-500" />
+                      <div className="w-9 h-9 bg-dark-700/50 rounded-lg flex items-center justify-center border border-white/5">
+                        <File className="w-4 h-4 text-dark-400" />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-zinc-900">{material.name}</p>
-                        <p className="text-xs text-zinc-500">{new Date(material.uploadedAt).toLocaleDateString()}</p>
+                        <p className="text-sm font-medium text-white">{material.name}</p>
+                        <p className="text-xs text-dark-400">{new Date(material.uploadedAt).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
-                      <button onClick={() => { setSelectedMaterial(material); setShowMindMapModal(true); }} className="p-2 text-zinc-400 hover:text-violet-600 hover:bg-violet-50 rounded-lg transition-colors" title="Generate Mind Map">
+                      <button onClick={() => { setSelectedMaterial(material); setShowMindMapModal(true); }} className="p-2 text-dark-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors" title="Generate Mind Map">
                         <BrainCircuit className="w-4 h-4" />
                       </button>
-                      <a href={material.url} target="_blank" rel="noopener noreferrer" className="p-2 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors">
+                      <a href={material.url} target="_blank" rel="noopener noreferrer" className="p-2 text-dark-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
                         <Download className="w-4 h-4" />
                       </a>
-                      <button onClick={() => handleDeleteMaterial(material._id)} className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                      <button onClick={() => handleDeleteMaterial(material._id)} className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
                   </div>
                 )) : (
-                  <div className="text-center py-8 text-zinc-400">
-                    <FileText className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                  <div className="text-center py-8 text-dark-500">
+                    <FileText className="w-12 h-12 mx-auto mb-2 opacity-30" />
                     <p className="text-sm">No materials uploaded yet</p>
                   </div>
                 )}

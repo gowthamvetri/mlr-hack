@@ -122,8 +122,30 @@ const MindMapPreview = ({ courseId, materialId, onClose, onSave, readOnly = fals
                                     />
                                 </div>
                             )}
-                            <div className={`flex-1 relative bg-white ${isEditing ? 'w-2/3' : 'w-full'} min-h-[500px]`}>
+                            <div className={`flex-1 relative bg-gradient-to-br from-slate-900 to-slate-800 ${isEditing ? 'w-2/3' : 'w-full'} min-h-[500px]`}>
                                 <svg ref={svgRef} className="w-full h-full block" style={{ width: '100%', height: '100%' }} />
+                                <style>{`
+                                    /* White text for visibility on dark background */
+                                    .markmap-node text {
+                                        fill: #ffffff !important;
+                                        font-weight: 500 !important;
+                                        font-size: 14px !important;
+                                    }
+                                    .markmap-node foreignObject div,
+                                    .markmap-node foreignObject * {
+                                        color: #ffffff !important;
+                                    }
+                                    svg text {
+                                        fill: #ffffff !important;
+                                    }
+                                    svg foreignObject, svg foreignObject * {
+                                        color: #ffffff !important;
+                                    }
+                                    .markmap-link, svg path {
+                                        stroke: #64748b !important;
+                                        stroke-width: 2px !important;
+                                    }
+                                `}</style>
                             </div>
                         </>
                     )}

@@ -17,7 +17,7 @@ const CountBadge = ({ count, active = false }) => (
     transition-all duration-300 transform
     ${active
             ? 'bg-white text-violet-600 scale-110'
-            : 'bg-zinc-200/60 text-zinc-500 group-hover:bg-violet-100 group-hover:text-violet-600'
+            : 'bg-dark-700 text-dark-400 group-hover:bg-violet-500/20 group-hover:text-violet-400'
         }
   `}>
         {count}
@@ -27,12 +27,12 @@ const CountBadge = ({ count, active = false }) => (
 // Interactive Filter Chip with hover glow
 const FilterChip = ({ label, icon: Icon, active, onClick, count, color = 'violet' }) => {
     const colorStyles = {
-        violet: { active: 'bg-violet-600 text-white shadow-lg shadow-violet-500/25', hover: 'hover:border-violet-300 hover:bg-violet-50' },
-        blue: { active: 'bg-blue-600 text-white shadow-lg shadow-blue-500/25', hover: 'hover:border-blue-300 hover:bg-blue-50' },
-        emerald: { active: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/25', hover: 'hover:border-emerald-300 hover:bg-emerald-50' },
-        amber: { active: 'bg-amber-600 text-white shadow-lg shadow-amber-500/25', hover: 'hover:border-amber-300 hover:bg-amber-50' },
-        zinc: { active: 'bg-zinc-900 text-white shadow-lg shadow-zinc-500/25', hover: 'hover:border-zinc-300 hover:bg-zinc-50' },
-        red: { active: 'bg-red-600 text-white shadow-lg shadow-red-500/25', hover: 'hover:border-red-300 hover:bg-red-50' },
+        violet: { active: 'bg-violet-600 text-white shadow-lg shadow-violet-500/20', hover: 'hover:border-violet-500/50 hover:bg-violet-500/10' },
+        blue: { active: 'bg-blue-600 text-white shadow-lg shadow-blue-500/20', hover: 'hover:border-blue-500/50 hover:bg-blue-500/10' },
+        emerald: { active: 'bg-emerald-600 text-white shadow-lg shadow-emerald-500/20', hover: 'hover:border-emerald-500/50 hover:bg-emerald-500/10' },
+        amber: { active: 'bg-amber-600 text-white shadow-lg shadow-amber-500/20', hover: 'hover:border-amber-500/50 hover:bg-amber-500/10' },
+        zinc: { active: 'bg-dark-200 text-dark-900 shadow-lg shadow-white/10', hover: 'hover:border-dark-500 hover:bg-dark-700' },
+        red: { active: 'bg-red-600 text-white shadow-lg shadow-red-500/20', hover: 'hover:border-red-500/50 hover:bg-red-500/10' },
     };
     const styles = colorStyles[color] || colorStyles.violet;
 
@@ -44,7 +44,7 @@ const FilterChip = ({ label, icon: Icon, active, onClick, count, color = 'violet
         border transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]
         ${active
                     ? `${styles.active} border-transparent`
-                    : `bg-white border-zinc-200 text-zinc-700 ${styles.hover}`
+                    : `bg-dark-800 border-dark-700 text-dark-300 ${styles.hover}`
                 }
       `}
         >
@@ -77,8 +77,8 @@ export const FilterTriggerButton = ({
                 group relative flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium
                 border transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]
                 ${isOpen
-                    ? 'bg-violet-600 text-white border-violet-600 shadow-lg shadow-violet-500/25'
-                    : 'bg-white border-zinc-200 text-zinc-700 hover:border-violet-300 hover:bg-violet-50'
+                    ? 'bg-violet-600 text-white border-violet-600 shadow-lg shadow-violet-500/20'
+                    : 'glass-card-dark border-dark-700 text-dark-300 hover:border-violet-500/50 hover:bg-violet-500/10 hover:text-white'
                 }
                 ${className}
             `}
@@ -88,7 +88,7 @@ export const FilterTriggerButton = ({
             {activeFiltersCount > 0 && (
                 <span className={`
                     inline-flex items-center justify-center min-w-[20px] h-[20px] px-1.5 text-[10px] font-bold rounded-full
-                    ${isOpen ? 'bg-white text-violet-600' : 'bg-violet-100 text-violet-600'}
+                    ${isOpen ? 'bg-white text-violet-600' : 'bg-violet-500/20 text-violet-400'}
                 `}>
                     {activeFiltersCount}
                 </span>
@@ -191,8 +191,8 @@ export const PremiumFilterBar = ({
             ref={filterPanelRef}
             style={{ display: 'none', overflow: 'hidden' }}
             className={`
-                relative bg-white rounded-2xl border border-zinc-100
-                shadow-lg shadow-zinc-200/50
+                relative glass-card-dark rounded-2xl border border-dark-700
+                shadow-xl shadow-black/20
                 ${className}
             `}
         >
@@ -200,21 +200,21 @@ export const PremiumFilterBar = ({
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-blue-500 to-emerald-500 opacity-80 rounded-t-2xl" />
 
             {/* Header with close button */}
-            <div className="px-4 lg:px-5 py-3 border-b border-zinc-100 flex items-center justify-between">
+            <div className="px-4 lg:px-5 py-3 border-b border-white/5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-violet-100 rounded-lg">
-                        <SlidersHorizontal className="w-4 h-4 text-violet-600" />
+                    <div className="p-2 bg-violet-500/10 rounded-lg">
+                        <SlidersHorizontal className="w-4 h-4 text-violet-400" />
                     </div>
                     <div>
-                        <h3 className="text-sm font-semibold text-zinc-800">Filter Options</h3>
-                        <p className="text-[11px] text-zinc-500">Refine your results</p>
+                        <h3 className="text-sm font-semibold text-white">Filter Options</h3>
+                        <p className="text-[11px] text-dark-400">Refine your results</p>
                     </div>
                 </div>
                 <button
                     onClick={onClose}
-                    className="p-2 hover:bg-zinc-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-dark-700 rounded-lg transition-colors"
                 >
-                    <X className="w-4 h-4 text-zinc-400" />
+                    <X className="w-4 h-4 text-dark-400" />
                 </button>
             </div>
 
@@ -225,7 +225,7 @@ export const PremiumFilterBar = ({
                     <div className="mb-4">
                         <div className="relative group">
                             <div className="absolute left-0 top-0 bottom-0 w-10 flex items-center justify-center pointer-events-none">
-                                <Search className="w-4 h-4 text-zinc-400 group-focus-within:text-violet-500 transition-colors" />
+                                <Search className="w-4 h-4 text-dark-400 group-focus-within:text-violet-400 transition-colors" />
                             </div>
                             <input
                                 type="text"
@@ -233,18 +233,18 @@ export const PremiumFilterBar = ({
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 className="
-                                    w-full pl-10 pr-10 py-3 text-sm bg-zinc-50/80 border-0 rounded-xl
-                                    focus:outline-none focus:ring-2 focus:ring-violet-200 focus:bg-white
-                                    transition-all duration-200 text-zinc-700 placeholder-zinc-400
-                                    hover:bg-zinc-100/80
+                                    w-full pl-10 pr-10 py-3 text-sm bg-dark-900/50 border-0 rounded-xl
+                                    focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:bg-dark-900
+                                    transition-all duration-200 text-white placeholder-dark-500
+                                    hover:bg-dark-900/80
                                 "
                             />
                             {searchQuery && (
                                 <button
                                     onClick={() => setSearchQuery('')}
-                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-zinc-200 hover:bg-zinc-300 rounded-lg transition-colors"
+                                    className="absolute right-3 top-1/2 -translate-y-1/2 p-1.5 bg-dark-700 hover:bg-dark-600 rounded-lg transition-colors"
                                 >
-                                    <X className="w-3 h-3 text-zinc-500" />
+                                    <X className="w-3 h-3 text-dark-400" />
                                 </button>
                             )}
                         </div>
@@ -255,8 +255,8 @@ export const PremiumFilterBar = ({
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {/* Department Filters */}
                     {departments.length > 0 && (
-                        <div className="space-y-2.5 p-3 bg-zinc-50/50 rounded-xl">
-                            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="space-y-2.5 p-3 bg-dark-800/50 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-semibold text-dark-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <Building className="w-3 h-3" />
                                 Department
                             </span>
@@ -277,8 +277,8 @@ export const PremiumFilterBar = ({
 
                     {/* Year Filters */}
                     {years.length > 0 && (
-                        <div className="space-y-2.5 p-3 bg-zinc-50/50 rounded-xl">
-                            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="space-y-2.5 p-3 bg-dark-800/50 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-semibold text-dark-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <GraduationCap className="w-3 h-3" />
                                 Year
                             </span>
@@ -299,8 +299,8 @@ export const PremiumFilterBar = ({
 
                     {/* Semester Filters */}
                     {semesters.length > 0 && (
-                        <div className="space-y-2.5 p-3 bg-zinc-50/50 rounded-xl">
-                            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="space-y-2.5 p-3 bg-dark-800/50 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-semibold text-dark-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <Hash className="w-3 h-3" />
                                 Semester
                             </span>
@@ -320,8 +320,8 @@ export const PremiumFilterBar = ({
 
                     {/* Status Filters */}
                     {statuses.length > 0 && (
-                        <div className="space-y-2.5 p-3 bg-zinc-50/50 rounded-xl">
-                            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <div className="space-y-2.5 p-3 bg-dark-800/50 rounded-xl border border-white/5">
+                            <span className="text-[10px] font-semibold text-dark-400 uppercase tracking-wider flex items-center gap-1.5">
                                 <Sparkles className="w-3 h-3" />
                                 Status
                             </span>
@@ -343,17 +343,17 @@ export const PremiumFilterBar = ({
 
                 {/* View Mode Toggle */}
                 {showViewToggle && setViewMode && (
-                    <div className="mt-4 pt-4 border-t border-zinc-100">
+                    <div className="mt-4 pt-4 border-t border-white/5">
                         <div className="flex items-center gap-3">
-                            <span className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">View</span>
-                            <div className="flex items-center p-1 bg-zinc-100 rounded-xl">
+                            <span className="text-[10px] font-semibold text-dark-400 uppercase tracking-wider">View</span>
+                            <div className="flex items-center p-1 bg-dark-800 rounded-xl border border-dark-700">
                                 <button
                                     onClick={() => setViewMode('grid')}
                                     className={`
                                         flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                                         ${viewMode === 'grid'
-                                            ? 'bg-white text-zinc-900 shadow-sm'
-                                            : 'text-zinc-500 hover:text-zinc-700'
+                                            ? 'bg-dark-700 text-white shadow-sm'
+                                            : 'text-dark-400 hover:text-white'
                                         }
                                     `}
                                 >
@@ -365,8 +365,8 @@ export const PremiumFilterBar = ({
                                     className={`
                                         flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200
                                         ${viewMode === 'list'
-                                            ? 'bg-white text-zinc-900 shadow-sm'
-                                            : 'text-zinc-500 hover:text-zinc-700'
+                                            ? 'bg-dark-700 text-white shadow-sm'
+                                            : 'text-dark-400 hover:text-white'
                                         }
                                     `}
                                 >
@@ -380,16 +380,16 @@ export const PremiumFilterBar = ({
             </div>
 
             {/* Footer Bar - Results count and clear */}
-            <div className="px-4 lg:px-5 py-3 bg-zinc-50/80 border-t border-zinc-100 flex items-center justify-between rounded-b-2xl">
+            <div className="px-4 lg:px-5 py-3 bg-dark-800/80 border-t border-white/5 flex items-center justify-between rounded-b-2xl">
                 <div className="flex items-center gap-3">
                     {filteredCount !== undefined && totalCount !== undefined && (
-                        <p className="text-xs text-zinc-500">
-                            Showing <span className="font-semibold text-zinc-700">{filteredCount}</span> of{' '}
-                            <span className="font-semibold text-zinc-700">{totalCount}</span> results
+                        <p className="text-xs text-dark-400">
+                            Showing <span className="font-semibold text-white">{filteredCount}</span> of{' '}
+                            <span className="font-semibold text-white">{totalCount}</span> results
                         </p>
                     )}
                     {hasActiveFilters && (
-                        <span className="flex items-center gap-1 text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded-full">
+                        <span className="flex items-center gap-1 text-[10px] font-medium text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-full">
                             <Filter className="w-2.5 h-2.5" />
                             Filters active
                         </span>
@@ -400,7 +400,7 @@ export const PremiumFilterBar = ({
                     {hasActiveFilters && onClearFilters && (
                         <button
                             onClick={onClearFilters}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 rounded-lg transition-colors"
+                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-lg transition-colors"
                         >
                             <X className="w-3 h-3" />
                             Clear all

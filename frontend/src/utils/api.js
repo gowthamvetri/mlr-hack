@@ -73,6 +73,13 @@ export const getClubStats = () => API.get('/clubs/stats');
 export const getAdminStats = () => API.get('/analytics/admin');
 export const getPerformanceMetrics = () => API.get('/analytics/performance-metrics');
 export const getDepartmentDistribution = () => API.get('/analytics/department-distribution');
+export const getCourseAnalytics = () => API.get('/analytics/courses');
+export const getPlacementAnalytics = () => API.get('/analytics/placements');
+export const getEngagementStats = () => API.get('/analytics/engagement');
+export const getMonthlyTrends = () => API.get('/analytics/monthly-trends');
+export const getExamAnalytics = () => API.get('/analytics/exams');
+export const getQuickInsights = () => API.get('/analytics/insights');
+
 
 // User management
 export const getUsers = (params) => API.get('/users', { params });

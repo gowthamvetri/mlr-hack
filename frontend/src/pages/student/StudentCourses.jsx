@@ -2,9 +2,9 @@ import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import { getCourses, enrollInCourse, getCourseMaterials, submitStaffRating, canRateStaff } from '../../utils/api';
+import { getSubjectsForStudent, getSubjectMaterials, submitStaffRating, canRateStaff } from '../../utils/api';
 import {
-  BookOpen, Search, Users, Clock, Star, Play, CheckCircle, BookMarked, Award,
+  BookOpen, Search, Users, Star, BookMarked, Award,
   FileText, Download, File, Folder, BrainCircuit, Grid3X3, List
 } from 'lucide-react';
 import Modal from '../../components/Modal';
@@ -41,16 +41,11 @@ const StudentCourses = () => {
   const pageRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const [filterDept, setFilterDept] = useState('all');
-  const [filterStatus, setFilterStatus] = useState('all');
   const [viewMode, setViewMode] = useState('grid');
-  const [enrolling, setEnrolling] = useState(null);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [showMaterialsModal, setShowMaterialsModal] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState(null);
   const [materials, setMaterials] = useState([]);
-  const [loadingMaterials, setLoadingMaterials] = useState(false);
-  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
 
   // Mind Map State
   const [showMindMapModal, setShowMindMapModal] = useState(false);
@@ -70,59 +65,29 @@ const StudentCourses = () => {
       gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
       gsap.fromTo('.course-card', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, delay: 0.2, ease: 'power2.out' });
     }
-  }, [loading, courses]);
+  }, [loading, subjects]);
 
-  useEffect(() => { fetchCourses(); }, []);
+  useEffect(() => { fetchSubjects(); }, []);
 
-  const fetchCourses = async () => {
+  const fetchSubjects = async () => {
     try {
       setLoading(true);
-      // Filter courses by student's department
-      const params = {};
-      if (user?.department) {
-        params.department = user.department;
-      }
-      const { data } = await getCourses(params);
-      setCourses(Array.isArray(data) ? data : []);
-      const enrolled = (data || []).filter(c => c.enrolledStudents?.some(s => s._id === user?._id || s === user?._id));
-      setEnrolledCourses(enrolled.map(c => c._id));
+      // Fetches subjects filtered by student's department and year
+      const { data } = await getSubjectsForStudent();
+      setSubjects(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error('Error fetching courses:', error);
-      setCourses([]);
+      console.error('Error fetching subjects:', error);
+      setSubjects([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEnroll = async (courseId) => {
-    try {
-      setEnrolling(courseId);
-      await enrollInCourse(courseId);
-      setEnrolledCourses([...enrolledCourses, courseId]);
-      fetchCourses();
-    } catch (error) {
-      console.error('Error enrolling:', error);
-      setEnrolledCourses([...enrolledCourses, courseId]);
-    } finally {
-      setEnrolling(null);
-    }
-  };
-
-  const isEnrolled = (courseId) => enrolledCourses.includes(courseId);
-
-  const handleViewMaterials = async (course) => {
-    setSelectedCourse(course);
+  const handleViewMaterials = async (subject) => {
+    setSelectedCourse(subject);
     setShowMaterialsModal(true);
-    setLoadingMaterials(true);
-    try {
-      const { data } = await getCourseMaterials(course._id);
-      setMaterials(data.materials || data || []);
-    } catch (error) {
-      console.error('Error fetching materials:', error);
-      setMaterials([]);
-    } finally {
-      setLoadingMaterials(false);
-    }
+    // Materials are already included in subject from getSubjectsForStudent
+    setMaterials(subject.materials || []);
   };
 
   const getFileIcon = (type) => {
@@ -160,7 +125,7 @@ const StudentCourses = () => {
       await submitStaffRating({ staffId: selectedCourse.instructorId, courseId: selectedCourse._id, rating: userRating, comment: ratingComment });
       alert('Rating submitted!');
       setShowRatingModal(false);
-      fetchCourses();
+      fetchSubjects();
     } catch (error) {
       alert(error.response?.data?.message || 'Failed to submit');
     } finally {
@@ -183,41 +148,36 @@ const StudentCourses = () => {
     );
   };
 
-  const departments = ['all', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT'];
 
-  const filteredCourses = courses.filter(c => {
-    const matchesSearch = c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.code?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDept = filterDept === 'all' || c.department === filterDept || c.department?.code === filterDept;
-    const matchesStatus = filterStatus === 'all' ||
-      (filterStatus === 'enrolled' && isEnrolled(c._id)) ||
-      (filterStatus === 'available' && !isEnrolled(c._id));
-    return matchesSearch && matchesDept && matchesStatus;
+  const filteredSubjects = subjects.filter(s => {
+    const matchesSearch = s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.code?.toLowerCase().includes(searchQuery.toLowerCase());
+    return matchesSearch;
   });
 
   const stats = {
-    total: courses.length,
-    enrolled: enrolledCourses.length,
-    available: courses.filter(c => c.status === 'Active' && !isEnrolled(c._id)).length,
-    completed: 0
+    total: subjects.length,
+    withMaterials: subjects.filter(s => s.materials?.length > 0).length,
+    totalMaterials: subjects.reduce((sum, s) => sum + (s.materials?.length || 0), 0),
+    semesters: [...new Set(subjects.map(s => s.semester))].length
   };
 
   return (
     <DashboardLayout>
-      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
+      <div ref={pageRef} className="min-h-screen bg-dark-900 p-6 lg:p-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Course Catalog</h1>
-            <p className="text-sm text-zinc-500 mt-1">Browse and enroll in available courses</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">My Subjects</h1>
+            <p className="text-sm text-dark-400 mt-1">Subjects for your department with study materials</p>
           </div>
           <div className="flex items-center gap-2">
-            <div className="flex bg-zinc-100 rounded-lg p-1">
-              <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}>
-                <Grid3X3 className="w-4 h-4 text-zinc-600" />
+            <div className="flex bg-dark-800 rounded-lg p-1 border border-dark-700">
+              <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-dark-700 shadow-sm text-white' : 'text-dark-400 hover:text-white'}`}>
+                <Grid3X3 className="w-4 h-4" />
               </button>
-              <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}>
-                <List className="w-4 h-4 text-zinc-600" />
+              <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-dark-700 shadow-sm text-white' : 'text-dark-400 hover:text-white'}`}>
+                <List className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -225,184 +185,147 @@ const StudentCourses = () => {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-violet-500/30 hover:shadow-lg transition-all group">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                <BookOpen className="w-4.5 h-4.5 text-violet-500" />
+              <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center border border-violet-500/20 group-hover:bg-violet-500/20 transition-colors">
+                <BookOpen className="w-4.5 h-4.5 text-violet-400" />
               </div>
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Courses</p>
-            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.total} /></p>
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Subjects</p>
+            <p className="text-2xl font-bold text-white"><AnimatedNumber value={stats.total} /></p>
           </div>
 
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-blue-500/30 hover:shadow-lg transition-all group">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                <BookMarked className="w-4.5 h-4.5 text-blue-500" />
+              <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20 group-hover:bg-blue-500/20 transition-colors">
+                <BookMarked className="w-4.5 h-4.5 text-blue-400" />
               </div>
-              {stats.enrolled > 0 && (
-                <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Active</span>
+              {stats.withMaterials > 0 && (
+                <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Active</span>
               )}
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Enrolled</p>
-            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.enrolled} /></p>
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">With Materials</p>
+            <p className="text-2xl font-bold text-white"><AnimatedNumber value={stats.withMaterials} /></p>
           </div>
 
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-emerald-500/30 hover:shadow-lg transition-all group">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                <Play className="w-4.5 h-4.5 text-emerald-500" />
+              <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 group-hover:bg-emerald-500/20 transition-colors">
+                <FileText className="w-4.5 h-4.5 text-emerald-400" />
               </div>
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Available</p>
-            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.available} /></p>
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Materials</p>
+            <p className="text-2xl font-bold text-white"><AnimatedNumber value={stats.totalMaterials} /></p>
           </div>
 
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-amber-500/30 hover:shadow-lg transition-all group">
             <div className="flex items-start justify-between mb-3">
-              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                <Award className="w-4.5 h-4.5 text-amber-500" />
+              <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/20 group-hover:bg-amber-500/20 transition-colors">
+                <Award className="w-4.5 h-4.5 text-amber-400" />
               </div>
             </div>
-            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Completed</p>
-            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.completed} /></p>
+            <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Semesters</p>
+            <p className="text-2xl font-bold text-white"><AnimatedNumber value={stats.semesters} /></p>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-zinc-100 p-4 mb-6">
+        <div className="glass-card-dark rounded-xl border border-dark-700 p-4 mb-6">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-              <input type="text" placeholder="Search courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+              <input
+                type="text"
+                placeholder="Search subjects..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+              />
             </div>
-            <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}
-              className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100">
-              <option value="all">All Departments</option>
-              {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
-            </select>
-            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
-              className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100">
-              <option value="all">All Courses</option>
-              <option value="enrolled">My Enrolled</option>
-              <option value="available">Available</option>
-            </select>
           </div>
         </div>
 
-        {/* Courses */}
+        {/* Subjects */}
         {loading ? (
           <div className="text-center py-16">
-            <div className="w-10 h-10 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-sm text-zinc-500">Loading courses...</p>
+            <div className="w-10 h-10 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm text-dark-400">Loading subjects...</p>
           </div>
-        ) : filteredCourses.length === 0 ? (
-          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-zinc-200">
-            <BookOpen className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
-            <p className="text-sm font-medium text-zinc-700">No courses found</p>
-            <p className="text-xs text-zinc-500 mt-1">Try adjusting your search or filters</p>
+        ) : filteredSubjects.length === 0 ? (
+          <div className="text-center py-16 glass-card-dark rounded-xl border border-dashed border-dark-700">
+            <BookOpen className="w-12 h-12 text-dark-600 mx-auto mb-3" />
+            <p className="text-sm font-medium text-white">No subjects found</p>
+            <p className="text-xs text-dark-400 mt-1">Try adjusting your search</p>
           </div>
         ) : viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCourses.map((course) => (
-              <div key={course._id} className="course-card bg-white rounded-xl border border-zinc-100 overflow-hidden hover:border-zinc-200 hover:shadow-md transition-all">
-                <div className="h-1.5 bg-gradient-to-r from-violet-500 to-violet-400" />
+            {filteredSubjects.map((subject) => (
+              <div key={subject._id} className="course-card glass-card-dark rounded-xl border border-dark-700 overflow-hidden hover:border-dark-600 hover:shadow-lg transition-all">
+                <div className="h-1.5 bg-gradient-to-r from-primary-600 to-primary-500" />
                 <div className="p-5">
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{course.code}</span>
-                        {isEnrolled(course._id) && (
-                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3" />Enrolled
-                          </span>
-                        )}
+                        <span className="text-[10px] font-bold text-primary-400 bg-primary-500/10 px-2 py-0.5 rounded border border-primary-500/20">{subject.code}</span>
+                        <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Sem {subject.semester}</span>
                       </div>
-                      <h3 className="font-medium text-zinc-900 text-sm mb-1">{course.name}</h3>
-                      <p className="text-xs text-zinc-500 flex items-center gap-1">
+                      <h3 className="font-bold text-white text-sm mb-1">{subject.name}</h3>
+                      <p className="text-xs text-dark-400 flex items-center gap-1">
                         <Users className="w-3 h-3" />
-                        {course.instructor?.name || course.instructor || 'TBA'}
+                        {subject.assignedStaff?.name || 'TBA'}
                       </p>
                     </div>
                   </div>
 
-                  <p className="text-xs text-zinc-500 line-clamp-2 mb-4">
-                    {course.description || 'No description available.'}
-                  </p>
-
-                  <div className="flex items-center justify-between py-3 px-3 bg-zinc-50 rounded-lg mb-4 text-xs">
+                  <div className="flex items-center justify-between py-3 px-3 bg-dark-800/50 rounded-lg mb-4 text-xs border border-dark-700">
                     <div className="text-center">
-                      <p className="font-semibold text-zinc-900">{course.enrolledStudents?.length || 0}</p>
-                      <p className="text-zinc-400">Students</p>
+                      <p className="font-bold text-white">{subject.materials?.length || 0}</p>
+                      <p className="text-dark-500">Materials</p>
                     </div>
-                    <div className="text-center border-l border-zinc-200 pl-4">
-                      <p className="font-semibold text-zinc-900">{course.credits}</p>
-                      <p className="text-zinc-400">Credits</p>
+                    <div className="text-center border-l border-dark-700 pl-4">
+                      <p className="font-bold text-white">{subject.credits || '-'}</p>
+                      <p className="text-dark-500">Credits</p>
                     </div>
-                    <div className="text-center border-l border-zinc-200 pl-4">
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold text-zinc-900">{course.rating || '4.5'}</span>
-                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                      </div>
-                      <p className="text-zinc-400">Rating</p>
+                    <div className="text-center border-l border-dark-700 pl-4">
+                      <p className="font-bold text-white">Year {subject.year || '-'}</p>
+                      <p className="text-dark-500">Year</p>
                     </div>
                   </div>
 
-                  {isEnrolled(course._id) ? (
-                    <button onClick={() => handleViewMaterials(course)}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
-                      <Play className="w-4 h-4" />Continue
-                    </button>
-                  ) : (
-                    <button onClick={() => handleEnroll(course._id)} disabled={enrolling === course._id}
-                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-50">
-                      {enrolling === course._id ? (
-                        <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enrolling...</>
-                      ) : (
-                        <><BookMarked className="w-4 h-4" />Enroll</>
-                      )}
-                    </button>
-                  )}
+                  <button onClick={() => handleViewMaterials(subject)}
+                    className="w-full flex items-center justify-center gap-2 py-2.5 bg-dark-800 text-white rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors border border-dark-700">
+                    <FileText className="w-4 h-4" />View Materials
+                  </button>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
-            <div className="divide-y divide-zinc-50">
-              {filteredCourses.map((course) => (
-                <div key={course._id} className="course-card p-4 hover:bg-zinc-50 transition-colors">
+          <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
+            <div className="divide-y divide-dark-700">
+              {filteredSubjects.map((subject) => (
+                <div key={subject._id} className="course-card p-4 hover:bg-dark-800/50 transition-colors">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-violet-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <BookOpen className="w-6 h-6 text-violet-500" />
+                    <div className="w-12 h-12 bg-primary-500/10 rounded-lg flex items-center justify-center flex-shrink-0 border border-primary-500/20">
+                      <BookOpen className="w-6 h-6 text-primary-500" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-medium text-zinc-900 text-sm">{course.name}</h3>
-                        <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">{course.code}</span>
-                        {isEnrolled(course._id) && (
-                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Enrolled</span>
-                        )}
+                        <h3 className="font-medium text-white text-sm">{subject.name}</h3>
+                        <span className="text-[10px] font-bold text-primary-400 bg-primary-500/10 px-1.5 py-0.5 rounded border border-primary-500/20">{subject.code}</span>
+                        <span className="text-[10px] font-bold text-blue-400 bg-blue-500/10 px-1.5 py-0.5 rounded border border-blue-500/20">Sem {subject.semester}</span>
                       </div>
-                      <div className="flex items-center gap-4 text-xs text-zinc-500">
-                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{course.instructor?.name || 'TBA'}</span>
-                        <span>{course.credits} credits</span>
-                        <span className="flex items-center gap-1">{course.rating || '4.5'}<Star className="w-3 h-3 text-amber-400 fill-amber-400" /></span>
+                      <div className="flex items-center gap-4 text-xs text-dark-400">
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{subject.assignedStaff?.name || 'TBA'}</span>
+                        <span>{subject.materials?.length || 0} materials</span>
+                        <span>{subject.credits || '-'} credits</span>
                       </div>
                     </div>
                     <div className="flex-shrink-0">
-                      {isEnrolled(course._id) ? (
-                        <button onClick={() => handleViewMaterials(course)}
-                          className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-medium hover:bg-zinc-800">
-                          Continue
-                        </button>
-                      ) : (
-                        <button onClick={() => handleEnroll(course._id)} disabled={enrolling === course._id}
-                          className="px-4 py-2 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-700 disabled:opacity-50">
-                          Enroll
-                        </button>
-                      )}
+                      <button onClick={() => handleViewMaterials(subject)}
+                        className="px-4 py-2 bg-dark-800 text-white rounded-lg text-xs font-medium hover:bg-dark-700 border border-dark-700">
+                        View Materials
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -418,35 +341,35 @@ const StudentCourses = () => {
             <div className="space-y-6">
               {loadingMaterials ? (
                 <div className="text-center py-12">
-                  <div className="w-8 h-8 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-3" />
-                  <p className="text-sm text-zinc-500">Loading materials...</p>
+                  <div className="w-8 h-8 border-2 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-sm text-dark-400">Loading materials...</p>
                 </div>
               ) : materials.length > 0 ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 pb-3 border-b border-zinc-100">
-                    <Folder className="w-4 h-4 text-violet-500" />
-                    <span className="text-sm font-medium text-zinc-900">Files ({materials.length})</span>
+                  <div className="flex items-center gap-2 pb-3 border-b border-dark-700">
+                    <Folder className="w-4 h-4 text-primary-400" />
+                    <span className="text-sm font-medium text-white">Files ({materials.length})</span>
                   </div>
                   {materials.map((material) => (
-                    <div key={material._id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
+                    <div key={material._id} className="flex items-center justify-between p-3 bg-dark-800/50 rounded-lg hover:bg-dark-800 transition-colors border border-dark-700">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-zinc-100">
+                        <div className="w-8 h-8 bg-dark-700 rounded-lg flex items-center justify-center border border-dark-600">
                           {getFileIcon(material.type)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-zinc-900">{material.name}</p>
-                          <p className="text-xs text-zinc-500">{formatFileSize(material.size)}</p>
+                          <p className="text-sm font-medium text-white">{material.name}</p>
+                          <p className="text-xs text-dark-500">{formatFileSize(material.size)}</p>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
                         {material.mindMap && (
                           <button onClick={() => { setSelectedMaterial(material); setShowMindMapModal(true); }}
-                            className="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
+                            className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-lg transition-colors">
                             <BrainCircuit className="w-4 h-4" />
                           </button>
                         )}
                         <a href={`http://localhost:5000${material.url}`} target="_blank" rel="noopener noreferrer"
-                          className="p-2 text-zinc-600 hover:bg-zinc-200 rounded-lg transition-colors">
+                          className="p-2 text-dark-400 hover:bg-dark-700 rounded-lg transition-colors">
                           <Download className="w-4 h-4" />
                         </a>
                       </div>
@@ -454,22 +377,22 @@ const StudentCourses = () => {
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-12 bg-zinc-50 rounded-lg">
-                  <FileText className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
-                  <p className="text-sm font-medium text-zinc-700">No materials yet</p>
-                  <p className="text-xs text-zinc-500 mt-1">Check back later</p>
+                <div className="text-center py-12 bg-dark-800/50 rounded-lg border border-dark-700">
+                  <FileText className="w-10 h-10 text-dark-600 mx-auto mb-3" />
+                  <p className="text-sm font-medium text-white">No materials yet</p>
+                  <p className="text-xs text-dark-400 mt-1">Check back later</p>
                 </div>
               )}
 
-              <div className="pt-4 border-t border-zinc-100 flex gap-3">
+              <div className="pt-4 border-t border-dark-700 flex gap-3">
                 {selectedCourse?.instructorId && (
                   <button onClick={() => handleOpenRating(selectedCourse)}
-                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-violet-50 text-violet-700 rounded-lg text-sm font-medium hover:bg-violet-100 transition-colors">
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-violet-500/10 text-violet-400 rounded-lg text-sm font-medium hover:bg-violet-500/20 transition-colors border border-violet-500/20">
                     <Star className="w-4 h-4" />Rate Instructor
                   </button>
                 )}
                 <button onClick={() => setShowMaterialsModal(false)}
-                  className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
+                  className="flex-1 py-2.5 bg-dark-800 text-white rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors border border-dark-700">
                   Close
                 </button>
               </div>
@@ -481,32 +404,32 @@ const StudentCourses = () => {
         <Modal isOpen={showRatingModal && selectedCourse} onClose={() => { setShowRatingModal(false); setUserRating(0); setRatingComment(''); }} title="Rate Instructor" size="md">
           {selectedCourse && (
             <div className="space-y-6">
-              <div className="text-center pb-4 border-b border-zinc-100">
-                <div className="w-14 h-14 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-3">
+              <div className="text-center pb-4 border-b border-dark-700">
+                <div className="w-14 h-14 bg-violet-500/10 rounded-full flex items-center justify-center mx-auto mb-3 border border-violet-500/20">
                   <Users className="w-7 h-7 text-violet-500" />
                 </div>
-                <h3 className="font-semibold text-zinc-900">{selectedCourse.instructor?.name || selectedCourse.instructor}</h3>
-                <p className="text-xs text-zinc-500 mt-1">{selectedCourse.name}</p>
+                <h3 className="font-bold text-white">{selectedCourse.instructor?.name || selectedCourse.instructor}</h3>
+                <p className="text-xs text-dark-400 mt-1">{selectedCourse.name}</p>
               </div>
 
               <div className="flex flex-col items-center py-4">
-                <p className="text-sm text-zinc-600 mb-3">{ratingStatus.hasRated ? 'Update rating' : 'Rate this instructor'}</p>
+                <p className="text-sm text-dark-300 mb-3">{ratingStatus.hasRated ? 'Update rating' : 'Rate this instructor'}</p>
                 <StarRating rating={userRating} onRate={setUserRating} onHover={setHoverRating} onLeave={() => setHoverRating(0)} />
-                <p className="text-xl font-semibold text-zinc-900 mt-3">{hoverRating || userRating || 0} / 5</p>
+                <p className="text-xl font-bold text-white mt-3">{hoverRating || userRating || 0} / 5</p>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Comment (optional)</label>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Comment (optional)</label>
                 <textarea value={ratingComment} onChange={(e) => setRatingComment(e.target.value)} placeholder="Share your experience..."
-                  rows={3} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none" />
+                  rows={3} className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 resize-none placeholder-dark-500" />
               </div>
 
               <div className="flex gap-3">
-                <button onClick={() => setShowRatingModal(false)} className="flex-1 py-2.5 border border-zinc-200 text-zinc-600 rounded-lg text-sm font-medium hover:bg-zinc-50">
+                <button onClick={() => setShowRatingModal(false)} className="flex-1 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white">
                   Cancel
                 </button>
                 <button onClick={handleSubmitRating} disabled={!userRating || submittingRating}
-                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50">
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 disabled:opacity-50 shadow-lg shadow-primary-500/20">
                   {submittingRating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Submitting...</> : 'Submit'}
                 </button>
               </div>

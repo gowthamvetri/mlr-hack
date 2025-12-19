@@ -4,7 +4,7 @@ import { selectCurrentUser } from '../store/slices/authSlice';
 import {
   getStudentExams, getEvents, getMySeat, getSubjects,
   getStreak, getSkills, getCareerProgress, updateStreak,
-  getMyApprovalStatus
+  getMyApprovalStatus, getExternalCourses
 } from '../utils/api';
 import SyllabusMindMap from '../components/SyllabusMindMap';
 import DashboardLayout from '../components/DashboardLayout';
@@ -142,11 +142,12 @@ const StudentDashboard = () => {
         if (subjectsArray.length > 0) setSelectedSubject(subjectsArray[0]);
 
         try {
-          const [streakRes, skillsRes, careerRes, approvalRes] = await Promise.all([
+          const [streakRes, skillsRes, careerRes, approvalRes, externalCoursesRes] = await Promise.all([
             getStreak().catch(() => ({ data: null })),
             getSkills().catch(() => ({ data: null })),
             getCareerProgress().catch(() => ({ data: null })),
-            getMyApprovalStatus().catch(() => ({ data: {} }))
+            getMyApprovalStatus().catch(() => ({ data: {} })),
+            getExternalCourses().catch(() => ({ data: [] }))
           ]);
 
           if (streakRes?.data) {
@@ -154,8 +155,14 @@ const StudentDashboard = () => {
             await updateStreak();
           }
 
+          // Calculate completed external courses for skills gained
+          const externalCourses = externalCoursesRes?.data || [];
+          const completedCoursesCount = externalCourses.filter(course =>
+            course.completedBy?.some(c => c.student === user?._id || c.student?._id === user?._id)
+          ).length;
+          setSkillsGained(completedCoursesCount);
+
           if (skillsRes?.data) {
-            setSkillsGained(skillsRes.data.totalSkills || 0);
             setSkillsTracked(skillsRes.data.skills?.length || 0);
             const formattedSkills = (skillsRes.data.skills || []).slice(0, 4).map(skill => ({
               name: skill.name,

@@ -32,71 +32,106 @@ const TOPIC_INDICATORS = [
 ];
 
 /**
- * Get appropriate prompt based on content size
+ * Get appropriate prompt based on content size - SUMMARIZES entire content
  */
 const getPromptForSize = (text) => {
     const textLength = text.length;
 
-    // Small content (< 500 chars) - simpler structure
+    // Small content (<500 chars) - concise summary
     if (textLength < 500) {
-        return `Analyze this short content and create a concise mind map in markdown format.
+        return `Analyze and SUMMARIZE this content into a mind map format.
 
 Requirements:
-1. Create a main topic heading (#)
-2. List 2-3 key points (- bullets)
-3. Add any important terms if present
+1. Create a clear main topic heading (#)
+2. Summarize ALL key information into 3-4 short bullet points
+3. Each point should be a CONCISE sentence (max 15 words)
+4. Capture the essence of the entire content, not just keywords
 
-Content:
+Output Format (Markdown):
+# [Main Topic]
+- [Summary point 1]
+- [Summary point 2]
+- [Summary point 3]
+
+Content to summarize:
 ${text}`;
     }
 
-    // Medium content (500 - 3000 chars)
+    // Medium content (500 - 3000 chars) - structured summary
     if (textLength < 3000) {
-        return `Analyze this content and create a structured mind map in markdown format.
+        return `Read and SUMMARIZE this content completely into a structured mind map.
 
 Requirements:
-1. Identify the MAIN TOPIC (use as # heading)
-2. Extract 2-4 KEY SUBTOPICS (use as ## headings)
-3. For each subtopic, list 1-3 important points (- bullets)
-4. Include key terms if applicable
+1. Identify the MAIN TOPIC and use it as the # heading
+2. Break content into 3-5 SUBTOPICS (## headings) based on themes/sections
+3. Under each subtopic, write 2-4 SHORT summary points (- bullets)
+4. Each bullet should be a COMPLETE thought in 10-20 words
+5. Cover ALL important information from the content
+6. Include a "Key Terms" section if technical terms are present
 
-Format:
+Output Format (Markdown):
 # Main Topic
-## Subtopic 1
-- Point 1
-- Point 2
 
-Content:
-${text}`;
-    }
+## Subtopic 1: [Theme Name]
+- [Complete summary sentence about this aspect]
+- [Another key point summarized concisely]
 
-    // Large content (3000+ chars) - full structure
-    return `Analyze this educational content and create a comprehensive mind map in markdown format.
-
-Requirements:
-1. Identify the MAIN TOPIC (use as # heading)
-2. Extract 3-5 KEY SUBTOPICS (use as ## headings)
-3. For each subtopic, list 2-4 important points (use - bullets)
-4. Include a "Key Terms" section with important vocabulary and brief definitions
-5. Keep it organized and educational
-
-Format example:
-# Main Topic Title
-
-## Subtopic 1
-- Important point 1
-- Important point 2
-
-## Subtopic 2
-- Important point 1
-- Important point 2
+## Subtopic 2: [Theme Name]
+- [Summary of this section's main idea]
+- [Supporting detail or concept]
 
 ## Key Terms
 - Term 1: Brief definition
 - Term 2: Brief definition
 
-Content to analyze:
-${text.substring(0, 30000)}`;
+Content to summarize:
+${text}`;
+    }
+
+    // Large content (3000+ chars) - comprehensive summary
+    return `Read this ENTIRE document carefully and create a COMPREHENSIVE mind map summary.
+
+CRITICAL INSTRUCTIONS:
+1. READ and UNDERSTAND the full content before generating
+2. Create a hierarchical summary that captures ALL major concepts
+3. Use SHORT, COMPLETE sentences (10-25 words max per point)
+4. Every section of the PDF should be represented in the summary
+5. Include factual information, not just topic names
+
+Structure Requirements:
+- # Main Topic: The central theme of the document
+- ## Subtopics (4-6): Major sections or themes covered
+- Under each ##, include 3-5 bullet points summarizing that section
+- Each bullet should explain a concept, not just name it
+- Add a "Key Concepts" section with important terms and their meanings
+- Add a "Summary" section with 3-4 main takeaways
+
+Output Format (Markdown):
+# [Document Title/Main Subject]
+
+## [First Major Theme/Section]
+- [Explain the main idea of this section in one sentence]
+- [Key detail or concept from this section]
+- [Another important point summarized]
+
+## [Second Major Theme/Section]
+- [Core concept explained briefly]
+- [Supporting information or example]
+- [Related detail]
+
+## [Additional Sections as needed...]
+
+## Key Concepts
+- [Term]: [What it means and why it's important]
+- [Concept]: [Brief explanation]
+
+## Summary
+- [Main takeaway 1]
+- [Main takeaway 2]
+- [What reader should remember most]
+
+Document Content:
+${text.substring(0, 50000)}`;
 };
 
 /**
@@ -166,7 +201,13 @@ const extractTopics = (text, maxTopics = 5) => {
 
 const generateLocalMindMap = (text) => {
     const topics = extractTopics(text, 5);
-    const keywords = extractKeywords(text, 12);
+    const keywords = extractKeywords(text, 10);
+
+    // Extract first meaningful sentences for summary
+    const sentences = text.split(/[.!?]+/)
+        .map(s => s.trim())
+        .filter(s => s.length > 30 && s.length < 150)
+        .slice(0, 5);
 
     let markdown = '# Document Summary\n\n';
 
@@ -174,11 +215,20 @@ const generateLocalMindMap = (text) => {
         markdown += '## Main Topics\n';
         topics.forEach(topic => {
             const formatted = topic.charAt(0).toUpperCase() + topic.slice(1).toLowerCase();
-            markdown += `### ${formatted}\n`;
+            markdown += `- ${formatted}\n`;
         });
+        markdown += '\n';
     }
 
-    markdown += '\n## Key Terms\n';
+    if (sentences.length > 0) {
+        markdown += '## Key Points\n';
+        sentences.forEach(sentence => {
+            markdown += `- ${sentence.trim()}\n`;
+        });
+        markdown += '\n';
+    }
+
+    markdown += '## Key Terms\n';
     keywords.forEach(({ word }) => {
         markdown += `- ${word.charAt(0).toUpperCase() + word.slice(1)}\n`;
     });
@@ -188,29 +238,29 @@ const generateLocalMindMap = (text) => {
 
 /**
  * Main function: Generate mind map from text
- * Works with ALL file sizes - uses adaptive prompts
+ * ALWAYS uses Gemini LLM - no local fallback
  */
 const generateMindMapFromText = async (text) => {
     // Accept even very small content (minimum 10 chars)
     if (!text || text.trim().length < 10) {
-        return '# Document Summary\n- No content available for analysis';
+        throw new Error('Content too short. Please provide more text for summarization.');
     }
 
-    // Always try Gemini AI first (with adaptive prompts for different sizes)
+    console.log(`Using Gemini AI for mind map generation (${text.length} chars)...`);
+    
     try {
-        console.log(`Using Gemini AI for mind map generation (${text.length} chars)...`);
         const aiResult = await generateWithGemini(text.trim());
 
         if (aiResult && aiResult.trim().length > 20) {
+            console.log('Mind map generated successfully via Gemini AI');
             return aiResult;
+        } else {
+            throw new Error('AI returned empty or insufficient response');
         }
     } catch (error) {
-        console.error('Gemini API error, falling back to local:', error.message);
+        console.error('Gemini API error:', error.message);
+        throw new Error(`Failed to generate mind map: ${error.message}. Please try again.`);
     }
-
-    // Fallback to local extraction
-    console.log('Using local extraction for mind map...');
-    return generateLocalMindMap(text);
 };
 
 module.exports = { generateMindMapFromText };

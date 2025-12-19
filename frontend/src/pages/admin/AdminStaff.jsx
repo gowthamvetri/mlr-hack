@@ -58,7 +58,7 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3 }) => {
                     cy={size / 2}
                     r={radius}
                     fill="none"
-                    stroke="#f4f4f5"
+                    stroke="#27272a"
                     strokeWidth={strokeWidth}
                 />
                 <circle
@@ -75,7 +75,7 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3 }) => {
                 />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[10px] font-semibold text-zinc-600">{percentage}%</span>
+                <span className="text-[10px] font-semibold text-dark-400">{percentage}%</span>
             </div>
         </div>
     );
@@ -83,33 +83,33 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3 }) => {
 
 // Skeleton with subtle shimmer
 const SkeletonCard = () => (
-    <div className="rounded-xl p-5 bg-white border border-zinc-100">
+    <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
         <div className="animate-pulse">
             <div className="flex items-start justify-between mb-6">
-                <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
-                <div className="w-16 h-5 bg-zinc-100 rounded-full" />
+                <div className="w-9 h-9 bg-dark-700 rounded-lg" />
+                <div className="w-16 h-5 bg-dark-700 rounded-full" />
             </div>
             <div className="space-y-2">
-                <div className="h-3 w-20 bg-zinc-100 rounded" />
-                <div className="h-8 w-14 bg-zinc-100 rounded" />
+                <div className="h-3 w-20 bg-dark-700 rounded" />
+                <div className="h-8 w-14 bg-dark-700 rounded" />
             </div>
         </div>
     </div>
 );
 
 const SkeletonStaffCard = () => (
-    <div className="rounded-xl p-5 bg-white border border-zinc-100">
+    <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
         <div className="animate-pulse">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 bg-zinc-100 rounded-full" />
+                <div className="w-11 h-11 bg-dark-700 rounded-full" />
                 <div className="space-y-2 flex-1">
-                    <div className="h-4 w-28 bg-zinc-100 rounded" />
-                    <div className="h-3 w-36 bg-zinc-100 rounded" />
+                    <div className="h-4 w-28 bg-dark-700 rounded" />
+                    <div className="h-3 w-36 bg-dark-700 rounded" />
                 </div>
             </div>
             <div className="space-y-2">
-                <div className="h-3 w-full bg-zinc-100 rounded" />
-                <div className="h-3 w-2/3 bg-zinc-100 rounded" />
+                <div className="h-3 w-full bg-dark-700 rounded" />
+                <div className="h-3 w-2/3 bg-dark-700 rounded" />
             </div>
         </div>
     </div>
@@ -242,8 +242,8 @@ const AdminStaff = () => {
                 {/* Premium Header - Clean and confident */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Staff Directory</h1>
-                        <p className="text-zinc-500 text-sm mt-0.5">Manage faculty members across departments</p>
+                        <h1 className="text-2xl font-semibold text-white tracking-tight">Staff Directory</h1>
+                        <p className="text-dark-400 text-sm mt-0.5">Manage faculty members across departments</p>
                     </div>
                     <div className="flex items-center gap-2.5">
                         <FilterTriggerButton
@@ -253,7 +253,7 @@ const AdminStaff = () => {
                         />
                         <button
                             onClick={handleExport}
-                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
+                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-400 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all duration-200"
                         >
                             <Download className="w-4 h-4" />
                             <span className="hidden sm:inline">Export</span>
@@ -275,112 +275,112 @@ const AdminStaff = () => {
                     ) : (
                         <>
                             {/* Total Staff */}
-                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
-                                        <Users className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-dark-700/50 flex items-center justify-center border border-white/5">
+                                        <Users className="w-4.5 h-4.5 text-dark-400" strokeWidth={1.5} />
                                     </div>
-                                    <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                    <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                                         <ArrowUpRight className="w-3 h-3" />
                                         <span>8%</span>
                                     </div>
                                 </div>
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Staff</p>
-                                <p className="text-2xl font-semibold text-zinc-900">
+                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Staff</p>
+                                <p className="text-2xl font-semibold text-white">
                                     <AnimatedNumber value={stats.total} />
                                 </p>
 
                                 {/* Mini bar chart for departments */}
-                                <div className="mt-4 pt-3 border-t border-zinc-50">
+                                <div className="mt-4 pt-3 border-t border-white/5">
                                     <div className="flex items-end gap-1 h-8">
                                         {deptDistribution.slice(0, 6).map((dept, i) => (
                                             <div
                                                 key={dept.name}
-                                                className="flex-1 bg-violet-100 rounded-sm transition-all duration-500"
+                                                className="flex-1 bg-violet-500/50 rounded-sm transition-all duration-500 hover:bg-violet-500"
                                                 style={{ height: `${(dept.count / maxDeptCount) * 100}%`, minHeight: '4px' }}
                                                 title={`${dept.name}: ${dept.count}`}
                                             />
                                         ))}
                                     </div>
-                                    <p className="text-[10px] text-zinc-400 mt-1.5">Across {deptDistribution.length} departments</p>
+                                    <p className="text-[10px] text-dark-400 mt-1.5">Across {deptDistribution.length} departments</p>
                                 </div>
                             </div>
 
                             {/* Professors */}
-                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                                        <GraduationCap className="w-4.5 h-4.5 text-violet-500" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center border border-violet-500/10">
+                                        <GraduationCap className="w-4.5 h-4.5 text-violet-400" strokeWidth={1.5} />
                                     </div>
                                     <ProgressRing percentage={stats.total > 0 ? Math.round((stats.professors / stats.total) * 100) : 0} />
                                 </div>
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Professors</p>
-                                <p className="text-2xl font-semibold text-zinc-900">
+                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Professors</p>
+                                <p className="text-2xl font-semibold text-white">
                                     <AnimatedNumber value={stats.professors} />
                                 </p>
 
-                                <div className="mt-4 pt-3 border-t border-zinc-50">
+                                <div className="mt-4 pt-3 border-t border-white/5">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs text-zinc-500">{stats.total > 0 ? Math.round((stats.professors / stats.total) * 100) : 0}% of faculty</span>
-                                        <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">Senior</span>
+                                        <span className="text-xs text-dark-500">{stats.total > 0 ? Math.round((stats.professors / stats.total) * 100) : 0}% of faculty</span>
+                                        <span className="text-[10px] font-medium text-violet-400 bg-violet-500/10 border border-violet-500/10 px-2 py-0.5 rounded">Senior</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Avg Rating */}
-                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                                        <Star className="w-4.5 h-4.5 text-amber-500" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/10">
+                                        <Star className="w-4.5 h-4.5 text-amber-400" strokeWidth={1.5} />
                                     </div>
                                     <div className="flex items-center gap-0.5">
                                         {[1, 2, 3, 4, 5].map(i => (
                                             <Star
                                                 key={i}
-                                                className={`w-3 h-3 transition-colors ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-zinc-200'}`}
+                                                className={`w-3 h-3 transition-colors ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-dark-600'}`}
                                             />
                                         ))}
                                     </div>
                                 </div>
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Avg. Rating</p>
-                                <p className="text-2xl font-semibold text-zinc-900">
+                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg. Rating</p>
+                                <p className="text-2xl font-semibold text-white">
                                     <AnimatedNumber value={parseFloat(stats.avgRating) || 0} suffix="/5" />
                                 </p>
 
-                                <div className="mt-4 pt-3 border-t border-zinc-50">
-                                    <div className="relative h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                                <div className="mt-4 pt-3 border-t border-white/5">
+                                    <div className="relative h-1.5 bg-dark-700 rounded-full overflow-hidden">
                                         <div
                                             className="absolute h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full transition-all duration-700"
                                             style={{ width: `${((parseFloat(stats.avgRating) || 0) / 5) * 100}%` }}
                                         />
                                     </div>
-                                    <p className="text-[10px] text-zinc-400 mt-1.5">Performance score</p>
+                                    <p className="text-[10px] text-dark-400 mt-1.5">Performance score</p>
                                 </div>
                             </div>
 
                             {/* Active Courses */}
-                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                        <BookOpen className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/10">
+                                        <BookOpen className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
                                     </div>
-                                    <div className="flex items-center gap-1 text-xs font-medium text-emerald-600">
+                                    <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
                                         <ArrowUpRight className="w-3 h-3" />
                                         <span>12%</span>
                                     </div>
                                 </div>
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Active Courses</p>
-                                <p className="text-2xl font-semibold text-zinc-900">
+                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Active Courses</p>
+                                <p className="text-2xl font-semibold text-white">
                                     <AnimatedNumber value={stats.totalCourses} />
                                 </p>
 
-                                <div className="mt-4 pt-3 border-t border-zinc-50">
+                                <div className="mt-4 pt-3 border-t border-white/5">
                                     <div className="flex items-center gap-2">
                                         <span className="relative flex h-2 w-2">
                                             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                                             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                                         </span>
-                                        <span className="text-xs text-zinc-500">Being taught</span>
+                                        <span className="text-xs text-dark-400">Being taught</span>
                                     </div>
                                 </div>
                             </div>
@@ -423,29 +423,29 @@ const AdminStaff = () => {
                         {filteredStaff.length > 0 ? filteredStaff.map((member) => (
                             <div
                                 key={member._id}
-                                className="staff-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300"
+                                className="staff-item group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className="relative">
-                                            <div className="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
-                                                <span className="text-white font-medium text-sm">
+                                            <div className="w-11 h-11 bg-gradient-to-br from-violet-600/20 to-violet-600/10 rounded-full flex items-center justify-center border border-violet-500/20">
+                                                <span className="text-violet-300 font-medium text-sm">
                                                     {member.name?.split(' ').map(n => n[0]).join('').slice(0, 2) || '?'}
                                                 </span>
                                             </div>
-                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
+                                            <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-dark-800" />
                                         </div>
                                         <div>
-                                            <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors">
+                                            <h3 className="font-medium text-white text-sm group-hover:text-violet-400 transition-colors">
                                                 {member.name || 'Unknown'}
                                             </h3>
-                                            <p className="text-xs text-zinc-500">{member.designation || 'Staff'}</p>
+                                            <p className="text-xs text-dark-400">{member.designation || 'Staff'}</p>
                                         </div>
                                     </div>
                                     <button
                                         onClick={() => { setSelectedStaff(member); setShowDeleteModal(true); }}
-                                        className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                                        className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                                     >
                                         <MoreHorizontal className="w-4 h-4" />
                                     </button>
@@ -453,56 +453,56 @@ const AdminStaff = () => {
 
                                 {/* Stats Row */}
                                 <div className="grid grid-cols-2 gap-3 mb-4">
-                                    <div className="px-3 py-2 bg-zinc-50 rounded-lg">
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Department</p>
-                                        <p className="text-xs font-medium text-zinc-700">{member.department || 'N/A'}</p>
+                                    <div className="px-3 py-2 bg-dark-700/50 rounded-lg border border-white/5">
+                                        <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Department</p>
+                                        <p className="text-xs font-medium text-dark-300">{member.department || 'N/A'}</p>
                                     </div>
-                                    <div className="px-3 py-2 bg-zinc-50 rounded-lg">
-                                        <p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5">Rating</p>
+                                    <div className="px-3 py-2 bg-dark-700/50 rounded-lg border border-white/5">
+                                        <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Rating</p>
                                         <div className="flex items-center gap-1">
                                             <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                                            <span className="text-xs font-medium text-zinc-700">{member.rating || '—'}</span>
+                                            <span className="text-xs font-medium text-dark-300">{member.rating || '—'}</span>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Contact */}
                                 <div className="space-y-2 mb-4 text-xs">
-                                    <div className="flex items-center gap-2 text-zinc-500">
-                                        <Mail className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} />
+                                    <div className="flex items-center gap-2 text-dark-400">
+                                        <Mail className="w-3.5 h-3.5 text-dark-500" strokeWidth={1.5} />
                                         <span className="truncate">{member.email}</span>
                                     </div>
                                     {member.experience && (
-                                        <div className="flex items-center gap-2 text-zinc-500">
-                                            <Briefcase className="w-3.5 h-3.5 text-zinc-400" strokeWidth={1.5} />
+                                        <div className="flex items-center gap-2 text-dark-400">
+                                            <Briefcase className="w-3.5 h-3.5 text-dark-500" strokeWidth={1.5} />
                                             <span>{member.experience} experience</span>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Footer */}
-                                <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
-                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium ${(member.status === 'Active' || !member.status)
-                                        ? 'bg-emerald-50 text-emerald-700'
-                                        : 'bg-zinc-100 text-zinc-600'
+                                <div className="flex items-center justify-between pt-3 border-t border-white/5">
+                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium border border-white/5 ${(member.status === 'Active' || !member.status)
+                                        ? 'bg-emerald-500/10 text-emerald-400'
+                                        : 'bg-dark-700 text-dark-400'
                                         }`}>
-                                        <span className={`w-1.5 h-1.5 rounded-full ${(member.status === 'Active' || !member.status) ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
+                                        <span className={`w-1.5 h-1.5 rounded-full ${(member.status === 'Active' || !member.status) ? 'bg-emerald-500' : 'bg-dark-500'}`} />
                                         {member.status || 'Active'}
                                     </span>
-                                    <span className="text-[10px] text-zinc-400">
+                                    <span className="text-[10px] text-dark-400">
                                         {member.courses || member.subjects?.length || 0} courses
                                     </span>
                                 </div>
                             </div>
                         )) : (
                             <div className="col-span-full text-center py-16">
-                                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                                    <Users className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
+                                    <Users className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                                 </div>
-                                <h3 className="text-sm font-medium text-zinc-700 mb-1">No staff found</h3>
-                                <p className="text-xs text-zinc-500 mb-4">Try adjusting your filters</p>
+                                <h3 className="text-sm font-medium text-white mb-1">No staff found</h3>
+                                <p className="text-xs text-dark-400 mb-4">Try adjusting your filters</p>
                                 {hasActiveFilters && (
-                                    <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors">
+                                    <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark-700 text-dark-300 rounded-lg text-xs font-medium hover:bg-dark-600 transition-colors">
                                         <X className="w-3 h-3" />
                                         Clear filters
                                     </button>
@@ -512,60 +512,60 @@ const AdminStaff = () => {
                     </div>
                 ) : (
                     /* List View - Clean table */
-                    <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+                    <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
                         <div className="overflow-x-auto">
                             <table className="w-full">
-                                <thead className="bg-zinc-50 border-b border-zinc-100">
+                                <thead className="bg-dark-800/50 border-b border-dark-700">
                                     <tr>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Staff Member</th>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Department</th>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Designation</th>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Rating</th>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Status</th>
-                                        <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Actions</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Staff Member</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Department</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Designation</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Rating</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Status</th>
+                                        <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Actions</th>
                                     </tr>
                                 </thead>
-                                <tbody className="divide-y divide-zinc-50">
+                                <tbody className="divide-y divide-dark-700">
                                     {filteredStaff.map((member) => (
-                                        <tr key={member._id} className="staff-item group hover:bg-zinc-50 transition-colors">
+                                        <tr key={member._id} className="staff-item group hover:bg-dark-800/30 transition-colors">
                                             <td className="py-3 px-5">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
-                                                        <span className="text-white font-medium text-xs">{member.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
+                                                    <div className="w-9 h-9 bg-gradient-to-br from-violet-600/20 to-violet-600/10 border border-violet-500/20 rounded-full flex items-center justify-center">
+                                                        <span className="text-violet-300 font-medium text-xs">{member.name?.split(' ').map(n => n[0]).join('').slice(0, 2)}</span>
                                                     </div>
                                                     <div>
-                                                        <p className="text-sm font-medium text-zinc-900">{member.name}</p>
-                                                        <p className="text-xs text-zinc-500">{member.email}</p>
+                                                        <p className="text-sm font-medium text-white">{member.name}</p>
+                                                        <p className="text-xs text-dark-400">{member.email}</p>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="py-3 px-5">
-                                                <span className="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-xs font-medium">{member.department}</span>
+                                                <span className="px-2 py-1 bg-dark-700/50 text-dark-300 border border-white/5 rounded text-xs font-medium">{member.department}</span>
                                             </td>
-                                            <td className="py-3 px-5 text-sm text-zinc-600">{member.designation || 'Staff'}</td>
+                                            <td className="py-3 px-5 text-sm text-dark-400">{member.designation || 'Staff'}</td>
                                             <td className="py-3 px-5">
                                                 <div className="flex items-center gap-1">
                                                     <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                                                    <span className="text-sm font-medium text-zinc-700">{member.rating || '—'}</span>
+                                                    <span className="text-sm font-medium text-dark-300">{member.rating || '—'}</span>
                                                 </div>
                                             </td>
                                             <td className="py-3 px-5">
-                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${(member.status === 'Active' || !member.status) ? 'bg-emerald-50 text-emerald-700' : 'bg-zinc-100 text-zinc-600'}`}>
-                                                    <span className={`w-1 h-1 rounded-full ${(member.status === 'Active' || !member.status) ? 'bg-emerald-500' : 'bg-zinc-400'}`} />
+                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/5 ${(member.status === 'Active' || !member.status) ? 'bg-emerald-500/10 text-emerald-400' : 'bg-dark-700 text-dark-400'}`}>
+                                                    <span className={`w-1 h-1 rounded-full ${(member.status === 'Active' || !member.status) ? 'bg-emerald-500' : 'bg-dark-500'}`} />
                                                     {member.status || 'Active'}
                                                 </span>
                                             </td>
                                             <td className="py-3 px-5">
                                                 <div className="flex items-center gap-0.5">
-                                                    <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
+                                                    <button className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors">
                                                         <Eye className="w-3.5 h-3.5" />
                                                     </button>
-                                                    <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
+                                                    <button className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors">
                                                         <Edit className="w-3.5 h-3.5" />
                                                     </button>
                                                     <button
                                                         onClick={() => { setSelectedStaff(member); setShowDeleteModal(true); }}
-                                                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                                                        className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
                                                     >
                                                         <Trash2 className="w-3.5 h-3.5" />
                                                     </button>
@@ -578,16 +578,16 @@ const AdminStaff = () => {
                         </div>
                         {filteredStaff.length === 0 && (
                             <div className="text-center py-16">
-                                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                                    <Users className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
+                                    <Users className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                                 </div>
-                                <h3 className="text-sm font-medium text-zinc-700 mb-1">No staff found</h3>
+                                <h3 className="text-sm font-medium text-white mb-1">No staff found</h3>
                             </div>
                         )}
                         {filteredStaff.length > 0 && (
-                            <div className="px-5 py-3 bg-zinc-50 border-t border-zinc-100">
-                                <p className="text-xs text-zinc-500">
-                                    Showing <span className="font-medium text-zinc-700">{filteredStaff.length}</span> of <span className="font-medium text-zinc-700">{staff.length}</span> staff members
+                            <div className="px-5 py-3 bg-dark-800/30 border-t border-dark-700">
+                                <p className="text-xs text-dark-500">
+                                    Showing <span className="font-medium text-white">{filteredStaff.length}</span> of <span className="font-medium text-white">{staff.length}</span> staff members
                                 </p>
                             </div>
                         )}
@@ -598,62 +598,62 @@ const AdminStaff = () => {
                 <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Staff" size="md">
                     <form onSubmit={handleAddStaff} className="space-y-4">
                         {formError && (
-                            <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+                            <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm flex items-center gap-2">
                                 <AlertTriangle className="w-4 h-4" />
                                 {formError}
                             </div>
                         )}
                         {formSuccess && (
-                            <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm flex items-center gap-2">
+                            <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm flex items-center gap-2">
                                 <CheckCircle className="w-4 h-4" />
                                 {formSuccess}
                             </div>
                         )}
                         <div>
-                            <label className="block text-xs font-medium text-zinc-600 mb-1.5">Full Name *</label>
-                            <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Enter name" />
+                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Full Name *</label>
+                            <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="Enter name" />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Email *</label>
-                                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="email@example.com" />
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Email *</label>
+                                <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="email@example.com" />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Password *</label>
-                                <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Min 6 chars" />
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Password *</label>
+                                <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="Min 6 chars" />
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                                    {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
+                                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                                    {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-800">{d}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Designation</label>
-                                <select value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                                    <option>Professor</option>
-                                    <option>Associate Professor</option>
-                                    <option>Assistant Professor</option>
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Designation</label>
+                                <select value={formData.designation} onChange={(e) => setFormData({ ...formData, designation: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                                    <option className="bg-dark-800">Professor</option>
+                                    <option className="bg-dark-800">Associate Professor</option>
+                                    <option className="bg-dark-800">Assistant Professor</option>
                                 </select>
                             </div>
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Experience</label>
-                                <input type="text" value={formData.experience} onChange={(e) => setFormData({ ...formData, experience: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="e.g., 5 years" />
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Experience</label>
+                                <input type="text" value={formData.experience} onChange={(e) => setFormData({ ...formData, experience: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="e.g., 5 years" />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Phone</label>
-                                <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Phone number" />
+                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Phone</label>
+                                <input type="text" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="Phone number" />
                             </div>
                         </div>
                         <div className="flex gap-2.5 pt-3">
-                            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
+                            <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">
                                 Cancel
                             </button>
-                            <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">
+                            <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">
                                 Add Staff
                             </button>
                         </div>
@@ -664,15 +664,15 @@ const AdminStaff = () => {
                 <Modal isOpen={showDeleteModal && selectedStaff} onClose={() => setShowDeleteModal(false)} size="sm">
                     {selectedStaff && (
                         <div className="text-center py-2">
-                            <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <AlertTriangle className="w-6 h-6 text-red-600" />
+                            <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/10">
+                                <AlertTriangle className="w-6 h-6 text-red-500" />
                             </div>
-                            <h3 className="text-lg font-semibold text-zinc-900 mb-2">Delete Staff?</h3>
-                            <p className="text-sm text-zinc-500 mb-6">
-                                Are you sure you want to delete <strong className="text-zinc-700">{selectedStaff.name}</strong>? This action cannot be undone.
+                            <h3 className="text-lg font-semibold text-white mb-2">Delete Staff?</h3>
+                            <p className="text-sm text-dark-400 mb-6">
+                                Are you sure you want to delete <strong className="text-white">{selectedStaff.name}</strong>? This action cannot be undone.
                             </p>
                             <div className="flex gap-2.5">
-                                <button onClick={() => { setShowDeleteModal(false); setSelectedStaff(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
+                                <button onClick={() => { setShowDeleteModal(false); setSelectedStaff(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">
                                     Cancel
                                 </button>
                                 <button onClick={handleDeleteStaff} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">

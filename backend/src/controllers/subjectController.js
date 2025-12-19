@@ -506,26 +506,27 @@ const getSubjectsForStudent = async (req, res) => {
     const studentDepartment = req.user.department;
     const studentYear = req.user.year;
 
-    const filter = { department: studentDepartment };
-    if (studentYear) filter.year = studentYear;
+    // Build filter - match department, optionally filter by year
+    const filter = {};
+    if (studentDepartment) filter.department = studentDepartment;
+    // Don't filter by year so students can see all years' subjects in their department
 
-    // Find subjects matching student's department and year with approved materials
+    // Find all subjects matching student's department
     const subjects = await Subject.find(filter)
       .populate('assignedStaff', 'name email')
       .populate('materials.uploadedBy', 'name')
       .sort({ year: 1, semester: 1, code: 1 });
 
-    // Filter to only include approved materials for students
-    const subjectsWithApprovedMaterials = subjects.map(subject => {
+    // Filter materials to only include approved ones for students
+    const subjectsWithFilteredMaterials = subjects.map(subject => {
       const subjectObj = subject.toObject();
-      subjectObj.materials = subjectObj.materials.filter(m => m.isApproved === true);
+      // Only show approved materials to students
+      subjectObj.materials = (subjectObj.materials || []).filter(m => m.isApproved === true);
       return subjectObj;
     });
 
-    // Only return subjects that have at least one approved material
-    const subjectsWithMaterials = subjectsWithApprovedMaterials.filter(s => s.materials.length > 0);
-
-    res.json(subjectsWithMaterials);
+    // Return all subjects (even those without materials)
+    res.json(subjectsWithFilteredMaterials);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

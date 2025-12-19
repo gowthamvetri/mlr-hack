@@ -104,7 +104,7 @@ const StaffAttendance = () => {
   };
 
   const filteredStudents = Array.isArray(students) ? students.filter(student => student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase())) : [];
-  const getAttendanceColor = (att) => att >= 75 ? 'text-emerald-600' : att >= 60 ? 'text-amber-600' : 'text-red-600';
+  const getAttendanceColor = (att) => att >= 75 ? 'text-emerald-400' : att >= 60 ? 'text-amber-400' : 'text-red-400';
   const years = [{ value: '1', label: '1st Year' }, { value: '2', label: '2nd Year' }, { value: '3', label: '3rd Year' }, { value: '4', label: '4th Year' }];
 
   return (
@@ -113,18 +113,18 @@ const StaffAttendance = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Attendance Management</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Attendance Management</h1>
+            <p className="text-dark-400 text-sm mt-0.5">
               Update and manage student attendance
-              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200">{staffDepartment}</span>}
+              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-dark-800 text-dark-300 border border-dark-700">{staffDepartment}</span>}
             </p>
           </div>
           <div className="flex gap-2">
-            <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors">
+            <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors">
               <RefreshCw className="w-4 h-4" /> Refresh
             </button>
             {Object.keys(editedAttendance).length > 0 && (
-              <button onClick={handleBulkSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-60 transition-colors shadow-sm">
+              <button onClick={handleBulkSave} disabled={saving} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 disabled:opacity-60 transition-colors shadow-lg shadow-primary-500/20">
                 <Save className="w-4 h-4" /> Save All ({Object.keys(editedAttendance).length})
               </button>
             )}
@@ -133,7 +133,7 @@ const StaffAttendance = () => {
 
         {/* Success Message */}
         {successMessage && (
-          <div className="p-3 bg-emerald-50 text-emerald-700 rounded-lg text-sm flex items-center gap-2 border border-emerald-100">
+          <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm flex items-center gap-2 border border-emerald-500/20">
             <Check className="w-4 h-4" /> {successMessage}
           </div>
         )}
@@ -147,9 +147,9 @@ const StaffAttendance = () => {
               { label: 'Below 75%', value: summary.belowThreshold, color: 'red' },
               { label: 'Average', value: summary.averageAttendance, suffix: '%', color: 'violet' }
             ].map((stat, i) => (
-              <div key={i} className={`metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all`}>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">{stat.label}</p>
-                <p className={`text-2xl font-semibold text-${stat.color === 'blue' ? 'zinc-900' : stat.color + '-600'}`}>
+              <div key={i} className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.label}</p>
+                <p className={`text-2xl font-bold text-${stat.color === 'blue' ? 'white' : stat.color + '-400'}`}>
                   <AnimatedNumber value={stat.value || 0} suffix={stat.suffix || ''} />
                 </p>
               </div>
@@ -158,13 +158,23 @@ const StaffAttendance = () => {
         )}
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-zinc-100 p-4">
+        <div className="glass-card-dark rounded-xl border border-dark-700 p-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-              <input type="text" placeholder="Search by name or roll number..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+              <input
+                type="text"
+                placeholder="Search by name or roll number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+              />
             </div>
-            <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)} className="px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+            <select
+              value={filterYear}
+              onChange={(e) => setFilterYear(e.target.value)}
+              className="px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+            >
               <option value="all">All Years</option>
               {years.map(year => <option key={year.value} value={year.value}>{year.label}</option>)}
             </select>
@@ -172,53 +182,62 @@ const StaffAttendance = () => {
         </div>
 
         {/* Students Table */}
-        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+        <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-zinc-50 border-b border-zinc-100">
+              <thead className="bg-dark-800 border-b border-dark-700">
                 <tr>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Student</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Roll No</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Year</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Attendance</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Status</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Action</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Student</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Roll No</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Year</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Attendance</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Status</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-50">
+              <tbody className="divide-y divide-dark-700">
                 {loading ? (
-                  <tr><td colSpan="6" className="px-5 py-10 text-center text-zinc-400 text-sm"><Loader className="w-5 h-5 animate-spin mx-auto" /></td></tr>
+                  <tr><td colSpan="6" className="px-5 py-10 text-center text-dark-400 text-sm"><Loader className="w-5 h-5 animate-spin mx-auto text-primary-500" /></td></tr>
                 ) : filteredStudents.length === 0 ? (
-                  <tr><td colSpan="6" className="px-5 py-10 text-center text-zinc-400 text-sm">No students found</td></tr>
+                  <tr><td colSpan="6" className="px-5 py-10 text-center text-dark-400 text-sm">No students found</td></tr>
                 ) : (
                   filteredStudents.map(student => {
                     const att = editedAttendance[student._id] ?? student.attendance ?? 0;
                     return (
-                      <tr key={student._id} className="hover:bg-zinc-50/50 transition-colors">
+                      <tr key={student._id} className="hover:bg-dark-800/50 transition-colors">
                         <td className="py-3 px-5">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-violet-50 rounded-full flex items-center justify-center text-xs font-semibold text-violet-600">{student.name?.charAt(0)}</div>
+                            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg">
+                              {student.name?.charAt(0)}
+                            </div>
                             <div>
-                              <p className="text-sm font-medium text-zinc-900">{student.name}</p>
-                              <p className="text-xs text-zinc-500">{student.email}</p>
+                              <p className="text-sm font-medium text-white">{student.name}</p>
+                              <p className="text-xs text-dark-400">{student.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-5 text-sm font-mono text-zinc-600">{student.rollNumber || '-'}</td>
-                        <td className="py-3 px-5 text-sm text-zinc-600">{student.year || '-'}</td>
+                        <td className="py-3 px-5 text-sm font-mono text-dark-300">{student.rollNumber || '-'}</td>
+                        <td className="py-3 px-5 text-sm text-dark-300">{student.year || '-'}</td>
                         <td className="py-3 px-5">
-                          <input type="number" min="0" max="100" value={att} onChange={(e) => handleAttendanceChange(student._id, e.target.value)} className={`w-16 px-2 py-1 border border-zinc-200 rounded-lg text-sm text-center font-medium ${getAttendanceColor(att)} focus:outline-none focus:ring-2 focus:ring-violet-100`} />
+                          <input
+                            type="number"
+                            min="0"
+                            max="100"
+                            value={att}
+                            onChange={(e) => handleAttendanceChange(student._id, e.target.value)}
+                            className={`w-16 px-2 py-1 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-center font-bold ${getAttendanceColor(att)} focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all`}
+                          />
                         </td>
                         <td className="py-3 px-5">
                           {att >= 75 ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100"><ArrowUp className="w-3 h-3" /> Eligible</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><ArrowUp className="w-3 h-3" /> Eligible</span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-700 border border-red-100"><ArrowDown className="w-3 h-3" /> Low</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-red-500/10 text-red-400 border border-red-500/20"><ArrowDown className="w-3 h-3" /> Low</span>
                           )}
                         </td>
                         <td className="py-3 px-5">
                           {editedAttendance[student._id] !== undefined && (
-                            <button onClick={() => handleSaveAttendance(student._id)} disabled={saving} className="p-1.5 text-violet-600 hover:bg-violet-50 rounded-md transition-colors disabled:opacity-50"><Save className="w-4 h-4" /></button>
+                            <button onClick={() => handleSaveAttendance(student._id)} disabled={saving} className="p-1.5 text-primary-400 hover:bg-primary-500/10 rounded-md transition-colors disabled:opacity-50 border border-transparent hover:border-primary-500/20"><Save className="w-4 h-4" /></button>
                           )}
                         </td>
                       </tr>

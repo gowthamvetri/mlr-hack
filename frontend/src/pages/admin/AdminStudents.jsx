@@ -58,13 +58,13 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={strokeWidth} className="text-dark-700" />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
           className="transition-all duration-700 ease-out" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-semibold text-zinc-600">{percentage}%</span>
+        <span className="text-[10px] font-semibold text-dark-300">{percentage}%</span>
       </div>
     </div>
   );
@@ -72,33 +72,33 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
 
 // Skeleton with subtle shimmer
 const SkeletonCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
+  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
     <div className="animate-pulse">
       <div className="flex items-start justify-between mb-6">
-        <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
-        <div className="w-16 h-5 bg-zinc-100 rounded-full" />
+        <div className="w-9 h-9 bg-dark-700 rounded-lg" />
+        <div className="w-16 h-5 bg-dark-700 rounded-full" />
       </div>
       <div className="space-y-2">
-        <div className="h-3 w-20 bg-zinc-100 rounded" />
-        <div className="h-8 w-14 bg-zinc-100 rounded" />
+        <div className="h-3 w-20 bg-dark-700 rounded" />
+        <div className="h-8 w-14 bg-dark-700 rounded" />
       </div>
     </div>
   </div>
 );
 
 const SkeletonStudentCard = () => (
-  <div className="rounded-xl p-5 bg-white border border-zinc-100">
+  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
     <div className="animate-pulse">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-11 h-11 bg-zinc-100 rounded-full" />
+        <div className="w-11 h-11 bg-dark-700 rounded-full" />
         <div className="space-y-2 flex-1">
-          <div className="h-4 w-28 bg-zinc-100 rounded" />
-          <div className="h-3 w-36 bg-zinc-100 rounded" />
+          <div className="h-4 w-28 bg-dark-700 rounded" />
+          <div className="h-3 w-36 bg-dark-700 rounded" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 w-full bg-zinc-100 rounded" />
-        <div className="h-3 w-2/3 bg-zinc-100 rounded" />
+        <div className="h-3 w-full bg-dark-700 rounded" />
+        <div className="h-3 w-2/3 bg-dark-700 rounded" />
       </div>
     </div>
   </div>
@@ -469,8 +469,8 @@ const AdminStudents = () => {
         {/* Premium Header - Clean and confident */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Student Directory</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">Manage enrolled students across departments</p>
+            <h1 className="text-2xl font-semibold text-white tracking-tight">Student Directory</h1>
+            <p className="text-dark-400 text-sm mt-0.5">Manage enrolled students across departments</p>
           </div>
           <div className="flex items-center gap-2.5">
             <FilterTriggerButton
@@ -480,21 +480,21 @@ const AdminStudents = () => {
             />
             <button
               onClick={() => setShowBulkModal(true)}
-              className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
+              className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 glass-card-dark border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all duration-200"
             >
               <Upload className="w-4 h-4" />
               <span className="hidden sm:inline">Bulk Import</span>
             </button>
             <button
               onClick={handleExport}
-              className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:border-zinc-300 transition-all duration-200"
+              className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 glass-card-dark border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all duration-200"
             >
               <Download className="w-4 h-4" />
               <span className="hidden sm:inline">Export</span>
             </button>
             <button
               onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all duration-200 shadow-sm"
+              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-all duration-200 shadow-lg shadow-violet-600/20"
             >
               <UserPlus className="w-4 h-4" />
               <span>Add Student</span>
@@ -509,27 +509,27 @@ const AdminStudents = () => {
           ) : (
             <>
               {/* Total Students */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-zinc-50 flex items-center justify-center">
-                    <Users className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
+                  <div className="w-9 h-9 rounded-lg bg-dark-800/80 flex items-center justify-center border border-dark-700">
+                    <Users className="w-4.5 h-4.5 text-dark-400" strokeWidth={1.5} />
                   </div>
                   {stats.placed > 0 && (
-                    <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{stats.placed} placed</span>
+                    <span className="text-[10px] font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded">{stats.placed} placed</span>
                   )}
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Students</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Students</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={stats.total} />
                 </p>
 
                 {/* Mini bar chart for years */}
-                <div className="mt-4 pt-3 border-t border-zinc-50">
+                <div className="mt-4 pt-3 border-t border-white/5">
                   <div className="flex items-end gap-1 h-8">
                     {yearDistribution.map((y) => (
                       <div
                         key={y.year}
-                        className="flex-1 bg-violet-100 rounded-sm transition-all duration-500"
+                        className="flex-1 bg-violet-500/20 rounded-sm transition-all duration-500 hover:bg-violet-500/40"
                         style={{ height: `${(y.count / maxYearCount) * 100}%`, minHeight: '4px' }}
                         title={`Year ${y.year}: ${y.count}`}
                       />
@@ -537,98 +537,98 @@ const AdminStudents = () => {
                   </div>
                   <div className="flex justify-between mt-1.5">
                     {yearDistribution.map((y) => (
-                      <span key={y.year} className="text-[9px] text-zinc-400 flex-1 text-center">Y{y.year}</span>
+                      <span key={y.year} className="text-[9px] text-dark-400 flex-1 text-center">Y{y.year}</span>
                     ))}
                   </div>
                 </div>
               </div>
 
               {/* Approved Students */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
                     <GraduationCap className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
                   </div>
                   <ProgressRing percentage={stats.total > 0 ? Math.round((stats.approved / stats.total) * 100) : 0} color="#10b981" />
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Approved Students</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Approved Students</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={stats.approved} />
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-zinc-50">
+                <div className="mt-4 pt-3 border-t border-white/5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <span className="relative flex h-2 w-2">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                         <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                       </span>
-                      <span className="text-xs text-zinc-500">Enrolled</span>
+                      <span className="text-xs text-dark-400">Enrolled</span>
                     </div>
                     {stats.pending > 0 && (
-                      <span className="text-[10px] font-medium text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">{stats.pending} pending</span>
+                      <span className="text-[10px] font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">{stats.pending} pending</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Departments */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
                     <Building className="w-4.5 h-4.5 text-blue-500" strokeWidth={1.5} />
                   </div>
-                  <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">{deptDistribution.length} active</span>
+                  <span className="text-[10px] font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">{deptDistribution.length} active</span>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Departments</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Departments</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={stats.departments} />
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-zinc-50">
+                <div className="mt-4 pt-3 border-t border-white/5">
                   <div className="flex flex-wrap gap-1">
                     {deptDistribution.slice(0, 4).map((d) => (
-                      <span key={d.name} className="text-[10px] text-zinc-500 bg-zinc-100 px-1.5 py-0.5 rounded">
+                      <span key={d.name} className="text-[10px] text-dark-400 bg-dark-800 px-1.5 py-0.5 rounded border border-dark-700">
                         {d.name}
                       </span>
                     ))}
                     {deptDistribution.length > 4 && (
-                      <span className="text-[10px] text-zinc-400">+{deptDistribution.length - 4}</span>
+                      <span className="text-[10px] text-dark-500">+{deptDistribution.length - 4}</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Avg Attendance */}
-              <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
                     <Target className="w-4.5 h-4.5 text-violet-500" strokeWidth={1.5} />
                   </div>
                   {stats.feesPaid > 0 && (
-                    <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">{stats.feesPaid} fees paid</span>
+                    <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded">{stats.feesPaid} fees paid</span>
                   )}
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Avg. Attendance</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg. Attendance</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={stats.avgAttendance} suffix="%" />
                 </p>
 
-                <div className="mt-4 pt-3 border-t border-zinc-50">
-                  <div className="relative h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                <div className="mt-4 pt-3 border-t border-white/5">
+                  <div className="relative h-1.5 bg-dark-800 rounded-full overflow-hidden">
                     <div
                       className="absolute h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-700"
                       style={{ width: `${stats.avgAttendance}%` }}
                     />
                     {/* Target marker at 85% */}
-                    <div className="absolute top-0 bottom-0 w-0.5 bg-violet-800" style={{ left: '85%' }} />
+                    <div className="absolute top-0 bottom-0 w-0.5 bg-violet-400/50" style={{ left: '85%' }} />
                   </div>
                   <div className="flex justify-between mt-1.5 text-[10px]">
-                    <span className="text-zinc-400">0%</span>
-                    <span className={`font-medium ${stats.avgAttendance >= 85 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    <span className="text-dark-500">0%</span>
+                    <span className={`font-medium ${stats.avgAttendance >= 85 ? 'text-emerald-400' : 'text-amber-400'}`}>
                       {stats.avgAttendance >= 85 ? '✓ Above target' : '↑ Below 85%'}
                     </span>
-                    <span className="text-zinc-400">100%</span>
+                    <span className="text-dark-500">100%</span>
                   </div>
                 </div>
               </div>
@@ -680,24 +680,24 @@ const AdminStudents = () => {
               return (
                 <div
                   key={student._id}
-                  className="student-item group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-md transition-all duration-300"
+                  className="student-item group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-500 hover:shadow-lg transition-all duration-300"
                 >
                   {/* Header */}
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
                       <div className="relative">
-                        <div className="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
+                        <div className="w-11 h-11 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center border border-white/10 shadow-inner">
                           <span className="text-white font-medium text-sm">
                             {student.name?.charAt(0).toUpperCase()}
                           </span>
                         </div>
-                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white" />
+                        <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-dark-800" />
                       </div>
                       <div>
-                        <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors">
+                        <h3 className="font-medium text-white text-sm group-hover:text-violet-400 transition-colors">
                           {student.name}
                         </h3>
-                        <p className="text-xs text-zinc-500 flex items-center gap-1">
+                        <p className="text-xs text-dark-400 flex items-center gap-1">
                           <Mail className="w-3 h-3" />
                           <span className="truncate max-w-[140px]">{student.email}</span>
                         </p>
@@ -705,7 +705,7 @@ const AdminStudents = () => {
                     </div>
                     <button
                       onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
-                      className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                      className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
                     >
                       <MoreHorizontal className="w-4 h-4" />
                     </button>
@@ -713,29 +713,29 @@ const AdminStudents = () => {
 
                   {/* Info Grid */}
                   <div className="grid grid-cols-3 gap-2 mb-4">
-                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                      <Hash className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={1.5} />
-                      <p className="text-[10px] font-mono font-medium text-zinc-700 truncate">{student.rollNumber}</p>
+                    <div className="px-2 py-2 bg-dark-800/50 rounded-lg text-center border border-dark-700">
+                      <Hash className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
+                      <p className="text-[10px] font-mono font-medium text-dark-300 truncate">{student.rollNumber}</p>
                     </div>
-                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                      <BookOpen className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={1.5} />
-                      <p className="text-[10px] font-medium text-zinc-700">{student.department}</p>
+                    <div className="px-2 py-2 bg-dark-800/50 rounded-lg text-center border border-dark-700">
+                      <BookOpen className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
+                      <p className="text-[10px] font-medium text-dark-300">{student.department}</p>
                     </div>
-                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center">
-                      <Calendar className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={1.5} />
-                      <p className="text-[10px] font-medium text-zinc-700">Year {student.year}</p>
+                    <div className="px-2 py-2 bg-dark-800/50 rounded-lg text-center border border-dark-700">
+                      <Calendar className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
+                      <p className="text-[10px] font-medium text-dark-300">Year {student.year}</p>
                     </div>
                   </div>
 
                   {/* Performance */}
                   <div className="mb-4">
                     <div className="flex items-center justify-between text-[10px] mb-1">
-                      <span className="text-zinc-400">Performance</span>
-                      <span className={`font-medium ${performanceScore >= 80 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                      <span className="text-dark-400">Performance</span>
+                      <span className={`font-medium ${performanceScore >= 80 ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {performanceScore}%
                       </span>
                     </div>
-                    <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-1 bg-dark-700/50 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-700"
                         style={{
@@ -747,15 +747,15 @@ const AdminStudents = () => {
                   </div>
 
                   {/* Footer with Approval Status */}
-                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
+                  <div className="flex items-center justify-between pt-3 border-t border-white/5">
                     {/* Approval Status Badge */}
                     {student.isApproved ? (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                         <CheckCircle className="w-3 h-3" />
                         Approved
                       </span>
                     ) : (
-                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700">
+                      <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                         <Clock className="w-3 h-3" />
                         Pending
                       </span>
@@ -767,11 +767,11 @@ const AdminStudents = () => {
                           <button
                             onClick={() => handleApproveStudent(student._id, student.name)}
                             disabled={approvingId === student._id}
-                            className="p-1.5 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors disabled:opacity-50"
+                            className="p-1.5 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-md transition-colors disabled:opacity-50"
                             title="Approve Student"
                           >
                             {approvingId === student._id ? (
-                              <div className="w-3.5 h-3.5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                              <div className="w-3.5 h-3.5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
                             ) : (
                               <UserCheck className="w-3.5 h-3.5" />
                             )}
@@ -779,23 +779,23 @@ const AdminStudents = () => {
                           <button
                             onClick={() => handleRejectStudent(student._id, student.name)}
                             disabled={rejectingId === student._id}
-                            className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                            className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
                             title="Reject Student"
                           >
                             {rejectingId === student._id ? (
-                              <div className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                              <div className="w-3.5 h-3.5 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
                             ) : (
                               <XCircle className="w-3.5 h-3.5" />
                             )}
                           </button>
                         </>
                       )}
-                      <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
+                      <button className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-md transition-colors">
                         <Eye className="w-3.5 h-3.5" />
                       </button>
                       <button
                         onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                        className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -805,13 +805,13 @@ const AdminStudents = () => {
               );
             }) : (
               <div className="col-span-full text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                  <Users className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-4 bg-dark-800 rounded-full flex items-center justify-center border border-dark-700">
+                  <Users className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-sm font-medium text-zinc-700 mb-1">No students found</h3>
-                <p className="text-xs text-zinc-500 mb-4">Try adjusting your filters</p>
+                <h3 className="text-sm font-medium text-white mb-1">No students found</h3>
+                <p className="text-xs text-dark-400 mb-4">Try adjusting your filters</p>
                 {hasActiveFilters && (
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 text-zinc-600 rounded-lg text-xs font-medium hover:bg-zinc-200 transition-colors">
+                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark-800 text-dark-300 rounded-lg text-xs font-medium hover:bg-dark-700 hover:text-white transition-colors border border-dark-700">
                     <X className="w-3 h-3" />
                     Clear filters
                   </button>
@@ -821,48 +821,48 @@ const AdminStudents = () => {
           </div>
         ) : (
           /* List View */
-          <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+          <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
-                <thead className="bg-zinc-50 border-b border-zinc-100">
+                <thead className="bg-dark-800/50 border-b border-white/5">
                   <tr>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Student</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Roll Number</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Department</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Year</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Status</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-zinc-500 uppercase tracking-wide">Actions</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Student</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Roll Number</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Department</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Year</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Status</th>
+                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-50">
+                <tbody className="divide-y divide-white/5">
                   {filteredStudents.map((student) => (
-                    <tr key={student._id} className="student-item group hover:bg-zinc-50 transition-colors">
+                    <tr key={student._id} className="student-item group hover:bg-white/5 transition-colors">
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center">
+                          <div className="w-9 h-9 bg-gradient-to-br from-violet-500 to-violet-600 rounded-full flex items-center justify-center border border-white/10">
                             <span className="text-white font-medium text-xs">{student.name?.charAt(0).toUpperCase()}</span>
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-zinc-900">{student.name}</p>
-                            <p className="text-xs text-zinc-500">{student.email}</p>
+                            <p className="text-sm font-medium text-white">{student.name}</p>
+                            <p className="text-xs text-dark-400">{student.email}</p>
                           </div>
                         </div>
                       </td>
                       <td className="py-3 px-5">
-                        <span className="font-mono text-xs font-medium text-zinc-700 bg-zinc-100 px-2 py-1 rounded">{student.rollNumber}</span>
+                        <span className="font-mono text-xs font-medium text-dark-300 bg-dark-800/50 px-2 py-1 rounded border border-dark-700">{student.rollNumber}</span>
                       </td>
                       <td className="py-3 px-5">
-                        <span className="px-2 py-1 bg-zinc-100 text-zinc-700 rounded text-xs font-medium">{student.department}</span>
+                        <span className="px-2 py-1 bg-dark-800/50 text-dark-300 rounded text-xs font-medium border border-dark-700">{student.department}</span>
                       </td>
-                      <td className="py-3 px-5 text-sm text-zinc-600">Year {student.year}</td>
+                      <td className="py-3 px-5 text-sm text-dark-400">Year {student.year}</td>
                       <td className="py-3 px-5">
                         {student.isApproved ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                             <CheckCircle className="w-3 h-3" />
                             Approved
                           </span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-50 text-amber-700">
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
                             <Clock className="w-3 h-3" />
                             Pending
                           </span>
@@ -876,11 +876,11 @@ const AdminStudents = () => {
                               <button
                                 onClick={() => handleApproveStudent(student._id, student.name)}
                                 disabled={approvingId === student._id}
-                                className="p-1.5 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-md transition-colors disabled:opacity-50"
+                                className="p-1.5 text-emerald-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-md transition-colors disabled:opacity-50"
                                 title="Approve"
                               >
                                 {approvingId === student._id ? (
-                                  <div className="w-3.5 h-3.5 border-2 border-emerald-300 border-t-emerald-600 rounded-full animate-spin" />
+                                  <div className="w-3.5 h-3.5 border-2 border-emerald-500/30 border-t-emerald-500 rounded-full animate-spin" />
                                 ) : (
                                   <UserCheck className="w-3.5 h-3.5" />
                                 )}
@@ -888,23 +888,23 @@ const AdminStudents = () => {
                               <button
                                 onClick={() => handleRejectStudent(student._id, student.name)}
                                 disabled={rejectingId === student._id}
-                                className="p-1.5 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50"
+                                className="p-1.5 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-md transition-colors disabled:opacity-50"
                                 title="Reject"
                               >
                                 {rejectingId === student._id ? (
-                                  <div className="w-3.5 h-3.5 border-2 border-red-300 border-t-red-600 rounded-full animate-spin" />
+                                  <div className="w-3.5 h-3.5 border-2 border-red-500/30 border-t-red-500 rounded-full animate-spin" />
                                 ) : (
                                   <XCircle className="w-3.5 h-3.5" />
                                 )}
                               </button>
                             </>
                           )}
-                          <button className="p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 rounded-md transition-colors">
+                          <button className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-md transition-colors">
                             <Eye className="w-3.5 h-3.5" />
                           </button>
                           <button
                             onClick={() => { setSelectedStudent(student); setShowDeleteModal(true); }}
-                            className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
+                            className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -917,16 +917,16 @@ const AdminStudents = () => {
             </div>
             {filteredStudents.length === 0 && (
               <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center">
-                  <Users className="w-7 h-7 text-zinc-400" strokeWidth={1.5} />
+                <div className="w-16 h-16 mx-auto mb-4 bg-dark-800 rounded-full flex items-center justify-center border border-dark-700">
+                  <Users className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
                 </div>
-                <h3 className="text-sm font-medium text-zinc-700 mb-1">No students found</h3>
+                <h3 className="text-sm font-medium text-white mb-1">No students found</h3>
               </div>
             )}
             {filteredStudents.length > 0 && (
-              <div className="px-5 py-3 bg-zinc-50 border-t border-zinc-100">
-                <p className="text-xs text-zinc-500">
-                  Showing <span className="font-medium text-zinc-700">{filteredStudents.length}</span> of <span className="font-medium text-zinc-700">{students.length}</span> students
+              <div className="px-5 py-3 bg-dark-800/80 border-t border-white/5">
+                <p className="text-xs text-dark-400">
+                  Showing <span className="font-medium text-white">{filteredStudents.length}</span> of <span className="font-medium text-white">{students.length}</span> students
                 </p>
               </div>
             )}
@@ -937,52 +937,52 @@ const AdminStudents = () => {
         <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Student" size="md">
           <form onSubmit={handleAddStudent} className="space-y-4">
             {formError && (
-              <div className="p-3 bg-red-50 text-red-700 rounded-lg text-sm flex items-center gap-2">
+              <div className="p-3 bg-red-500/10 text-red-400 rounded-lg text-sm flex items-center gap-2 border border-red-500/20">
                 <AlertTriangle className="w-4 h-4" />
                 {formError}
               </div>
             )}
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Full Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Enter name" />
+              <label className="block text-xs font-medium text-dark-400 mb-1.5">Full Name *</label>
+              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all placeholder-dark-500" placeholder="Enter name" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Email *</label>
-              <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="student@example.com" />
+              <label className="block text-xs font-medium text-dark-400 mb-1.5">Email *</label>
+              <input type="email" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all placeholder-dark-500" placeholder="student@example.com" />
             </div>
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Password *</label>
-              <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" placeholder="Min 6 characters" />
+              <label className="block text-xs font-medium text-dark-400 mb-1.5">Password *</label>
+              <input type="password" value={formData.password} onChange={(e) => setFormData({ ...formData, password: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all placeholder-dark-500" placeholder="Min 6 characters" />
             </div>
-            <div className="p-3 bg-violet-50 rounded-lg border border-violet-100">
-              <div className="flex items-center gap-2 text-violet-700">
+            <div className="p-3 bg-violet-500/10 rounded-lg border border-violet-500/20">
+              <div className="flex items-center gap-2 text-violet-300">
                 <Hash className="w-4 h-4" />
                 <span className="text-xs font-medium">Roll Number Auto-Generated</span>
               </div>
-              <p className="text-[10px] text-violet-600 mt-1">Format: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
+              <p className="text-[10px] text-violet-400 mt-1">Format: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
+                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-900">{d}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Year</label>
-                <select value={formData.year} onChange={(e) => setFormData({ ...formData, year: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  <option value="1">1st Year</option>
-                  <option value="2">2nd Year</option>
-                  <option value="3">3rd Year</option>
-                  <option value="4">4th Year</option>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Year</label>
+                <select value={formData.year} onChange={(e) => setFormData({ ...formData, year: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                  <option value="1" className="bg-dark-900">1st Year</option>
+                  <option value="2" className="bg-dark-900">2nd Year</option>
+                  <option value="3" className="bg-dark-900">3rd Year</option>
+                  <option value="4" className="bg-dark-900">4th Year</option>
                 </select>
               </div>
             </div>
             <div className="flex gap-2.5 pt-3">
-              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
+              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-300 border border-dark-600 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">
                 Cancel
               </button>
-              <button type="submit" disabled={isCreating} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50">
+              <button type="submit" disabled={isCreating} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50">
                 {isCreating ? 'Adding...' : 'Add Student'}
               </button>
             </div>
@@ -993,18 +993,18 @@ const AdminStudents = () => {
         <Modal isOpen={showDeleteModal && selectedStudent} onClose={() => setShowDeleteModal(false)} size="sm">
           {selectedStudent && (
             <div className="text-center py-2">
-              <div className="w-14 h-14 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <AlertTriangle className="w-6 h-6 text-red-600" />
+              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/20">
+                <AlertTriangle className="w-6 h-6 text-red-400" />
               </div>
-              <h3 className="text-lg font-semibold text-zinc-900 mb-2">Delete Student?</h3>
-              <p className="text-sm text-zinc-500 mb-6">
-                Are you sure you want to delete <strong className="text-zinc-700">{selectedStudent.name}</strong>? This action cannot be undone.
+              <h3 className="text-lg font-semibold text-white mb-2">Delete Student?</h3>
+              <p className="text-sm text-dark-400 mb-6">
+                Are you sure you want to delete <strong className="text-white">{selectedStudent.name}</strong>? This action cannot be undone.
               </p>
               <div className="flex gap-2.5">
-                <button onClick={() => { setShowDeleteModal(false); setSelectedStudent(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">
+                <button onClick={() => { setShowDeleteModal(false); setSelectedStudent(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-300 border border-dark-600 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">
                   Cancel
                 </button>
-                <button onClick={handleDeleteStudent} disabled={isDeleting} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50">
+                <button onClick={handleDeleteStudent} disabled={isDeleting} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 shadow-lg shadow-red-600/20">
                   {isDeleting ? 'Deleting...' : 'Delete'}
                 </button>
               </div>
@@ -1016,10 +1016,10 @@ const AdminStudents = () => {
         <Modal isOpen={showBulkModal} onClose={() => { setShowBulkModal(false); setBulkResult(null); setBulkData(''); setExcelPreview([]); clearExcelPreview(); }} title="Bulk Import Students" size="xl">
           <div className="space-y-5">
             {/* Mode Toggle */}
-            <div className="flex gap-2 p-1 bg-zinc-100 rounded-lg w-fit">
+            <div className="flex gap-2 p-1 bg-dark-800 rounded-lg w-fit border border-dark-700">
               <button
                 onClick={() => setUploadMode('excel')}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'excel' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'excel' ? 'bg-dark-700 text-white shadow-sm' : 'text-dark-400 hover:text-white'
                   }`}
               >
                 <FileSpreadsheet className="w-4 h-4" />
@@ -1027,7 +1027,7 @@ const AdminStudents = () => {
               </button>
               <button
                 onClick={() => setUploadMode('json')}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'json' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'
+                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-md transition-all ${uploadMode === 'json' ? 'bg-dark-700 text-white shadow-sm' : 'text-dark-400 hover:text-white'
                   }`}
               >
                 <Hash className="w-4 h-4" />
@@ -1039,18 +1039,18 @@ const AdminStudents = () => {
             {uploadMode === 'excel' && (
               <>
                 {/* Instructions */}
-                <div className="p-4 bg-violet-50 rounded-xl border border-violet-100">
+                <div className="p-4 bg-violet-500/10 rounded-xl border border-violet-500/20">
                   <div className="flex items-start gap-3">
-                    <FileSpreadsheet className="w-5 h-5 text-violet-600 mt-0.5" />
+                    <FileSpreadsheet className="w-5 h-5 text-violet-400 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-medium text-violet-900 mb-1">Excel File Format</h4>
-                      <p className="text-xs text-violet-700">Columns: <span className="font-medium">Name (required), Email (optional), Password (optional), Department, Year, JoiningYear</span></p>
-                      <div className="mt-2 text-[10px] text-violet-600 space-y-0.5">
-                        <p>📧 <strong>Email:</strong> If empty, auto-generated as <code className="bg-violet-100 px-1 rounded">firstname.lastname.dept@mlrit.ac.in</code></p>
+                      <h4 className="text-sm font-medium text-violet-200 mb-1">Excel File Format</h4>
+                      <p className="text-xs text-violet-300">Columns: <span className="font-medium text-white">Name (required), Email (optional), Password (optional), Department, Year, JoiningYear</span></p>
+                      <div className="mt-2 text-[10px] text-violet-300 space-y-0.5">
+                        <p>📧 <strong>Email:</strong> If empty, auto-generated as <code className="bg-violet-500/20 px-1 rounded text-violet-200">firstname.lastname.dept@mlrit.ac.in</code></p>
                         <p>🔑 <strong>Password:</strong> If empty, uses email prefix without dots</p>
                         <p>🎫 <strong>Roll Number:</strong> Auto-generated as 24MLRIDCSE001</p>
                       </div>
-                      <button onClick={downloadExcelTemplate} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-violet-700 hover:text-violet-900 bg-violet-100 px-2.5 py-1.5 rounded-md transition-colors">
+                      <button onClick={downloadExcelTemplate} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-violet-300 hover:text-white bg-violet-500/20 hover:bg-violet-500/30 px-2.5 py-1.5 rounded-md transition-colors">
                         <Download className="w-3.5 h-3.5" />
                         Download Sample Excel Template
                       </button>
@@ -1067,8 +1067,8 @@ const AdminStudents = () => {
                     onDrop={handleDrop}
                     onClick={() => fileInputRef.current?.click()}
                     className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive
-                      ? 'border-violet-400 bg-violet-50'
-                      : 'border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50'
+                      ? 'border-violet-500/50 bg-violet-500/10'
+                      : 'border-dark-600 hover:border-dark-500 hover:bg-dark-800'
                       }`}
                   >
                     <input
@@ -1079,15 +1079,15 @@ const AdminStudents = () => {
                       className="hidden"
                     />
                     <div className="flex flex-col items-center gap-3">
-                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${dragActive ? 'bg-violet-100' : 'bg-zinc-100'
+                      <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${dragActive ? 'bg-violet-500/20' : 'bg-dark-700'
                         }`}>
-                        <Upload className={`w-6 h-6 ${dragActive ? 'text-violet-600' : 'text-zinc-400'}`} />
+                        <Upload className={`w-6 h-6 ${dragActive ? 'text-violet-400' : 'text-dark-400'}`} />
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-zinc-700">
+                        <p className="text-sm font-medium text-white">
                           {dragActive ? 'Drop your Excel file here' : 'Drag & drop Excel file here'}
                         </p>
-                        <p className="text-xs text-zinc-500 mt-1">or click to browse (.xlsx, .xls)</p>
+                        <p className="text-xs text-dark-500 mt-1">or click to browse (.xlsx, .xls)</p>
                       </div>
                     </div>
                   </div>
@@ -1098,49 +1098,49 @@ const AdminStudents = () => {
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
-                        <Table className="w-4 h-4 text-emerald-600" />
-                        <span className="text-sm font-medium text-zinc-700">Preview ({excelPreview.length} students)</span>
+                        <Table className="w-4 h-4 text-emerald-400" />
+                        <span className="text-sm font-medium text-white">Preview ({excelPreview.length} students)</span>
                       </div>
                       <button
                         onClick={clearExcelPreview}
-                        className="text-xs text-zinc-500 hover:text-zinc-700 flex items-center gap-1"
+                        className="text-xs text-dark-400 hover:text-white flex items-center gap-1 transition-colors"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                         Upload Different File
                       </button>
                     </div>
-                    <div className="max-h-[300px] overflow-auto border border-zinc-200 rounded-xl">
+                    <div className="max-h-[300px] overflow-auto border border-dark-700 rounded-xl">
                       <table className="w-full text-sm">
-                        <thead className="bg-zinc-50 sticky top-0">
+                        <thead className="bg-dark-800 sticky top-0 border-b border-dark-700">
                           <tr>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">#</th>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Name</th>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Email</th>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Password</th>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Department</th>
-                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Year</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">#</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Name</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Email</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Password</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Department</th>
+                            <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Year</th>
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-zinc-100">
+                        <tbody className="divide-y divide-white/5">
                           {excelPreview.slice(0, 50).map((student, idx) => (
-                            <tr key={idx} className="hover:bg-zinc-50">
-                              <td className="px-4 py-2.5 text-zinc-400 text-xs">{idx + 1}</td>
-                              <td className="px-4 py-2.5 font-medium text-zinc-900">{student.name || <span className="text-red-500">Missing</span>}</td>
-                              <td className="px-4 py-2.5 text-zinc-600">
+                            <tr key={idx} className="hover:bg-white/5">
+                              <td className="px-4 py-2.5 text-dark-500 text-xs">{idx + 1}</td>
+                              <td className="px-4 py-2.5 font-medium text-white">{student.name || <span className="text-red-400">Missing</span>}</td>
+                              <td className="px-4 py-2.5 text-dark-300">
                                 {student.email
                                   ? student.email
-                                  : <span className="text-blue-600 italic text-xs">Auto: {student.name ? `${student.name.toLowerCase().split(' ')[0]}.${(student.department || 'cse').toLowerCase()}@mlrit.ac.in` : '...'}</span>
+                                  : <span className="text-blue-400 italic text-xs">Auto: {student.name ? `${student.name.toLowerCase().split(' ')[0]}.${(student.department || 'cse').toLowerCase()}@mlrit.ac.in` : '...'}</span>
                                 }
                               </td>
-                              <td className="px-4 py-2.5 text-zinc-600">{student.password ? <span className="text-emerald-600">Set</span> : <span className="text-zinc-400 italic">Default</span>}</td>
-                              <td className="px-4 py-2.5 text-zinc-600">{student.department || '-'}</td>
-                              <td className="px-4 py-2.5 text-zinc-600">{student.year || '-'}</td>
+                              <td className="px-4 py-2.5 text-dark-300">{student.password ? <span className="text-emerald-400">Set</span> : <span className="text-dark-500 italic">Default</span>}</td>
+                              <td className="px-4 py-2.5 text-dark-300">{student.department || '-'}</td>
+                              <td className="px-4 py-2.5 text-dark-300">{student.year || '-'}</td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                       {excelPreview.length > 50 && (
-                        <div className="p-3 bg-zinc-50 text-center text-xs text-zinc-500 border-t border-zinc-200">
+                        <div className="p-3 bg-dark-800 text-center text-xs text-dark-400 border-t border-dark-700">
                           Showing first 50 of {excelPreview.length} students
                         </div>
                       )}
@@ -1153,25 +1153,25 @@ const AdminStudents = () => {
             {/* JSON Mode */}
             {uploadMode === 'json' && (
               <>
-                <div className="p-4 bg-blue-50 rounded-xl border border-blue-100">
+                <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/20">
                   <div className="flex items-start gap-3">
-                    <Hash className="w-5 h-5 text-blue-600 mt-0.5" />
+                    <Hash className="w-5 h-5 text-blue-400 mt-0.5" />
                     <div>
-                      <h4 className="text-sm font-medium text-blue-900 mb-1">JSON Format</h4>
-                      <p className="text-xs text-blue-700">Paste a JSON array with fields: name, email, department, year, joiningYear (optional)</p>
-                      <p className="text-[10px] text-blue-600 mt-1">Roll numbers auto-generated as: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
-                      <button onClick={downloadTemplate} className="mt-2 text-xs text-blue-600 hover:text-blue-800 underline">Download JSON template</button>
+                      <h4 className="text-sm font-medium text-blue-200 mb-1">JSON Format</h4>
+                      <p className="text-xs text-blue-300">Paste a JSON array with fields: name, email, department, year, joiningYear (optional)</p>
+                      <p className="text-[10px] text-blue-300 mt-1">Roll numbers auto-generated as: 24MLRIDCSE001 (Year + MLRID + Dept + Seq)</p>
+                      <button onClick={downloadTemplate} className="mt-2 text-xs text-blue-400 hover:text-blue-300 underline">Download JSON template</button>
                     </div>
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Student Data (JSON)</label>
+                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Student Data (JSON)</label>
                   <textarea
                     value={bulkData}
                     onChange={(e) => setBulkData(e.target.value)}
                     rows={10}
-                    className="w-full px-3 py-2.5 text-sm font-mono border border-zinc-200 rounded-lg focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all"
+                    className="w-full px-3 py-2.5 text-sm font-mono bg-dark-900 border border-dark-600 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all placeholder-dark-500"
                     placeholder={`[\n  { "name": "John Doe", "email": "john@example.com", "department": "CSE", "year": "1", "joiningYear": 2024 },\n  { "name": "Jane Smith", "email": "jane@example.com", "department": "ECE", "year": "2" }\n]`}
                   />
                 </div>
@@ -1180,24 +1180,24 @@ const AdminStudents = () => {
 
             {/* Result Display */}
             {bulkResult && (
-              <div className={`p-4 rounded-xl border ${bulkResult.error ? 'bg-red-50 border-red-200' : 'bg-emerald-50 border-emerald-200'}`}>
+              <div className={`p-4 rounded-xl border ${bulkResult.error ? 'bg-red-500/10 border-red-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
                 {bulkResult.error ? (
-                  <div className="flex items-center gap-2 text-red-700">
+                  <div className="flex items-center gap-2 text-red-400">
                     <AlertTriangle className="w-4 h-4" />
                     <span className="text-sm">{bulkResult.error}</span>
                   </div>
                 ) : (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-emerald-700">
+                    <div className="flex items-center gap-2 text-emerald-400">
                       <CheckCircle className="w-4 h-4" />
                       <span className="text-sm font-medium">{bulkResult.message}</span>
                     </div>
-                    <div className="text-xs text-emerald-600">
+                    <div className="text-xs text-emerald-300">
                       <p>✓ {bulkResult.successful} imported successfully</p>
                       {bulkResult.duplicates > 0 && <p>⚠ {bulkResult.duplicates} duplicates skipped</p>}
                       {bulkResult.failed > 0 && <p>✗ {bulkResult.failed} failed</p>}
                     </div>
-                    <p className="text-[10px] text-emerald-600 mt-2">Note: Default password is the email prefix (before @)</p>
+                    <p className="text-[10px] text-emerald-300 mt-2">Note: Default password is the email prefix (before @)</p>
                   </div>
                 )}
               </div>
@@ -1208,7 +1208,7 @@ const AdminStudents = () => {
               <button
                 type="button"
                 onClick={() => { setShowBulkModal(false); setBulkResult(null); setBulkData(''); setExcelPreview([]); }}
-                className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors"
+                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-300 border border-dark-600 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
               >
                 Close
               </button>
@@ -1216,7 +1216,7 @@ const AdminStudents = () => {
                 <button
                   onClick={handleExcelImport}
                   disabled={bulkLoading || excelPreview.length === 0}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-violet-600/20"
                 >
                   {bulkLoading ? (
                     <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing...</>
@@ -1228,7 +1228,7 @@ const AdminStudents = () => {
                 <button
                   onClick={handleBulkImport}
                   disabled={bulkLoading || !bulkData.trim()}
-                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+                  className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-violet-600/20"
                 >
                   {bulkLoading ? (
                     <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing...</>

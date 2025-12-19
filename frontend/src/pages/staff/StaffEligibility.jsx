@@ -107,61 +107,75 @@ const StaffEligibility = () => {
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Hall Ticket Eligibility</h1>
-            <p className="text-zinc-500 text-sm mt-0.5">
+            <h1 className="text-2xl font-bold text-white tracking-tight">Hall Ticket Eligibility</h1>
+            <p className="text-dark-400 text-sm mt-0.5">
               Check student eligibility for hall tickets
-              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200">{staffDepartment}</span>}
+              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-dark-800 text-dark-300 border border-dark-700">{staffDepartment}</span>}
             </p>
           </div>
-          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors">
+          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
         </div>
 
         {/* Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <div className="metric-card bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl p-5 text-white">
+          <div className="metric-card bg-gradient-to-br from-violet-600 to-violet-700 rounded-xl p-5 text-white shadow-lg border border-white/10">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center"><Users className="w-5 h-5" /></div>
               <div>
-                <p className="text-violet-200 text-xs">Total Students</p>
-                <p className="text-2xl font-semibold mt-0.5"><AnimatedNumber value={students.length} /></p>
+                <p className="text-violet-200 text-xs font-bold uppercase tracking-wider">Total Students</p>
+                <p className="text-2xl font-bold mt-0.5"><AnimatedNumber value={students.length} /></p>
               </div>
             </div>
           </div>
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center"><CheckCircle className="w-5 h-5 text-emerald-500" /></div>
+              <div className="w-10 h-10 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20"><CheckCircle className="w-5 h-5 text-emerald-400" /></div>
               <div>
-                <p className="text-zinc-500 text-xs">Eligible</p>
-                <p className="text-2xl font-semibold text-emerald-600 mt-0.5"><AnimatedNumber value={eligibleCount} /></p>
+                <p className="text-dark-400 text-xs font-bold uppercase tracking-wider">Eligible</p>
+                <p className="text-2xl font-bold text-emerald-400 mt-0.5"><AnimatedNumber value={eligibleCount} /></p>
               </div>
             </div>
           </div>
-          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100">
+          <div className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 transition-colors">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center"><XCircle className="w-5 h-5 text-red-500" /></div>
+              <div className="w-10 h-10 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20"><XCircle className="w-5 h-5 text-red-400" /></div>
               <div>
-                <p className="text-zinc-500 text-xs">Not Eligible</p>
-                <p className="text-2xl font-semibold text-red-600 mt-0.5"><AnimatedNumber value={ineligibleCount} /></p>
+                <p className="text-dark-400 text-xs font-bold uppercase tracking-wider">Not Eligible</p>
+                <p className="text-2xl font-bold text-red-400 mt-0.5"><AnimatedNumber value={ineligibleCount} /></p>
               </div>
             </div>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white rounded-xl border border-zinc-100 p-4">
+        <div className="glass-card-dark rounded-xl border border-dark-700 p-4">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-              <input type="text" placeholder="Search by name or roll number..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+              <input
+                type="text"
+                placeholder="Search by name or roll number..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+              />
             </div>
             <div className="flex gap-2">
-              <select value={filterYear} onChange={(e) => setFilterYear(e.target.value)} className="px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+              <select
+                value={filterYear}
+                onChange={(e) => setFilterYear(e.target.value)}
+                className="px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+              >
                 <option value="all">All Years</option>
                 {years.map(year => <option key={year.value} value={year.value}>{year.label}</option>)}
               </select>
-              <select value={filterEligibility} onChange={(e) => setFilterEligibility(e.target.value)} className="px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+              <select
+                value={filterEligibility}
+                onChange={(e) => setFilterEligibility(e.target.value)}
+                className="px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+              >
                 <option value="all">All Students</option>
                 <option value="eligible">Eligible Only</option>
                 <option value="ineligible">Ineligible Only</option>
@@ -171,58 +185,60 @@ const StaffEligibility = () => {
         </div>
 
         {/* Students Table */}
-        <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+        <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-zinc-50 border-b border-zinc-100">
+              <thead className="bg-dark-800 border-b border-dark-700">
                 <tr>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Student</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Roll No</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Attendance</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Fees</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Eligibility</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-zinc-500 uppercase tracking-wide">Action</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Student</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Roll No</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Attendance</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Fees</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Eligibility</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-50">
+              <tbody className="divide-y divide-dark-700">
                 {loading ? (
-                  <tr><td colSpan="6" className="px-5 py-10 text-center text-zinc-400 text-sm"><Loader className="w-5 h-5 animate-spin mx-auto" /></td></tr>
+                  <tr><td colSpan="6" className="px-5 py-10 text-center text-dark-400 text-sm"><Loader className="w-5 h-5 animate-spin mx-auto text-primary-500" /></td></tr>
                 ) : filteredStudents.length === 0 ? (
-                  <tr><td colSpan="6" className="px-5 py-10 text-center text-zinc-400 text-sm">No students found</td></tr>
+                  <tr><td colSpan="6" className="px-5 py-10 text-center text-dark-400 text-sm">No students found</td></tr>
                 ) : (
                   filteredStudents.map(student => {
                     const { eligible } = checkEligibility(student);
                     return (
-                      <tr key={student._id} className="hover:bg-zinc-50/50 transition-colors">
+                      <tr key={student._id} className="hover:bg-dark-800/50 transition-colors">
                         <td className="py-3 px-5">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-violet-50 rounded-full flex items-center justify-center text-xs font-semibold text-violet-600">{student.name?.charAt(0)}</div>
+                            <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg">
+                              {student.name?.charAt(0)}
+                            </div>
                             <div>
-                              <p className="text-sm font-medium text-zinc-900">{student.name}</p>
-                              <p className="text-xs text-zinc-500">{student.email}</p>
+                              <p className="text-sm font-medium text-white">{student.name}</p>
+                              <p className="text-xs text-dark-400">{student.email}</p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-3 px-5 text-sm font-mono text-zinc-600">{student.rollNumber || '-'}</td>
+                        <td className="py-3 px-5 text-sm font-mono text-dark-300">{student.rollNumber || '-'}</td>
                         <td className="py-3 px-5">
-                          <span className={`text-sm font-medium ${student.attendance >= 75 ? 'text-emerald-600' : 'text-red-600'}`}>{student.attendance || 0}%</span>
+                          <span className={`text-sm font-bold ${student.attendance >= 75 ? 'text-emerald-400' : 'text-red-400'}`}>{student.attendance || 0}%</span>
                         </td>
                         <td className="py-3 px-5">
                           {student.feesPaid ? (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-100"><CheckCircle className="w-3 h-3" /> Paid</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><CheckCircle className="w-3 h-3" /> Paid</span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-medium bg-red-50 text-red-700 border border-red-100"><XCircle className="w-3 h-3" /> Pending</span>
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-red-500/10 text-red-400 border border-red-500/20"><XCircle className="w-3 h-3" /> Pending</span>
                           )}
                         </td>
                         <td className="py-3 px-5">
                           {eligible ? (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-100"><CheckCircle className="w-3.5 h-3.5" /> Eligible</span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold tracking-wide bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><CheckCircle className="w-3.5 h-3.5" /> Eligible</span>
                           ) : (
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-medium bg-red-50 text-red-700 border border-red-100"><AlertTriangle className="w-3.5 h-3.5" /> Not Eligible</span>
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded text-xs font-bold tracking-wide bg-red-500/10 text-red-400 border border-red-500/20"><AlertTriangle className="w-3.5 h-3.5" /> Not Eligible</span>
                           )}
                         </td>
                         <td className="py-3 px-5">
-                          <button onClick={() => handleViewDetails(student)} className="p-1.5 text-violet-600 hover:bg-violet-50 rounded-md transition-colors"><FileText className="w-4 h-4" /></button>
+                          <button onClick={() => handleViewDetails(student)} className="p-1.5 text-primary-400 hover:bg-primary-500/10 rounded-md transition-colors border border-transparent hover:border-primary-500/20"><FileText className="w-4 h-4" /></button>
                         </td>
                       </tr>
                     );
@@ -236,36 +252,38 @@ const StaffEligibility = () => {
         {/* Eligibility Details Modal */}
         <Modal isOpen={showModal && !!selectedStudent} onClose={() => setShowModal(false)} title="Eligibility Details" size="md">
           {checkingEligibility ? (
-            <div className="text-center py-8"><Loader className="w-6 h-6 text-violet-500 animate-spin mx-auto mb-3" /><p className="text-zinc-500 text-sm">Checking eligibility...</p></div>
+            <div className="text-center py-8"><Loader className="w-6 h-6 text-primary-500 animate-spin mx-auto mb-3" /><p className="text-dark-400 text-sm">Checking eligibility...</p></div>
           ) : eligibilityDetails ? (
             <div className="space-y-5">
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-full bg-violet-50 flex items-center justify-center text-violet-600 text-xl font-semibold">{eligibilityDetails.name?.charAt(0)}</div>
+                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-violet-700 flex items-center justify-center text-white text-xl font-bold border border-white/10 shadow-lg">
+                  {eligibilityDetails.name?.charAt(0)}
+                </div>
                 <div>
-                  <h4 className="font-semibold text-zinc-900">{eligibilityDetails.name}</h4>
-                  <p className="text-xs text-zinc-500">{eligibilityDetails.rollNumber} · {eligibilityDetails.department}</p>
+                  <h4 className="font-bold text-white">{eligibilityDetails.name}</h4>
+                  <p className="text-xs text-dark-400">{eligibilityDetails.rollNumber} · {eligibilityDetails.department}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <div className="p-4 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-500 mb-1">Attendance</p>
-                  <p className={`text-xl font-bold ${eligibilityDetails.attendance >= 75 ? 'text-emerald-600' : 'text-red-600'}`}>{eligibilityDetails.attendance}%</p>
+                <div className="p-4 bg-dark-800 rounded-lg border border-dark-700">
+                  <p className="text-xs text-dark-400 mb-1">Attendance</p>
+                  <p className={`text-xl font-bold ${eligibilityDetails.attendance >= 75 ? 'text-emerald-400' : 'text-red-400'}`}>{eligibilityDetails.attendance}%</p>
                 </div>
-                <div className="p-4 bg-zinc-50 rounded-lg">
-                  <p className="text-xs text-zinc-500 mb-1">Fee Status</p>
-                  <p className={`text-xl font-bold ${eligibilityDetails.feesPaid ? 'text-emerald-600' : 'text-red-600'}`}>{eligibilityDetails.feesPaid ? 'Cleared' : 'Pending'}</p>
+                <div className="p-4 bg-dark-800 rounded-lg border border-dark-700">
+                  <p className="text-xs text-dark-400 mb-1">Fee Status</p>
+                  <p className={`text-xl font-bold ${eligibilityDetails.feesPaid ? 'text-emerald-400' : 'text-red-400'}`}>{eligibilityDetails.feesPaid ? 'Cleared' : 'Pending'}</p>
                 </div>
               </div>
-              <div className={`p-4 rounded-lg ${eligibilityDetails.eligible ? 'bg-emerald-50 border border-emerald-100' : 'bg-red-50 border border-red-100'}`}>
+              <div className={`p-4 rounded-lg border ${eligibilityDetails.eligible ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-red-500/10 border-red-500/20'}`}>
                 <div className="flex items-center gap-2 mb-2">
-                  {eligibilityDetails.eligible ? (<><CheckCircle className="w-5 h-5 text-emerald-600" /><span className="font-semibold text-emerald-700">Eligible for Hall Ticket</span></>) : (<><XCircle className="w-5 h-5 text-red-600" /><span className="font-semibold text-red-700">Not Eligible</span></>)}
+                  {eligibilityDetails.eligible ? (<><CheckCircle className="w-5 h-5 text-emerald-400" /><span className="font-bold text-emerald-400">Eligible for Hall Ticket</span></>) : (<><XCircle className="w-5 h-5 text-red-400" /><span className="font-bold text-red-400">Not Eligible</span></>)}
                 </div>
-                {eligibilityDetails.issues?.length > 0 && (<ul className="text-xs text-red-700 list-disc pl-5 space-y-1">{eligibilityDetails.issues.map((issue, i) => <li key={i}>{issue}</li>)}</ul>)}
+                {eligibilityDetails.issues?.length > 0 && (<ul className="text-xs text-red-400 list-disc pl-5 space-y-1">{eligibilityDetails.issues.map((issue, i) => <li key={i}>{issue}</li>)}</ul>)}
               </div>
             </div>
           ) : null}
-          <div className="flex justify-end mt-6 pt-4 border-t border-zinc-100">
-            <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-zinc-100 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-200 transition-colors">Close</button>
+          <div className="flex justify-end mt-6 pt-4 border-t border-dark-700">
+            <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-dark-800 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors border border-dark-700">Close</button>
           </div>
         </Modal>
       </div>

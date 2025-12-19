@@ -45,18 +45,42 @@ const MarkmapRender = ({ markdown, className = '' }) => {
     }, []);
 
     return (
-        <div className={`relative w-full bg-gradient-to-br from-zinc-50 to-white rounded-xl border border-zinc-100 overflow-hidden ${className}`}>
+        <div className={`relative w-full bg-gradient-to-br from-dark-800 to-dark-900 rounded-xl border border-dark-700 overflow-hidden ${className}`}>
             <svg
                 ref={svgRef}
                 className="w-full h-full block"
                 style={{ width: '100%', height: '100%', minHeight: '400px' }}
             />
+            <style>{`
+                /* Mind Map Text - White on dark background */
+                .markmap-node text {
+                    fill: #ffffff !important;
+                    font-weight: 500 !important;
+                }
+                .markmap-node foreignObject div,
+                .markmap-node foreignObject * {
+                    color: #ffffff !important;
+                }
+                svg text {
+                    fill: #ffffff !important;
+                }
+                svg foreignObject,
+                svg foreignObject * {
+                    color: #ffffff !important;
+                }
+                /* Links */
+                .markmap-link, svg path {
+                    stroke: #71717a !important;
+                    stroke-width: 2px !important;
+                    fill: none !important;
+                }
+            `}</style>
             {/* Controls hint */}
-            <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg border border-zinc-200 text-[10px] text-zinc-500 shadow-sm">
+            <div className="absolute bottom-3 left-3 flex items-center gap-2 px-3 py-1.5 bg-dark-900/90 backdrop-blur-sm rounded-lg border border-dark-700 text-[10px] text-dark-400 shadow-sm">
                 <span>🖱️ Drag to pan</span>
-                <span className="text-zinc-300">•</span>
+                <span className="text-dark-600">•</span>
                 <span>🔍 Scroll to zoom</span>
-                <span className="text-zinc-300">•</span>
+                <span className="text-dark-600">•</span>
                 <span>👆 Click to expand/collapse</span>
             </div>
         </div>

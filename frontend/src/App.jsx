@@ -38,7 +38,6 @@ const StudentCareer = lazy(() => import('./pages/student/StudentCareer'));
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'));
 const StudentCalculators = lazy(() => import('./pages/student/StudentCalculators'));
 const StudentAITwin = lazy(() => import('./pages/student/StudentAITwin'));
-const StudentHallTickets = lazy(() => import('./pages/student/StudentHallTickets'));
 
 // Admin Pages
 const AdminEvents = lazy(() => import('./pages/admin/AdminEvents'));
@@ -173,11 +172,7 @@ function App() {
 
             <Route
               path="/student/hall-tickets"
-              element={
-                <ProtectedRoute allowedRoles={['Student']}>
-                  <StudentHallTickets />
-                </ProtectedRoute>
-              }
+              element={<Navigate to="/student/exams" replace />}
             />
 
             {/* Admin Routes */}

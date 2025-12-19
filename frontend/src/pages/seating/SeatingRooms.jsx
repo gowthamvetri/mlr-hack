@@ -105,8 +105,8 @@ const SeatingRooms = () => {
 
   const getStatusColor = (isAvailable) => {
     return isAvailable
-      ? 'bg-green-100 text-green-700'
-      : 'bg-red-100 text-red-700';
+      ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      : 'bg-red-500/10 text-red-400 border-red-500/20';
   };
 
   const totalCapacity = rooms.reduce((sum, r) => sum + (r.capacity || 0), 0);
@@ -114,24 +114,24 @@ const SeatingRooms = () => {
 
   return (
     <DashboardLayout role="seating_manager" userName={user?.name}>
-      <div className="space-y-6 animate-fade-in">
+      <div className="min-h-screen bg-dark-900 p-6 lg:p-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Room Management</h1>
-            <p className="text-gray-500 mt-1 text-lg">Manage exam rooms and their configurations</p>
+            <h1 className="text-2xl font-bold text-white tracking-tight">Room Management</h1>
+            <p className="text-dark-400 mt-1 text-sm">Manage exam rooms and their configurations</p>
           </div>
           <div className="flex gap-2">
             <button
               onClick={fetchRooms}
-              className="flex items-center gap-2 px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+              className="flex items-center gap-2 px-4 py-3 bg-dark-800 hover:bg-dark-700 text-dark-300 hover:text-white border border-dark-700 rounded-xl font-bold transition-all"
             >
               <RefreshCw className="w-5 h-5" />
               Refresh
             </button>
             <button
               onClick={() => setShowAddRoom(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-lg shadow-primary-200 transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg shadow-primary-500/20 transition-all"
             >
               <Plus className="w-5 h-5" />
               Add Room
@@ -140,63 +140,63 @@ const SeatingRooms = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-in-up">
-          <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-5 text-white shadow-lg shadow-primary-200 hover:scale-[1.02] transition-transform">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-5 text-white shadow-lg shadow-primary-900/20 border border-primary-500/30">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-primary-100 font-medium text-sm">Total Rooms</p>
-                <p className="text-3xl font-bold mt-1">{rooms.length}</p>
+                <p className="text-primary-100 font-bold text-xs uppercase tracking-wide">Total Rooms</p>
+                <p className="text-2xl font-bold mt-1">{rooms.length}</p>
               </div>
-              <div className="w-11 h-11 bg-white/20 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center border border-white/20">
                 <Building className="w-5 h-5 text-white" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Available</p>
-                <p className="text-3xl font-bold text-green-600 mt-1">{availableRooms}</p>
+                <p className="text-dark-400 font-bold text-xs uppercase tracking-wide">Available</p>
+                <p className="text-2xl font-bold text-emerald-400 mt-1">{availableRooms}</p>
               </div>
-              <div className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center">
-                <Check className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center">
+                <Check className="w-5 h-5 text-emerald-400" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-primary-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Total Capacity</p>
-                <p className="text-3xl font-bold text-primary-600 mt-1">{totalCapacity}</p>
+                <p className="text-dark-400 font-bold text-xs uppercase tracking-wide">Total Capacity</p>
+                <p className="text-2xl font-bold text-primary-400 mt-1">{totalCapacity}</p>
               </div>
-              <div className="w-11 h-11 bg-primary-50 rounded-xl flex items-center justify-center">
-                <Users className="w-5 h-5 text-primary-600" />
+              <div className="w-10 h-10 bg-primary-500/10 border border-primary-500/20 rounded-xl flex items-center justify-center">
+                <Users className="w-5 h-5 text-primary-400" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-orange-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Buildings</p>
-                <p className="text-3xl font-bold text-orange-600 mt-1">{[...new Set(rooms.map(r => r.building))].length}</p>
+                <p className="text-dark-400 font-bold text-xs uppercase tracking-wide">Buildings</p>
+                <p className="text-2xl font-bold text-orange-400 mt-1">{[...new Set(rooms.map(r => r.building))].length}</p>
               </div>
-              <div className="w-11 h-11 bg-orange-50 rounded-xl flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-orange-600" />
+              <div className="w-10 h-10 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-orange-400" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Search */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
+        <div className="glass-card-dark rounded-xl border border-dark-700 p-5 mb-6">
           <div className="relative group">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-dark-500 group-focus-within:text-primary-400 transition-colors" />
             <input
               type="text"
               placeholder="Search rooms by number, building, or hall name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 transition-all"
+              className="w-full pl-12 pr-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:bg-dark-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white placeholder-dark-500"
             />
           </div>
         </div>
@@ -204,70 +204,70 @@ const SeatingRooms = () => {
         {/* Rooms Grid */}
         {loading ? (
           <div className="text-center py-24">
-            <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500 font-medium">Loading rooms from database...</p>
+            <div className="w-16 h-16 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-dark-400 font-bold">Loading rooms from database...</p>
           </div>
         ) : rooms.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-16 text-center">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Sparkles className="w-10 h-10 text-gray-300" />
+          <div className="glass-card-dark rounded-xl border border-dark-700 p-16 text-center">
+            <div className="w-20 h-20 bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dark-700">
+              <Sparkles className="w-10 h-10 text-dark-500" />
             </div>
-            <p className="text-xl font-bold text-gray-900">No rooms in database</p>
-            <p className="text-gray-500 mt-2">Click "Add Room" to create your first room</p>
+            <p className="text-xl font-bold text-white">No rooms in database</p>
+            <p className="text-dark-400 mt-2">Click "Add Room" to create your first room</p>
           </div>
         ) : filteredRooms.length === 0 ? (
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center">
-            <Search className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-            <p className="text-gray-500 font-medium">No rooms found</p>
-            <p className="text-gray-400 text-sm">Try adjusting your search</p>
+          <div className="glass-card-dark rounded-xl border border-dark-700 p-12 text-center">
+            <Search className="w-12 h-12 mx-auto mb-3 text-dark-500" />
+            <p className="text-white font-bold">No rooms found</p>
+            <p className="text-dark-400 text-sm">Try adjusting your search</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredRooms.map(room => (
-              <div key={room._id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all group">
-                <div className={`h-1.5 ${room.isAvailable !== false ? 'bg-gradient-to-r from-green-500 to-green-600' : 'bg-gradient-to-r from-red-500 to-red-600'}`} />
+              <div key={room._id} className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden hover:border-dark-600 hover:shadow-lg transition-all group">
+                <div className={`h-1.5 ${room.isAvailable !== false ? 'bg-gradient-to-r from-emerald-500 to-emerald-600' : 'bg-gradient-to-r from-red-500 to-red-600'}`} />
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Building className="w-6 h-6 text-primary-600" />
+                      <div className="w-12 h-12 bg-primary-500/10 border border-primary-500/20 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        <Building className="w-6 h-6 text-primary-400" />
                       </div>
                       <div>
-                        <h3 className="font-bold text-lg text-gray-900">{room.hallNo || `Room ${room.roomNumber}`}</h3>
-                        <p className="text-sm text-gray-500">{room.roomNumber}</p>
+                        <h3 className="font-bold text-lg text-white">{room.hallNo || `Room ${room.roomNumber}`}</h3>
+                        <p className="text-sm text-dark-400">{room.roomNumber}</p>
                       </div>
                     </div>
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${getStatusColor(room.isAvailable !== false)}`}>
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusColor(room.isAvailable !== false)}`}>
                       {room.isAvailable !== false ? 'Available' : 'Unavailable'}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-sm mb-4">
                     <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">{room.building}</span>
+                      <MapPin className="w-4 h-4 text-dark-500" />
+                      <span className="text-dark-300">{room.building}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Layers className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">Floor {room.floor}</span>
+                      <Layers className="w-4 h-4 text-dark-500" />
+                      <span className="text-dark-300">Floor {room.floor}</span>
                     </div>
                     <div className="flex items-center gap-2 col-span-2">
-                      <Users className="w-4 h-4 text-gray-400" />
-                      <span className="text-gray-600">{room.capacity} seats</span>
+                      <Users className="w-4 h-4 text-dark-500" />
+                      <span className="text-dark-300">{room.capacity} seats</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end pt-4 border-t border-gray-100">
+                  <div className="flex items-center justify-end pt-4 border-t border-dark-700">
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => setEditingRoom({ ...room })}
-                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
                       >
                         <Edit className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteRoom(room._id)}
-                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        className="p-2 text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -290,10 +290,10 @@ const SeatingRooms = () => {
         <div className="space-y-5">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Room Number *</label>
+              <label className="block text-sm font-bold text-dark-300 mb-2">Room Number *</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
                 value={editingRoom ? editingRoom.roomNumber : newRoom.roomNumber}
                 onChange={(e) => editingRoom
                   ? setEditingRoom({ ...editingRoom, roomNumber: e.target.value })
@@ -303,10 +303,10 @@ const SeatingRooms = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Hall Name</label>
+              <label className="block text-sm font-bold text-dark-300 mb-2">Hall Name</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
                 value={editingRoom ? editingRoom.hallNo : newRoom.hallNo}
                 onChange={(e) => editingRoom
                   ? setEditingRoom({ ...editingRoom, hallNo: e.target.value })
@@ -317,9 +317,9 @@ const SeatingRooms = () => {
             </div>
           </div>
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">Building</label>
+            <label className="block text-sm font-bold text-dark-300 mb-2">Building</label>
             <select
-              className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+              className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
               value={editingRoom ? editingRoom.building : newRoom.building}
               onChange={(e) => editingRoom
                 ? setEditingRoom({ ...editingRoom, building: e.target.value })
@@ -334,10 +334,10 @@ const SeatingRooms = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Floor</label>
+              <label className="block text-sm font-bold text-dark-300 mb-2">Floor</label>
               <input
                 type="text"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
                 value={editingRoom ? editingRoom.floor : newRoom.floor}
                 onChange={(e) => editingRoom
                   ? setEditingRoom({ ...editingRoom, floor: e.target.value })
@@ -347,10 +347,10 @@ const SeatingRooms = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Capacity *</label>
+              <label className="block text-sm font-bold text-dark-300 mb-2">Capacity *</label>
               <input
                 type="number"
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
                 value={editingRoom ? editingRoom.capacity : newRoom.capacity}
                 onChange={(e) => editingRoom
                   ? setEditingRoom({ ...editingRoom, capacity: parseInt(e.target.value) || 0 })
@@ -363,9 +363,9 @@ const SeatingRooms = () => {
           </div>
           {editingRoom && (
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-bold text-dark-300 mb-2">Status</label>
               <select
-                className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:bg-white transition-all"
+                className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
                 value={editingRoom.isAvailable !== false ? 'true' : 'false'}
                 onChange={(e) => setEditingRoom({ ...editingRoom, isAvailable: e.target.value === 'true' })}
               >
@@ -375,17 +375,17 @@ const SeatingRooms = () => {
             </div>
           )}
         </div>
-        <div className="mt-6 pt-4 border-t border-gray-100 flex gap-3">
+        <div className="mt-6 pt-4 border-t border-dark-700 flex gap-3">
           <button
             onClick={() => { setShowAddRoom(false); setEditingRoom(null); }}
-            className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+            className="px-6 py-3 bg-dark-800 hover:bg-dark-700 text-dark-300 hover:text-white border border-dark-700 rounded-xl font-bold transition-all"
           >
             Cancel
           </button>
           <button
             onClick={editingRoom ? handleUpdateRoom : handleAddRoom}
             disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 text-white py-3 rounded-xl font-semibold shadow-lg shadow-primary-200 transition-all"
+            className="flex-1 flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-500 disabled:bg-dark-700 text-white py-3 rounded-xl font-bold shadow-lg shadow-primary-500/20 transition-all disabled:shadow-none disabled:text-dark-500"
           >
             {saving ? (
               <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

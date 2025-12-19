@@ -77,22 +77,48 @@ export const MindMapView = ({ markdown, options = {} }) => {
         <div className="relative w-full h-full bg-gradient-to-br from-dark-800 to-dark-900 rounded-xl overflow-hidden border border-dark-700/50">
             <svg ref={svgRef} className="w-full h-full min-h-[400px]" />
             <style>{`
+                /* Mind Map Text - Make highly visible on dark background */
+                .markmap-node text {
+                    fill: #ffffff !important;
+                    font-weight: 500 !important;
+                    font-size: 14px !important;
+                    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+                }
+                .markmap-node foreignObject div {
+                    color: #ffffff !important;
+                    font-weight: 500 !important;
+                }
+                
+                /* Links/branches */
                 .markmap-link {
-                    stroke: #a1a1aa !important;
+                    stroke: #71717a !important;
                     stroke-width: 2px !important;
                     fill: none !important;
-                    stroke-opacity: 0.8 !important;
+                    stroke-opacity: 0.9 !important;
                 }
                 svg path {
-                    stroke: #a1a1aa;
+                    stroke: #71717a;
                     stroke-width: 2px;
                     fill: none;
                 }
+                
+                /* Nodes */
                 .markmap-node circle {
                     cursor: pointer;
+                    stroke-width: 2px;
                 }
-                .markmap-node text {
-                    fill: #F4F4F6 !important;
+                
+                /* Make all SVG text white */
+                svg text {
+                    fill: #ffffff !important;
+                }
+                
+                /* foreignObject content (some markmap versions use this) */
+                svg foreignObject {
+                    color: #ffffff !important;
+                }
+                svg foreignObject * {
+                    color: #ffffff !important;
                 }
             `}</style>
             <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-dark-900/90 backdrop-blur-sm rounded-lg border border-dark-700 text-[10px] text-dark-400 shadow-sm flex items-center gap-2">

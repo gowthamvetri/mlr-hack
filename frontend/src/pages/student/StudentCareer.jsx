@@ -272,7 +272,7 @@ const StudentCareer = () => {
     return (
       <DashboardLayout title="Career Development">
         <div className="flex items-center justify-center py-20">
-          <div className="w-12 h-12 border-4 border-primary-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-12 h-12 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin"></div>
         </div>
       </DashboardLayout>
     );
@@ -280,86 +280,89 @@ const StudentCareer = () => {
 
   return (
     <DashboardLayout title="Career Development">
-      <div className="space-y-4 sm:space-y-6">
+      <div className="space-y-4 sm:space-y-6 animate-fade-in">
         {/* Header Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          <div className="col-span-2 lg:col-span-1 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white">
-            <div className="flex items-center justify-between">
+          <div className="col-span-2 lg:col-span-1 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl p-4 sm:p-5 text-white shadow-lg shadow-primary-900/20 border border-primary-500/30 overflow-hidden relative group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all duration-500"></div>
+            <div className="flex items-center justify-between relative z-10">
               <div>
-                <p className="text-primary-100 text-xs sm:text-sm">Steps Completed</p>
-                <p className="text-2xl sm:text-3xl font-bold mt-1"><AnimatedNumber value={getCompletedStepsCount()} />/5</p>
+                <p className="text-primary-100 text-xs sm:text-sm font-medium uppercase tracking-wide">Steps Completed</p>
+                <p className="text-2xl sm:text-3xl font-bold mt-1 text-white drop-shadow-sm"><AnimatedNumber value={getCompletedStepsCount()} />/5</p>
               </div>
-              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center">
+              <div className="w-10 sm:w-12 h-10 sm:h-12 bg-white/20 rounded-xl flex items-center justify-center border border-white/20 backdrop-blur-sm">
                 <Award className="w-5 sm:w-6 h-5 sm:h-6 text-white" />
               </div>
             </div>
-            <div className="mt-3 bg-white/20 rounded-full h-2">
-              <div className="bg-white rounded-full h-2" style={{ width: `${(getCompletedStepsCount() / 5) * 100}%` }}></div>
+            <div className="mt-3 bg-black/20 rounded-full h-2 overflow-hidden border border-white/10">
+              <div className="bg-white rounded-full h-2 shadow-[0_0_10px_rgba(255,255,255,0.5)]" style={{ width: `${(getCompletedStepsCount() / 5) * 100}%` }}></div>
             </div>
           </div>
 
-          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
+          <div className="glass-card-dark rounded-xl p-4 sm:p-5 tilt-card border border-dark-700 shadow-xl group hover:border-emerald-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-xs sm:text-sm">Career Ready</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={Math.round((getCompletedStepsCount() / 5) * 100)} suffix="%" /></p>
+                <p className="text-dark-400 text-xs sm:text-sm font-bold uppercase tracking-wide">Career Ready</p>
+                <p className="text-2xl sm:text-3xl font-bold text-emerald-400 mt-1 drop-shadow-sm"><AnimatedNumber value={Math.round((getCompletedStepsCount() / 5) * 100)} suffix="%" /></p>
               </div>
-              <div className="w-8 sm:w-10 h-8 sm:h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-green-600" />
-              </div>
-            </div>
-          </div>
-
-          <div className="glass-card rounded-xl p-4 sm:p-5 tilt-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 text-xs sm:text-sm">Skills Added</p>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={skills.length} /></p>
-              </div>
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-blue-600" />
+              <div className="w-8 sm:w-10 h-8 sm:h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-lg flex items-center justify-center group-hover:bg-emerald-500/20 transition-colors">
+                <TrendingUp className="w-4 sm:w-5 h-4 sm:h-5 text-emerald-500" />
               </div>
             </div>
           </div>
 
-          <div className="glass-card rounded-xl p-5 tilt-card">
+          <div className="glass-card-dark rounded-xl p-4 sm:p-5 tilt-card border border-dark-700 shadow-xl group hover:border-blue-500/30 transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 text-sm">Active Goals</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={goals.filter(g => g.status === 'In Progress').length} /></p>
+                <p className="text-dark-400 text-xs sm:text-sm font-bold uppercase tracking-wide">Skills Added</p>
+                <p className="text-2xl sm:text-3xl font-bold text-white mt-1 drop-shadow-sm"><AnimatedNumber value={skills.length} /></p>
               </div>
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-center group-hover:bg-blue-500/20 transition-colors">
+                <Brain className="w-5 h-5 text-blue-400" />
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card-dark rounded-xl p-5 tilt-card border border-dark-700 shadow-xl group hover:border-purple-500/30 transition-all">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-dark-400 text-sm font-bold uppercase tracking-wide">Active Goals</p>
+                <p className="text-3xl font-bold text-white mt-1 drop-shadow-sm"><AnimatedNumber value={goals.filter(g => g.status === 'In Progress').length} /></p>
+              </div>
+              <div className="w-10 h-10 bg-purple-500/10 border border-purple-500/20 rounded-lg flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                <Target className="w-5 h-5 text-purple-400" />
               </div>
             </div>
           </div>
         </div>
 
         {/* Tabs */}
-        <div className="glass-card rounded-xl tilt-card">
-          <div className="border-b border-gray-100">
-            <div className="flex overflow-x-auto">
+        <div className="glass-card-dark rounded-xl tilt-card border border-dark-700 shadow-xl overflow-hidden">
+          <div className="border-b border-dark-700 bg-dark-800/30">
+            <div className="flex overflow-x-auto custom-scrollbar">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-4 font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  className={`flex items-center gap-2 px-6 py-4 font-bold border-b-2 transition-all whitespace-nowrap ${activeTab === tab.id
+                    ? 'border-primary-500 text-primary-400 bg-primary-500/5'
+                    : 'border-transparent text-dark-400 hover:text-white hover:bg-dark-700/50'
                     }`}
                 >
-                  <tab.icon className="w-4 h-4" />
+                  <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-primary-500' : 'text-dark-500'}`} />
                   {tab.label}
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="p-6">
+          <div className="p-6 bg-dark-900/40">
             {/* Career Roadmap Tab */}
             {activeTab === 'roadmap' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">Career Roadmap</h3>
-                  <p className="text-sm text-gray-500">Complete each step and request admin approval to unlock the next</p>
+                  <h3 className="text-lg font-bold text-white">Career Roadmap</h3>
+                  <p className="text-sm text-dark-400 font-medium">Complete each step and request admin approval to unlock the next</p>
                 </div>
 
                 <div className="space-y-4">
@@ -370,35 +373,35 @@ const StudentCareer = () => {
                     return (
                       <div
                         key={step.id}
-                        className={`rounded-xl border-2 p-6 transition-all ${status === 'approved' ? 'border-green-200 bg-green-50' :
-                          status === 'pending' ? 'border-yellow-200 bg-yellow-50' :
-                            status === 'rejected' ? 'border-red-200 bg-red-50' :
-                              status === 'available' ? 'border-primary-200 bg-white hover:shadow-md' :
-                                'border-gray-200 bg-gray-50 opacity-60'
+                        className={`rounded-xl border p-6 transition-all ${status === 'approved' ? 'border-emerald-500/30 bg-emerald-500/5' :
+                          status === 'pending' ? 'border-amber-500/30 bg-amber-500/5' :
+                            status === 'rejected' ? 'border-red-500/30 bg-red-500/5' :
+                              status === 'available' ? 'border-primary-500/30 bg-primary-500/5 hover:border-primary-500/50' :
+                                'border-dark-700 bg-dark-800/20 opacity-60'
                           }`}
                       >
                         <div className="flex items-start gap-4">
-                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${status === 'approved' ? 'bg-green-500' :
-                            status === 'pending' ? 'bg-yellow-500' :
-                              status === 'rejected' ? 'bg-red-500' :
-                                status === 'available' ? 'bg-primary-600' :
-                                  'bg-gray-300'
+                          <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 border shadow-lg ${status === 'approved' ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400' :
+                            status === 'pending' ? 'bg-amber-500/10 border-amber-500/20 text-amber-400' :
+                              status === 'rejected' ? 'bg-red-500/10 border-red-500/20 text-red-400' :
+                                status === 'available' ? 'bg-primary-500/10 border-primary-500/20 text-primary-400' :
+                                  'bg-dark-800 border-dark-700 text-dark-500'
                             }`}>
-                            {status === 'approved' ? <CheckCircle className="w-6 h-6 text-white" /> :
-                              status === 'locked' ? <Lock className="w-5 h-5 text-white" /> :
-                                status === 'pending' ? <Clock className="w-5 h-5 text-white" /> :
-                                  status === 'rejected' ? <AlertCircle className="w-5 h-5 text-white" /> :
-                                    <step.icon className="w-6 h-6 text-white" />}
+                            {status === 'approved' ? <CheckCircle className="w-6 h-6" /> :
+                              status === 'locked' ? <Lock className="w-5 h-5" /> :
+                                status === 'pending' ? <Clock className="w-5 h-5" /> :
+                                  status === 'rejected' ? <AlertCircle className="w-5 h-5" /> :
+                                    <step.icon className="w-6 h-6" />}
                           </div>
 
                           <div className="flex-1">
                             <div className="flex items-center gap-3 mb-2">
-                              <h4 className="font-bold text-gray-800">{step.title}</h4>
-                              <span className={`px-3 py-1 rounded-full text-xs font-medium ${status === 'approved' ? 'bg-green-100 text-green-700' :
-                                status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                  status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                    status === 'available' ? 'bg-blue-100 text-blue-700' :
-                                      'bg-gray-100 text-gray-600'
+                              <h4 className="font-bold text-white text-lg">{step.title}</h4>
+                              <span className={`px-3 py-1 rounded-full text-xs font-bold border shadow-sm ${status === 'approved' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' :
+                                status === 'pending' ? 'bg-amber-500/10 text-amber-400 border-amber-500/20' :
+                                  status === 'rejected' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
+                                    status === 'available' ? 'bg-primary-500/10 text-primary-400 border-primary-500/20' :
+                                      'bg-dark-800 text-dark-400 border-dark-700'
                                 }`}>
                                 {status === 'approved' ? 'Approved' :
                                   status === 'pending' ? 'Pending Approval' :
@@ -406,14 +409,14 @@ const StudentCareer = () => {
                                       status === 'available' ? 'Available' : 'Locked'}
                               </span>
                             </div>
-                            <p className="text-sm text-gray-600 mb-4">{step.description}</p>
+                            <p className="text-sm text-dark-300 mb-4 font-medium leading-relaxed">{step.description}</p>
 
-                            <div className="bg-white/50 rounded-lg p-4 mb-4">
-                              <p className="text-sm font-medium text-gray-700 mb-2">Requirements to complete:</p>
+                            <div className="bg-dark-800/50 border border-dark-700 rounded-lg p-4 mb-4">
+                              <p className="text-sm font-bold text-dark-200 mb-2 uppercase tracking-wide">Requirements to complete:</p>
                               <ul className="space-y-1">
                                 {step.requirements.map((req, idx) => (
-                                  <li key={idx} className="flex items-center gap-2 text-sm text-gray-600">
-                                    <Circle className="w-2 h-2 text-gray-400" />
+                                  <li key={idx} className="flex items-center gap-2 text-sm text-dark-400 font-medium">
+                                    <Circle className="w-1.5 h-1.5 text-dark-500 fill-current" />
                                     {req}
                                   </li>
                                 ))}
@@ -421,16 +424,16 @@ const StudentCareer = () => {
                             </div>
 
                             {status === 'rejected' && approval?.adminComment && (
-                              <div className="bg-red-100 rounded-lg p-3 mb-4">
-                                <p className="text-sm font-medium text-red-700">Admin Feedback:</p>
-                                <p className="text-sm text-red-600">{approval.adminComment}</p>
+                              <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 mb-4">
+                                <p className="text-sm font-bold text-red-400 mb-1">Admin Feedback:</p>
+                                <p className="text-sm text-red-300 font-medium">{approval.adminComment}</p>
                               </div>
                             )}
 
                             {(status === 'available' || status === 'rejected') && (
                               <button
                                 onClick={() => openRequestModal(step)}
-                                className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                                className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20 font-bold text-sm"
                               >
                                 <Send className="w-4 h-4" />
                                 {status === 'rejected' ? 'Re-submit Request' : 'Request Approval'}
@@ -438,14 +441,14 @@ const StudentCareer = () => {
                             )}
 
                             {status === 'pending' && (
-                              <p className="text-sm text-yellow-700 flex items-center gap-2">
+                              <p className="text-sm text-amber-500 font-bold flex items-center gap-2 bg-amber-500/5 p-2 rounded-lg border border-amber-500/10 w-fit text-amber-400">
                                 <Clock className="w-4 h-4" />
                                 Waiting for admin to review your request...
                               </p>
                             )}
 
                             {status === 'locked' && (
-                              <p className="text-sm text-gray-500 flex items-center gap-2">
+                              <p className="text-sm text-dark-500 font-medium flex items-center gap-2 bg-dark-800/50 p-2 rounded-lg border border-dark-700 w-fit">
                                 <Lock className="w-4 h-4" />
                                 Complete previous steps to unlock
                               </p>
@@ -464,55 +467,55 @@ const StudentCareer = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-800">Skills Tracker</h3>
-                    <p className="text-sm text-gray-500">Add and track your technical and soft skills</p>
+                    <h3 className="text-lg font-bold text-white">Skills Tracker</h3>
+                    <p className="text-sm text-dark-400 font-medium">Add and track your technical and soft skills</p>
                   </div>
-                  <button onClick={() => setShowAddSkillModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                  <button onClick={() => setShowAddSkillModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 shadow-lg shadow-primary-500/20 font-bold text-sm transition-all">
                     <Plus className="w-4 h-4" />
                     Add Skill
                   </button>
                 </div>
 
                 {skills.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-xl">
-                    <Brain className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p className="font-medium text-gray-600">No skills added yet</p>
-                    <p className="text-sm text-gray-500 mb-4">Start tracking your skills by adding them</p>
-                    <button onClick={() => setShowAddSkillModal(true)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                  <div className="text-center py-12 bg-dark-800/30 rounded-xl border border-dark-700 border-dashed">
+                    <Brain className="w-12 h-12 mx-auto mb-3 text-dark-600" />
+                    <p className="font-bold text-white text-lg">No skills added yet</p>
+                    <p className="text-sm text-dark-400 mb-4 font-medium">Start tracking your skills by adding them</p>
+                    <button onClick={() => setShowAddSkillModal(true)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 shadow-lg shadow-primary-500/20 font-bold text-sm transition-all">
                       Add Your First Skill
                     </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {skills.map((skill) => (
-                      <div key={skill.id} className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
+                      <div key={skill.id} className="bg-dark-800/40 rounded-xl p-4 hover:bg-dark-800/80 transition-all border border-dark-700 hover:border-primary-500/30 group">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${skill.category === 'Technical' ? 'bg-blue-100' : 'bg-purple-100'}`}>
-                              {skill.category === 'Technical' ? <Code className="w-5 h-5 text-blue-600" /> : <Users className="w-5 h-5 text-purple-600" />}
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center border shadow-sm ${skill.category === 'Technical' ? 'bg-blue-500/10 border-blue-500/20' : 'bg-purple-500/10 border-purple-500/20'}`}>
+                              {skill.category === 'Technical' ? <Code className="w-5 h-5 text-blue-400" /> : <Users className="w-5 h-5 text-purple-400" />}
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-800">{skill.name}</h4>
-                              <p className="text-xs text-gray-500">{skill.category}</p>
+                              <h4 className="font-bold text-white">{skill.name}</h4>
+                              <p className="text-xs text-dark-400 font-medium">{skill.category}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-sm font-medium ${skill.trend?.startsWith('+') ? 'text-green-600' : 'text-red-600'}`}>{skill.trend}</span>
-                            <button onClick={() => handleDeleteSkill(skill.id)} className="p-1 hover:bg-red-100 rounded text-red-500">
+                            <span className={`text-sm font-bold ${skill.trend?.startsWith('+') ? 'text-emerald-400' : 'text-red-400'}`}>{skill.trend}</span>
+                            <button onClick={() => handleDeleteSkill(skill.id)} className="p-1.5 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors border border-transparent hover:border-red-500/30">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
-                        <div className="bg-gray-200 rounded-full h-2">
-                          <div className="bg-primary-600 h-2 rounded-full transition-all" style={{ width: `${skill.level}%` }}></div>
+                        <div className="bg-dark-700/50 rounded-full h-2 border border-dark-600">
+                          <div className="bg-gradient-to-r from-primary-600 to-primary-400 h-2 rounded-full transition-all shadow-[0_0_10px_rgba(var(--primary-500),0.3)]" style={{ width: `${skill.level}%` }}></div>
                         </div>
-                        <div className="flex justify-between items-center mt-2 text-sm">
-                          <span className="text-gray-500">Proficiency</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-700">{skill.level}%</span>
+                        <div className="flex justify-between items-center mt-3 text-sm">
+                          <span className="text-dark-500 font-medium uppercase tracking-wider text-xs">Proficiency</span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-bold text-white">{skill.level}%</span>
                             <div className="flex gap-1">
-                              <button onClick={() => handleUpdateSkillLevel(skill.id, Math.max(0, skill.level - 5))} className="px-2 py-0.5 bg-gray-200 hover:bg-gray-300 rounded text-xs">-5</button>
-                              <button onClick={() => handleUpdateSkillLevel(skill.id, Math.min(100, skill.level + 5))} className="px-2 py-0.5 bg-primary-100 hover:bg-primary-200 text-primary-700 rounded text-xs">+5</button>
+                              <button onClick={() => handleUpdateSkillLevel(skill.id, Math.max(0, skill.level - 5))} className="w-6 h-6 flex items-center justify-center bg-dark-700 hover:bg-dark-600 rounded text-xs text-dark-300 font-bold border border-dark-600 transition-colors">-5</button>
+                              <button onClick={() => handleUpdateSkillLevel(skill.id, Math.min(100, skill.level + 5))} className="w-6 h-6 flex items-center justify-center bg-primary-600/20 hover:bg-primary-600/40 text-primary-400 rounded text-xs font-bold border border-primary-500/30 transition-colors">+5</button>
                             </div>
                           </div>
                         </div>
@@ -528,59 +531,62 @@ const StudentCareer = () => {
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-gray-800">My Career Goals</h3>
-                    <p className="text-sm text-gray-500">Set and track your personal career development goals</p>
+                    <h3 className="text-lg font-bold text-white">My Career Goals</h3>
+                    <p className="text-sm text-dark-400 font-medium">Set and track your personal career development goals</p>
                   </div>
-                  <button onClick={() => setShowAddGoalModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                  <button onClick={() => setShowAddGoalModal(true)} className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 shadow-lg shadow-primary-500/20 font-bold text-sm transition-all">
                     <Plus className="w-4 h-4" />
                     Add Goal
                   </button>
                 </div>
 
                 {goals.length === 0 ? (
-                  <div className="text-center py-12 bg-gray-50 rounded-xl">
-                    <Target className="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                    <p className="font-medium text-gray-600">No goals set yet</p>
-                    <p className="text-sm text-gray-500 mb-4">Define your career goals to stay focused</p>
-                    <button onClick={() => setShowAddGoalModal(true)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700">
+                  <div className="text-center py-12 bg-dark-800/30 rounded-xl border border-dark-700 border-dashed">
+                    <Target className="w-12 h-12 mx-auto mb-3 text-dark-600" />
+                    <p className="font-bold text-white text-lg">No goals set yet</p>
+                    <p className="text-sm text-dark-400 mb-4 font-medium">Define your career goals to stay focused</p>
+                    <button onClick={() => setShowAddGoalModal(true)} className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-500 shadow-lg shadow-primary-500/20 font-bold text-sm transition-all">
                       Add Your First Goal
                     </button>
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {goals.map((goal) => (
-                      <div key={goal.id} className="bg-gray-50 rounded-xl p-5 hover:shadow-md transition-all">
+                      <div key={goal.id} className="bg-dark-800/40 rounded-xl p-5 hover:bg-dark-800/80 transition-all border border-dark-700 hover:border-primary-500/30 hover:shadow-lg group">
                         <div className="flex items-start justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${goal.category === 'Technical' ? 'bg-blue-100' : goal.category === 'Projects' ? 'bg-green-100' : 'bg-purple-100'
+                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center border shadow-sm ${goal.category === 'Technical' ? 'bg-blue-500/10 border-blue-500/20' : goal.category === 'Projects' ? 'bg-emerald-500/10 border-emerald-500/20' : 'bg-purple-500/10 border-purple-500/20'
                               }`}>
                               {getCategoryIcon(goal.category)}
+                              {goal.category === 'Technical' && <span className="sr-only">Technical</span>}
+                              {goal.category === 'Projects' && <span className="sr-only">Projects</span>}
+                              {goal.category !== 'Technical' && goal.category !== 'Projects' && <span className="sr-only">{goal.category}</span>}
                             </div>
                             <div>
-                              <h4 className="font-medium text-gray-800">{goal.title}</h4>
-                              <p className="text-xs text-gray-500">Due: {new Date(goal.deadline).toLocaleDateString()}</p>
+                              <h4 className="font-bold text-white">{goal.title}</h4>
+                              <p className="text-xs text-dark-400 font-medium">Due: {new Date(goal.deadline).toLocaleDateString()}</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${goal.status === 'Completed' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
+                            <span className={`px-2 py-1 rounded-md text-xs font-bold border ${goal.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20' : 'bg-blue-500/10 text-blue-400 border-blue-500/20'}`}>
                               {goal.status}
                             </span>
-                            <button onClick={() => handleDeleteGoal(goal.id)} className="p-1 hover:bg-red-100 rounded text-red-500">
+                            <button onClick={() => handleDeleteGoal(goal.id)} className="p-1.5 hover:bg-red-500/20 rounded-lg text-red-400 transition-colors border border-transparent hover:border-red-500/30">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
-                        <div className="bg-gray-200 rounded-full h-2 mb-2">
-                          <div className={`h-2 rounded-full ${goal.status === 'Completed' ? 'bg-green-500' : 'bg-primary-600'}`} style={{ width: `${goal.progress}%` }}></div>
+                        <div className="bg-dark-700/50 rounded-full h-2 mb-3 border border-dark-600">
+                          <div className={`h-2 rounded-full transition-all shadow-[0_0_10px_rgba(255,255,255,0.2)] ${goal.status === 'Completed' ? 'bg-emerald-500' : 'bg-primary-600'}`} style={{ width: `${goal.progress}%` }}></div>
                         </div>
                         <div className="flex justify-between items-center text-sm">
-                          <span className="text-gray-500">Progress</span>
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-gray-700">{goal.progress}%</span>
+                          <span className="text-dark-500 font-medium uppercase tracking-wider text-xs">Progress</span>
+                          <div className="flex items-center gap-3">
+                            <span className="font-bold text-white">{goal.progress}%</span>
                             {goal.status !== 'Completed' && (
                               <div className="flex gap-1">
-                                <button onClick={() => handleUpdateGoalProgress(goal.id, Math.max(0, goal.progress - 10))} className="px-2 py-0.5 bg-gray-200 hover:bg-gray-300 rounded text-xs">-10</button>
-                                <button onClick={() => handleUpdateGoalProgress(goal.id, Math.min(100, goal.progress + 10))} className="px-2 py-0.5 bg-primary-100 hover:bg-primary-200 text-primary-700 rounded text-xs">+10</button>
+                                <button onClick={() => handleUpdateGoalProgress(goal.id, Math.max(0, goal.progress - 10))} className="w-6 h-6 flex items-center justify-center bg-dark-700 hover:bg-dark-600 rounded text-xs text-dark-300 font-bold border border-dark-600 transition-colors">-10</button>
+                                <button onClick={() => handleUpdateGoalProgress(goal.id, Math.min(100, goal.progress + 10))} className="w-6 h-6 flex items-center justify-center bg-primary-600/20 hover:bg-primary-600/40 text-primary-400 rounded text-xs font-bold border border-primary-500/30 transition-colors">+10</button>
                               </div>
                             )}
                           </div>
@@ -596,39 +602,39 @@ const StudentCareer = () => {
             {activeTab === 'paths' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-800">Recommended Career Paths</h3>
-                  <p className="text-sm text-gray-500">Based on your skills and interests</p>
+                  <h3 className="text-lg font-bold text-white">Recommended Career Paths</h3>
+                  <p className="text-sm text-dark-400 font-medium">Based on your skills and interests</p>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {recommendedPaths.map((path) => (
-                    <div key={path.id} className="bg-gray-50 rounded-xl p-5 hover:shadow-md transition-all border-2 border-transparent hover:border-primary-200">
+                    <div key={path.id} className="glass-card-dark rounded-xl p-5 hover:shadow-xl transition-all border border-dark-700 hover:border-primary-500/30 group">
                       <div className="flex items-center justify-between mb-4">
-                        <div className="w-12 h-12 bg-gradient-to-br from-primary-100 to-primary-200 rounded-xl flex items-center justify-center">
-                          <Briefcase className="w-6 h-6 text-primary-600" />
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary-600/20 to-primary-500/20 rounded-xl flex items-center justify-center border border-primary-500/20 group-hover:bg-primary-500/30 transition-colors">
+                          <Briefcase className="w-6 h-6 text-primary-400 group-hover:text-primary-300" />
                         </div>
                         <div className="text-right">
-                          <p className="text-2xl font-bold text-primary-600">{path.match}%</p>
-                          <p className="text-xs text-gray-500">Match</p>
+                          <p className="text-2xl font-bold text-primary-400">{path.match}%</p>
+                          <p className="text-xs text-dark-400 font-bold uppercase tracking-wide">Match</p>
                         </div>
                       </div>
-                      <h4 className="font-bold text-gray-800 mb-2">{path.title}</h4>
-                      <div className="space-y-2 mb-4">
-                        <div className="flex items-center gap-2 text-sm">
-                          <TrendingUp className="w-4 h-4 text-green-500" />
-                          <span className="text-gray-600">Demand: {path.demand}</span>
+                      <h4 className="font-bold text-white mb-3 text-lg">{path.title}</h4>
+                      <div className="space-y-2 mb-5">
+                        <div className="flex items-center gap-2 text-sm bg-dark-800/50 p-2 rounded-lg border border-dark-700/50">
+                          <TrendingUp className="w-4 h-4 text-emerald-400" />
+                          <span className="text-dark-300 font-medium">Demand: <span className="text-emerald-400 font-bold">{path.demand}</span></span>
                         </div>
-                        <div className="flex items-center gap-2 text-sm">
-                          <Award className="w-4 h-4 text-yellow-500" />
-                          <span className="text-gray-600">Salary: {path.avgSalary}</span>
+                        <div className="flex items-center gap-2 text-sm bg-dark-800/50 p-2 rounded-lg border border-dark-700/50">
+                          <Award className="w-4 h-4 text-amber-400" />
+                          <span className="text-dark-300 font-medium">Salary: <span className="text-amber-400 font-bold">{path.avgSalary}</span></span>
                         </div>
                       </div>
-                      <div className="flex flex-wrap gap-2 mb-4">
+                      <div className="flex flex-wrap gap-2 mb-5">
                         {path.skills?.map((skill, idx) => (
-                          <span key={idx} className="px-2 py-1 bg-white rounded text-xs text-gray-600 border">{skill}</span>
+                          <span key={idx} className="px-2 py-1 bg-dark-800 rounded-md text-xs text-dark-300 border border-dark-700 font-medium">{skill}</span>
                         ))}
                       </div>
-                      <button className="w-full py-2 text-primary-600 font-medium hover:bg-primary-50 rounded-lg transition-colors">
+                      <button className="w-full py-2.5 bg-dark-800 hover:bg-primary-600 text-primary-400 hover:text-white font-bold rounded-lg transition-all border border-dark-700 hover:border-primary-500 shadow-sm hover:shadow-lg hover:shadow-primary-500/20">
                         Explore Path →
                       </button>
                     </div>
@@ -649,21 +655,35 @@ const StudentCareer = () => {
       >
         {selectedStep && (
           <>
-            <p className="text-sm text-gray-500 mb-6 -mt-4">{selectedStep.title}</p>
+            <p className="text-sm text-dark-400 mb-6 -mt-4 font-medium">{selectedStep.title}</p>
             <div className="space-y-4">
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-sm text-blue-700">
+              <div className="bg-primary-500/10 border border-primary-500/20 rounded-lg p-4">
+                <p className="text-sm text-primary-400 font-medium">
                   By submitting this request, you confirm that you have completed all the requirements for this step.
                 </p>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message to Admin (Optional)</label>
-                <textarea value={requestMessage} onChange={(e) => setRequestMessage(e.target.value)} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500 h-24 resize-none" placeholder="Add any notes..." />
+                <label className="block text-sm font-bold text-dark-300 mb-1">Message to Admin (Optional)</label>
+                <textarea
+                  value={requestMessage}
+                  onChange={(e) => setRequestMessage(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-primary-500 text-white placeholder-dark-500 h-24 resize-none transition-all"
+                  placeholder="Add any notes..."
+                />
               </div>
-              <div className="flex gap-3 pt-4">
-                <button onClick={() => setShowRequestModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-                <button onClick={handleRequestApproval} disabled={submitting} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 flex items-center justify-center gap-2">
-                  {submitting ? <><div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>Submitting...</> : <><Send className="w-4 h-4" />Submit</>}
+              <div className="flex gap-3 pt-4 border-t border-dark-700 mt-2">
+                <button
+                  onClick={() => setShowRequestModal(false)}
+                  className="flex-1 px-4 py-2.5 bg-dark-800 text-dark-300 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white font-bold transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleRequestApproval}
+                  disabled={submitting}
+                  className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-500 disabled:opacity-50 flex items-center justify-center gap-2 font-bold shadow-lg shadow-primary-500/20 transition-all"
+                >
+                  {submitting ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Submitting...</> : <><Send className="w-4 h-4" />Submit</>}
                 </button>
               </div>
             </div>
@@ -680,22 +700,53 @@ const StudentCareer = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name *</label>
-            <input type="text" value={newSkill.name} onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Python, React" />
+            <label className="block text-sm font-bold text-dark-300 mb-1">Skill Name *</label>
+            <input
+              type="text"
+              value={newSkill.name}
+              onChange={(e) => setNewSkill({ ...newSkill, name: e.target.value })}
+              className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-primary-500 text-white placeholder-dark-500 transition-all"
+              placeholder="e.g., Python, React"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select value={newSkill.category} onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
-              <option>Technical</option><option>Soft Skills</option><option>Tools</option><option>Languages</option>
+            <label className="block text-sm font-bold text-dark-300 mb-1">Category</label>
+            <select
+              value={newSkill.category}
+              onChange={(e) => setNewSkill({ ...newSkill, category: e.target.value })}
+              className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-primary-500 cursor-pointer transition-all"
+            >
+              <option className="bg-dark-800">Technical</option>
+              <option className="bg-dark-800">Soft Skills</option>
+              <option className="bg-dark-800">Tools</option>
+              <option className="bg-dark-800">Languages</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Initial Proficiency: {newSkill.level}%</label>
-            <input type="range" min="0" max="100" value={newSkill.level} onChange={(e) => setNewSkill({ ...newSkill, level: parseInt(e.target.value) })} className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" />
+            <label className="block text-sm font-bold text-dark-300 mb-1">Initial Proficiency: {newSkill.level}%</label>
+            <input
+              type="range"
+              min="0"
+              max="100"
+              value={newSkill.level}
+              onChange={(e) => setNewSkill({ ...newSkill, level: parseInt(e.target.value) })}
+              className="w-full h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-primary-500"
+            />
           </div>
-          <div className="flex gap-3 pt-4">
-            <button onClick={() => setShowAddSkillModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button onClick={handleAddSkill} disabled={!newSkill.name} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Skill</button>
+          <div className="flex gap-3 pt-4 border-t border-dark-700 mt-2">
+            <button
+              onClick={() => setShowAddSkillModal(false)}
+              className="flex-1 px-4 py-2.5 bg-dark-800 text-dark-300 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white font-bold transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAddSkill}
+              disabled={!newSkill.name}
+              className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-500 disabled:opacity-50 font-bold shadow-lg shadow-primary-500/20 transition-all"
+            >
+              Add Skill
+            </button>
           </div>
         </div>
       </Modal>
@@ -709,22 +760,52 @@ const StudentCareer = () => {
       >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Goal Title *</label>
-            <input type="text" value={newGoal.title} onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-primary-500" placeholder="e.g., Learn React Native" />
+            <label className="block text-sm font-bold text-dark-300 mb-1">Goal Title *</label>
+            <input
+              type="text"
+              value={newGoal.title}
+              onChange={(e) => setNewGoal({ ...newGoal, title: e.target.value })}
+              className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-primary-500 text-white placeholder-dark-500 transition-all"
+              placeholder="e.g., Learn React Native"
+            />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
-            <select value={newGoal.category} onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg bg-white">
-              <option>Technical</option><option>Soft Skills</option><option>Projects</option><option>Certifications</option>
+            <label className="block text-sm font-bold text-dark-300 mb-1">Category</label>
+            <select
+              value={newGoal.category}
+              onChange={(e) => setNewGoal({ ...newGoal, category: e.target.value })}
+              className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-primary-500 cursor-pointer transition-all"
+            >
+              <option className="bg-dark-800">Technical</option>
+              <option className="bg-dark-800">Soft Skills</option>
+              <option className="bg-dark-800">Projects</option>
+              <option className="bg-dark-800">Certifications</option>
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Deadline *</label>
-            <input type="date" value={newGoal.deadline} onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })} className="w-full px-4 py-2.5 border border-gray-200 rounded-lg" />
+            <label className="block text-sm font-bold text-dark-300 mb-1">Deadline *</label>
+            <input
+              type="date"
+              value={newGoal.deadline}
+              onChange={(e) => setNewGoal({ ...newGoal, deadline: e.target.value })}
+              className="w-full px-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg text-white appearance-none transition-all min-h-[46px] color-scheme-dark"
+              style={{ colorScheme: 'dark' }}
+            />
           </div>
-          <div className="flex gap-3 pt-4">
-            <button onClick={() => setShowAddGoalModal(false)} className="flex-1 px-4 py-2.5 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50">Cancel</button>
-            <button onClick={handleAddGoal} disabled={!newGoal.title || !newGoal.deadline} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50">Add Goal</button>
+          <div className="flex gap-3 pt-4 border-t border-dark-700 mt-2">
+            <button
+              onClick={() => setShowAddGoalModal(false)}
+              className="flex-1 px-4 py-2.5 bg-dark-800 text-dark-300 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white font-bold transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleAddGoal}
+              disabled={!newGoal.title || !newGoal.deadline}
+              className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg hover:bg-primary-500 disabled:opacity-50 font-bold shadow-lg shadow-primary-500/20 transition-all"
+            >
+              Add Goal
+            </button>
           </div>
         </div>
       </Modal>
