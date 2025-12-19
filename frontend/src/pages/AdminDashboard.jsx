@@ -186,7 +186,7 @@ const AdminDashboard = () => {
         getEvents('Pending')
       ]);
       setStats(statsRes.data);
-      setPendingEvents(eventsRes.data);
+      setPendingEvents(Array.isArray(eventsRes.data) ? eventsRes.data : []);
 
       try {
         const [deptDistRes, perfMetricsRes, courseStatsRes, facultyStatsRes, placementStatsRes, activitiesRes] = await Promise.all([
@@ -238,7 +238,7 @@ const AdminDashboard = () => {
     { name: 'Civil Engineering', count: 180, color: '#ec4899' }
   ];
 
-  const depts = departmentData.length > 0
+  const depts = Array.isArray(departmentData) && departmentData.length > 0
     ? departmentData.map((d, i) => ({ ...d, color: ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ec4899'][i] }))
     : defaultDepts;
 
