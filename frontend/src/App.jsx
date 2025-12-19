@@ -54,6 +54,8 @@ const AdminExternalCourses = lazy(() => import('./pages/admin/AdminExternalCours
 const AdminExamScheduling = lazy(() => import('./pages/admin/AdminExamScheduling'));
 const AdminInvigilators = lazy(() => import('./pages/admin/AdminInvigilators'));
 const AdminSubjects = lazy(() => import('./pages/admin/AdminSubjects'));
+const AdminChatbotContent = lazy(() => import('./pages/admin/AdminChatbotContent'));
+const AdminDepartments = lazy(() => import('./pages/admin/AdminDepartments'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));

@@ -80,12 +80,12 @@ export const updateUser = (id, data) => API.put(`/users/${id}`, data);
 export const createUserByAdmin = (data) => API.post('/users/admin/create', data);
 
 // Department management
-// export const getDepartments = () => API.get('/departments');
-// export const getDepartmentById = (id) => API.get(`/departments/${id}`);
-// export const createDepartment = (data) => API.post('/departments', data);
-// export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
-// export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
-// export const getDepartmentStats = () => API.get('/departments/stats'); 
+export const getDepartments = () => API.get('/departments');
+export const getDepartmentById = (id) => API.get(`/departments/${id}`);
+export const createDepartment = (data) => API.post('/departments', data);
+export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
+export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
+export const getDepartmentStats = () => API.get('/departments/stats'); 
 
 // Course management
 export const getCourses = (params) => API.get('/courses', { params });
