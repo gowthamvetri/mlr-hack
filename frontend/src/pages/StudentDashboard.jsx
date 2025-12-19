@@ -6,7 +6,7 @@ import {
   getStreak, getSkills, getCareerProgress, updateStreak,
   getMyApprovalStatus
 } from '../utils/api';
-import MindMapViewer from '../components/MindMapViewer';
+import SyllabusMindMap from '../components/SyllabusMindMap';
 import DashboardLayout from '../components/DashboardLayout';
 import DataTable from '../components/DataTable';
 import NoticeBoard from '../components/NoticeBoard';
@@ -505,8 +505,8 @@ const StudentDashboard = () => {
                     <div
                       key={i}
                       className={`aspect-square flex items-center justify-center rounded-md text-xs transition-all ${isToday ? 'bg-zinc-900 text-white font-medium' :
-                          hasExam ? 'bg-violet-50 text-violet-700 font-medium' :
-                            isValid ? 'text-zinc-600 hover:bg-zinc-50' : 'text-zinc-300'
+                        hasExam ? 'bg-violet-50 text-violet-700 font-medium' :
+                          isValid ? 'text-zinc-600 hover:bg-zinc-50' : 'text-zinc-300'
                         }`}
                     >
                       {isValid ? day : ''}
@@ -619,7 +619,7 @@ const StudentDashboard = () => {
             </button>
             {showMindMap && selectedSubject && (
               <div className="mt-4 h-[300px] bg-zinc-50 rounded-lg overflow-hidden border border-zinc-100">
-                <MindMapViewer subject={selectedSubject} />
+                <SyllabusMindMap subject={selectedSubject} />
               </div>
             )}
           </div>

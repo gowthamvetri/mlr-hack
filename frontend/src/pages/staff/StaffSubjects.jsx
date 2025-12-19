@@ -3,15 +3,15 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import Modal from '../../components/Modal';
+import { MindMapView } from '../../components/MindMapViewer';
 import { useAppDispatch } from '../../store';
 import { showSuccessToast, showErrorToast } from '../../store/slices/uiSlice';
 import gsap from 'gsap';
-import ReactMarkdown from 'react-markdown';
 import {
     BookOpen, Plus, Trash2, FileText, Video, Link as LinkIcon, File,
     ChevronRight, Calendar, Users, Download, Upload, RefreshCw, Eye,
     Image, ExternalLink, Sparkles, Check, Edit3, Save, Loader, X,
-    Brain, CheckCircle
+    Brain, CheckCircle, Code
 } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API;
@@ -429,7 +429,7 @@ const StaffSubjects = () => {
                                                                 <p className="text-xs text-zinc-500 truncate">{material.description}</p>
                                                             )}
                                                         </div>
-                                                        <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                        <div className="flex items-center gap-1">
                                                             {/* Generate/View Mind Map */}
                                                             {(material.type === 'PDF' || material.type === 'Document') && (
                                                                 <button
@@ -651,13 +651,13 @@ const StaffSubjects = () => {
                                             onClick={() => setEditingMindMap(false)}
                                             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${!editingMindMap ? 'bg-violet-100 text-violet-700' : 'text-zinc-600 hover:bg-zinc-100'}`}
                                         >
-                                            <Eye className="w-4 h-4 inline mr-1" />Preview
+                                            <Brain className="w-4 h-4 inline mr-1" />Mind Map
                                         </button>
                                         <button
                                             onClick={() => setEditingMindMap(true)}
                                             className={`px-3 py-1.5 text-sm rounded-md transition-colors ${editingMindMap ? 'bg-violet-100 text-violet-700' : 'text-zinc-600 hover:bg-zinc-100'}`}
                                         >
-                                            <Edit3 className="w-4 h-4 inline mr-1" />Edit
+                                            <Code className="w-4 h-4 inline mr-1" />Edit Source
                                         </button>
                                     </div>
                                     {selectedMaterial?.isApproved && (
@@ -668,17 +668,19 @@ const StaffSubjects = () => {
                                 </div>
 
                                 {/* Content */}
-                                <div className="min-h-[300px] max-h-[500px] overflow-y-auto">
+                                <div className="min-h-[400px]">
                                     {editingMindMap ? (
                                         <textarea
                                             value={mindMapMarkdown}
                                             onChange={(e) => setMindMapMarkdown(e.target.value)}
-                                            className="w-full h-[400px] px-4 py-3 text-sm font-mono border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none"
-                                            placeholder="Markdown content..."
+                                            className="w-full h-[400px] px-4 py-3 text-sm font-mono border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none bg-zinc-900 text-emerald-400"
+                                            placeholder="# Main Topic&#10;&#10;## Subtopic 1&#10;- Point A&#10;- Point B&#10;&#10;## Subtopic 2&#10;- Point C&#10;- Point D"
                                         />
+                                    ) : mindMapMarkdown ? (
+                                        <MindMapView markdown={mindMapMarkdown} />
                                     ) : (
-                                        <div className="prose prose-sm prose-zinc max-w-none p-4 bg-zinc-50 rounded-lg">
-                                            <ReactMarkdown>{mindMapMarkdown || '*No content yet*'}</ReactMarkdown>
+                                        <div className="flex items-center justify-center h-[400px] bg-zinc-50 rounded-lg border border-zinc-100">
+                                            <p className="text-sm text-zinc-400">No content yet. Generate or add markdown.</p>
                                         </div>
                                     )}
                                 </div>

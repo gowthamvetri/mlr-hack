@@ -103,6 +103,15 @@ const StaffInvigilation = () => {
     const pastCount = assignments.length - upcomingCount;
     const thisWeekCount = assignments.filter(a => { const d = new Date(a.date); const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + 7); return d >= today && d <= weekEnd; }).length;
 
+    const todaysAssignment = assignments.find(a => {
+        const d = new Date(a.date);
+        d.setHours(0, 0, 0, 0);
+        return d.getTime() === today.getTime();
+    });
+
+    const completionRate = assignments.length > 0 ? Math.round((pastCount / assignments.length) * 100) : 0;
+
+
     return (
         <DashboardLayout role="staff" userName={user?.name}>
             <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">

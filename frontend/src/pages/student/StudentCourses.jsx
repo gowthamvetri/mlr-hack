@@ -77,9 +77,14 @@ const StudentCourses = () => {
   const fetchCourses = async () => {
     try {
       setLoading(true);
-      const { data } = await getCourses();
-      setCourses(data);
-      const enrolled = data.filter(c => c.enrolledStudents?.some(s => s._id === user?._id || s === user?._id));
+      // Filter courses by student's department
+      const params = {};
+      if (user?.department) {
+        params.department = user.department;
+      }
+      const { data } = await getCourses(params);
+      setCourses(Array.isArray(data) ? data : []);
+      const enrolled = (data || []).filter(c => c.enrolledStudents?.some(s => s._id === user?._id || s === user?._id));
       setEnrolledCourses(enrolled.map(c => c._id));
     } catch (error) {
       console.error('Error fetching courses:', error);

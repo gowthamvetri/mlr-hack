@@ -3,8 +3,8 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import AnimatedNumber from '../../components/AnimatedNumber';
+import { MindMapPreview } from '../../components/MindMapViewer';
 import { getExternalCourses, markExternalCourseComplete, getSubjectsForStudent } from '../../utils/api';
-import ReactMarkdown from 'react-markdown';
 import {
   BookOpen, Video, FileText, Link as LinkIcon, Search, Filter, Star, Clock, ExternalLink,
   Award, Globe, CheckCircle, Sparkles, GraduationCap, Users, Calendar, File, Image, Brain, Eye, ChevronDown, ChevronUp
@@ -479,12 +479,12 @@ const StudentStudy = () => {
                                       onClick={() => setViewingMindMap(viewingMindMap === material._id ? null : material._id)}
                                       className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
                                     >
-                                      {viewingMindMap === material._id ? <ChevronUp className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                      {viewingMindMap === material._id ? <ChevronUp className="w-3.5 h-3.5" /> : <Brain className="w-3.5 h-3.5" />}
                                       {viewingMindMap === material._id ? 'Hide Mind Map' : 'View Mind Map'}
                                     </button>
                                     {viewingMindMap === material._id && (
-                                      <div className="mt-2 p-4 bg-amber-50/50 rounded-xl border border-amber-100 prose prose-sm prose-amber max-w-none animate-fade-in">
-                                        <ReactMarkdown>{material.mindMap}</ReactMarkdown>
+                                      <div className="mt-3 animate-fade-in" style={{ height: '400px' }}>
+                                        <MindMapPreview markdown={material.mindMap} />
                                       </div>
                                     )}
                                   </div>

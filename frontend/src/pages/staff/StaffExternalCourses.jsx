@@ -134,6 +134,10 @@ const StaffExternalCourses = () => {
 
     const filteredCourses = courses.filter(c => c.title?.toLowerCase().includes(searchQuery.toLowerCase()));
 
+    const totalCompletions = courses.reduce((a, c) => a + (c.completedBy?.length || 0), 0);
+    const providersUsed = [...new Set(courses.map(c => c.provider))].length;
+    const completionRate = courses.length > 0 ? Math.round((totalCompletions / (courses.length * 10)) * 100) : 0;
+
     const getProviderColor = (provider) => {
         const colors = { 'Coursera': 'bg-blue-50 text-blue-700 border-blue-100', 'NPTEL': 'bg-orange-50 text-orange-700 border-orange-100', 'Udemy': 'bg-violet-50 text-violet-700 border-violet-100', 'edX': 'bg-red-50 text-red-700 border-red-100', 'Google': 'bg-emerald-50 text-emerald-700 border-emerald-100', 'Microsoft': 'bg-cyan-50 text-cyan-700 border-cyan-100', 'AWS': 'bg-amber-50 text-amber-700 border-amber-100' };
         return colors[provider] || 'bg-zinc-50 text-zinc-700 border-zinc-100';
