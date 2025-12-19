@@ -3,15 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import ChatBot from '../components/ChatBot';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ScrollToPlugin } from 'gsap/ScrollToPlugin';
 import AnimatedNumber from '../components/AnimatedNumber';
 import {
   GraduationCap, Building2, Users, ArrowRight,
   CheckCircle, Sparkles, Target, Shield, Globe, ChevronRight, Briefcase,
-  ChevronDown, ExternalLink
+  ChevronDown, ExternalLink, ChevronUp
 } from 'lucide-react';
 
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(ScrollTrigger);
 
 const API_URL = import.meta.env.VITE_API;
 
@@ -19,32 +18,32 @@ const Onboarding = () => {
   const navigate = useNavigate();
   const [departments, setDepartments] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
-  const [activePanel, setActivePanel] = useState(0);
+  const [showScrollTop, setShowScrollTop] = useState(false);
 
   // Refs
   const containerRef = useRef(null);
-  const horizontalRef = useRef(null);
-  const panelsRef = useRef([]);
-
-  // Custom navigation that kills ScrollTrigger first
-  const handleNavigation = (path) => {
-    ScrollTrigger.getAll().forEach(trigger => trigger.kill());
-    navigate(path);
-  };
-
-  // Store ScrollTrigger reference for navigation
-  const scrollTriggerRef = useRef(null);
+  const heroRef = useRef(null);
+  const departmentsRef = useRef(null);
+  const portalsRef = useRef(null);
+  const contactRef = useRef(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoaded(true), 100);
     return () => clearTimeout(timer);
   }, []);
 
-  // Horizontal Scroll with Stacking Effect
+  // Handle scroll to show/hide scroll-to-top button
   useEffect(() => {
-    if (!containerRef.current || !horizontalRef.current) return;
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 500);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
-    const panels = panelsRef.current.filter(Boolean);
+  // GSAP Animations for vertical scroll
+  useEffect(() => {
+    if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
       // Hero entrance animations
@@ -60,79 +59,25 @@ const Onboarding = () => {
       gsap.to('.float-slow', { y: -20, duration: 3, repeat: -1, yoyo: true, ease: 'sine.inOut' });
       gsap.to('.float-fast', { y: -15, duration: 2, repeat: -1, yoyo: true, ease: 'sine.inOut', delay: 0.5 });
 
-      // Horizontal Scroll Animation
-      const totalWidth = horizontalRef.current.scrollWidth - window.innerWidth;
+      // Section reveal animations on scroll
+      const sections = [departmentsRef.current, portalsRef.current, contactRef.current];
+      sections.forEach((section) => {
+        if (!section) return;
 
-      const horizontalScroll = gsap.to(horizontalRef.current, {
-        x: -totalWidth,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: containerRef.current,
-          start: 'top top',
-          end: () => `+=${totalWidth}`,
-          scrub: 1,
-          pin: true,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            const newActivePanel = Math.round(self.progress * (panels.length - 1));
-            if (newActivePanel !== activePanel) {
-              setActivePanel(newActivePanel);
-            }
-          }
-        }
-      });
-
-      // Store the ScrollTrigger reference for navigation
-      scrollTriggerRef.current = horizontalScroll.scrollTrigger;
-
-      // Panel animations
-      panels.forEach((panel, i) => {
-        if (i === 0) return;
-
-        gsap.fromTo(panel,
-          { opacity: 0.3, scale: 0.85, rotateY: -15 },
+        gsap.fromTo(section.querySelectorAll('.animate-card'),
+          { opacity: 0, y: 50, scale: 0.95 },
           {
-            opacity: 1, scale: 1, rotateY: 0, ease: 'power2.out',
+            opacity: 1, y: 0, scale: 1,
+            duration: 0.6,
+            stagger: 0.08,
+            ease: 'back.out(1.4)',
             scrollTrigger: {
-              trigger: panel,
-              containerAnimation: horizontalScroll,
-              start: 'left 80%',
-              end: 'left 20%',
-              scrub: 1,
+              trigger: section,
+              start: 'top 80%',
+              toggleActions: 'play none none reverse'
             }
           }
         );
-
-        gsap.to(panel, {
-          scale: 0.8, opacity: 0.3, rotateY: 15, ease: 'power2.in',
-          scrollTrigger: {
-            trigger: panel,
-            containerAnimation: horizontalScroll,
-            start: 'right 80%',
-            end: 'right -20%',
-            scrub: 1,
-          }
-        });
-      });
-
-      // Content animations
-      panels.forEach((panel) => {
-        ScrollTrigger.create({
-          trigger: panel,
-          containerAnimation: horizontalScroll,
-          start: 'left 60%',
-          onEnter: () => {
-            const cards = panel.querySelectorAll('.animate-card');
-            if (cards.length > 0) {
-              gsap.fromTo(cards,
-                { opacity: 0, y: 50, scale: 0.9 },
-                { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.08, ease: 'back.out(1.4)' }
-              );
-            }
-          },
-          once: true
-        });
       });
 
     }, containerRef);
@@ -183,7 +128,7 @@ const Onboarding = () => {
       icon: GraduationCap,
       features: ['Digital hall tickets & exam schedules', 'AI career guidance assistant', 'Learning streak tracking', 'Club & event participation'],
       cta: 'Join as Student',
-      action: () => handleNavigation('/register'),
+      action: () => navigate('/register'),
       primary: true,
     },
     {
@@ -192,7 +137,7 @@ const Onboarding = () => {
       icon: Shield,
       features: ['Student & faculty management', 'Advanced analytics dashboard', 'Placement tracking system', 'Event approval workflow'],
       cta: 'Admin Login',
-      action: () => handleNavigation('/login'),
+      action: () => navigate('/login'),
       primary: false,
     },
     {
@@ -201,25 +146,37 @@ const Onboarding = () => {
       icon: Users,
       features: ['Club event management', 'Seating allocation tools', 'Room management system', 'Reports & data exports'],
       cta: 'Staff Login',
-      action: () => handleNavigation('/login'),
+      action: () => navigate('/login'),
       primary: false,
     },
   ];
 
-  const panelNames = ['Welcome', 'Programs', 'Portals', 'Contact'];
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollToSection = (ref) => {
+    ref?.current?.scrollIntoView({ behavior: 'smooth' });
+  };
 
   return (
-    <div ref={containerRef} className="mesh-gradient-bg overflow-hidden" style={{ perspective: '1500px' }}>
+    <div ref={containerRef} className="mesh-gradient-bg min-h-screen overflow-x-hidden">
       {/* Fixed Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 bg-white/80 backdrop-blur-lg shadow-sm ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <img src="/mlrit-logo.png" alt="MLRIT" className="h-14 w-auto drop-shadow-lg" />
+            <div className="hidden md:flex items-center gap-6">
+              <button onClick={() => scrollToSection(heroRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Home</button>
+              <button onClick={() => scrollToSection(departmentsRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Departments</button>
+              <button onClick={() => scrollToSection(portalsRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Portals</button>
+              <button onClick={() => scrollToSection(contactRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Contact</button>
+            </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => handleNavigation('/register')} className="hidden sm:block px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-all hover:scale-105">
+              <button onClick={() => navigate('/register')} className="hidden sm:block px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-all hover:scale-105">
                 Register
               </button>
-              <button onClick={() => handleNavigation('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-semibold hover:scale-105 shadow-lg shadow-primary-500/25">
+              <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-semibold hover:scale-105 shadow-lg shadow-primary-500/25">
                 Login <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -227,330 +184,291 @@ const Onboarding = () => {
         </div>
       </nav>
 
-      {/* Bottom Progress Bar - Dark themed for visibility */}
-      <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] flex items-center gap-4 px-6 py-3 bg-gray-900/90 backdrop-blur-md rounded-full shadow-2xl border border-gray-700/50">
-        {panelNames.map((name, i) => (
-          <button
-            key={i}
-            onClick={() => {
-              // Use ScrollTrigger's scroll method to navigate to the correct position
-              if (scrollTriggerRef.current) {
-                const targetProgress = i / (panelNames.length - 1);
-                const targetScrollPos = scrollTriggerRef.current.start + (scrollTriggerRef.current.end - scrollTriggerRef.current.start) * targetProgress;
-                gsap.to(window, { scrollTo: targetScrollPos, duration: 1, ease: 'power2.inOut' });
-              }
-            }}
-            className={`flex items-center gap-2 transition-all duration-300 ${activePanel === i ? 'opacity-100' : 'opacity-50 hover:opacity-80'}`}
-          >
-            <div className={`w-8 h-1.5 rounded-full transition-all duration-500 ${activePanel === i ? 'bg-primary-400 shadow-lg shadow-primary-500/50' : 'bg-gray-600'}`} />
-            <span className={`text-xs font-medium transition-all duration-300 ${activePanel === i ? 'text-white' : 'text-gray-400'}`}>{name}</span>
-          </button>
-        ))}
-      </div>
-
-      {/* Scroll to Top Button - Appears after hero section */}
+      {/* Scroll to Top Button */}
       <button
-        onClick={() => {
-          if (scrollTriggerRef.current) {
-            gsap.to(window, { scrollTo: 0, duration: 1, ease: 'power2.inOut' });
-          }
-        }}
-        className={`fixed bottom-24 right-8 z-[100] p-4 bg-primary-500 text-white rounded-full shadow-2xl shadow-primary-500/30 hover:bg-primary-600 hover:scale-110 transition-all duration-300 ${activePanel > 0 ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
-          }`}
+        onClick={scrollToTop}
+        className={`fixed bottom-8 right-8 z-[100] p-4 bg-primary-500 text-white rounded-full shadow-2xl shadow-primary-500/30 hover:bg-primary-600 hover:scale-110 transition-all duration-300 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
         aria-label="Scroll to top"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="m18 15-6-6-6 6" />
-        </svg>
+        <ChevronUp className="w-6 h-6" />
       </button>
 
-      {/* Scroll Hint - Only on hero */}
-      <div className={`fixed bottom-28 left-1/2 -translate-x-1/2 z-[100] flex flex-col items-center gap-2 transition-opacity duration-500 ${activePanel === 0 ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
-        <span className="text-xs text-gray-500 uppercase tracking-widest">Scroll to explore</span>
-        <ChevronDown className="w-5 h-5 text-gray-400 animate-bounce" />
-      </div>
-
-      {/* Horizontal Scroll Container */}
-      <div
-        ref={horizontalRef}
-        className="flex h-screen"
-        style={{ width: 'fit-content', transformStyle: 'preserve-3d' }}
+      {/* ===== SECTION 1: HERO ===== */}
+      <section
+        ref={heroRef}
+        className="min-h-screen relative flex items-center justify-center overflow-hidden pt-20"
       >
-        {/* ===== PANEL 1: HERO ===== */}
-        <section
-          ref={el => panelsRef.current[0] = el}
-          className="panel w-screen h-screen flex-shrink-0 relative flex items-center justify-center overflow-hidden"
-          style={{ transformStyle: 'preserve-3d' }}
-        >
-          {/* Video Background */}
-          <div className="absolute inset-0 z-0">
-            <iframe
-              width="100%"
-              height="100%"
-              src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
-              title="MLRIT"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              className="w-full h-full object-cover scale-150"
-              style={{ pointerEvents: 'none' }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-white/50 to-white/50" />
+        {/* Video Background */}
+        <div className="absolute inset-0 z-0">
+          <iframe
+            width="100%"
+            height="100%"
+            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
+            title="MLRIT"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            className="w-full h-full object-cover scale-150"
+            style={{ pointerEvents: 'none' }}
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-white/50 to-white/50" />
+        </div>
+
+        {/* Floating Elements */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="float-slow absolute top-1/4 left-[10%] w-32 h-32 bg-gradient-to-br from-primary-500/10 to-orange-500/10 rounded-full blur-2xl" />
+          <div className="float-fast absolute top-1/3 right-[15%] w-24 h-24 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-full blur-2xl" />
+          <div className="float-slow absolute bottom-1/3 left-[20%] w-20 h-20 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-2xl" />
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+
+          <h1 className="mb-6">
+            <span className="hero-title-1 block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight">
+              Transform Your
+            </span>
+            <span className="hero-title-2 block mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold gradient-text">
+              Academic Journey
+            </span>
+          </h1>
+
+          <p className="hero-subtitle text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
+            One unified platform for students, faculty, and administrators with
+            <span className="text-gray-900 font-medium"> AI-powered</span> exam management and career guidance.
+          </p>
+
+          <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
+            <button
+              onClick={() => navigate('/register')}
+              className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1 hover:scale-105"
+            >
+              Get Started Free
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button
+              onClick={() => navigate('/placements')}
+              className="group flex items-center justify-center gap-3 px-8 py-4 glass-card text-gray-700 rounded-full font-bold text-lg hover:bg-white/80 transition-all hover:scale-105 shadow-lg"
+            >
+              <Briefcase className="w-5 h-5" />
+              View Placements
+            </button>
           </div>
 
-          {/* Floating Elements */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div className="float-slow absolute top-1/4 left-[10%] w-32 h-32 bg-gradient-to-br from-primary-500/10 to-orange-500/10 rounded-full blur-2xl" />
-            <div className="float-fast absolute top-1/3 right-[15%] w-24 h-24 bg-gradient-to-br from-purple-500/10 to-indigo-500/10 rounded-full blur-2xl" />
-            <div className="float-slow absolute bottom-1/3 left-[20%] w-20 h-20 bg-gradient-to-br from-green-500/10 to-emerald-500/10 rounded-full blur-2xl" />
-          </div>
-
-          {/* Hero Content */}
-          <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-
-            <h1 className="mb-6">
-              <span className="hero-title-1 block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight">
-                Transform Your
-              </span>
-              <span className="hero-title-2 block mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold gradient-text">
-                Academic Journey
-              </span>
-            </h1>
-
-            <p className="hero-subtitle text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
-              One unified platform for students, faculty, and administrators with
-              <span className="text-gray-900 font-medium"> AI-powered</span> exam management and career guidance.
-            </p>
-
-            <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <button
-                onClick={() => handleNavigation('/register')}
-                className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1 hover:scale-105"
+          {/* Stats */}
+          <div className="hero-stats grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-6">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                className="group glass-card rounded-2xl p-5 tilt-card hover:shadow-xl transition-all duration-300"
               >
-                Get Started Free
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </button>
-              <button
-                onClick={() => handleNavigation('/placements')}
-                className="group flex items-center justify-center gap-3 px-8 py-4 glass-card text-gray-700 rounded-full font-bold text-lg hover:bg-white/80 transition-all hover:scale-105 shadow-lg"
-              >
-                <Briefcase className="w-5 h-5" />
-                View Placements
-              </button>
-            </div>
-
-            {/* Stats */}
-            <div className="hero-stats grid grid-cols-2 sm:grid-cols-4 gap-4 lg:gap-6">
-              {stats.map((stat, index) => (
-                <div
-                  key={index}
-                  className="group glass-card rounded-2xl p-5 tilt-card hover:shadow-xl transition-all duration-300"
-                >
-                  <div className={`w-10 h-10 mx-auto mb-3 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
-                    <stat.icon className="w-5 h-5 text-white" />
-                  </div>
-                  <p className="text-2xl sm:text-3xl font-bold text-gray-900">
-                    <AnimatedNumber value={stat.value} duration={2000} />{stat.suffix}
-                  </p>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+                <div className={`w-10 h-10 mx-auto mb-3 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
+                  <stat.icon className="w-5 h-5 text-white" />
                 </div>
-              ))}
-            </div>
+                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+                  <AnimatedNumber value={stat.value} duration={2000} />{stat.suffix}
+                </p>
+                <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+              </div>
+            ))}
           </div>
-        </section>
+        </div>
 
-        {/* ===== PANEL 2: DEPARTMENTS ===== */}
-        <section
-          ref={el => panelsRef.current[1] = el}
-          className="panel w-screen h-screen flex-shrink-0 relative flex items-center mesh-gradient-bg overflow-hidden"
-          style={{ transformStyle: 'preserve-3d' }}
-        >
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-purple-600">
-                <Building2 className="w-4 h-4" />
-                Explore Programs
-              </span>
-              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Our <span className="gradient-text">Departments</span>
-              </h2>
-              <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
-                Choose from our wide range of undergraduate and postgraduate programs
-              </p>
-            </div>
+        {/* Scroll Hint */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+          <span className="text-xs text-gray-500 uppercase tracking-widest">Scroll to explore</span>
+          <ChevronDown className="w-5 h-5 text-gray-400 animate-bounce" />
+        </div>
+      </section>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-              {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
-                <Link
-                  key={dept._id || index}
-                  to={`/departments/${dept.slug}`}
-                  className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
-                >
-                  <div className="aspect-[4/3] overflow-hidden">
-                    <img
-                      src={dept.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400'}
-                      alt={dept.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                  </div>
-                  <div className="p-3 bg-white/80">
-                    <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
-                      {dept.name}
-                    </h3>
-                  </div>
-                </Link>
-              ))}
-            </div>
+      {/* ===== SECTION 2: DEPARTMENTS ===== */}
+      <section
+        ref={departmentsRef}
+        className="py-24 mesh-gradient-bg relative overflow-hidden"
+      >
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-purple-600">
+              <Building2 className="w-4 h-4" />
+              Explore Programs
+            </span>
+            <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+              Our <span className="gradient-text">Departments</span>
+            </h2>
+            <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+              Choose from our wide range of undergraduate and postgraduate programs
+            </p>
+          </div>
 
-            <div className="text-center mt-10">
-              <button
-                onClick={() => handleNavigation('/register')}
-                className="animate-card inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl"
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
+              <Link
+                key={dept._id || index}
+                to={`/departments/${dept.slug}`}
+                className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
               >
-                Explore All Programs
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </div>
+                <div className="aspect-[4/3] overflow-hidden">
+                  <img
+                    src={dept.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400'}
+                    alt={dept.name}
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                </div>
+                <div className="p-3 bg-white/80">
+                  <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
+                    {dept.name}
+                  </h3>
+                </div>
+              </Link>
+            ))}
           </div>
-        </section>
 
-        {/* ===== PANEL 3: PORTALS ===== */}
-        <section
-          ref={el => panelsRef.current[2] = el}
-          className="panel w-screen h-screen flex-shrink-0 relative flex items-center mesh-gradient-bg overflow-hidden"
-          style={{ transformStyle: 'preserve-3d' }}
-        >
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
-              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-green-600">
-                <Globe className="w-4 h-4" />
-                Access Portals
-              </span>
-              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-                Choose Your <span className="gradient-text">Portal</span>
-              </h2>
-              <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
-                Tailored experiences designed for every role in your academic institution
-              </p>
-            </div>
+          <div className="text-center mt-10">
+            <button
+              onClick={() => navigate('/register')}
+              className="animate-card inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl"
+            >
+              Explore All Programs
+              <ArrowRight className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </section>
 
-            <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
-              {portalTypes.map((portal, index) => (
-                <div
-                  key={index}
-                  className={`animate-card group relative rounded-3xl p-8 transition-all duration-500 hover:-translate-y-3 ${portal.primary
-                    ? 'bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 text-white shadow-2xl shadow-primary-500/30'
-                    : 'glass-card tilt-card'
+      {/* ===== SECTION 3: PORTALS ===== */}
+      <section
+        ref={portalsRef}
+        className="py-24 mesh-gradient-bg relative overflow-hidden"
+      >
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-green-600">
+              <Globe className="w-4 h-4" />
+              Access Portals
+            </span>
+            <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
+              Choose Your <span className="gradient-text">Portal</span>
+            </h2>
+            <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+              Tailored experiences designed for every role in your academic institution
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6 lg:gap-8">
+            {portalTypes.map((portal, index) => (
+              <div
+                key={index}
+                className={`animate-card group relative rounded-3xl p-8 transition-all duration-500 hover:-translate-y-3 ${portal.primary
+                  ? 'bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 text-white shadow-2xl shadow-primary-500/30'
+                  : 'glass-card tilt-card'
+                  }`}
+              >
+                {portal.primary && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold rounded-full shadow-lg uppercase tracking-wider">
+                    Most Popular
+                  </div>
+                )}
+
+                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary ? 'bg-white/20' : 'bg-gradient-to-br from-primary-500/10 to-orange-500/10'
+                  }`}>
+                  <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
+                </div>
+
+                <h3 className={`text-2xl font-bold mb-3 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>{portal.title}</h3>
+                <p className={`mb-6 ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                  {portal.description}
+                </p>
+
+                <ul className="space-y-3 mb-8">
+                  {portal.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start gap-3">
+                      <CheckCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${portal.primary ? 'text-green-300' : 'text-green-500'
+                        }`} />
+                      <span className={`text-sm ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                        {feature}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={portal.action}
+                  className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${portal.primary
+                    ? 'bg-white text-primary-600 hover:bg-gray-100 shadow-xl'
+                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40'
                     }`}
                 >
-                  {portal.primary && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold rounded-full shadow-lg uppercase tracking-wider">
-                      Most Popular
-                    </div>
-                  )}
-
-                  <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary ? 'bg-white/20' : 'bg-gradient-to-br from-primary-500/10 to-orange-500/10'
-                    }`}>
-                    <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
-                  </div>
-
-                  <h3 className={`text-2xl font-bold mb-3 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>{portal.title}</h3>
-                  <p className={`mb-6 ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
-                    {portal.description}
-                  </p>
-
-                  <ul className="space-y-3 mb-8">
-                    {portal.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-start gap-3">
-                        <CheckCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${portal.primary ? 'text-green-300' : 'text-green-500'
-                          }`} />
-                        <span className={`text-sm ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
-                          {feature}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={portal.action}
-                    className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${portal.primary
-                      ? 'bg-white text-primary-600 hover:bg-gray-100 shadow-xl'
-                      : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40'
-                      }`}
-                  >
-                    {portal.cta}
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ===== PANEL 4: FOOTER ===== */}
-        <section
-          ref={el => panelsRef.current[3] = el}
-          className="panel w-screen h-screen flex-shrink-0 relative flex items-center bg-gray-900 overflow-hidden"
-          style={{ transformStyle: 'preserve-3d' }}
-        >
-          <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
-              {/* Left - CTA */}
-              <div className="text-center lg:text-left">
-                <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500/20 border border-primary-500/30 rounded-full text-sm font-medium mb-6 text-primary-300">
-                  <Sparkles className="w-4 h-4" />
-                  Get Started Today
-                </span>
-                <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-                  Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">Transform</span> Your Institution?
-                </h2>
-                <p className="animate-card text-lg text-gray-400 mb-10 max-w-lg">
-                  Join thousands of students and educators already using MLRIT Academic Portal for a seamless educational experience.
-                </p>
-                <div className="animate-card flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                  <button
-                    onClick={() => handleNavigation('/register')}
-                    className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all hover:scale-105"
-                  >
-                    Start Free Today
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </button>
-                  <button
-                    onClick={() => handleNavigation('/login')}
-                    className="flex items-center justify-center gap-3 px-8 py-4 bg-white/10 border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all"
-                  >
-                    Sign In
-                  </button>
-                </div>
+                  {portal.cta}
+                  <ChevronRight className="w-5 h-5" />
+                </button>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-              {/* Right - Contact Info */}
-              <div className="animate-card grid grid-cols-2 gap-8">
-                <div>
-                  <h4 className="font-bold text-white mb-5 text-lg">Quick Links</h4>
-                  <ul className="space-y-3 text-sm">
-                    <li><button onClick={() => handleNavigation('/placements')} className="text-gray-400 hover:text-white transition-colors">Placements</button></li>
-                    <li><button onClick={() => handleNavigation('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
-                    <li><button onClick={() => handleNavigation('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
-                    <li><button onClick={() => handleNavigation('/register')} className="text-gray-400 hover:text-white transition-colors">Register</button></li>
-                  </ul>
-                </div>
-                <div>
-                  <h4 className="font-bold text-white mb-5 text-lg">Contact</h4>
-                  <ul className="space-y-3 text-gray-400 text-sm">
-                    <li>MLRIT, Hyderabad</li>
-                    <li>info@mlrit.ac.in</li>
-                    <li>+91 40 2345 6789</li>
-                  </ul>
-                </div>
-                <div className="col-span-2 pt-6 border-t border-white/10">
-                  <img src="/mlrit-logo.png" alt="MLRIT" className="h-12 w-auto mb-4" />
-                  <p className="text-gray-500 text-sm">© 2025 MLRIT. All rights reserved.</p>
-                </div>
+      {/* ===== SECTION 4: FOOTER ===== */}
+      <section
+        ref={contactRef}
+        className="py-24 bg-gray-900 relative overflow-hidden"
+      >
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left - CTA */}
+            <div className="text-center lg:text-left">
+              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500/20 border border-primary-500/30 rounded-full text-sm font-medium mb-6 text-primary-300">
+                <Sparkles className="w-4 h-4" />
+                Get Started Today
+              </span>
+              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">Transform</span> Your Institution?
+              </h2>
+              <p className="animate-card text-lg text-gray-400 mb-10 max-w-lg">
+                Join thousands of students and educators already using MLRIT Academic Portal for a seamless educational experience.
+              </p>
+              <div className="animate-card flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                <button
+                  onClick={() => navigate('/register')}
+                  className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all hover:scale-105"
+                >
+                  Start Free Today
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button
+                  onClick={() => navigate('/login')}
+                  className="flex items-center justify-center gap-3 px-8 py-4 bg-white/10 border border-white/20 text-white rounded-full font-bold text-lg hover:bg-white/20 transition-all"
+                >
+                  Sign In
+                </button>
+              </div>
+            </div>
+
+            {/* Right - Contact Info */}
+            <div className="animate-card grid grid-cols-2 gap-8">
+              <div>
+                <h4 className="font-bold text-white mb-5 text-lg">Quick Links</h4>
+                <ul className="space-y-3 text-sm">
+                  <li><button onClick={() => navigate('/placements')} className="text-gray-400 hover:text-white transition-colors">Placements</button></li>
+                  <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Student Login</button></li>
+                  <li><button onClick={() => navigate('/login')} className="text-gray-400 hover:text-white transition-colors">Admin Portal</button></li>
+                  <li><button onClick={() => navigate('/register')} className="text-gray-400 hover:text-white transition-colors">Register</button></li>
+                </ul>
+              </div>
+              <div>
+                <h4 className="font-bold text-white mb-5 text-lg">Contact</h4>
+                <ul className="space-y-3 text-gray-400 text-sm">
+                  <li>MLRIT, Hyderabad</li>
+                  <li>info@mlrit.ac.in</li>
+                  <li>+91 40 2345 6789</li>
+                </ul>
+              </div>
+              <div className="col-span-2 pt-6 border-t border-white/10">
+                <img src="/mlrit-logo.png" alt="MLRIT" className="h-12 w-auto mb-4" />
+                <p className="text-gray-500 text-sm">© 2025 MLRIT. All rights reserved.</p>
               </div>
             </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       {/* ChatBot */}
       <ChatBot
