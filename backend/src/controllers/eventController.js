@@ -98,6 +98,9 @@ const updateEventStatus = async (req, res) => {
       // Notify Coordinator about the decision
       const Notification = require('../models/Notification');
       await Notification.create({
+        recipient: event.coordinator,
+        title: `Event ${status}`,
+        message: `Your event '${event.title}' has been ${status.toLowerCase()}. ${adminComments ? 'Note: ' + adminComments : ''}`,
         type: 'Event'
       });
 

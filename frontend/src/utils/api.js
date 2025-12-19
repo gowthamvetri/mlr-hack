@@ -46,6 +46,8 @@ export const getSubjectsForExam = (filters) => {
   return API.get(`/subjects/for-exam?${params.toString()}`);
 };
 export const getSubjectDepartments = () => API.get('/subjects/departments');
+export const getSubjectsForStudent = () => API.get('/subjects/student-subjects');
+export const getSubjectMaterials = (id) => API.get(`/subjects/${id}/materials`);
 
 export const getNotifications = () => API.get('/notifications');
 export const markNotificationRead = (id) => API.put(`/notifications/${id}/read`);

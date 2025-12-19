@@ -9,7 +9,7 @@ import {
   getAdminPlacementSlides, createPlacementSlide, updatePlacementSlide, deletePlacementSlide,
   getAdminRecruiters, createRecruiter, updateRecruiter, deleteRecruiter,
   getAdminTrainingContent, createTrainingContent, updateTrainingContent, deleteTrainingContent,
-  addSelectedStudents, getEligibleStudents, getPlacementById,
+  addSelectedStudents, getEligibleStudents, getPlacementById, getDepartments,
 } from '../../utils/api';
 import gsap from 'gsap';
 import {
@@ -59,12 +59,13 @@ const AdminPlacements = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDrive, setSelectedDrive] = useState(null);
-  const [formData, setFormData] = useState({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0 });
+  const [formData, setFormData] = useState({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0, departments: [], departmentNames: [] });
   const [formError, setFormError] = useState('');
   const [formSuccess, setFormSuccess] = useState('');
   const [stats, setStats] = useState({ totalPlaced: 0, averagePackage: '0 LPA', highestPackage: '0 LPA', companiesVisited: 0, placementRate: 0 });
   const [topRecruiters, setTopRecruiters] = useState([]);
   const [departmentStats, setDepartmentStats] = useState([]);
+  const [departments, setDepartments] = useState([]);
 
   // Page Content state (from AdminPlacementPage)
   const [activeContentTab, setActiveContentTab] = useState('slides');
@@ -90,6 +91,17 @@ const AdminPlacements = () => {
 
   // Fetch page content
   useEffect(() => { fetchContentData(); }, []);
+
+  // Fetch departments for dropdown
+  useEffect(() => {
+    const fetchDepts = async () => {
+      try {
+        const { data } = await getDepartments();
+        setDepartments(data || []);
+      } catch (e) { console.error('Failed to fetch departments:', e); }
+    };
+    fetchDepts();
+  }, []);
 
   useEffect(() => {
     if (pageRef.current && !loading) {
@@ -158,11 +170,11 @@ const AdminPlacements = () => {
       else if (formData.maxPackage) placementData.package = parseFloat(formData.maxPackage);
       await createPlacement(placementData);
       setFormSuccess('Added!');
-      setTimeout(() => { setShowAddModal(false); setFormData({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0 }); setFormSuccess(''); fetchPlacementData(); }, 1000);
+      setTimeout(() => { setShowAddModal(false); setFormData({ company: '', position: '', driveDate: '', minPackage: '', maxPackage: '', location: '', type: 'Full-time', eligibility: '', description: '', status: 'Upcoming', totalSelected: 0, departments: [], departmentNames: [] }); setFormSuccess(''); fetchPlacementData(); }, 1000);
     } catch (error) { setFormError(error.response?.data?.message || 'Error'); }
   };
 
-  const handleEditClick = (drive) => { setSelectedDrive(drive); setFormData({ company: drive.company || '', position: drive.position || '', driveDate: drive.driveDate ? drive.driveDate.split('T')[0] : '', minPackage: '', maxPackage: drive.package || '', location: drive.location || '', type: drive.type || 'Full-time', eligibility: drive.eligibility || '', description: drive.description || '', status: drive.status || 'Upcoming', totalSelected: drive.totalSelected || 0 }); setShowEditModal(true); };
+  const handleEditClick = (drive) => { setSelectedDrive(drive); setFormData({ company: drive.company || '', position: drive.position || '', driveDate: drive.driveDate ? drive.driveDate.split('T')[0] : '', minPackage: '', maxPackage: drive.package || '', location: drive.location || '', type: drive.type || 'Full-time', eligibility: drive.eligibility || '', description: drive.description || '', status: drive.status || 'Upcoming', totalSelected: drive.totalSelected || 0, departments: drive.departments || [], departmentNames: drive.departmentNames || [] }); setShowEditModal(true); };
 
   const handleUpdateDrive = async (e) => {
     e.preventDefault();
@@ -431,6 +443,7 @@ const AdminPlacements = () => {
                     <tr className="border-b border-zinc-100">
                       <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Company</th>
                       <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Position</th>
+                      <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Department</th>
                       <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Date</th>
                       <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Package</th>
                       <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Selected</th>
@@ -448,6 +461,7 @@ const AdminPlacements = () => {
                           </div>
                         </td>
                         <td className="px-6 py-4 text-sm text-zinc-600">{d.position}</td>
+                        <td className="px-6 py-4"><div className="flex flex-wrap gap-1">{d.departmentNames?.length > 0 ? d.departmentNames.map((name, i) => <span key={i} className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-violet-50 text-violet-700 border border-violet-100">{name}</span>) : <span className="text-zinc-400 text-xs">-</span>}</div></td>
                         <td className="px-6 py-4 text-xs text-zinc-500">{d.driveDate ? new Date(d.driveDate).toLocaleDateString() : '-'}</td>
                         <td className="px-6 py-4 text-sm font-medium text-emerald-600">{d.package ? `${d.package} LPA` : d.packageRange || '-'}</td>
                         <td className="px-6 py-4">
@@ -610,6 +624,29 @@ const AdminPlacements = () => {
             <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Max Package (LPA)</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           </div>
           <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-2">Departments</label>
+            <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-zinc-50 rounded-lg border border-zinc-200">
+              {departments.map(d => (
+                <label key={d._id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white p-1.5 rounded">
+                  <input
+                    type="checkbox"
+                    checked={formData.departments?.includes(d._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({ ...formData, departments: [...(formData.departments || []), d._id], departmentNames: [...(formData.departmentNames || []), d.name] });
+                      } else {
+                        const idx = formData.departments?.indexOf(d._id);
+                        setFormData({ ...formData, departments: formData.departments?.filter(id => id !== d._id), departmentNames: formData.departmentNames?.filter((_, i) => i !== idx) });
+                      }
+                    }}
+                    className="rounded text-violet-600 focus:ring-violet-500"
+                  />
+                  <span className="text-zinc-700">{d.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div className="flex gap-2 pt-4">
             <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
             <button type="submit" className="flex-1 px-4 py-2 text-sm text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Add Drive</button>
@@ -633,6 +670,29 @@ const AdminPlacements = () => {
             <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Max Package</label><input type="number" step="0.1" value={formData.maxPackage} onChange={(e) => setFormData({ ...formData, maxPackage: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           </div>
           <div><label className="block text-xs font-medium text-zinc-500 mb-1.5">Status</label><select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100 bg-white"><option value="Upcoming">Upcoming</option><option value="Ongoing">Ongoing</option><option value="Completed">Completed</option></select></div>
+          <div>
+            <label className="block text-xs font-medium text-zinc-500 mb-2">Departments</label>
+            <div className="grid grid-cols-2 gap-2 max-h-32 overflow-y-auto p-2 bg-zinc-50 rounded-lg border border-zinc-200">
+              {departments.map(d => (
+                <label key={d._id} className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white p-1.5 rounded">
+                  <input
+                    type="checkbox"
+                    checked={formData.departments?.includes(d._id)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormData({ ...formData, departments: [...(formData.departments || []), d._id], departmentNames: [...(formData.departmentNames || []), d.name] });
+                      } else {
+                        const idx = formData.departments?.indexOf(d._id);
+                        setFormData({ ...formData, departments: formData.departments?.filter(id => id !== d._id), departmentNames: formData.departmentNames?.filter((_, i) => i !== idx) });
+                      }
+                    }}
+                    className="rounded text-violet-600 focus:ring-violet-500"
+                  />
+                  <span className="text-zinc-700">{d.name}</span>
+                </label>
+              ))}
+            </div>
+          </div>
           <div className="border-t border-zinc-100 pt-4"><label className="block text-xs font-medium text-zinc-500 mb-1.5">Students Placed</label><input type="number" min="0" value={formData.totalSelected} onChange={(e) => setFormData({ ...formData, totalSelected: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-100" /></div>
           <div className="flex gap-2 pt-4">
             <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
@@ -773,13 +833,13 @@ const AdminPlacements = () => {
                     key={student._id}
                     onClick={() => handleToggleStudent(student._id)}
                     className={`flex items-center gap-4 p-4 cursor-pointer transition-colors ${selectedStudentIds.includes(student._id)
-                        ? 'bg-violet-50 hover:bg-violet-100'
-                        : 'hover:bg-zinc-50'
+                      ? 'bg-violet-50 hover:bg-violet-100'
+                      : 'hover:bg-zinc-50'
                       }`}
                   >
                     <div className={`w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all ${selectedStudentIds.includes(student._id)
-                        ? 'bg-violet-600 border-violet-600'
-                        : 'border-zinc-300'
+                      ? 'bg-violet-600 border-violet-600'
+                      : 'border-zinc-300'
                       }`}>
                       {selectedStudentIds.includes(student._id) && (
                         <CheckCircle className="w-3.5 h-3.5 text-white" />

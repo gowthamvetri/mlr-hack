@@ -8,8 +8,8 @@ const placementSchema = mongoose.Schema({
   packageRange: { type: String }, // e.g., "8-12 LPA"
   location: { type: String },
   type: { type: String, enum: ['Full-time', 'Internship', 'Contract'], default: 'Full-time' },
-  department: { type: mongoose.Schema.Types.ObjectId, ref: 'Department' },
-  departmentName: { type: String },
+  departments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Department' }],
+  departmentNames: [{ type: String }],
   selectedStudents: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   totalSelected: { type: Number, default: 0 },
   driveDate: { type: Date },

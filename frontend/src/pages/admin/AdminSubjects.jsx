@@ -5,7 +5,9 @@ import DataTable from '../../components/DataTable';
 import { getSubjects, createSubject, updateSubject, deleteSubject, bulkImportSubjects, getSubjectDepartments } from '../../utils/api';
 import PremiumFilterBar, { FilterTriggerButton } from '../../components/PremiumFilterBar';
 import gsap from 'gsap';
-import { Plus, Search, Upload, Edit, Trash2, BookOpen, Filter, Download, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Search, Upload, Edit, Trash2, BookOpen, Filter, Download, CheckCircle, XCircle, Users, UserPlus } from 'lucide-react';
+
+const API_URL = import.meta.env.VITE_API;
 
 // Animated Counter
 const AnimatedNumber = ({ value }) => {
@@ -35,6 +37,7 @@ const AnimatedNumber = ({ value }) => {
 const AdminSubjects = () => {
     const [subjects, setSubjects] = useState([]);
     const [departments, setDepartments] = useState([]);
+    const [staffList, setStaffList] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [showBulkModal, setShowBulkModal] = useState(false);
@@ -42,7 +45,9 @@ const AdminSubjects = () => {
     const [bulkData, setBulkData] = useState('');
     const [bulkResult, setBulkResult] = useState(null);
     const [filters, setFilters] = useState({ department: '', year: '', semester: '', search: '' });
-    const [formData, setFormData] = useState({ code: '', name: '', department: '', year: 1, semester: 1, credits: 3, subjectType: 'HEAVY' });
+    const [formData, setFormData] = useState({
+        code: '', name: '', department: '', year: 1, semester: 1, credits: 3, subjectType: 'HEAVY', assignedStaff: []
+    });
     const pageRef = useRef(null);
     const [filterPanelOpen, setFilterPanelOpen] = useState(false);
 
@@ -54,14 +59,37 @@ const AdminSubjects = () => {
         }
     }, [loading]);
 
+    // Fetch staff list when modal opens
+    useEffect(() => {
+        if (showModal) {
+            fetchStaffList();
+        }
+    }, [showModal, formData.department]);
+
+    const fetchStaffList = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const url = formData.department
+                ? `${API_URL}subjects/staff-list?department=${formData.department}`
+                : `${API_URL}subjects/staff-list`;
+            const response = await fetch(url, {
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setStaffList(data);
+            }
+        } catch (error) {
+            console.error('Error fetching staff:', error);
+        }
+    };
+
     const fetchData = async () => {
         try {
             setLoading(true);
             const [subjectsRes, deptsRes] = await Promise.all([getSubjects(filters), getSubjectDepartments()]);
-            // Ensure subjects is always an array
             const subjectsData = subjectsRes.data;
             setSubjects(Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []));
-            // Ensure departments is always an array
             const deptsData = deptsRes.data;
             setDepartments(Array.isArray(deptsData) ? deptsData : (deptsData?.departments || []));
         } catch (error) { console.error('Error:', error); setSubjects([]); setDepartments([]); }
@@ -86,7 +114,16 @@ const AdminSubjects = () => {
 
     const handleEdit = (subject) => {
         setEditingSubject(subject);
-        setFormData({ code: subject.code, name: subject.name, department: subject.department, year: subject.year, semester: subject.semester, credits: subject.credits, subjectType: subject.subjectType });
+        setFormData({
+            code: subject.code,
+            name: subject.name,
+            department: subject.department,
+            year: subject.year,
+            semester: subject.semester,
+            credits: subject.credits,
+            subjectType: subject.subjectType,
+            assignedStaff: subject.assignedStaff?.map(s => s._id || s) || []
+        });
         setShowModal(true);
     };
 
@@ -102,12 +139,24 @@ const AdminSubjects = () => {
         }
     };
 
-    const resetForm = () => { setFormData({ code: '', name: '', department: '', year: 1, semester: 1, credits: 3, subjectType: 'HEAVY' }); setEditingSubject(null); };
+    const resetForm = () => {
+        setFormData({ code: '', name: '', department: '', year: 1, semester: 1, credits: 3, subjectType: 'HEAVY', assignedStaff: [] });
+        setEditingSubject(null);
+    };
 
     const downloadTemplate = () => {
         const template = [{ code: 'CS101', name: 'Introduction to Programming', department: 'CSE', year: 1, semester: 1, credits: 4, subjectType: 'HEAVY' }];
         const blob = new Blob([JSON.stringify(template, null, 2)], { type: 'application/json' });
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'subjects_template.json'; a.click();
+    };
+
+    const toggleStaffSelection = (staffId) => {
+        const currentStaff = formData.assignedStaff || [];
+        if (currentStaff.includes(staffId)) {
+            setFormData({ ...formData, assignedStaff: currentStaff.filter(id => id !== staffId) });
+        } else {
+            setFormData({ ...formData, assignedStaff: [...currentStaff, staffId] });
+        }
     };
 
     const columns = [
@@ -117,6 +166,20 @@ const AdminSubjects = () => {
         { header: 'Year', accessor: 'year' },
         { header: 'Semester', accessor: 'semester' },
         { header: 'Credits', accessor: 'credits' },
+        {
+            header: 'Staff', render: (row) => (
+                <div className="flex items-center gap-1">
+                    {row.assignedStaff?.length > 0 ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600">
+                            <Users className="w-3 h-3" />
+                            {row.assignedStaff.length} assigned
+                        </span>
+                    ) : (
+                        <span className="text-xs text-zinc-400">No staff</span>
+                    )}
+                </div>
+            )
+        },
         {
             header: 'Type', render: (row) => (
                 <span className={`px-2 py-1 rounded-full text-[10px] font-medium ${row.subjectType === 'HEAVY' ? 'bg-violet-50 text-violet-600' : 'bg-zinc-100 text-zinc-600'}`}>{row.subjectType}</span>
@@ -132,6 +195,8 @@ const AdminSubjects = () => {
         }
     ];
 
+    const subjectsWithStaff = subjects.filter(s => s.assignedStaff?.length > 0).length;
+
     return (
         <DashboardLayout title="Subject Management">
             <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
@@ -139,7 +204,7 @@ const AdminSubjects = () => {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Semester Subjects</h1>
-                        <p className="text-zinc-500 text-sm mt-0.5">Manage subjects, credits, and semesters</p>
+                        <p className="text-zinc-500 text-sm mt-0.5">Manage subjects, credits, and staff assignments</p>
                     </div>
                     <div className="flex gap-2">
                         <FilterTriggerButton
@@ -160,8 +225,8 @@ const AdminSubjects = () => {
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
                         { label: 'Total Subjects', value: subjects.length, icon: BookOpen, color: 'violet' },
+                        { label: 'Staff Assigned', value: subjectsWithStaff, icon: Users, color: 'emerald' },
                         { label: 'Total Credits', value: subjects.reduce((sum, s) => sum + (s.credits || 0), 0), icon: BookOpen, color: 'blue' },
-                        { label: 'Major Subjects', value: subjects.filter(s => s.subjectType === 'HEAVY').length, icon: BookOpen, color: 'emerald' },
                         { label: 'Departments', value: departments.length, icon: BookOpen, color: 'amber' },
                     ].map((stat, i) => {
                         const colorMap = { violet: 'bg-violet-50 text-violet-500', blue: 'bg-blue-50 text-blue-500', emerald: 'bg-emerald-50 text-emerald-500', amber: 'bg-amber-50 text-amber-500' };
@@ -179,32 +244,25 @@ const AdminSubjects = () => {
                     })}
                 </div>
 
-                {/* Collapsible Premium Filter Panel */}
+                {/* Filter Panel */}
                 <PremiumFilterBar
                     isOpen={filterPanelOpen}
                     onClose={() => setFilterPanelOpen(false)}
-
                     searchQuery={filters.search}
                     setSearchQuery={(val) => setFilters({ ...filters, search: val })}
                     searchPlaceholder="Search by code or name..."
-
                     departments={['', ...departments]}
                     filterDept={filters.department}
                     setFilterDept={(val) => setFilters({ ...filters, department: val })}
-
                     years={['', '1', '2', '3', '4']}
                     filterYear={filters.year}
                     setFilterYear={(val) => setFilters({ ...filters, year: val })}
-
                     semesters={['', '1', '2', '3', '4', '5', '6', '7', '8']}
                     filterSemester={filters.semester}
                     setFilterSemester={(val) => setFilters({ ...filters, semester: val })}
-
                     showViewToggle={false}
-
                     onClearFilters={() => setFilters({ department: '', year: '', semester: '', search: '' })}
                     hasActiveFilters={filters.search || filters.department || filters.year || filters.semester}
-
                     filteredCount={subjects.length}
                     totalCount={subjects.length}
                 />
@@ -213,7 +271,7 @@ const AdminSubjects = () => {
                 <DataTable columns={columns} data={subjects} emptyMessage="No subjects found. Add your first subject!" />
 
                 {/* Add/Edit Modal */}
-                <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingSubject ? 'Edit Subject' : 'Add Subject'}>
+                <Modal isOpen={showModal} onClose={() => setShowModal(false)} title={editingSubject ? 'Edit Subject' : 'Add Subject'} size="lg">
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
@@ -254,6 +312,40 @@ const AdminSubjects = () => {
                                 </select>
                             </div>
                         </div>
+
+                        {/* Staff Assignment Section */}
+                        <div className="border-t border-zinc-100 pt-4">
+                            <label className="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-2">
+                                <UserPlus className="w-4 h-4" />
+                                Assign Staff {formData.assignedStaff?.length > 0 && <span className="text-violet-600">({formData.assignedStaff.length} selected)</span>}
+                            </label>
+                            <div className="max-h-40 overflow-y-auto border border-zinc-200 rounded-lg p-2 bg-zinc-50">
+                                {staffList.length === 0 ? (
+                                    <p className="text-xs text-zinc-400 text-center py-4">
+                                        {formData.department ? 'No staff found in this department' : 'Enter department to see available staff'}
+                                    </p>
+                                ) : (
+                                    <div className="space-y-1">
+                                        {staffList.map(staff => (
+                                            <label key={staff._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white cursor-pointer transition-colors">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={formData.assignedStaff?.includes(staff._id) || false}
+                                                    onChange={() => toggleStaffSelection(staff._id)}
+                                                    className="w-4 h-4 rounded border-zinc-300 text-violet-600 focus:ring-violet-500"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-zinc-900 truncate">{staff.name}</p>
+                                                    <p className="text-xs text-zinc-500 truncate">{staff.email}</p>
+                                                </div>
+                                                <span className="text-[10px] text-zinc-400 bg-zinc-100 px-1.5 py-0.5 rounded">{staff.department}</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
                         <div className="flex justify-end gap-2 pt-4">
                             <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-zinc-600 bg-zinc-100 rounded-lg hover:bg-zinc-200 transition-colors">Cancel</button>
                             <button type="submit" className="px-4 py-2 text-sm text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">{editingSubject ? 'Update' : 'Create'}</button>

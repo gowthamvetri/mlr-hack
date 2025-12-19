@@ -425,7 +425,7 @@ const StudentDashboard = () => {
                   <p className="text-sm font-medium text-white">Next: Complete your resume</p>
                   <p className="text-xs text-violet-200">Unlock interview opportunities</p>
                 </div>
-                <button className="px-4 py-2 bg-white text-violet-600 rounded-lg text-xs font-medium hover:bg-violet-50 transition-colors">
+                <button onClick={() => navigate('/student/career')} className="px-4 py-2 bg-white text-violet-600 rounded-lg text-xs font-medium hover:bg-violet-50 transition-colors">
                   Continue
                 </button>
               </div>

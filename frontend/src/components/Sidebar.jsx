@@ -58,16 +58,14 @@ const Sidebar = ({ isOpen, onClose }) => {
       case 'Admin':
         return [
           { to: '/admin', icon: LayoutDashboard, label: 'Overview' },
-          { to: '/admin/students', icon: Users, label: 'Students' },
+          // { to: '/admin/students', icon: Users, label: 'Students' },
           { to: '/admin/staff', icon: School, label: 'Staff' },
           { to: '/admin/analytics', icon: BarChart3, label: 'Analytics' },
-          { to: '/admin/courses', icon: BookOpen, label: 'Courses' },
           { to: '/admin/subjects', icon: BookOpen, label: 'Subjects' },
           { to: '/admin/departments', icon: Building2, label: 'Departments' },
-          { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
+          // { to: '/admin/registration-requests', icon: UserPlus, label: 'Registration Requests' },
           { to: '/admin/placements', icon: Briefcase, label: 'Placements' },
           { to: '/admin/exam-scheduling', icon: Wand2, label: 'Exam Management' },
-          { to: '/admin/invigilators', icon: UserCog, label: 'Invigilators' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },
           { to: '/admin/chatbot-content', icon: MessageSquare, label: 'Chatbot Content' },
           { to: '/admin/profile', icon: UserCircle, label: 'My Profile' },
@@ -89,14 +87,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       case 'Faculty':
         return [
           { to: '/staff', icon: LayoutDashboard, label: 'Dashboard' },
-          { to: '/staff/registration-requests', icon: UserPlus, label: 'Registration Requests' },
-          { to: '/staff/courses', icon: BookOpen, label: 'My Courses' },
+          { to: '/staff/students', icon: Users, label: 'Students' },
+          { to: '/staff/subjects', icon: BookOpen, label: 'My Subjects' },
           { to: '/staff/external-courses', icon: ExternalLink, label: 'External Courses' },
           { to: '/staff/invigilation', icon: ClipboardCheck, label: 'Invigilation' },
-          { to: '/staff/attendance', icon: ClipboardList, label: 'Attendance' },
-          { to: '/staff/fees', icon: ClipboardCheck, label: 'Fee Management' },
+          { to: '/staff/student-management', icon: ClipboardList, label: 'Student Management' },
           { to: '/staff/career-approvals', icon: Target, label: 'Career Approvals' },
-          { to: '/staff/eligibility', icon: ClipboardList, label: 'Eligibility Check' },
           { to: '/staff/profile', icon: UserCircle, label: 'My Profile' },
         ];
       default:

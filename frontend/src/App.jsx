@@ -68,10 +68,11 @@ const CoordinatorProfile = lazy(() => import('./pages/coordinator/CoordinatorPro
 
 // Staff Pages
 const StaffDashboard = lazy(() => import('./pages/staff/StaffDashboard'));
-const StaffAttendance = lazy(() => import('./pages/staff/StaffAttendance'));
-const StaffFees = lazy(() => import('./pages/staff/StaffFees'));
+const StaffStudents = lazy(() => import('./pages/staff/StaffStudents'));
+const StaffSubjects = lazy(() => import('./pages/staff/StaffSubjects'));
+const StaffRegistrationRequests = lazy(() => import('./pages/staff/StaffRegistrationRequests'));
+const StaffStudentManagement = lazy(() => import('./pages/staff/StaffStudentManagement'));
 const StaffCareerApprovals = lazy(() => import('./pages/staff/StaffCareerApprovals'));
-const StaffEligibility = lazy(() => import('./pages/staff/StaffEligibility'));
 const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
@@ -90,7 +91,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Onboarding />} />
             <Route path="/login" element={<Login />} />
-            
+
 
             {/* Public Pages */}
             <Route path="/departments/:slug" element={<DepartmentPage />} />
@@ -380,6 +381,30 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/staff/students"
+              element={
+                <ProtectedRoute allowedRoles={['Staff']}>
+                  <StaffStudents />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/subjects"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffSubjects />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/registration-requests"
+              element={
+                <ProtectedRoute allowedRoles={['Staff']}>
+                  <StaffRegistrationRequests />
+                </ProtectedRoute>
+              }
+            />
 
             <Route
               path="/staff/courses"
@@ -398,18 +423,10 @@ function App() {
               }
             />
             <Route
-              path="/staff/attendance"
+              path="/staff/student-management"
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
-                  <StaffAttendance />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/staff/fees"
-              element={
-                <ProtectedRoute allowedRoles={['Staff']}>
-                  <StaffFees />
+                  <StaffStudentManagement />
                 </ProtectedRoute>
               }
             />
@@ -418,14 +435,6 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
                   <StaffCareerApprovals />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/staff/eligibility"
-              element={
-                <ProtectedRoute allowedRoles={['Staff']}>
-                  <StaffEligibility />
                 </ProtectedRoute>
               }
             />

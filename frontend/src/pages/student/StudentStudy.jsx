@@ -3,17 +3,25 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import AnimatedNumber from '../../components/AnimatedNumber';
-import { getExternalCourses, markExternalCourseComplete } from '../../utils/api';
+import { getExternalCourses, markExternalCourseComplete, getSubjectsForStudent } from '../../utils/api';
+import ReactMarkdown from 'react-markdown';
 import {
   BookOpen, Video, FileText, Link as LinkIcon, Search, Filter, Star, Clock, ExternalLink,
-  Award, Globe, CheckCircle, Sparkles
+  Award, Globe, CheckCircle, Sparkles, GraduationCap, Users, Calendar, File, Image, Brain, Eye, ChevronDown, ChevronUp
 } from 'lucide-react';
 
 const StudentStudy = () => {
   const user = useSelector(selectCurrentUser);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [activeTab, setActiveTab] = useState('resources');
+  const [activeTab, setActiveTab] = useState('subjects');
+
+  // My Subjects state
+  const [subjects, setSubjects] = useState([]);
+  const [loadingSubjects, setLoadingSubjects] = useState(false);
+  const [filterYear, setFilterYear] = useState('all');
+  const [filterSemester, setFilterSemester] = useState('all');
+  const [expandedSubject, setExpandedSubject] = useState(null);
 
   // External courses state
   const [externalCourses, setExternalCourses] = useState([]);
@@ -21,25 +29,40 @@ const StudentStudy = () => {
   const [filterProvider, setFilterProvider] = useState('all');
   const [completingCourse, setCompletingCourse] = useState(null);
 
-  // Mock study resources
-  const resources = [
-    { id: 1, title: 'Data Structures & Algorithms', description: 'Complete guide to DSA concepts with practice problems', category: 'Computer Science', type: 'course', duration: '40 hours', rating: 4.8, link: '#' },
-    { id: 2, title: 'Database Management Systems', description: 'Learn SQL, normalization, and database design', category: 'Computer Science', type: 'video', duration: '25 hours', rating: 4.6, link: '#' },
-    { id: 3, title: 'Operating Systems Notes', description: 'Comprehensive notes covering all OS concepts', category: 'Computer Science', type: 'notes', duration: 'PDF', rating: 4.5, link: '#' },
-    { id: 4, title: 'Computer Networks', description: 'TCP/IP, OSI Model, and networking fundamentals', category: 'Computer Science', type: 'course', duration: '30 hours', rating: 4.7, link: '#' },
-    { id: 5, title: 'Software Engineering', description: 'SDLC, Agile, and software development practices', category: 'Computer Science', type: 'video', duration: '20 hours', rating: 4.4, link: '#' },
-    { id: 6, title: 'Machine Learning Basics', description: 'Introduction to ML algorithms and applications', category: 'AI/ML', type: 'course', duration: '35 hours', rating: 4.9, link: '#' }
-  ];
-
-  const categories = ['all', 'Computer Science', 'AI/ML', 'Mathematics', 'Electronics'];
   const providers = ['Coursera', 'NPTEL', 'Udemy', 'edX', 'LinkedIn Learning', 'Google', 'Microsoft', 'AWS', 'Other'];
   const extCategories = ['all', 'AI/ML', 'Web Development', 'Mobile Development', 'Data Science', 'Cloud Computing', 'Cybersecurity', 'Soft Skills', 'Programming', 'Database', 'Other'];
 
   useEffect(() => {
-    if (activeTab === 'certifications') {
+    if (activeTab === 'subjects') {
+      fetchSubjects();
+    } else if (activeTab === 'certifications') {
       fetchExternalCourses();
     }
-  }, [activeTab, filterProvider, selectedCategory]);
+  }, [activeTab, filterYear, filterSemester, filterProvider, selectedCategory]);
+
+  const fetchSubjects = async () => {
+    try {
+      setLoadingSubjects(true);
+      // Use student-specific endpoint that returns only approved materials from student's department
+      const { data } = await getSubjectsForStudent();
+      setSubjects(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching subjects:', error);
+      setSubjects([]);
+    } finally {
+      setLoadingSubjects(false);
+    }
+  };
+
+  // Debounced search for subjects
+  useEffect(() => {
+    if (activeTab === 'subjects') {
+      const timer = setTimeout(() => {
+        fetchSubjects();
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [searchQuery]);
 
   const fetchExternalCourses = async () => {
     try {
@@ -60,7 +83,6 @@ const StudentStudy = () => {
     try {
       setCompletingCourse(courseId);
       await markExternalCourseComplete(courseId);
-      // Update local state
       setExternalCourses(prev => prev.map(c =>
         c._id === courseId
           ? { ...c, completedBy: [...(c.completedBy || []), { student: user._id }] }
@@ -78,20 +100,24 @@ const StudentStudy = () => {
     return course.completedBy?.some(c => c.student === user?._id || c.student?._id === user?._id);
   };
 
-  const getTypeIcon = (type) => {
+  const getMaterialIcon = (type) => {
     switch (type) {
-      case 'course': return <BookOpen className="w-5 h-5" />;
-      case 'video': return <Video className="w-5 h-5" />;
-      case 'notes': return <FileText className="w-5 h-5" />;
-      default: return <LinkIcon className="w-5 h-5" />;
+      case 'PDF': return <FileText className="w-4 h-4" />;
+      case 'Video': return <Video className="w-4 h-4" />;
+      case 'Link': return <LinkIcon className="w-4 h-4" />;
+      case 'Document': return <File className="w-4 h-4" />;
+      case 'Image': return <Image className="w-4 h-4" />;
+      default: return <FileText className="w-4 h-4" />;
     }
   };
 
-  const getTypeColor = (type) => {
+  const getMaterialColor = (type) => {
     switch (type) {
-      case 'course': return 'bg-blue-100 text-blue-600';
-      case 'video': return 'bg-purple-100 text-purple-600';
-      case 'notes': return 'bg-green-100 text-green-600';
+      case 'PDF': return 'bg-red-100 text-red-600';
+      case 'Video': return 'bg-purple-100 text-purple-600';
+      case 'Link': return 'bg-blue-100 text-blue-600';
+      case 'Document': return 'bg-green-100 text-green-600';
+      case 'Image': return 'bg-yellow-100 text-yellow-600';
       default: return 'bg-gray-100 text-gray-600';
     }
   };
@@ -109,12 +135,10 @@ const StudentStudy = () => {
     return colors[provider] || 'bg-gray-100 text-gray-700';
   };
 
-  const filteredResources = resources.filter(resource => {
-    const matchesSearch = resource.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      resource.description.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || resource.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredSubjects = subjects.filter(subject =>
+    subject.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    subject.code?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const filteredExternalCourses = externalCourses.filter(course =>
     course.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -122,30 +146,38 @@ const StudentStudy = () => {
   );
 
   const completedCount = externalCourses.filter(c => isCompleted(c)).length;
+  const totalMaterials = subjects.reduce((sum, s) => sum + (s.materials?.length || 0), 0);
+  const materialsWithMindMaps = subjects.reduce((sum, s) => sum + (s.materials?.filter(m => m.mindMap).length || 0), 0);
+  const [viewingMindMap, setViewingMindMap] = useState(null);
 
   return (
     <DashboardLayout role="student" userName={user?.name}>
       <div className="mb-8 animate-fade-in">
         <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Study Support</h1>
-        <p className="text-gray-500 mt-1 text-lg">Access learning resources and free certifications</p>
+        <p className="text-gray-500 mt-1 text-lg">Access your subjects, materials, and certifications</p>
       </div>
 
       {/* Tabs */}
       <div className="flex gap-2 mb-6 bg-gray-100 p-1.5 rounded-xl w-fit">
         <button
-          onClick={() => { setActiveTab('resources'); setSelectedCategory('all'); }}
-          className={`px-6 py-2.5 rounded-lg font-semibold transition-all ${activeTab === 'resources'
+          onClick={() => { setActiveTab('subjects'); setSearchQuery(''); }}
+          className={`px-6 py-2.5 rounded-lg font-semibold transition-all ${activeTab === 'subjects'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900'
             }`}
         >
           <span className="flex items-center gap-2">
-            <BookOpen className="w-4 h-4" />
-            Study Materials
+            <GraduationCap className="w-4 h-4" />
+            My Subjects
+            {subjects.length > 0 && (
+              <span className="px-2 py-0.5 bg-violet-100 text-violet-700 text-xs font-bold rounded-full">
+                {subjects.length}
+              </span>
+            )}
           </span>
         </button>
         <button
-          onClick={() => { setActiveTab('certifications'); setSelectedCategory('all'); }}
+          onClick={() => { setActiveTab('certifications'); setSelectedCategory('all'); setSearchQuery(''); }}
           className={`px-6 py-2.5 rounded-lg font-semibold transition-all ${activeTab === 'certifications'
             ? 'bg-white text-gray-900 shadow-sm'
             : 'text-gray-600 hover:text-gray-900'
@@ -165,49 +197,60 @@ const StudentStudy = () => {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8 animate-slide-in-up">
-        {activeTab === 'resources' ? (
+        {activeTab === 'subjects' ? (
           <>
+            <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-6 text-white shadow-lg">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-primary-100 font-medium">My Subjects</p>
+                  <p className="text-3xl font-bold mt-2"><AnimatedNumber value={subjects.length} /></p>
+                </div>
+                <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+                  <BookOpen className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
             <div className="glass-card rounded-2xl p-6 tilt-card">
-              <div className="flex items-center gap-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 font-medium">Materials</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={totalMaterials} /></p>
+                </div>
                 <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-3xl font-bold text-gray-900"><AnimatedNumber value={12} /></p>
-                  <p className="text-sm font-medium text-gray-500">Active Courses</p>
+                  <FileText className="w-6 h-6 text-blue-600" />
                 </div>
               </div>
             </div>
             <div className="glass-card rounded-2xl p-6 tilt-card">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                  <Video className="w-6 h-6 text-purple-600" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900"><AnimatedNumber value={48} /></p>
-                  <p className="text-sm font-medium text-gray-500">Video Tutorials</p>
+                  <p className="text-gray-500 font-medium">With Mind Maps</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={materialsWithMindMaps} /></p>
+                </div>
+                <div className="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                  <Brain className="w-6 h-6 text-amber-600" />
                 </div>
               </div>
             </div>
             <div className="glass-card rounded-2xl p-6 tilt-card">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                  <FileText className="w-6 h-6 text-green-600" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900"><AnimatedNumber value={156} /></p>
-                  <p className="text-sm font-medium text-gray-500">Study Notes</p>
+                  <p className="text-gray-500 font-medium">Department</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{user?.department || '-'}</p>
+                </div>
+                <div className="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-violet-600" />
                 </div>
               </div>
             </div>
             <div className="glass-card rounded-2xl p-6 tilt-card">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                  <Clock className="w-6 h-6 text-orange-600" />
-                </div>
+              <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-3xl font-bold text-gray-900">24h</p>
-                  <p className="text-sm font-medium text-gray-500">Learning Time</p>
+                  <p className="text-gray-500 font-medium">Year</p>
+                  <p className="text-3xl font-bold text-gray-900 mt-2">{user?.year || '-'}</p>
+                </div>
+                <div className="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-emerald-600" />
                 </div>
               </div>
             </div>
@@ -269,87 +312,196 @@ const StudentStudy = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
             <input
               type="text"
-              placeholder={activeTab === 'resources' ? "Search resources..." : "Search certifications..."}
+              placeholder={activeTab === 'subjects' ? "Search subjects..." : "Search certifications..."}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-12 pr-4 py-3.5 border-2 border-transparent bg-gray-50 hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-900 transition-all font-medium placeholder-gray-400"
             />
           </div>
           <div className="flex items-center gap-3">
-            {activeTab === 'certifications' && (
-              <select
-                value={filterProvider}
-                onChange={(e) => setFilterProvider(e.target.value)}
-                className="px-4 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all"
-              >
-                <option value="all">All Providers</option>
-                {providers.map(p => <option key={p} value={p}>{p}</option>)}
-              </select>
+            {activeTab === 'subjects' ? (
+              <>
+                <select
+                  value={filterYear}
+                  onChange={(e) => setFilterYear(e.target.value)}
+                  className="px-4 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all"
+                >
+                  <option value="all">All Years</option>
+                  {[1, 2, 3, 4].map(y => <option key={y} value={y}>Year {y}</option>)}
+                </select>
+                <select
+                  value={filterSemester}
+                  onChange={(e) => setFilterSemester(e.target.value)}
+                  className="px-4 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all"
+                >
+                  <option value="all">All Semesters</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s}>Semester {s}</option>)}
+                </select>
+              </>
+            ) : (
+              <>
+                <select
+                  value={filterProvider}
+                  onChange={(e) => setFilterProvider(e.target.value)}
+                  className="px-4 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all"
+                >
+                  <option value="all">All Providers</option>
+                  {providers.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <div className="relative">
+                  <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    className="pl-10 pr-10 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all appearance-none min-w-[180px]"
+                  >
+                    {extCategories.map(cat => (
+                      <option key={cat} value={cat}>
+                        {cat === 'all' ? 'All Categories' : cat}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </>
             )}
-            <div className="relative">
-              <Filter className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 pr-10 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all appearance-none min-w-[180px]"
-              >
-                {(activeTab === 'resources' ? categories : extCategories).map(cat => (
-                  <option key={cat} value={cat}>
-                    {cat === 'all' ? 'All Categories' : cat}
-                  </option>
-                ))}
-              </select>
-            </div>
           </div>
         </div>
       </div>
 
       {/* Content */}
-      {activeTab === 'resources' ? (
+      {activeTab === 'subjects' ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-            {filteredResources.map(resource => (
-              <div key={resource.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col hover-card">
-                <div className="p-7 flex flex-col h-full">
-                  <div className="flex items-start justify-between mb-6">
-                    <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${getTypeColor(resource.type)} shadow-sm group-hover:scale-110 transition-transform`}>
-                      {getTypeIcon(resource.type)}
-                    </div>
-                    <div className="flex flex-col items-end gap-2">
-                      <span className="px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold uppercase tracking-wide">
-                        {resource.category}
-                      </span>
-                      <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-md">
-                        <span className="text-xs font-bold text-gray-800">{resource.rating}</span>
-                        <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+          {loadingSubjects ? (
+            <div className="text-center py-24">
+              <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-gray-500 font-medium">Loading your subjects...</p>
+            </div>
+          ) : filteredSubjects.length === 0 ? (
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center animate-fade-in">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <BookOpen className="w-8 h-8 text-gray-300" />
+              </div>
+              <p className="text-xl font-bold text-gray-900">No subjects found</p>
+              <p className="text-gray-500 mt-2">
+                {user?.department
+                  ? `No subjects available for ${user.department} department yet.`
+                  : 'Please update your profile with your department.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 animate-fade-in">
+              {filteredSubjects.map(subject => (
+                <div
+                  key={subject._id}
+                  className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl transition-all duration-300 group"
+                >
+                  <div className="p-6">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="px-3 py-1 bg-violet-100 text-violet-700 rounded-lg text-xs font-bold">
+                            {subject.code}
+                          </span>
+                          <span className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs font-medium">
+                            Year {subject.year}, Sem {subject.semester}
+                          </span>
+                        </div>
+                        <h3 className="font-bold text-lg text-gray-900 group-hover:text-primary-600 transition-colors">
+                          {subject.name}
+                        </h3>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-1 bg-blue-50 text-blue-600 rounded-lg text-xs font-medium">
+                          {subject.credits} credits
+                        </span>
                       </div>
                     </div>
-                  </div>
-                  <h3 className="font-bold text-xl text-gray-900 mb-2 leading-tight group-hover:text-primary-600 transition-colors">{resource.title}</h3>
-                  <p className="text-gray-500 text-sm mb-6 leading-relaxed flex-1">{resource.description}</p>
-                  <div className="pt-6 border-t border-gray-50 mt-auto">
-                    <div className="flex items-center justify-between mb-4">
-                      <span className="flex items-center gap-2 text-sm font-medium text-gray-500 bg-gray-50 px-3 py-1.5 rounded-lg">
-                        <Clock className="w-4 h-4 text-gray-400" />
-                        {resource.duration}
-                      </span>
-                    </div>
-                    <a href={resource.link} className="flex items-center justify-center gap-2 w-full py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 group/btn">
-                      <span>Start Learning</span>
-                      <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
-                    </a>
+
+                    {/* Staff Info */}
+                    {subject.assignedStaff?.length > 0 && (
+                      <div className="flex items-center gap-2 mb-4 text-sm text-gray-500">
+                        <Users className="w-4 h-4" />
+                        <span>
+                          {subject.assignedStaff.map(s => s.name).join(', ')}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Materials */}
+                    {subject.materials?.length > 0 ? (
+                      <div className="border-t border-gray-100 pt-4">
+                        <button
+                          onClick={() => setExpandedSubject(expandedSubject === subject._id ? null : subject._id)}
+                          className="flex items-center justify-between w-full text-left"
+                        >
+                          <span className="text-sm font-medium text-gray-700">
+                            {subject.materials.length} Material{subject.materials.length !== 1 ? 's' : ''} Available
+                          </span>
+                          <span className={`text-xs text-primary-600 font-medium transition-transform ${expandedSubject === subject._id ? 'rotate-180' : ''}`}>
+                            {expandedSubject === subject._id ? '▲ Hide' : '▼ Show'}
+                          </span>
+                        </button>
+
+                        {expandedSubject === subject._id && (
+                          <div className="mt-3 space-y-2 animate-fade-in">
+                            {subject.materials.map((material, idx) => (
+                              <div key={idx} className="space-y-2">
+                                <a
+                                  href={material.url?.startsWith('/') ? `${import.meta.env.VITE_API?.replace('/api/', '')}${material.url}` : material.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors group/item"
+                                >
+                                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${getMaterialColor(material.type)}`}>
+                                    {getMaterialIcon(material.type)}
+                                  </div>
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2">
+                                      <p className="text-sm font-medium text-gray-900 truncate group-hover/item:text-primary-600">
+                                        {material.title}
+                                      </p>
+                                      {material.mindMap && (
+                                        <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-amber-50 text-black-600 border border-amber-100">
+                                          <Brain className="w-2.5 h-2.5" /> Mind Map
+                                        </span>
+                                      )}
+                                    </div>
+                                    {material.description && (
+                                      <p className="text-xs text-gray-500 truncate">{material.description}</p>
+                                    )}
+                                  </div>
+                                  <ExternalLink className="w-4 h-4 text-gray-400 group-hover/item:text-primary-600" />
+                                </a>
+                                {/* Mind Map Display */}
+                                {material.mindMap && (
+                                  <div className="ml-3">
+                                    <button
+                                      onClick={() => setViewingMindMap(viewingMindMap === material._id ? null : material._id)}
+                                      className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition-colors"
+                                    >
+                                      {viewingMindMap === material._id ? <ChevronUp className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                                      {viewingMindMap === material._id ? 'Hide Mind Map' : 'View Mind Map'}
+                                    </button>
+                                    {viewingMindMap === material._id && (
+                                      <div className="mt-2 p-4 bg-amber-50/50 rounded-xl border border-amber-100 prose prose-sm prose-amber max-w-none animate-fade-in">
+                                        <ReactMarkdown>{material.mindMap}</ReactMarkdown>
+                                      </div>
+                                    )}
+                                  </div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="border-t border-gray-100 pt-4">
+                        <p className="text-sm text-gray-400 text-center">No materials uploaded yet</p>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
-          {filteredResources.length === 0 && (
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 text-center mt-8 animate-fade-in">
-              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Search className="w-8 h-8 text-gray-300" />
-              </div>
-              <p className="text-xl font-bold text-gray-900">No resources found</p>
-              <p className="text-gray-500 mt-2">Try adjusting your search or filters.</p>
+              ))}
             </div>
           )}
         </>
@@ -425,4 +577,3 @@ const StudentStudy = () => {
 };
 
 export default StudentStudy;
-

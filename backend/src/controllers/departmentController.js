@@ -6,7 +6,30 @@ const Faculty = require('../models/Faculty');
 const getDepartments = async (req, res) => {
   try {
     const departments = await Department.find({}).populate('headOfDepartment', 'name email');
-    res.json(departments);
+
+    // Calculate totalStudents and totalFaculty for each department
+    const departmentsWithStats = await Promise.all(
+      departments.map(async (dept) => {
+        const deptObj = dept.toObject();
+        // Count students belonging to this department
+        const totalStudents = await User.countDocuments({
+          role: 'Student',
+          department: dept.code // Match by department code (e.g., 'CSE')
+        });
+        // Count staff/faculty belonging to this department
+        const totalFaculty = await User.countDocuments({
+          role: 'Staff',
+          department: dept.code
+        });
+        return {
+          ...deptObj,
+          totalStudents,
+          totalFaculty
+        };
+      })
+    );
+
+    res.json(departmentsWithStats);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

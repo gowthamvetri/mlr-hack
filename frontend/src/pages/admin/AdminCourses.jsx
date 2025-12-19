@@ -622,7 +622,7 @@ const AdminCourses = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
                   {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
@@ -635,15 +635,25 @@ const AdminCourses = () => {
                 </select>
               </div>
             </div>
-            {staffList.length > 0 && (
-              <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Instructor</label>
-                <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                  <option value="">Select instructor</option>
-                  {staffList.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
-                </select>
-              </div>
-            )}
+            {(() => {
+              const filteredStaff = staffList.filter(s => {
+                const staffDept = s.department?.code || s.department;
+                return staffDept === formData.department;
+              });
+              return filteredStaff.length > 0 ? (
+                <div>
+                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Instructor <span className="text-zinc-400 font-normal">({filteredStaff.length} in {formData.department})</span></label>
+                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+                    <option value="">Select instructor</option>
+                    {filteredStaff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  </select>
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                  <p className="text-xs text-amber-700">No staff available in {formData.department} department</p>
+                </div>
+              );
+            })()}
             <div className="flex gap-2.5 pt-3">
               <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
               <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Add Course</button>
@@ -673,7 +683,7 @@ const AdminCourses = () => {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
                   {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
                 </select>
               </div>
@@ -686,6 +696,25 @@ const AdminCourses = () => {
                 </select>
               </div>
             </div>
+            {(() => {
+              const filteredStaff = staffList.filter(s => {
+                const staffDept = s.department?.code || s.department;
+                return staffDept === formData.department;
+              });
+              return filteredStaff.length > 0 ? (
+                <div>
+                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Instructor <span className="text-zinc-400 font-normal">({filteredStaff.length} in {formData.department})</span></label>
+                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
+                    <option value="">Select instructor</option>
+                    {filteredStaff.map(s => <option key={s._id} value={s._id}>{s.name}</option>)}
+                  </select>
+                </div>
+              ) : (
+                <div className="p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                  <p className="text-xs text-amber-700">No staff available in {formData.department} department</p>
+                </div>
+              );
+            })()}
             <div className="flex gap-2.5 pt-3">
               <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
               <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-colors">Update Course</button>
@@ -812,7 +841,7 @@ const AdminCourses = () => {
           {selectedMaterial && <MindMapPreview material={selectedMaterial} />}
         </Modal>
       </div>
-    </DashboardLayout>
+    </DashboardLayout >
   );
 };
 
