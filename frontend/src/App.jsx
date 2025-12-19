@@ -19,7 +19,7 @@ const LoadingSpinner = () => (
 // Auth & Public Pages
 const Onboarding = lazy(() => import('./pages/Onboarding'));
 const Login = lazy(() => import('./pages/Login'));
-const Register = lazy(() => import('./pages/Register'));
+
 const DepartmentPage = lazy(() => import('./pages/DepartmentPage'));
 const PlacementsPage = lazy(() => import('./pages/PlacementsPage'));
 
@@ -90,7 +90,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Onboarding />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
+            
 
             {/* Public Pages */}
             <Route path="/departments/:slug" element={<DepartmentPage />} />

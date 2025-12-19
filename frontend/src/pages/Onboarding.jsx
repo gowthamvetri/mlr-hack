@@ -128,7 +128,7 @@ const Onboarding = () => {
       icon: GraduationCap,
       features: ['Digital hall tickets & exam schedules', 'AI career guidance assistant', 'Learning streak tracking', 'Club & event participation'],
       cta: 'Join as Student',
-      action: () => navigate('/register'),
+      action: () => navigate('/login'),
       primary: true,
     },
     {
@@ -300,26 +300,30 @@ const Onboarding = () => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-            {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => (
-              <Link
-                key={dept._id || index}
-                to={`/departments/${dept.slug}`}
-                className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={dept.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400'}
-                    alt={dept.name}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                </div>
-                <div className="p-3 bg-white/80">
-                  <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
-                    {dept.name}
-                  </h3>
-                </div>
-              </Link>
-            ))}
+            {(departments.length > 0 ? departments : defaultDepartments).map((dept, index) => {
+              // Generate slug from name if not available
+              const deptSlug = dept.slug || dept.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+              return (
+                <Link
+                  key={dept._id || index}
+                  to={`/departments/${deptSlug}`}
+                  className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={dept.image || 'https://images.unsplash.com/photo-1562774053-701939374585?w=400'}
+                      alt={dept.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                  </div>
+                  <div className="p-3 bg-white/80">
+                    <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
+                      {dept.name}
+                    </h3>
+                  </div>
+                </Link>
+              )
+            })}
           </div>
 
           <div className="text-center mt-10">

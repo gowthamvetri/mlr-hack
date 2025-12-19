@@ -22,36 +22,44 @@ const departmentSchema = mongoose.Schema({
   headOfDepartment: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   totalStudents: { type: Number, default: 0 },
   totalFaculty: { type: Number, default: 0 },
-  
+
   // Static page content
   overview: { type: String },
   mission: { type: String },
   vision: { type: String },
   image: { type: String }, // Department banner/header image
-  
+
   // Rankings
   rankings: [rankingSchema],
-  
+
   // Activities
   activities: [activitySchema],
-  
+
   // Accreditations
   accreditations: [{
     name: { type: String },
     logo: { type: String },
   }],
-  
+
   createdAt: { type: Date, default: Date.now },
 }, {
   timestamps: true,
 });
 
 // Generate slug from name before saving
-departmentSchema.pre('save', function(next) {
-  if (this.isModified('name') || !this.slug) {
-    this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+departmentSchema.pre('save', function (next) {
+  try {
+    if (this.isModified('name') || !this.slug) {
+      this.slug = this.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || '';
+    }
+    if (typeof next === 'function') {
+      next();
+    }
+  } catch (error) {
+    if (typeof next === 'function') {
+      next(error);
+    }
   }
-  next();
 });
 
 const Department = mongoose.model('Department', departmentSchema);

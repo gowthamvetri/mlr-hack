@@ -27,8 +27,29 @@ const getPublicDepartments = async (req, res) => {
 // Get department by slug (public)
 const getDepartmentBySlug = async (req, res) => {
   try {
-    const department = await Department.findOne({ slug: req.params.slug })
+    const slugParam = req.params.slug;
+
+    // First try to find by exact slug match
+    let department = await Department.findOne({ slug: slugParam })
       .populate('headOfDepartment', 'name email profileImage');
+
+    // If not found, try to find by generating slug from name
+    if (!department) {
+      // Get all departments and find one where generated slug matches
+      const allDepartments = await Department.find({})
+        .populate('headOfDepartment', 'name email profileImage');
+
+      department = allDepartments.find(dept => {
+        const generatedSlug = dept.name?.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        return generatedSlug === slugParam;
+      });
+
+      // If found, update the department with the slug for future lookups (using findByIdAndUpdate to avoid pre-save hook)
+      if (department) {
+        await Department.findByIdAndUpdate(department._id, { slug: slugParam });
+      }
+    }
+
     if (!department) {
       return res.status(404).json({ message: 'Department not found' });
     }
