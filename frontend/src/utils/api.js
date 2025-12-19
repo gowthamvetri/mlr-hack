@@ -85,7 +85,7 @@ export const getDepartmentById = (id) => API.get(`/departments/${id}`);
 export const createDepartment = (data) => API.post('/departments', data);
 export const updateDepartment = (id, data) => API.put(`/departments/${id}`, data);
 export const deleteDepartment = (id) => API.delete(`/departments/${id}`);
-export const getDepartmentStats = () => API.get('/departments/stats'); 
+export const getDepartmentStats = () => API.get('/departments/stats');
 
 // Course management
 export const getCourses = (params) => API.get('/courses', { params });
@@ -240,5 +240,17 @@ export const deleteSeatingRoom = (id) => API.delete(`/seating/rooms/${id}`);
 export const getMyInvigilation = () => API.get('/seating/my-invigilation');
 export const getMySeating = () => API.get('/seating/my-seat');
 export const getAvailableInvigilators = () => API.get('/seating/invigilators');
+
+// Zenith RAG Chatbot Content Management API (connects to Python backend)
+const ZENITH_API = axios.create({
+  baseURL: import.meta.env.VITE_ZENITH_API || 'http://localhost:8000',
+});
+
+export const getChatbotContent = () => ZENITH_API.get('/api/content');
+export const getChatbotContentStats = () => ZENITH_API.get('/api/content/stats');
+export const addChatbotContent = (data) => ZENITH_API.post('/api/content', data);
+export const updateChatbotContent = (id, data) => ZENITH_API.put(`/api/content/${id}`, data);
+export const deleteChatbotContent = (id, namespace) => ZENITH_API.delete(`/api/content/${id}`, { params: { namespace } });
+export const clearAllChatbotContent = () => ZENITH_API.delete('/api/content/clear');
 
 export default API;
