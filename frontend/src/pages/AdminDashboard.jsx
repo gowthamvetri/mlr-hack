@@ -284,7 +284,7 @@ const AdminDashboard = () => {
                 Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name?.split(' ')[0] || 'Admin'}
               </h1>
               <p className="text-white/60 text-sm lg:text-base max-w-lg">
-                {pendingEvents.length > 0
+                {Array.isArray(pendingEvents) && pendingEvents.length > 0
                   ? `You have ${pendingEvents.length} event${pendingEvents.length > 1 ? 's' : ''} awaiting approval. Student enrollment is up this month.`
                   : `Everything looks great! Student enrollment shows positive trends this month.`}
               </p>
@@ -460,7 +460,7 @@ const AdminDashboard = () => {
               <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
                 <Clock className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
               </div>
-              {pendingEvents.length > 0 && (
+              {Array.isArray(pendingEvents) && pendingEvents.length > 0 && (
                 <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 rounded-full animate-pulse">
                   <Zap className="w-3 h-3 text-amber-600" />
                   <span className="text-[11px] font-semibold text-amber-600">Action needed</span>
@@ -495,7 +495,7 @@ const AdminDashboard = () => {
                     <p className="text-xs text-zinc-500">Review and approve events</p>
                   </div>
                 </div>
-                {pendingEvents.length > 0 && (
+                {Array.isArray(pendingEvents) && pendingEvents.length > 0 && (
                   <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
                     {pendingEvents.length} pending
                   </span>
@@ -504,7 +504,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="p-4">
-              {pendingEvents.length > 0 ? (
+              {Array.isArray(pendingEvents) && pendingEvents.length > 0 ? (
                 <div className="space-y-2">
                   {pendingEvents.slice(0, 5).map((event, i) => (
                     <div key={event._id}
@@ -560,7 +560,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="p-4 max-h-[360px] overflow-y-auto">
-              {recentActivities.length > 0 ? (
+              {Array.isArray(recentActivities) && recentActivities.length > 0 ? (
                 <div className="space-y-1">
                   {recentActivities.slice(0, 8).map((activity, i) => {
                     const Icon = activity.icon;
@@ -604,7 +604,7 @@ const AdminDashboard = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {(performanceMetrics.length > 0 ? performanceMetrics : [
+            {(Array.isArray(performanceMetrics) && performanceMetrics.length > 0 ? performanceMetrics : [
               { label: 'Course Completion Rate', value: 87, trend: '+5%' },
               { label: 'Student Satisfaction', value: 92, trend: '+3%' },
               { label: 'Faculty Performance', value: 89, trend: '+4%' }
