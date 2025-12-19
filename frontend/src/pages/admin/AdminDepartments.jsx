@@ -69,7 +69,7 @@ const AdminDepartments = () => {
         try {
             setLoading(true);
             const { data } = await getDepartments();
-            setDepartments(data);
+            setDepartments(Array.isArray(data) ? data : []);
         } catch (error) {
             console.error('Error fetching departments:', error);
         } finally {
@@ -166,13 +166,13 @@ const AdminDepartments = () => {
         setShowEditModal(true);
     };
 
-    const filteredDepartments = departments.filter(dept =>
+    const filteredDepartments = Array.isArray(departments) ? departments.filter(dept =>
         dept.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         dept.code?.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    ) : [];
 
-    const totalStudents = departments.reduce((sum, d) => sum + (d.totalStudents || 0), 0);
-    const totalFaculty = departments.reduce((sum, d) => sum + (d.totalFaculty || 0), 0);
+    const totalStudents = Array.isArray(departments) ? departments.reduce((sum, d) => sum + (d.totalStudents || 0), 0) : 0;
+    const totalFaculty = Array.isArray(departments) ? departments.reduce((sum, d) => sum + (d.totalFaculty || 0), 0) : 0;
 
     return (
         <DashboardLayout>
