@@ -63,7 +63,7 @@ const StaffAttendance = () => {
         getStudentsForStaff(params),
         getAttendanceSummary(params).catch(() => ({ data: {} }))
       ]);
-      setStudents(studentsRes.data);
+      setStudents(Array.isArray(studentsRes.data) ? studentsRes.data : []);
       setSummary(summaryRes.data);
       setEditedAttendance({});
     } catch (error) {
@@ -103,7 +103,7 @@ const StaffAttendance = () => {
     finally { setSaving(false); }
   };
 
-  const filteredStudents = students.filter(student => student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredStudents = Array.isArray(students) ? students.filter(student => student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase())) : [];
   const getAttendanceColor = (att) => att >= 75 ? 'text-emerald-600' : att >= 60 ? 'text-amber-600' : 'text-red-600';
   const years = [{ value: '1', label: '1st Year' }, { value: '2', label: '2nd Year' }, { value: '3', label: '3rd Year' }, { value: '4', label: '4th Year' }];
 

@@ -66,7 +66,7 @@ const StaffFees = () => {
         getStudentsForStaff(params),
         getFeeSummary(params).catch(() => ({ data: {} }))
       ]);
-      let filteredStudents = studentsRes.data;
+      let filteredStudents = Array.isArray(studentsRes.data) ? studentsRes.data : [];
       if (filterStatus === 'paid') filteredStudents = filteredStudents.filter(s => s.feesPaid);
       else if (filterStatus === 'pending') filteredStudents = filteredStudents.filter(s => !s.feesPaid);
       setStudents(filteredStudents);
@@ -117,7 +117,7 @@ const StaffFees = () => {
     finally { setSaving(null); }
   };
 
-  const filteredStudents = students.filter(student => student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase()));
+  const filteredStudents = Array.isArray(students) ? students.filter(student => student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase())) : [];
   const years = [{ value: '1', label: '1st Year' }, { value: '2', label: '2nd Year' }, { value: '3', label: '3rd Year' }, { value: '4', label: '4th Year' }];
 
   return (

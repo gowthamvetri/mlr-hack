@@ -56,7 +56,7 @@ const StaffExternalCourses = () => {
         try {
             setLoading(true);
             const { data } = await getExternalCourses();
-            const myCourses = data.filter(c => c.postedBy?._id === user?._id);
+            const myCourses = Array.isArray(data) ? data.filter(c => c.postedBy?._id === user?._id) : [];
             setCourses(myCourses);
         } catch (error) { console.error('Error fetching courses:', error); }
         finally { setLoading(false); }
@@ -100,7 +100,7 @@ const StaffExternalCourses = () => {
     const openEditModal = (course) => { setSelectedCourse(course); setFormData({ title: course.title, description: course.description || '', provider: course.provider, url: course.url, category: course.category }); setShowEditModal(true); };
     const resetForm = () => { setFormData({ title: '', description: '', provider: 'Other', url: '', category: 'Other' }); setSelectedCourse(null); };
 
-    const filteredCourses = courses.filter(c => c.title?.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredCourses = Array.isArray(courses) ? courses.filter(c => c.title?.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
     const getProviderColor = (provider) => {
         const colors = { 'Coursera': 'bg-blue-50 text-blue-700 border-blue-100', 'NPTEL': 'bg-orange-50 text-orange-700 border-orange-100', 'Udemy': 'bg-violet-50 text-violet-700 border-violet-100', 'edX': 'bg-red-50 text-red-700 border-red-100', 'Google': 'bg-emerald-50 text-emerald-700 border-emerald-100', 'Microsoft': 'bg-cyan-50 text-cyan-700 border-cyan-100', 'AWS': 'bg-amber-50 text-amber-700 border-amber-100' };

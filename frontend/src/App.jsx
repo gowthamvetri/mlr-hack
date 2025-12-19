@@ -76,6 +76,7 @@ const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
 const StaffInvigilation = lazy(() => import('./pages/staff/StaffInvigilation'));
+const StaffRegistrationRequests = lazy(() => import('./pages/staff/StaffRegistrationRequests'));
 
 
 function App() {
@@ -442,6 +443,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff']}>
                   <StaffProfile />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/registration-requests"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffRegistrationRequests />
                 </ProtectedRoute>
               }
             />
