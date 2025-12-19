@@ -27,12 +27,28 @@ const getExternalCourses = async (req, res) => {
 // @desc    Create external course
 // @route   POST /api/external-courses
 // @access  Private (Admin, Staff)
+const mongoose = require('mongoose');
+const Department = require('../models/Department');
+
+
+
 const createExternalCourse = async (req, res) => {
     try {
-        const { title, description, provider, url, category, department } = req.body;
+        let { title, description, provider, url, category, department } = req.body;
 
         if (!title || !url) {
             return res.status(400).json({ message: 'Title and URL are required' });
+        }
+
+        // Handle department lookup if provided
+        let departmentId = null;
+        if (department) {
+            if (mongoose.Types.ObjectId.isValid(department)) {
+                departmentId = department;
+            } else {
+                const deptObj = await Department.findOne({ code: department });
+                if (deptObj) departmentId = deptObj._id;
+            }
         }
 
         const course = await ExternalCourse.create({
@@ -41,7 +57,7 @@ const createExternalCourse = async (req, res) => {
             provider: provider || 'Other',
             url,
             category: category || 'Other',
-            department: department || null,
+            department: departmentId,
             postedBy: req.user._id
         });
 
@@ -80,7 +96,26 @@ const updateExternalCourse = async (req, res) => {
         course.provider = provider || course.provider;
         course.url = url || course.url;
         course.category = category || course.category;
-        course.department = department !== undefined ? department : course.department;
+        
+        // Handle department update
+        if (department !== undefined) {
+            let departmentId = null;
+            if (department) {
+                if (mongoose.Types.ObjectId.isValid(department)) {
+                     departmentId = department;
+                } else {
+                     const deptObj = await Department.findOne({ code: department });
+                     if (deptObj) departmentId = deptObj._id;
+                }
+            }
+            if (departmentId) course.department = departmentId;
+             // If they sent a department code that wasn't found, should we ignore it or set to null?
+             // Assuming validation happens or we keep previous if invalid? 
+             // But simpler: if departmentId is found, set it. Or if they explicitly passed null?
+             // For now safest is to set only if departmentId resolved.
+             else if (department === null || department === '') course.department = null;
+        }
+
         course.isActive = isActive !== undefined ? isActive : course.isActive;
 
         await course.save();

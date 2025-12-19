@@ -55,13 +55,13 @@ const ProgressRing = ({ percentage, size = 56, strokeWidth = 4, color = '#8b5cf6
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#27272a" strokeWidth={strokeWidth} />
         <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
           strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
           className="transition-all duration-700 ease-out" />
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-semibold text-zinc-700">{percentage}%</span>
+        <span className="text-xs font-semibold text-white">{percentage}%</span>
       </div>
     </div>
   );
@@ -69,13 +69,13 @@ const ProgressRing = ({ percentage, size = 56, strokeWidth = 4, color = '#8b5cf6
 
 // Skeleton Loader
 const SkeletonCard = () => (
-  <div className="bg-white rounded-xl p-5 border border-zinc-100 animate-pulse">
+  <div className="bg-dark-800 rounded-xl p-5 border border-dark-700 animate-pulse">
     <div className="flex items-start justify-between mb-4">
-      <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
-      <div className="w-12 h-4 bg-zinc-100 rounded" />
+      <div className="w-9 h-9 bg-dark-700 rounded-lg" />
+      <div className="w-12 h-4 bg-dark-700 rounded" />
     </div>
-    <div className="w-20 h-3 bg-zinc-100 rounded mb-2" />
-    <div className="w-16 h-8 bg-zinc-100 rounded" />
+    <div className="w-20 h-3 bg-dark-700 rounded mb-2" />
+    <div className="w-16 h-8 bg-dark-700 rounded" />
   </div>
 );
 
@@ -218,22 +218,22 @@ const StudentDashboard = () => {
 
   return (
     <DashboardLayout title="Dashboard">
-      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
+      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-primary-900/10 via-dark-900 to-accent-900/10 p-6 lg:p-8">
         {/* Header */}
         <div className="mb-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div>
-              <p className="text-sm text-zinc-500 mb-1">Welcome back,</p>
-              <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+              <p className="text-sm text-dark-400 mb-1">Welcome back,</p>
+              <h1 className="text-2xl font-semibold text-white tracking-tight">
                 {user?.name?.split(' ')[0]} 👋
               </h1>
             </div>
             <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-lg text-xs font-medium">
                 <Flame className="w-3.5 h-3.5" />
                 {streak} day streak
               </div>
-              <span className="text-xs text-zinc-400">
+              <span className="text-xs text-dark-400">
                 {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
               </span>
             </div>
@@ -247,62 +247,62 @@ const StudentDashboard = () => {
           ) : (
             <>
               {/* Daily Streak */}
-              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+              <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center">
                     <Flame className="w-4.5 h-4.5 text-orange-500" />
                   </div>
                   {streak > 7 && (
-                    <span className="text-[10px] font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded">🔥 Hot!</span>
+                    <span className="text-[10px] font-medium text-orange-400 bg-orange-500/10 border border-orange-500/20 px-2 py-0.5 rounded">🔥 Hot!</span>
                   )}
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Daily Streak</p>
-                <p className="text-2xl font-semibold text-zinc-900">
-                  <AnimatedNumber value={streak} /> <span className="text-sm font-normal text-zinc-400">days</span>
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Daily Streak</p>
+                <p className="text-2xl font-semibold text-white">
+                  <AnimatedNumber value={streak} /> <span className="text-sm font-normal text-dark-400">days</span>
                 </p>
               </div>
 
               {/* Skills Gained */}
-              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+              <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <Award className="w-4.5 h-4.5 text-violet-500" />
+                  <div className="w-9 h-9 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                    <Award className="w-4.5 h-4.5 text-primary-500" />
                   </div>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Skills Gained</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Skills Gained</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={skillsGained} />
                 </p>
               </div>
 
               {/* Upcoming Exams */}
-              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+              <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                     <ClipboardList className="w-4.5 h-4.5 text-blue-500" />
                   </div>
                   {exams.length > 0 && (
-                    <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Upcoming</span>
+                    <span className="text-[10px] font-medium text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded">Upcoming</span>
                   )}
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Exams</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Exams</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={exams.length} />
                 </p>
               </div>
 
               {/* Profile Score */}
-              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+              <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all group">
                 <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
                     <TrendingUp className="w-4.5 h-4.5 text-emerald-500" />
                   </div>
                 </div>
-                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Profile Score</p>
-                <p className="text-2xl font-semibold text-zinc-900">
+                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Profile Score</p>
+                <p className="text-2xl font-semibold text-white">
                   <AnimatedNumber value={profileScore} suffix="%" />
                 </p>
-                <div className="mt-2 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                <div className="mt-2 h-1.5 bg-dark-700 rounded-full overflow-hidden">
                   <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${profileScore}%` }} />
                 </div>
               </div>
@@ -315,64 +315,64 @@ const StudentDashboard = () => {
           {/* AI Twin & Career Section */}
           <div className="lg:col-span-2 space-y-6">
             {/* AI Twin Card */}
-            <div className="section-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
+            <div className="section-card bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
               <div className="p-6">
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary-600 to-primary-700 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/20">
                       <Brain className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-zinc-900">AI Twin</h3>
-                      <p className="text-sm text-violet-600">Your Digital Mentor</p>
+                      <h3 className="font-semibold text-white">AI Twin</h3>
+                      <p className="text-sm text-primary-400">Your Digital Mentor</p>
                     </div>
                   </div>
-                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Active</span>
+                  <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">Active</span>
                 </div>
 
                 {/* Career Readiness */}
                 <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm text-zinc-600">Career Readiness</span>
-                    <span className="text-sm font-semibold text-violet-600">{careerReadiness}%</span>
+                    <span className="text-sm text-dark-300">Career Readiness</span>
+                    <span className="text-sm font-semibold text-primary-400">{careerReadiness}%</span>
                   </div>
-                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-700" style={{ width: `${careerReadiness}%` }} />
+                  <div className="h-2 bg-dark-700 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-primary-500 to-primary-400 rounded-full transition-all duration-700" style={{ width: `${careerReadiness}%` }} />
                   </div>
                 </div>
 
                 {/* Today's Insight */}
-                <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-100">
+                <div className="bg-amber-500/10 rounded-lg p-4 mb-6 border border-amber-500/20">
                   <div className="flex items-start gap-3">
-                    <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5" />
+                    <Lightbulb className="w-4 h-4 text-amber-500 mt-0.5" />
                     <div>
-                      <p className="text-xs font-medium text-zinc-900 mb-0.5">Today's Insight</p>
-                      <p className="text-xs text-zinc-600">Your JavaScript skills improved 15% this week! Consider taking the advanced assessment.</p>
+                      <p className="text-xs font-medium text-white mb-0.5">Today's Insight</p>
+                      <p className="text-xs text-dark-300">Your JavaScript skills improved 15% this week! Consider taking the advanced assessment.</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
-                  <div className="bg-zinc-50 rounded-lg p-3 text-center">
-                    <p className="text-lg font-semibold text-zinc-900">{activeGoals}</p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Active Goals</p>
+                  <div className="bg-dark-900 rounded-lg p-3 text-center border border-dark-700">
+                    <p className="text-lg font-semibold text-white">{activeGoals}</p>
+                    <p className="text-[10px] text-dark-400 uppercase tracking-wide">Active Goals</p>
                   </div>
-                  <div className="bg-zinc-50 rounded-lg p-3 text-center">
-                    <p className="text-lg font-semibold text-violet-600">{skillsTracked}+</p>
-                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Skills Tracked</p>
+                  <div className="bg-dark-900 rounded-lg p-3 text-center border border-dark-700">
+                    <p className="text-lg font-semibold text-primary-400">{skillsTracked}+</p>
+                    <p className="text-[10px] text-dark-400 uppercase tracking-wide">Skills Tracked</p>
                   </div>
                 </div>
 
                 {/* Actions */}
                 <div className="flex gap-3">
-                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-dark-600 rounded-lg text-sm font-medium text-dark-300 hover:bg-dark-700 hover:text-white transition-colors">
                     <MessageCircle className="w-4 h-4" />
                     Quick Chat
                   </button>
                   <button
                     onClick={() => navigate('/student/ai-twin')}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-dark-700 text-white rounded-lg text-sm font-medium hover:bg-dark-600 transition-colors"
                   >
                     View Details
                     <ArrowRight className="w-4 h-4" />
@@ -382,15 +382,15 @@ const StudentDashboard = () => {
             </div>
 
             {/* Career Roadmap */}
-            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+            <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-6">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <Target className="w-4.5 h-4.5 text-violet-500" />
+                  <div className="w-9 h-9 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                    <Target className="w-4.5 h-4.5 text-primary-500" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-zinc-900">Career Roadmap</h3>
-                    <p className="text-xs text-zinc-500">{completedSteps} of {careerRoadmap.length} steps completed</p>
+                    <h3 className="font-semibold text-white">Career Roadmap</h3>
+                    <p className="text-xs text-dark-400">{completedSteps} of {careerRoadmap.length} steps completed</p>
                   </div>
                 </div>
                 <ProgressRing percentage={overallProgress} size={48} strokeWidth={4} />
@@ -398,34 +398,34 @@ const StudentDashboard = () => {
 
               <div className="space-y-3">
                 {careerRoadmap.map((step, index) => (
-                  <div key={step.step} className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step.completed ? 'bg-emerald-500 text-white' : 'bg-zinc-200 text-zinc-500'
+                  <div key={step.step} className="flex items-center gap-3 p-3 bg-dark-900 rounded-lg border border-dark-700">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step.completed ? 'bg-emerald-500 text-white' : 'bg-dark-700 text-dark-400 border border-dark-600'
                       }`}>
                       {step.completed ? <CheckCircle className="w-4 h-4" /> : step.step}
                     </div>
                     <div className="flex-1">
-                      <p className={`text-sm font-medium ${step.completed ? 'text-zinc-900' : 'text-zinc-500'}`}>{step.title}</p>
+                      <p className={`text-sm font-medium ${step.completed ? 'text-white' : 'text-dark-400'}`}>{step.title}</p>
                     </div>
                     <div className="w-20">
-                      <div className="h-1.5 bg-zinc-200 rounded-full overflow-hidden">
-                        <div className={`h-full rounded-full transition-all duration-500 ${step.completed ? 'bg-emerald-500' : 'bg-violet-500'}`} style={{ width: `${step.progress}%` }} />
+                      <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${step.completed ? 'bg-emerald-500' : 'bg-primary-600'}`} style={{ width: `${step.progress}%` }} />
                       </div>
                     </div>
-                    <span className="text-xs font-medium text-zinc-400 w-8">{step.progress}%</span>
+                    <span className="text-xs font-medium text-dark-500 w-8">{step.progress}%</span>
                   </div>
                 ))}
               </div>
 
               {/* Next Milestone CTA */}
-              <div className="mt-6 bg-gradient-to-r from-violet-600 to-violet-500 rounded-lg p-4 flex items-center gap-4">
-                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+              <div className="mt-6 bg-gradient-to-r from-primary-600 to-primary-500 rounded-lg p-4 flex items-center gap-4 shadow-lg shadow-primary-500/20">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center border border-white/10">
                   <Trophy className="w-5 h-5 text-white" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-white">Next: Complete your resume</p>
-                  <p className="text-xs text-violet-200">Unlock interview opportunities</p>
+                  <p className="text-xs text-primary-200">Unlock interview opportunities</p>
                 </div>
-                <button onClick={() => navigate('/student/career')} className="px-4 py-2 bg-white text-violet-600 rounded-lg text-xs font-medium hover:bg-violet-50 transition-colors">
+                <button onClick={() => navigate('/student/career')} className="px-4 py-2 bg-white/10 text-white border border-white/20 rounded-lg text-xs font-bold hover:bg-white/20 transition-colors">
                   Continue
                 </button>
               </div>
@@ -435,23 +435,23 @@ const StudentDashboard = () => {
           {/* Right Sidebar */}
           <div className="space-y-6">
             {/* Skills Progress */}
-            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+            <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-6">
               <div className="flex items-center justify-between mb-5">
-                <h3 className="font-semibold text-zinc-900">Skills Progress</h3>
-                <button className="text-xs text-violet-600 font-medium hover:underline">View All</button>
+                <h3 className="font-semibold text-white">Skills Progress</h3>
+                <button className="text-xs text-primary-400 font-medium hover:underline hover:text-primary-300">View All</button>
               </div>
               <div className="space-y-4">
                 {skills.map((skill) => (
                   <div key={skill.name}>
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-sm text-zinc-700">{skill.name}</span>
+                      <span className="text-sm text-dark-200">{skill.name}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">{skill.trend}</span>
-                        <span className="text-xs font-medium text-zinc-600">{skill.level}%</span>
+                        <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded">{skill.trend}</span>
+                        <span className="text-xs font-medium text-dark-400">{skill.level}%</span>
                       </div>
                     </div>
-                    <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
-                      <div className="h-full bg-violet-500 rounded-full transition-all duration-700" style={{ width: `${skill.level}%` }} />
+                    <div className="h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                      <div className="h-full bg-primary-500 rounded-full transition-all duration-700" style={{ width: `${skill.level}%` }} />
                     </div>
                   </div>
                 ))}
@@ -459,11 +459,11 @@ const StudentDashboard = () => {
             </div>
 
             {/* Quick Actions */}
-            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
-              <h3 className="font-semibold text-zinc-900 mb-4">Quick Actions</h3>
+            <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-6">
+              <h3 className="font-semibold text-white mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 {[
-                  { label: 'View Courses', icon: BookOpen, path: '/student/courses', color: 'violet' },
+                  { label: 'View Courses', icon: BookOpen, path: '/student/courses', color: 'primary' },
                   { label: 'Career Portal', icon: Briefcase, path: '/student/career', color: 'blue' },
                   { label: 'Study Support', icon: GraduationCap, path: '/student/study', color: 'emerald' },
                   { label: 'Hall Tickets', icon: ClipboardList, path: '/student/hall-tickets', color: 'amber' },
@@ -471,29 +471,34 @@ const StudentDashboard = () => {
                   <button
                     key={action.label}
                     onClick={() => navigate(action.path)}
-                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-dark-700 transition-colors group border border-transparent hover:border-dark-600"
                   >
-                    <div className={`w-8 h-8 rounded-lg bg-${action.color}-50 flex items-center justify-center`}>
-                      <action.icon className={`w-4 h-4 text-${action.color}-500`} />
+                    {/* Using inline color logic to handle dynamic colors correctly in dark mode */}
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center 
+                      ${action.color === 'primary' ? 'bg-primary-500/10 text-primary-500 border border-primary-500/20' :
+                        action.color === 'blue' ? 'bg-blue-500/10 text-blue-500 border border-blue-500/20' :
+                          action.color === 'emerald' ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20' :
+                            'bg-amber-500/10 text-amber-500 border border-amber-500/20'}`}>
+                      <action.icon className="w-4 h-4" />
                     </div>
-                    <span className="flex-1 text-sm text-zinc-700 text-left">{action.label}</span>
-                    <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                    <span className="flex-1 text-sm text-dark-200 text-left group-hover:text-white transition-colors">{action.label}</span>
+                    <ChevronRight className="w-4 h-4 text-dark-500 group-hover:text-white group-hover:translate-x-0.5 transition-all" />
                   </button>
                 ))}
               </div>
             </div>
 
             {/* Mini Calendar */}
-            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+            <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="font-semibold text-zinc-900">
+                <h3 className="font-semibold text-white">
                   {new Date().toLocaleString('default', { month: 'long' })}
                 </h3>
-                <Calendar className="w-4 h-4 text-zinc-400" />
+                <Calendar className="w-4 h-4 text-dark-400" />
               </div>
               <div className="grid grid-cols-7 gap-1.5 text-center text-xs">
                 {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                  <div key={i} className="text-zinc-400 font-medium py-1">{day}</div>
+                  <div key={i} className="text-dark-500 font-medium py-1">{day}</div>
                 ))}
                 {Array.from({ length: 35 }, (_, i) => {
                   const day = i - new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() + 1;
@@ -504,9 +509,9 @@ const StudentDashboard = () => {
                   return (
                     <div
                       key={i}
-                      className={`aspect-square flex items-center justify-center rounded-md text-xs transition-all ${isToday ? 'bg-zinc-900 text-white font-medium' :
-                        hasExam ? 'bg-violet-50 text-violet-700 font-medium' :
-                          isValid ? 'text-zinc-600 hover:bg-zinc-50' : 'text-zinc-300'
+                      className={`aspect-square flex items-center justify-center rounded-md text-xs transition-all ${isToday ? 'bg-primary-600 text-white font-bold shadow-lg shadow-primary-500/20' :
+                        hasExam ? 'bg-primary-500/20 text-primary-400 font-medium border border-primary-500/30' :
+                          isValid ? 'text-dark-300 hover:bg-dark-700 hover:text-white' : 'text-dark-600'
                         }`}
                     >
                       {isValid ? day : ''}
@@ -514,13 +519,13 @@ const StudentDashboard = () => {
                   );
                 })}
               </div>
-              <div className="flex items-center gap-4 mt-4 text-[10px] text-zinc-500">
+              <div className="flex items-center gap-4 mt-4 text-[10px] text-dark-400">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 bg-zinc-900 rounded" />
+                  <div className="w-2.5 h-2.5 bg-primary-600 rounded" />
                   Today
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2.5 h-2.5 bg-violet-50 border border-violet-200 rounded" />
+                  <div className="w-2.5 h-2.5 bg-primary-500/20 border border-primary-500/30 rounded" />
                   Exam Day
                 </div>
               </div>
@@ -531,43 +536,43 @@ const StudentDashboard = () => {
         {/* Bottom Section - Exams & Study Support */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Upcoming Exams */}
-          <div className="lg:col-span-2 section-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
-            <div className="p-5 border-b border-zinc-100">
+          <div className="lg:col-span-2 section-card bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
+            <div className="p-5 border-b border-dark-700">
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-zinc-900">Upcoming Exams</h3>
-                <span className="text-xs text-zinc-500">{exams.length} scheduled</span>
+                <h3 className="font-semibold text-white">Upcoming Exams</h3>
+                <span className="text-xs text-dark-400">{exams.length} scheduled</span>
               </div>
             </div>
-            <div className="divide-y divide-zinc-50">
+            <div className="divide-y divide-dark-700">
               {exams.length === 0 ? (
                 <div className="p-8 text-center">
-                  <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                    <ClipboardList className="w-5 h-5 text-zinc-400" />
+                  <div className="w-12 h-12 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <ClipboardList className="w-5 h-5 text-dark-400" />
                   </div>
-                  <p className="text-sm text-zinc-500">No exams scheduled</p>
+                  <p className="text-sm text-dark-500">No exams scheduled</p>
                 </div>
               ) : (
                 exams.slice(0, 5).map((exam) => {
                   const seat = getSeatForExam(exam._id);
                   return (
-                    <div key={exam._id} className="p-4 hover:bg-zinc-50 transition-colors">
+                    <div key={exam._id} className="p-4 hover:bg-dark-700/50 transition-colors">
                       <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                        <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-lg flex items-center justify-center">
                           <BookOpen className="w-5 h-5 text-blue-500" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-sm font-medium text-zinc-900">{exam.courseName}</p>
+                          <p className="text-sm font-medium text-white">{exam.courseName}</p>
                           <div className="flex items-center gap-3 mt-1">
-                            <span className="text-xs text-zinc-500 flex items-center gap-1">
+                            <span className="text-xs text-dark-400 flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
                               {new Date(exam.date).toLocaleDateString()}
                             </span>
-                            <span className="text-xs text-zinc-500 flex items-center gap-1">
+                            <span className="text-xs text-dark-400 flex items-center gap-1">
                               <Clock className="w-3 h-3" />
                               {exam.startTime}
                             </span>
                             {seat && (
-                              <span className="text-xs text-violet-600 flex items-center gap-1">
+                              <span className="text-xs text-primary-400 flex items-center gap-1">
                                 <MapPin className="w-3 h-3" />
                                 Room {seat.roomNumber}, Seat {seat.seatNumber}
                               </span>
@@ -576,12 +581,12 @@ const StudentDashboard = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           {exam.hallTicketsGenerated ? (
-                            <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Ready</span>
+                            <span className="text-[10px] font-medium text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-1 rounded">Ready</span>
                           ) : (
-                            <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2 py-1 rounded">Pending</span>
+                            <span className="text-[10px] font-medium text-dark-400 bg-dark-700 border border-dark-600 px-2 py-1 rounded">Pending</span>
                           )}
                           {exam.hallTicketsGenerated && (
-                            <button className="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
+                            <button className="p-2 text-primary-400 hover:bg-primary-500/10 rounded-lg transition-colors">
                               <Download className="w-4 h-4" />
                             </button>
                           )}
@@ -595,30 +600,30 @@ const StudentDashboard = () => {
           </div>
 
           {/* Notice Board / Study Support */}
-          <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+          <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-6">
             <div className="flex items-center justify-between mb-5">
-              <h3 className="font-semibold text-zinc-900">Study Support</h3>
+              <h3 className="font-semibold text-white">Study Support</h3>
             </div>
             <div className="relative mb-4">
               <select
-                className="w-full px-4 py-2.5 pl-10 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                className="w-full px-4 py-2.5 pl-10 bg-dark-900 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500"
                 onChange={(e) => setSelectedSubject(subjects.find(s => s._id === e.target.value))}
               >
                 {subjects.map(sub => (
                   <option key={sub._id} value={sub._id}>{sub.name}</option>
                 ))}
               </select>
-              <BookOpen className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+              <BookOpen className="w-4 h-4 text-dark-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
             <button
               onClick={() => setShowMindMap(!showMindMap)}
-              className="w-full py-3 border-2 border-dashed border-zinc-200 rounded-lg text-sm text-zinc-500 font-medium hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all flex items-center justify-center gap-2"
+              className="w-full py-3 border border-dashed border-dark-600 rounded-lg text-sm text-dark-400 font-medium hover:border-primary-500/50 hover:text-primary-400 hover:bg-primary-500/10 transition-all flex items-center justify-center gap-2"
             >
               <Brain className="w-4 h-4" />
               {showMindMap ? 'Hide Mind Map' : 'View Mind Map'}
             </button>
             {showMindMap && selectedSubject && (
-              <div className="mt-4 h-[300px] bg-zinc-50 rounded-lg overflow-hidden border border-zinc-100">
+              <div className="mt-4 h-[300px] bg-dark-900 rounded-lg overflow-hidden border border-dark-700">
                 <SyllabusMindMap subject={selectedSubject} />
               </div>
             )}

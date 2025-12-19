@@ -109,31 +109,31 @@ const Sidebar = ({ isOpen, onClose }) => {
 
   return (
     <aside className={`
-      fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 shadow-lg z-50 flex flex-col
+      fixed left-0 top-0 h-screen w-64 bg-dark-900 border-r border-dark-700/50 shadow-xl z-50 flex flex-col
       transform transition-transform duration-300 ease-in-out
       ${isOpen ? 'translate-x-0' : '-translate-x-full'}
       lg:translate-x-0
     `}>
       {/* Logo */}
-      <div className="p-6 flex items-center justify-between border-b border-gray-100">
+      <div className="p-6 flex items-center justify-between border-b border-dark-700/50">
         <div className="flex items-center gap-3">
           <img
             src="/mlrit-logo.png"
             alt="MLRIT Logo"
-            className="h-10 w-auto object-contain"
+            className="h-10 w-auto object-contain brightness-0 invert"
           />
         </div>
         {/* Close button - Only on mobile */}
         <button
           onClick={onClose}
-          className="lg:hidden p-2 rounded-xl hover:bg-gray-100 transition-colors"
+          className="lg:hidden p-2 rounded-xl hover:bg-dark-800 transition-colors"
         >
-          <X className="w-5 h-5 text-gray-500" />
+          <X className="w-5 h-5 text-dark-400" />
         </button>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto py-4 custom-scrollbar">
         {navItems.map((item) => (
           <NavLink
             key={item.to}
@@ -142,17 +142,17 @@ const Sidebar = ({ isOpen, onClose }) => {
             onClick={handleNavClick}
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group ${isActive
-                ? 'bg-primary-600 text-white font-semibold shadow-lg shadow-primary-200'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                ? 'bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold shadow-lg shadow-primary-500/20 ring-1 ring-white/10'
+                : 'text-dark-300 hover:bg-dark-800 hover:text-white'
               }`
             }
           >
             {({ isActive }) => (
               <>
-                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-gray-400 group-hover:text-primary-600'}`} />
+                <item.icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'text-dark-500 group-hover:text-primary-400'}`} />
                 <span>{item.label}</span>
                 {isActive && (
-                  <div className="ml-auto w-2 h-2 rounded-full bg-white shadow-sm" />
+                  <div className="ml-auto w-2 h-2 rounded-full bg-white shadow-sm ring-2 ring-primary-500" />
                 )}
               </>
             )}
@@ -161,12 +161,12 @@ const Sidebar = ({ isOpen, onClose }) => {
       </nav>
 
       {/* User Section */}
-      <div className="p-4 border-t border-gray-100 bg-gray-50">
+      <div className="p-4 border-t border-dark-700/50 bg-dark-900/50">
         <button
           onClick={handleLogout}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-white hover:bg-primary-50 hover:text-primary-600 rounded-xl text-gray-600 shadow-sm border border-gray-200 transition-all duration-200 group"
+          className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-dark-800 hover:bg-dark-700 hover:text-white rounded-xl text-dark-400 shadow-sm border border-dark-700 transition-all duration-200 group"
         >
-          <LogOut size={18} className="group-hover:scale-110 transition-transform" />
+          <LogOut size={18} className="group-hover:scale-110 text-primary-500 transition-transform" />
           <span className="font-medium text-sm">Sign Out</span>
         </button>
       </div>

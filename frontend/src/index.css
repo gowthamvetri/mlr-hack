@@ -4,27 +4,31 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
 
 @theme {
-  --color-primary: #D50000;
-  --color-primary-50: #fff0f0;
-  --color-primary-100: #ffcdcd;
-  --color-primary-200: #ff9b9b;
-  --color-primary-300: #ff6969;
-  --color-primary-400: #ff3737;
-  --color-primary-500: #ff0505;
-  --color-primary-600: #D50000;
-  --color-primary-700: #a30000;
-  --color-primary-800: #710000;
-  --color-primary-900: #3f0000;
+  /* Primary Magenta */
+  --color-primary: #C03A7A;
+  --color-primary-50: #fdf2f8;
+  --color-primary-100: #fce7f3;
+  --color-primary-200: #fbcfe8;
+  --color-primary-300: #f9a8d4;
+  --color-primary-400: #f472b6;
+  --color-primary-500: #ec4899;
+  --color-primary-600: #C03A7A;
+  --color-primary-700: #be185d;
+  --color-primary-800: #9d174d;
+  --color-primary-900: #831843;
 
-  /* Accent Orange */
-  --color-accent: #F97316;
-  --color-accent-50: #FFF7ED;
-  --color-accent-100: #FFEDD5;
-  --color-accent-200: #FED7AA;
-  --color-accent-300: #FDBA74;
-  --color-accent-400: #FB923C;
-  --color-accent-500: #F97316;
-  --color-accent-600: #EA580C;
+  /* Accent Deep Purple */
+  --color-accent: #5B2D8B;
+  --color-accent-50: #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-200: #ddd6fe;
+  --color-accent-300: #c4b5fd;
+  --color-accent-400: #a78bfa;
+  --color-accent-500: #8b5cf6;
+  --color-accent-600: #7c3aed;
+  --color-accent-700: #6d28d9;
+  --color-accent-800: #5B2D8B;
+  --color-accent-900: #4c1d95;
 
   /* Success Green */
   --color-success: #22C55E;
@@ -36,17 +40,17 @@
   --color-success-700: #15803D;
 
   /* Dark Scale */
-  --color-dark: #111827;
-  --color-dark-50: #F9FAFB;
-  --color-dark-100: #F3F4F6;
-  --color-dark-200: #E5E7EB;
-  --color-dark-300: #D1D5DB;
-  --color-dark-400: #9CA3AF;
-  --color-dark-500: #6B7280;
-  --color-dark-600: #4B5563;
-  --color-dark-700: #374151;
-  --color-dark-800: #1F2937;
-  --color-dark-900: #111827;
+  --color-dark: #0E0E12;
+  --color-dark-50: #F4F4F6;
+  --color-dark-100: #e5e5e7;
+  --color-dark-200: #d1d1d6;
+  --color-dark-300: #9ca3af;
+  --color-dark-400: #6b7280;
+  --color-dark-500: #4b5563;
+  --color-dark-600: #374151;
+  --color-dark-700: #282834;
+  --color-dark-800: #1c1c24;
+  --color-dark-900: #0E0E12;
 }
 
 /* Base styles */
@@ -54,6 +58,8 @@ body {
   font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--color-dark-900);
+  color: var(--color-dark-50);
 }
 
 /* ===== ANIMATIONS ===== */
@@ -199,16 +205,16 @@ body {
 /* ===== GLASSMORPHISM CARDS ===== */
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.45);
+  background: rgba(17, 24, 39, 0.7);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .glass-card:hover {
-  background: rgba(255, 255, 255, 0.6);
-  border-color: rgba(255, 255, 255, 0.8);
+  background: rgba(17, 24, 39, 0.85);
+  border-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-4px);
 }
 
@@ -217,7 +223,7 @@ body {
   background: rgba(17, 24, 39, 0.6);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -267,11 +273,11 @@ body {
 
 .mesh-gradient-bg {
   background:
-    radial-gradient(at 40% 20%, rgba(213, 0, 0, 0.08) 0%, transparent 60%),
-    radial-gradient(at 80% 0%, rgba(249, 115, 22, 0.06) 0%, transparent 60%),
-    radial-gradient(at 0% 50%, rgba(99, 102, 241, 0.06) 0%, transparent 60%),
-    radial-gradient(at 80% 80%, rgba(34, 197, 94, 0.06) 0%, transparent 60%),
-    linear-gradient(180deg, #fafafa 0%, #f5f5f5 100%);
+    radial-gradient(at 40% 20%, rgba(192, 58, 122, 0.15) 0%, transparent 60%),
+    radial-gradient(at 80% 0%, rgba(91, 45, 139, 0.15) 0%, transparent 60%),
+    radial-gradient(at 0% 50%, rgba(34, 197, 94, 0.1) 0%, transparent 60%),
+    radial-gradient(at 80% 80%, rgba(192, 58, 122, 0.1) 0%, transparent 60%),
+    linear-gradient(180deg, #0E0E12 0%, #1c1c24 100%);
 }
 
 /* ===== GRADIENT TEXT ===== */

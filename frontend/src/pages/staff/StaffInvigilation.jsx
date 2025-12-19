@@ -39,7 +39,7 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
     return (
         <div className="relative" style={{ width: size, height: size }}>
             <svg width={size} height={size} className="transform -rotate-90">
-                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-zinc-100" />
+                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-dark-700" />
                 <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={thickness}
                     strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
                     className="transition-all duration-1000 ease-out" />
@@ -116,21 +116,21 @@ const StaffInvigilation = () => {
         <DashboardLayout role="staff" userName={user?.name}>
             <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">
                 {/* Hero Section */}
-                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 lg:p-8">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-violet-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900/50 via-dark-900 to-accent-900/50 p-6 lg:p-8 border border-dark-700/50">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-3">
                                 {todaysAssignment && (
-                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full text-[11px] font-medium animate-pulse">
+                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/20 text-amber-300 rounded-full text-[11px] font-medium border border-amber-500/30 animate-pulse">
                                         <AlertCircle className="w-3 h-3" />
                                         Duty Today
                                     </span>
                                 )}
                                 {upcomingCount > 0 && !todaysAssignment && (
-                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-blue-500/20 text-blue-300 rounded-full text-[11px] font-medium">
+                                    <span className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-500/20 text-primary-300 rounded-full text-[11px] font-medium border border-primary-500/30">
                                         <Calendar className="w-3 h-3" />
                                         {upcomingCount} upcoming
                                     </span>
@@ -139,14 +139,14 @@ const StaffInvigilation = () => {
                             <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
                                 Invigilation Duties
                             </h1>
-                            <p className="text-white/50 text-sm">
+                            <p className="text-dark-300 text-sm">
                                 View your assigned exam schedule • {assignments.length} total assignments
                             </p>
                         </div>
 
                         <div className="flex items-center gap-2.5">
                             <button onClick={handleRefresh} disabled={refreshing}
-                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white/80 bg-white/10 hover:bg-white/15 rounded-lg transition-all disabled:opacity-50">
+                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800/50 border border-dark-700/50 hover:bg-dark-800 hover:text-white rounded-lg transition-all disabled:opacity-50">
                                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                 <span className="hidden sm:inline">Refresh</span>
                             </button>
@@ -156,132 +156,132 @@ const StaffInvigilation = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <ClipboardCheck className="w-4.5 h-4.5 text-blue-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                                <ClipboardCheck className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.5} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-blue-600">
+                            <div className="flex items-center gap-1 text-xs font-medium text-primary-400">
                                 <ArrowUpRight className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Duties</p>
-                        <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={assignments.length} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">All time assignments</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Duties</p>
+                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={assignments.length} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">All time assignments</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-emerald-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                <Calendar className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <Calendar className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
                             </div>
                             <RadialProgress value={assignments.length > 0 ? Math.round((upcomingCount / assignments.length) * 100) : 0} color="#10b981" />
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Upcoming</p>
-                        <p className="text-2xl font-semibold text-emerald-600"><AnimatedNumber value={upcomingCount} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Scheduled duties</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Upcoming</p>
+                        <p className="text-2xl font-semibold text-emerald-400"><AnimatedNumber value={upcomingCount} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Scheduled duties</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center">
-                                <CheckCircle className="w-4.5 h-4.5 text-zinc-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-dark-700 border border-dark-600 flex items-center justify-center">
+                                <CheckCircle className="w-4.5 h-4.5 text-dark-400" strokeWidth={1.5} />
                             </div>
-                            <RadialProgress value={completionRate} color="#71717a" />
+                            <RadialProgress value={completionRate} color="#52525b" />
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Completed</p>
-                        <p className="text-2xl font-semibold text-zinc-600"><AnimatedNumber value={pastCount} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Past duties</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Completed</p>
+                        <p className="text-2xl font-semibold text-dark-300"><AnimatedNumber value={pastCount} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Past duties</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-violet-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                                <Clock className="w-4.5 h-4.5 text-violet-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-accent-500/10 border border-accent-500/20 flex items-center justify-center">
+                                <Clock className="w-4.5 h-4.5 text-accent-400" strokeWidth={1.5} />
                             </div>
                             {thisWeekCount > 0 && (
-                                <span className="px-2 py-0.5 bg-violet-100 text-violet-700 rounded text-[10px] font-bold">This Week</span>
+                                <span className="px-2 py-0.5 bg-accent-500/20 text-accent-300 rounded text-[10px] font-bold border border-accent-500/20">This Week</span>
                             )}
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">This Week</p>
-                        <p className="text-2xl font-semibold text-violet-600"><AnimatedNumber value={thisWeekCount} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Next 7 days</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">This Week</p>
+                        <p className="text-2xl font-semibold text-accent-400"><AnimatedNumber value={thisWeekCount} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Next 7 days</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Filter Tabs */}
-                <div className="filter-bar flex gap-2 bg-zinc-100 p-1 rounded-xl w-fit">
+                <div className="filter-bar flex gap-2 bg-dark-800 border border-dark-700 p-1 rounded-xl w-fit">
                     {[{ key: 'upcoming', label: 'Upcoming' }, { key: 'past', label: 'Completed' }, { key: 'all', label: 'All' }].map(tab => (
                         <button key={tab.key} onClick={() => setFilter(tab.key)}
-                            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${filter === tab.key ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-600 hover:text-zinc-900'}`}>
+                            className={`px-5 py-2 rounded-lg text-sm font-semibold transition-all ${filter === tab.key ? 'bg-dark-700 text-white shadow-lg shadow-black/20' : 'text-dark-400 hover:text-white'}`}>
                             {tab.label}
                         </button>
                     ))}
                 </div>
 
                 {/* Assignments List */}
-                <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+                <div className="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden">
                     {loading ? (
                         <div className="flex items-center justify-center h-48">
-                            <div className="w-10 h-10 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
+                            <div className="w-10 h-10 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin" />
                         </div>
                     ) : filteredAssignments.length > 0 ? (
-                        <div className="divide-y divide-zinc-50">
+                        <div className="divide-y divide-dark-700/50">
                             {filteredAssignments.map((assignment, idx) => {
                                 const assignmentDate = new Date(assignment.date);
                                 const isToday = assignmentDate.toDateString() === today.toDateString();
                                 const isPast = assignmentDate < today;
                                 return (
-                                    <div key={idx} className={`assignment-item p-5 hover:bg-zinc-50/50 transition-colors ${isToday ? 'bg-gradient-to-r from-amber-50/80 to-white border-l-4 border-l-amber-400' : ''}`}>
+                                    <div key={idx} className={`assignment-item p-5 hover:bg-dark-700/30 transition-colors ${isToday ? 'bg-gradient-to-r from-amber-500/10 to-transparent border-l-4 border-l-amber-500' : ''}`}>
                                         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-2 flex-wrap">
                                                     {isToday && (
-                                                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 rounded text-[10px] font-bold border border-amber-200 animate-pulse">
+                                                        <span className="px-2 py-0.5 bg-amber-500/20 text-amber-300 rounded text-[10px] font-bold border border-amber-500/30 animate-pulse">
                                                             TODAY
                                                         </span>
                                                     )}
                                                     {isPast && (
-                                                        <span className="px-2 py-0.5 bg-zinc-100 text-zinc-500 rounded text-[10px] font-bold border border-zinc-200">
+                                                        <span className="px-2 py-0.5 bg-dark-700 text-dark-400 rounded text-[10px] font-bold border border-dark-600">
                                                             COMPLETED
                                                         </span>
                                                     )}
-                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${assignment.session === 'FN' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-violet-50 text-violet-700 border-violet-100'}`}>
+                                                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase border ${assignment.session === 'FN' ? 'bg-primary-500/10 text-primary-400 border-primary-500/20' : 'bg-accent-500/10 text-accent-400 border-accent-500/20'}`}>
                                                         {assignment.session === 'FN' ? 'Morning' : 'Afternoon'}
                                                     </span>
                                                 </div>
-                                                <h3 className="text-sm font-semibold text-zinc-900">{assignment.exam?.courseName || 'Exam'}</h3>
-                                                <p className="text-xs text-zinc-500">{assignment.exam?.courseCode || 'N/A'}</p>
+                                                <h3 className="text-sm font-semibold text-white">{assignment.exam?.courseName || 'Exam'}</h3>
+                                                <p className="text-xs text-dark-400">{assignment.exam?.courseCode || 'N/A'}</p>
                                             </div>
                                             <div className="flex items-center gap-4 flex-wrap">
                                                 <div className="text-right min-w-[100px]">
-                                                    <div className="flex items-center gap-1.5 text-zinc-600 text-xs justify-end">
+                                                    <div className="flex items-center gap-1.5 text-dark-300 text-xs justify-end">
                                                         <CalendarDays className="w-3.5 h-3.5" />
                                                         <span className="font-medium">{assignmentDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
                                                     </div>
-                                                    <div className="flex items-center gap-1.5 text-zinc-500 text-xs mt-1 justify-end">
+                                                    <div className="flex items-center gap-1.5 text-dark-400 text-xs mt-1 justify-end">
                                                         <Clock className="w-3.5 h-3.5" />
                                                         <span>{assignment.exam?.startTime || '9:00'} - {assignment.exam?.endTime || '12:00'}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-center px-4 py-2.5 bg-gradient-to-br from-violet-50 to-violet-100/50 rounded-xl border border-violet-100">
-                                                    <div className="flex items-center gap-1.5 text-violet-700 font-bold text-xs">
+                                                <div className="text-center px-4 py-2.5 bg-dark-900/50 rounded-xl border border-dark-700">
+                                                    <div className="flex items-center gap-1.5 text-primary-400 font-bold text-xs">
                                                         <Building className="w-4 h-4" />
                                                         <span>Room {assignment.room?.roomNumber || 'TBD'}</span>
                                                     </div>
-                                                    <div className="text-[10px] text-zinc-500 mt-0.5 flex items-center gap-1">
+                                                    <div className="text-[10px] text-dark-500 mt-0.5 flex items-center gap-1">
                                                         <MapPin className="w-3 h-3" />{assignment.room?.building || 'Main Block'}
                                                     </div>
                                                 </div>
-                                                <span className={`px-3 py-1.5 rounded-lg text-[10px] font-bold ${assignment.status === 'Completed' ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : assignment.status === 'Confirmed' ? 'bg-blue-50 text-blue-700 border border-blue-100' : 'bg-amber-50 text-amber-700 border border-amber-100'}`}>
+                                                <span className={`px-3 py-1.5 rounded-lg text-[10px] font-bold ${assignment.status === 'Completed' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : assignment.status === 'Confirmed' ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20' : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'}`}>
                                                     {assignment.status}
                                                 </span>
                                             </div>
@@ -292,11 +292,11 @@ const StaffInvigilation = () => {
                         </div>
                     ) : (
                         <div className="text-center py-16">
-                            <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <Calendar className="w-7 h-7 text-zinc-400" />
+                            <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Calendar className="w-7 h-7 text-dark-400" />
                             </div>
-                            <h3 className="font-medium text-zinc-900 text-sm mb-1">No Invigilation Duties</h3>
-                            <p className="text-xs text-zinc-500">{filter === 'upcoming' ? 'No upcoming duties assigned' : filter === 'past' ? 'No completed duties' : 'No duties found'}</p>
+                            <h3 className="font-medium text-white text-sm mb-1">No Invigilation Duties</h3>
+                            <p className="text-xs text-dark-400">{filter === 'upcoming' ? 'No upcoming duties assigned' : filter === 'past' ? 'No completed duties' : 'No duties found'}</p>
                         </div>
                     )}
                 </div>
@@ -304,8 +304,8 @@ const StaffInvigilation = () => {
                 {/* Results Count */}
                 {filteredAssignments.length > 0 && (
                     <div className="text-center">
-                        <p className="text-xs text-zinc-500">
-                            Showing <span className="font-medium text-zinc-700">{filteredAssignments.length}</span> of <span className="font-medium text-zinc-700">{assignments.length}</span> assignments
+                        <p className="text-xs text-dark-500">
+                            Showing <span className="font-medium text-dark-200">{filteredAssignments.length}</span> of <span className="font-medium text-dark-200">{assignments.length}</span> assignments
                         </p>
                     </div>
                 )}

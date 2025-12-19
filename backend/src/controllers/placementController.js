@@ -11,11 +11,11 @@ const getPlacements = async (req, res) => {
     const filter = {};
 
     if (status) filter.status = status;
-    if (department) filter.departmentName = department;
+    if (department) filter.departmentNames = department;
     if (type) filter.type = type;
 
     const placements = await Placement.find(filter)
-      .populate('department', 'name code')
+      .populate('departments', 'name code')
       .populate('selectedStudents', 'name email rollNumber')
       .sort({ driveDate: -1 });
     res.json(placements);
@@ -28,7 +28,7 @@ const getPlacements = async (req, res) => {
 const getPlacementById = async (req, res) => {
   try {
     const placement = await Placement.findById(req.params.id)
-      .populate('department', 'name code')
+      .populate('departments', 'name code')
       .populate('selectedStudents', 'name email rollNumber department year')
       .populate('applicants', 'name email rollNumber');
     if (!placement) {
@@ -46,25 +46,30 @@ const createPlacement = async (req, res) => {
     const placementData = { ...req.body };
 
     // Handle department - accept both ObjectId and department code
-    if (placementData.department) {
-      if (!mongoose.Types.ObjectId.isValid(placementData.department)) {
-        // If not a valid ObjectId, assume it's a department code and lookup
-        const department = await Department.findOne({ code: placementData.department });
-        if (department) {
-          placementData.department = department._id;
-          placementData.departmentName = department.name;
+    // Handle departments
+    if (placementData.departments && Array.isArray(placementData.departments)) {
+      const deptIds = [];
+      const deptNames = [];
+
+      for (const deptInput of placementData.departments) {
+        if (mongoose.Types.ObjectId.isValid(deptInput)) {
+          const dept = await Department.findById(deptInput);
+          if (dept) {
+            deptIds.push(dept._id);
+            deptNames.push(dept.name);
+          }
         } else {
-          // Store as departmentName if department not found
-          placementData.departmentName = placementData.department;
-          delete placementData.department;
-        }
-      } else {
-        // If valid ObjectId, populate departmentName
-        const department = await Department.findById(placementData.department);
-        if (department) {
-          placementData.departmentName = department.name;
+          const dept = await Department.findOne({ code: deptInput });
+          if (dept) {
+            deptIds.push(dept._id);
+            deptNames.push(dept.name);
+          } else {
+            deptNames.push(deptInput);
+          }
         }
       }
+      placementData.departments = deptIds;
+      placementData.departmentNames = deptNames;
     }
 
     const placement = await Placement.create(placementData);
@@ -78,7 +83,7 @@ const createPlacement = async (req, res) => {
     });
 
     const populatedPlacement = await Placement.findById(placement._id)
-      .populate('department', 'name code')
+      .populate('departments', 'name code')
       .populate('selectedStudents', 'name email');
 
     // Notify relevant users
@@ -108,32 +113,37 @@ const updatePlacement = async (req, res) => {
     const updateData = { ...req.body };
 
     // Handle department update - accept both ObjectId and department code
-    if (updateData.department) {
-      if (!mongoose.Types.ObjectId.isValid(updateData.department)) {
-        // If not a valid ObjectId, assume it's a department code and lookup
-        const department = await Department.findOne({ code: updateData.department });
-        if (department) {
-          updateData.department = department._id;
-          updateData.departmentName = department.name;
+    // Handle departments update
+    if (updateData.departments && Array.isArray(updateData.departments)) {
+      const deptIds = [];
+      const deptNames = [];
+
+      for (const deptInput of updateData.departments) {
+        if (mongoose.Types.ObjectId.isValid(deptInput)) {
+          const dept = await Department.findById(deptInput);
+          if (dept) {
+            deptIds.push(dept._id);
+            deptNames.push(dept.name);
+          }
         } else {
-          // Store as departmentName if department not found
-          updateData.departmentName = updateData.department;
-          delete updateData.department;
-        }
-      } else {
-        // If valid ObjectId, populate departmentName
-        const department = await Department.findById(updateData.department);
-        if (department) {
-          updateData.departmentName = department.name;
+          const dept = await Department.findOne({ code: deptInput });
+          if (dept) {
+            deptIds.push(dept._id);
+            deptNames.push(dept.name);
+          } else {
+            deptNames.push(deptInput);
+          }
         }
       }
+      updateData.departments = deptIds;
+      updateData.departmentNames = deptNames;
     }
 
     Object.assign(placement, updateData);
     const updatedPlacement = await placement.save();
 
     const populatedPlacement = await Placement.findById(updatedPlacement._id)
-      .populate('department', 'name code')
+      .populate('departments', 'name code')
       .populate('selectedStudents', 'name email');
 
     // Notify relevant users

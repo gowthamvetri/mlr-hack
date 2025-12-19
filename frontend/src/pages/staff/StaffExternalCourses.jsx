@@ -37,7 +37,7 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
     return (
         <div className="relative" style={{ width: size, height: size }}>
             <svg width={size} height={size} className="transform -rotate-90">
-                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-zinc-100" />
+                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-dark-700" />
                 <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={thickness}
                     strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
                     className="transition-all duration-1000 ease-out" />
@@ -48,6 +48,44 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
         </div>
     );
 };
+
+const providers = ['Coursera', 'NPTEL', 'Udemy', 'edX', 'LinkedIn Learning', 'Google', 'Microsoft', 'AWS', 'Other'];
+const categories = ['AI/ML', 'Web Development', 'Mobile Development', 'Data Science', 'Cloud Computing', 'Cybersecurity', 'Soft Skills', 'Programming', 'Database', 'Other'];
+
+const CourseForm = ({ formData, setFormData, onSubmit, onCancel, submitting, isEdit = false }) => (
+    <form onSubmit={onSubmit} className="space-y-5">
+        <div>
+            <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Title *</label>
+            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 placeholder-dark-500" placeholder="e.g., Python for Beginners" />
+        </div>
+        <div>
+            <label className="block text-xs font-medium text-dark-400 mb-1.5">Description</label>
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 resize-none placeholder-dark-500" placeholder="Brief description..." />
+        </div>
+        <div>
+            <label className="block text-xs font-medium text-dark-400 mb-1.5">Course URL *</label>
+            <input type="url" required value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 placeholder-dark-500" placeholder="https://..." />
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+            <div>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Provider</label>
+                <select value={formData.provider} onChange={(e) => setFormData({ ...formData, provider: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50">
+                    {providers.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+            </div>
+            <div>
+                <label className="block text-xs font-medium text-dark-400 mb-1.5">Category</label>
+                <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50">
+                    {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+            </div>
+        </div>
+        <div className="flex gap-3 pt-4 border-t border-dark-700">
+            <button type="button" onClick={onCancel} className="flex-1 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors">Cancel</button>
+            <button type="submit" disabled={submitting} className="flex-1 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 disabled:opacity-60 transition-colors shadow-lg shadow-primary-500/20">{submitting ? 'Saving...' : (isEdit ? 'Update' : 'Add Course')}</button>
+        </div>
+    </form>
+);
 
 const StaffExternalCourses = () => {
     const user = useSelector(selectCurrentUser);
@@ -63,9 +101,6 @@ const StaffExternalCourses = () => {
     const [selectedCourse, setSelectedCourse] = useState(null);
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({ title: '', description: '', provider: 'Other', url: '', category: 'Other' });
-
-    const providers = ['Coursera', 'NPTEL', 'Udemy', 'edX', 'LinkedIn Learning', 'Google', 'Microsoft', 'AWS', 'Other'];
-    const categories = ['AI/ML', 'Web Development', 'Mobile Development', 'Data Science', 'Cloud Computing', 'Cybersecurity', 'Soft Skills', 'Programming', 'Database', 'Other'];
 
     useEffect(() => { fetchCourses(); }, []);
 
@@ -139,57 +174,32 @@ const StaffExternalCourses = () => {
     const completionRate = courses.length > 0 ? Math.round((totalCompletions / (courses.length * 10)) * 100) : 0;
 
     const getProviderColor = (provider) => {
-        const colors = { 'Coursera': 'bg-blue-50 text-blue-700 border-blue-100', 'NPTEL': 'bg-orange-50 text-orange-700 border-orange-100', 'Udemy': 'bg-violet-50 text-violet-700 border-violet-100', 'edX': 'bg-red-50 text-red-700 border-red-100', 'Google': 'bg-emerald-50 text-emerald-700 border-emerald-100', 'Microsoft': 'bg-cyan-50 text-cyan-700 border-cyan-100', 'AWS': 'bg-amber-50 text-amber-700 border-amber-100' };
-        return colors[provider] || 'bg-zinc-50 text-zinc-700 border-zinc-100';
+        const colors = {
+            'Coursera': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+            'NPTEL': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
+            'Udemy': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
+            'edX': 'bg-red-500/10 text-red-400 border-red-500/20',
+            'Google': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+            'Microsoft': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
+            'AWS': 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+        };
+        return colors[provider] || 'bg-dark-700/50 text-dark-300 border-dark-600';
     };
 
-    const CourseForm = ({ onSubmit, isEdit = false }) => (
-        <form onSubmit={onSubmit} className="space-y-5">
-            <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course Title *</label>
-                <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" placeholder="e.g., Python for Beginners" />
-            </div>
-            <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Description</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 resize-none" placeholder="Brief description..." />
-            </div>
-            <div>
-                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Course URL *</label>
-                <input type="url" required value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" placeholder="https://..." />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-                <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Provider</label>
-                    <select value={formData.provider} onChange={(e) => setFormData({ ...formData, provider: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                        {providers.map(p => <option key={p} value={p}>{p}</option>)}
-                    </select>
-                </div>
-                <div>
-                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Category</label>
-                    <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
-                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                </div>
-            </div>
-            <div className="flex gap-3 pt-4 border-t border-zinc-100">
-                <button type="button" onClick={() => { setShowAddModal(false); setShowEditModal(false); resetForm(); }} className="flex-1 py-2.5 bg-white border border-zinc-200 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors">Cancel</button>
-                <button type="submit" disabled={submitting} className="flex-1 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-60 transition-colors">{submitting ? 'Saving...' : (isEdit ? 'Update' : 'Add Course')}</button>
-            </div>
-        </form>
-    );
+
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
             <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">
                 {/* Hero Section */}
-                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-6 lg:p-8">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900/50 via-dark-900 to-accent-900/50 p-6 lg:p-8 border border-dark-700/50">
+                    <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-3">
-                                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-violet-500/20 text-violet-300 rounded-full text-[11px] font-medium">
+                                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-500/20 text-primary-300 rounded-full text-[11px] font-medium border border-primary-500/30">
                                     <BookOpen className="w-3 h-3" />
                                     External Courses
                                 </span>
@@ -197,19 +207,19 @@ const StaffExternalCourses = () => {
                             <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
                                 Recommend Courses
                             </h1>
-                            <p className="text-white/50 text-sm">
+                            <p className="text-dark-300 text-sm">
                                 Share free certification links with your students • {allCourses.length} total courses in system
                             </p>
                         </div>
 
                         <div className="flex items-center gap-2.5">
                             <button onClick={handleRefresh} disabled={refreshing}
-                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white/80 bg-white/10 hover:bg-white/15 rounded-lg transition-all disabled:opacity-50">
+                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800/50 border border-dark-700/50 hover:bg-dark-800 hover:text-white rounded-lg transition-all disabled:opacity-50">
                                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                 <span className="hidden sm:inline">Refresh</span>
                             </button>
                             <button onClick={() => { resetForm(); setShowAddModal(true); }}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-zinc-900 bg-white hover:bg-zinc-100 rounded-lg transition-all shadow-lg">
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 rounded-lg transition-all shadow-lg shadow-primary-500/20">
                                 <Plus className="w-4 h-4" />
                                 Add Course
                             </button>
@@ -219,119 +229,119 @@ const StaffExternalCourses = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
-                                <BookOpen className="w-4.5 h-4.5 text-violet-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
+                                <BookOpen className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.5} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-violet-600">
+                            <div className="flex items-center gap-1 text-xs font-medium text-primary-400">
                                 <ArrowUpRight className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">My Courses</p>
-                        <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={courses.length} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Courses you've shared</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">My Courses</p>
+                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={courses.length} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Courses you've shared</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
-                                <Award className="w-4.5 h-4.5 text-emerald-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                                <Award className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
                             </div>
                             <RadialProgress value={Math.min(completionRate, 100)} color="#10b981" />
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Completions</p>
-                        <p className="text-2xl font-semibold text-emerald-600"><AnimatedNumber value={totalCompletions} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Students completed</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Completions</p>
+                        <p className="text-2xl font-semibold text-emerald-400"><AnimatedNumber value={totalCompletions} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Students completed</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
-                                <Globe className="w-4.5 h-4.5 text-blue-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
+                                <Globe className="w-4.5 h-4.5 text-blue-400" strokeWidth={1.5} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-blue-600">
+                            <div className="flex items-center gap-1 text-xs font-medium text-blue-400">
                                 <TrendingUp className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Providers</p>
-                        <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={providersUsed} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Different platforms</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Providers</p>
+                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={providersUsed} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Different platforms</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
+                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
-                                <Users className="w-4.5 h-4.5 text-amber-500" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
+                                <Users className="w-4.5 h-4.5 text-amber-400" strokeWidth={1.5} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-amber-600">
+                            <div className="flex items-center gap-1 text-xs font-medium text-amber-400">
                                 <CheckCircle className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Avg/Course</p>
-                        <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={courses.length > 0 ? Math.round(totalCompletions / courses.length) : 0} /></p>
-                        <div className="mt-4 pt-3 border-t border-zinc-50">
-                            <p className="text-[10px] text-zinc-400">Completions per course</p>
+                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg/Course</p>
+                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={courses.length > 0 ? Math.round(totalCompletions / courses.length) : 0} /></p>
+                        <div className="mt-4 pt-3 border-t border-dark-700/50">
+                            <p className="text-[10px] text-dark-400">Completions per course</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Search Bar */}
-                <div className="section-card bg-white rounded-xl border border-zinc-100 p-4">
+                <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-4">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
-                        <input type="text" placeholder="Search your courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 transition-all" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+                        <input type="text" placeholder="Search your courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all placeholder-dark-500" />
                     </div>
                 </div>
 
                 {/* Courses Grid */}
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
-                        <div className="w-10 h-10 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
+                        <div className="w-10 h-10 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin" />
                     </div>
                 ) : filteredCourses.length === 0 ? (
-                    <div className="bg-white rounded-xl border border-zinc-100 p-12 text-center">
-                        <div className="w-16 h-16 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookOpen className="w-7 h-7 text-zinc-400" />
+                    <div className="bg-dark-800 rounded-xl border border-dark-700 p-12 text-center">
+                        <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <BookOpen className="w-7 h-7 text-dark-400" />
                         </div>
-                        <p className="text-zinc-900 font-medium">No Courses Yet</p>
-                        <p className="text-zinc-500 text-sm mt-1 mb-4">Start by adding a free certification course for your students.</p>
-                        <button onClick={() => { resetForm(); setShowAddModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors">
+                        <p className="text-white font-medium">No Courses Yet</p>
+                        <p className="text-dark-400 text-sm mt-1 mb-4">Start by adding a free certification course for your students.</p>
+                        <button onClick={() => { resetForm(); setShowAddModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20">
                             <Plus className="w-4 h-4" />Add Course
                         </button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {filteredCourses.map((course) => (
-                            <div key={course._id} className="course-card bg-white rounded-xl border border-zinc-100 overflow-hidden hover:border-zinc-200 hover:shadow-md transition-all duration-300 flex flex-col group">
-                                <div className="h-1.5 bg-gradient-to-r from-violet-500 to-violet-600 group-hover:from-violet-600 group-hover:to-violet-700 transition-all"></div>
+                            <div key={course._id} className="course-card bg-dark-800 rounded-xl border border-dark-700 overflow-hidden hover:border-dark-500 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 flex flex-col group">
+                                <div className="h-1.5 bg-gradient-to-r from-primary-600 to-accent-600 group-hover:from-primary-500 group-hover:to-accent-500 transition-all"></div>
                                 <div className="p-5 flex-1">
                                     <div className="flex items-start justify-between mb-3">
                                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border ${getProviderColor(course.provider)}`}>{course.provider}</span>
-                                        <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
+                                        <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
                                             <CheckCircle className="w-3.5 h-3.5" />
                                             <span className="text-xs font-bold">{course.completedBy?.length || 0}</span>
                                         </div>
                                     </div>
-                                    <h3 className="font-semibold text-sm text-zinc-900 mb-2 line-clamp-1 group-hover:text-violet-600 transition-colors">{course.title}</h3>
-                                    <p className="text-xs text-zinc-500 mb-3 line-clamp-2">{course.description || 'No description provided'}</p>
-                                    <span className="inline-block px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded text-[10px] font-medium">{course.category}</span>
+                                    <h3 className="font-semibold text-sm text-white mb-2 line-clamp-1 group-hover:text-primary-400 transition-colors">{course.title}</h3>
+                                    <p className="text-xs text-dark-400 mb-3 line-clamp-2">{course.description || 'No description provided'}</p>
+                                    <span className="inline-block px-2 py-0.5 bg-dark-700 text-dark-300 rounded text-[10px] font-medium border border-dark-600">{course.category}</span>
                                 </div>
-                                <div className="p-4 border-t border-zinc-100 bg-zinc-50/50 flex items-center gap-2">
-                                    <a href={course.url} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 bg-zinc-900 hover:bg-black text-white rounded-lg text-xs font-medium transition-colors">
+                                <div className="p-4 border-t border-dark-700/50 bg-dark-900/30 flex items-center gap-2">
+                                    <a href={course.url} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 bg-dark-700 hover:bg-primary-600 text-white rounded-lg text-xs font-medium transition-all group-hover:shadow-lg shadow-black/20">
                                         <LinkIcon className="w-3.5 h-3.5" /> Open Course
                                     </a>
-                                    <button onClick={() => openEditModal(course)} className="p-2 hover:bg-zinc-200 rounded-lg transition-colors border border-zinc-200 bg-white">
-                                        <Edit2 className="w-4 h-4 text-zinc-500" />
+                                    <button onClick={() => openEditModal(course)} className="p-2 hover:bg-dark-700 hover:text-white rounded-lg transition-colors border border-dark-700 bg-dark-800 text-dark-400">
+                                        <Edit2 className="w-4 h-4" />
                                     </button>
-                                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-2 hover:bg-red-100 rounded-lg transition-colors border border-zinc-200 bg-white">
-                                        <Trash2 className="w-4 h-4 text-red-500" />
+                                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-2 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors border border-dark-700 bg-dark-800 text-dark-400">
+                                        <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
                             </div>
@@ -342,22 +352,39 @@ const StaffExternalCourses = () => {
                 {/* Results Count */}
                 {filteredCourses.length > 0 && (
                     <div className="text-center">
-                        <p className="text-xs text-zinc-500">
-                            Showing <span className="font-medium text-zinc-700">{filteredCourses.length}</span> of <span className="font-medium text-zinc-700">{courses.length}</span> courses
+                        <p className="text-xs text-dark-500">
+                            Showing <span className="font-medium text-dark-200">{filteredCourses.length}</span> of <span className="font-medium text-dark-200">{courses.length}</span> courses
                         </p>
                     </div>
                 )}
             </div>
 
             {/* Modals */}
-            <Modal isOpen={showAddModal} onClose={() => { setShowAddModal(false); resetForm(); }} title="Add External Course" size="lg"><CourseForm onSubmit={handleAddCourse} /></Modal>
-            <Modal isOpen={showEditModal} onClose={() => { setShowEditModal(false); resetForm(); }} title="Edit Course" size="lg"><CourseForm onSubmit={handleUpdateCourse} isEdit={true} /></Modal>
+            <Modal isOpen={showAddModal} onClose={() => { setShowAddModal(false); resetForm(); }} title="Add External Course" size="lg">
+                <CourseForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    onSubmit={handleAddCourse}
+                    onCancel={() => { setShowAddModal(false); resetForm(); }}
+                    submitting={submitting}
+                />
+            </Modal>
+            <Modal isOpen={showEditModal} onClose={() => { setShowEditModal(false); resetForm(); }} title="Edit Course" size="lg">
+                <CourseForm
+                    formData={formData}
+                    setFormData={setFormData}
+                    onSubmit={handleUpdateCourse}
+                    onCancel={() => { setShowEditModal(false); resetForm(); }}
+                    submitting={submitting}
+                    isEdit={true}
+                />
+            </Modal>
             <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Course" size="sm">
                 <div className="text-center py-4">
-                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-6 h-6 text-red-500" /></div>
-                    <p className="text-zinc-600 text-sm mb-6">Delete "{selectedCourse?.title}"?</p>
+                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-6 h-6 text-red-500" /></div>
+                    <p className="text-dark-200 text-sm mb-6">Delete "{selectedCourse?.title}"?</p>
                     <div className="flex gap-3">
-                        <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2.5 bg-white border border-zinc-200 text-zinc-700 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors">Cancel</button>
+                        <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors">Cancel</button>
                         <button onClick={handleDeleteCourse} disabled={submitting} className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-60 transition-colors">{submitting ? 'Deleting...' : 'Delete'}</button>
                     </div>
                 </div>

@@ -7,35 +7,35 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary Red - Main brand color
+        // Primary Magenta - Main brand color (#C03A7A)
         primary: {
-          DEFAULT: '#DC2626',
-          50: '#FEF2F2',
-          100: '#FEE2E2',
-          200: '#FECACA',
-          300: '#FCA5A5',
-          400: '#F87171',
-          500: '#EF4444',
-          600: '#DC2626',
-          700: '#B91C1C',
-          800: '#991B1B',
-          900: '#7F1D1D',
+          DEFAULT: '#C03A7A',
+          50: '#fdf2f8',
+          100: '#fce7f3',
+          200: '#fbcfe8',
+          300: '#f9a8d4',
+          400: '#f472b6',
+          500: '#ec4899',
+          600: '#C03A7A', // Base
+          700: '#be185d',
+          800: '#9d174d',
+          900: '#831843',
         },
-        // Accent Orange - Secondary highlights
+        // Accent Deep Purple (#5B2D8B)
         accent: {
-          DEFAULT: '#F97316',
-          50: '#FFF7ED',
-          100: '#FFEDD5',
-          200: '#FED7AA',
-          300: '#FDBA74',
-          400: '#FB923C',
-          500: '#F97316',
-          600: '#EA580C',
-          700: '#C2410C',
-          800: '#9A3412',
-          900: '#7C2D12',
+          DEFAULT: '#5B2D8B',
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5B2D8B', // Base
+          900: '#4c1d95',
         },
-        // Success Green - Positive states
+        // Success Green - Positive states (Keeping consistent)
         success: {
           DEFAULT: '#22C55E',
           50: '#F0FDF4',
@@ -49,20 +49,20 @@ export default {
           800: '#166534',
           900: '#14532D',
         },
-        // Dark - Black scale for text and dark sections
+        // Dark - Black scale for text and dark sections (#0E0E12)
         dark: {
-          DEFAULT: '#111827',
-          50: '#F9FAFB',
-          100: '#F3F4F6',
-          200: '#E5E7EB',
-          300: '#D1D5DB',
-          400: '#9CA3AF',
-          500: '#6B7280',
-          600: '#4B5563',
-          700: '#374151',
-          800: '#1F2937',
-          900: '#111827',
-          950: '#030712',
+          DEFAULT: '#0E0E12',
+          50: '#F4F4F6', // Light text color as lightest
+          100: '#e5e5e7',
+          200: '#d1d1d6',
+          300: '#9ca3af',
+          400: '#6b7280',
+          500: '#4b5563',
+          600: '#374151',
+          700: '#282834', // Lighter background
+          800: '#1c1c24', // Card background
+          900: '#0E0E12', // Main background
+          950: '#050507',
         },
       },
       animation: {

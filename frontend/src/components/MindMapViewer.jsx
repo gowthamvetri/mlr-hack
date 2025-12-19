@@ -74,7 +74,7 @@ export const MindMapView = ({ markdown, options = {} }) => {
     }
 
     return (
-        <div className="relative w-full h-full bg-gradient-to-br from-zinc-50 to-white rounded-xl overflow-hidden border border-zinc-100">
+        <div className="relative w-full h-full bg-gradient-to-br from-dark-800 to-dark-900 rounded-xl overflow-hidden border border-dark-700/50">
             <svg ref={svgRef} className="w-full h-full min-h-[400px]" />
             <style>{`
                 .markmap-link {
@@ -91,10 +91,13 @@ export const MindMapView = ({ markdown, options = {} }) => {
                 .markmap-node circle {
                     cursor: pointer;
                 }
+                .markmap-node text {
+                    fill: #F4F4F6 !important;
+                }
             `}</style>
-            <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-white/90 backdrop-blur-sm rounded-lg border border-zinc-200 text-[10px] text-zinc-500 shadow-sm flex items-center gap-2">
+            <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-dark-900/90 backdrop-blur-sm rounded-lg border border-dark-700 text-[10px] text-dark-400 shadow-sm flex items-center gap-2">
                 <span>🖱️ Pan & Zoom</span>
-                <span className="w-0.5 h-3 bg-zinc-200" />
+                <span className="w-0.5 h-3 bg-dark-700" />
                 <span>👆 Click to Fold</span>
             </div>
         </div>

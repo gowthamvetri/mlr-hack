@@ -20,15 +20,15 @@ router.get('/', getExternalCourses);
 router.get('/my-completed', getMyCompletedCourses);
 
 // Create external course (Admin and Staff only)
-router.post('/', authorize('admin', 'staff'), createExternalCourse);
+router.post('/', authorize('Admin', 'Staff'), createExternalCourse);
 
 // Update external course (Admin or Staff who created)
-router.put('/:id', authorize('admin', 'staff'), updateExternalCourse);
+router.put('/:id', authorize('Admin', 'Staff'), updateExternalCourse);
 
 // Delete external course (Admin or Staff who created)
-router.delete('/:id', authorize('admin', 'staff'), deleteExternalCourse);
+router.delete('/:id', authorize('Admin', 'Staff'), deleteExternalCourse);
 
 // Mark course as completed (Student only)
-router.post('/:id/complete', authorize('student'), markAsCompleted);
+router.post('/:id/complete', authorize('Student'), markAsCompleted);
 
 module.exports = router;

@@ -173,9 +173,6 @@ const Onboarding = () => {
               <button onClick={() => scrollToSection(contactRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Contact</button>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/register')} className="hidden sm:block px-5 py-2.5 text-gray-600 hover:text-gray-900 font-medium transition-all hover:scale-105">
-                Register
-              </button>
               <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-semibold hover:scale-105 shadow-lg shadow-primary-500/25">
                 Login <ArrowRight className="w-4 h-4" />
               </button>
