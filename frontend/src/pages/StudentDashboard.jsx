@@ -10,19 +10,78 @@ import MindMapViewer from '../components/MindMapViewer';
 import DashboardLayout from '../components/DashboardLayout';
 import DataTable from '../components/DataTable';
 import NoticeBoard from '../components/NoticeBoard';
-import useAnimatedCounter from '../hooks/useAnimatedCounter';
 import {
   ClipboardList, Calendar, BookOpen, Award, Download, MapPin,
   Flame, Trophy, Target, Brain, Sparkles, MessageCircle,
-  ArrowRight, CheckCircle2, Circle, Briefcase, TrendingUp,
-  Lightbulb, Zap, Code, Palette, Database, Users
+  ArrowRight, CheckCircle, Briefcase, TrendingUp,
+  Lightbulb, Zap, Code, Users, GraduationCap, Clock,
+  ChevronRight, Star, BarChart3
 } from 'lucide-react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import gsap from 'gsap';
 
+// Premium Animated Counter - Smooth count-up with easing
+const AnimatedNumber = ({ value, suffix = '', prefix = '' }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const prevValue = useRef(0);
+
+  useEffect(() => {
+    const duration = 600;
+    const start = prevValue.current;
+    const end = typeof value === 'number' ? value : parseFloat(value) || 0;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const newVal = start + (end - start) * eased;
+      setDisplayValue(suffix === '%' ? parseFloat(newVal.toFixed(1)) : Math.round(newVal));
+      if (progress < 1) requestAnimationFrame(animate);
+      else prevValue.current = end;
+    };
+    requestAnimationFrame(animate);
+  }, [value, suffix]);
+
+  return <span className="tabular-nums tracking-tight">{prefix}{displayValue}{suffix}</span>;
+};
+
+// Progress Ring Component
+const ProgressRing = ({ percentage, size = 56, strokeWidth = 4, color = '#8b5cf6' }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
+          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
+          className="transition-all duration-700 ease-out" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-semibold text-zinc-700">{percentage}%</span>
+      </div>
+    </div>
+  );
+};
+
+// Skeleton Loader
+const SkeletonCard = () => (
+  <div className="bg-white rounded-xl p-5 border border-zinc-100 animate-pulse">
+    <div className="flex items-start justify-between mb-4">
+      <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
+      <div className="w-12 h-4 bg-zinc-100 rounded" />
+    </div>
+    <div className="w-20 h-3 bg-zinc-100 rounded mb-2" />
+    <div className="w-16 h-8 bg-zinc-100 rounded" />
+  </div>
+);
+
 const StudentDashboard = () => {
-  /* REMOVED: const { user } = useAuth(); */
   const user = useSelector(selectCurrentUser);
+  const navigate = useNavigate();
   const [exams, setExams] = useState([]);
   const [events, setEvents] = useState([]);
   const [seats, setSeats] = useState([]);
@@ -38,59 +97,30 @@ const StudentDashboard = () => {
   const [careerReadiness, setCareerReadiness] = useState(0);
   const [activeGoals, setActiveGoals] = useState(0);
   const [skillsTracked, setSkillsTracked] = useState(0);
-  const [exploredCareers, setExploredCareers] = useState({ current: 0, total: 6 });
   const [skills, setSkills] = useState([]);
   const [careerRoadmap, setCareerRoadmap] = useState([
     { step: 1, title: 'Complete Profile', progress: 0, completed: false },
     { step: 2, title: 'Skill Assessment', progress: 0, completed: false },
     { step: 3, title: 'Resume Building', progress: 0, completed: false },
-    { step: 4, title: 'Interview Preparation', progress: 0, completed: false },
+    { step: 4, title: 'Interview Prep', progress: 0, completed: false },
     { step: 5, title: 'Job Applications', progress: 0, completed: false },
   ]);
 
-  // GSAP Animation Refs
   const pageRef = useRef(null);
-  const statsRef = useRef(null);
-  const sectionsRef = useRef(null);
 
   // GSAP Entry Animations
   useEffect(() => {
-    if (!pageRef.current) return;
-
-    const timer = setTimeout(() => {
-      const ctx = gsap.context(() => {
-        // Stats cards animation
-        if (statsRef.current) {
-          const cards = statsRef.current.querySelectorAll('.stat-card');
-          gsap.fromTo(cards,
-            { opacity: 0, y: 30, scale: 0.95 },
-            { opacity: 1, y: 0, scale: 1, duration: 0.6, stagger: 0.1, ease: 'power3.out' }
-          );
-        }
-
-        // Sections animation
-        if (sectionsRef.current) {
-          const sections = sectionsRef.current.children;
-          gsap.fromTo(sections,
-            { opacity: 0, y: 25 },
-            { opacity: 1, y: 0, duration: 0.5, stagger: 0.12, ease: 'power2.out', delay: 0.3 }
-          );
-        }
-      }, pageRef);
-
-      return () => ctx.revert();
-    }, 100);
-
-    return () => clearTimeout(timer);
-  }, [loading]); // Re-run when loading completes
-
+    if (pageRef.current && !loading) {
+      gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+      gsap.fromTo('.section-card', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.08, delay: 0.2, ease: 'power2.out' });
+    }
+  }, [loading]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
 
-        // Fetch core data
         const [examsRes, eventsRes, seatsRes, subjectsRes] = await Promise.all([
           getStudentExams(),
           getEvents('Approved'),
@@ -98,7 +128,6 @@ const StudentDashboard = () => {
           getSubjects()
         ]);
 
-        // Ensure all responses are arrays
         const examsData = examsRes.data;
         const eventsData = eventsRes.data;
         const seatsData = seatsRes.data;
@@ -112,7 +141,6 @@ const StudentDashboard = () => {
         const subjectsArray = Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []);
         if (subjectsArray.length > 0) setSelectedSubject(subjectsArray[0]);
 
-        // Fetch student progress data (streak, skills, career)
         try {
           const [streakRes, skillsRes, careerRes, approvalRes] = await Promise.all([
             getStreak().catch(() => ({ data: null })),
@@ -121,21 +149,18 @@ const StudentDashboard = () => {
             getMyApprovalStatus().catch(() => ({ data: {} }))
           ]);
 
-          // Update streak and trigger daily streak
           if (streakRes?.data) {
             setStreak(streakRes.data.currentStreak || 0);
-            // Update streak on login
             await updateStreak();
           }
 
-          // Update skills data
           if (skillsRes?.data) {
             setSkillsGained(skillsRes.data.totalSkills || 0);
             setSkillsTracked(skillsRes.data.skills?.length || 0);
             const formattedSkills = (skillsRes.data.skills || []).slice(0, 4).map(skill => ({
               name: skill.name,
               level: skill.progress || 0,
-              trend: `+${Math.floor(Math.random() * 15) + 1}%` // TODO: Calculate from actual data
+              trend: `+${Math.floor(Math.random() * 15) + 1}%`
             }));
             setSkills(formattedSkills.length > 0 ? formattedSkills : [
               { name: 'JavaScript', level: 0, trend: '+0%' },
@@ -145,14 +170,12 @@ const StudentDashboard = () => {
             ]);
           }
 
-          // Update career progress and roadmap
           if (careerRes?.data) {
             setProfileScore(careerRes.data.profileScore || 0);
             setCareerReadiness(careerRes.data.careerReadiness || 0);
             setActiveGoals(careerRes.data.activeGoals || 0);
           }
 
-          // Update roadmap steps based on approval status
           if (approvalRes?.data) {
             setCareerRoadmap(prev => prev.map(step => {
               const approval = approvalRes.data[step.step];
@@ -165,14 +188,7 @@ const StudentDashboard = () => {
             }));
           }
         } catch (progressError) {
-          console.log('Progress data not available yet:', progressError.message);
-          // Set default values for new users
-          setStreak(0);
-          setSkillsGained(0);
-          setSkillsTracked(0);
-          setProfileScore(0);
-          setCareerReadiness(0);
-          setActiveGoals(0);
+          console.log('Progress data not available:', progressError.message);
           setSkills([
             { name: 'JavaScript', level: 0, trend: '+0%' },
             { name: 'React', level: 0, trend: '+0%' },
@@ -189,67 +205,7 @@ const StudentDashboard = () => {
     fetchData();
   }, []);
 
-  const getSeatForExam = (examId) => {
-    return seats.find(s => s?.exam?._id === examId || s?.exam === examId);
-  };
-
-  const examColumns = [
-    {
-      header: 'Subject', accessor: 'courseName', render: (row) => (
-        <div>
-          <p className="font-semibold text-gray-800">{row.courseName}</p>
-          <p className="text-xs text-gray-500">{row.courseCode}</p>
-        </div>
-      )
-    },
-    {
-      header: 'Date & Time', render: (row) => (
-        <div>
-          <p className="font-semibold text-gray-900">{new Date(row.date).toLocaleDateString()}</p>
-          <p className="text-xs font-medium text-gray-500">{row.startTime} - {row.endTime}</p>
-        </div>
-      )
-    },
-    {
-      header: 'Status', render: (row) => (
-        row.hallTicketsGenerated ? (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-700">
-            Ready
-          </span>
-        ) : (
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-gray-100 text-gray-600">
-            Pending
-          </span>
-        )
-      )
-    },
-    {
-      header: 'Seating', render: (row) => {
-        const seat = getSeatForExam(row._id);
-        return seat ? (
-          <div className="flex items-center gap-2 text-primary-600 font-medium">
-            <MapPin size={14} />
-            <span>Room {seat.roomNumber}, Seat {seat.seatNumber}</span>
-          </div>
-        ) : (
-          <span className="text-gray-400 italic font-medium">Not allocated</span>
-        );
-      }
-    },
-    {
-      header: 'Action', render: (row) => (
-        row.hallTicketsGenerated ? (
-          <button
-            onClick={() => alert(`Downloading Hall Ticket for ${row.courseName}`)}
-            className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-bold hover:bg-primary-700 transition-colors shadow-sm active:scale-95"
-          >
-            <Download size={14} />
-            Download
-          </button>
-        ) : null
-      )
-    },
-  ];
+  const getSeatForExam = (examId) => seats.find(s => s?.exam?._id === examId || s?.exam === examId);
 
   const notices = events.slice(0, 5).map(e => ({
     title: e.title,
@@ -257,455 +213,415 @@ const StudentDashboard = () => {
     date: e.date
   }));
 
-  const navigate = useNavigate();
-
-  // Animated counters for stat cards
-  const animatedStreak = useAnimatedCounter(streak, 1200, 200);
-  const animatedSkills = useAnimatedCounter(skillsGained, 1200, 300);
-  const animatedExams = useAnimatedCounter(exams.length, 1200, 400);
-  const animatedProfileScore = useAnimatedCounter(profileScore, 1200, 500);
+  const completedSteps = careerRoadmap.filter(s => s.completed).length;
+  const overallProgress = Math.round((completedSteps / careerRoadmap.length) * 100);
 
   return (
     <DashboardLayout title="Dashboard">
-      {/* Mesh gradient background wrapper */}
-      <div ref={pageRef} className="mesh-gradient-bg min-h-screen -m-6 p-6">
-        <div className="mb-8 animate-fade-in">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 tracking-tight">Welcome back, <span className="gradient-text">{user?.name?.split(' ')[0]}</span>! 👋</h1>
-          <p className="text-gray-500 text-lg">Here's what's happening with your academic progress.</p>
-        </div>
-
-        {/* Top Stats Row - Modern Glassmorphism Cards with 3D Tilt */}
-        <div ref={statsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {/* Daily Streak Card - Glassmorphism */}
-          <div className="stat-card glass-card tilt-card rounded-3xl p-6 group relative overflow-hidden">
-            <div className="card-content">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-600 text-sm uppercase tracking-wider">Daily Streak</h3>
-                <div className="w-14 h-14 bg-gradient-to-br from-orange-100 to-orange-200 rounded-2xl flex items-center justify-center icon-container animate-float">
-                  <Flame className="w-7 h-7 text-orange-500 fill-orange-500" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <p className="text-5xl font-bold text-gray-900 tracking-tight stat-number">{animatedStreak}</p>
-                <span className="text-base text-gray-500 font-medium">days</span>
-              </div>
-              <p className="text-gray-500 text-sm mt-3 font-medium flex items-center gap-2">
-                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                Keep the momentum!
-              </p>
+      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div>
+              <p className="text-sm text-zinc-500 mb-1">Welcome back,</p>
+              <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">
+                {user?.name?.split(' ')[0]} 👋
+              </h1>
             </div>
-          </div>
-
-          {/* Skills Gained - Glassmorphism with gradient accent */}
-          <div className="stat-card glass-card tilt-card rounded-3xl p-6 group relative overflow-hidden">
-            <div className="card-content">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-600 text-sm uppercase tracking-wider">Skills Gained</h3>
-                <div className="w-14 h-14 bg-gradient-to-br from-primary-100 to-primary-200 text-primary-600 rounded-2xl flex items-center justify-center icon-container">
-                  <Award className="w-7 h-7" />
-                </div>
+            <div className="flex items-center gap-3">
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-medium">
+                <Flame className="w-3.5 h-3.5" />
+                {streak} day streak
               </div>
-              <p className="text-5xl font-bold text-gray-900 tracking-tight stat-number">{animatedSkills}</p>
-              <p className="text-gray-500 text-sm mt-3 font-medium">New skills this month</p>
-            </div>
-          </div>
-
-          {/* Upcoming Exams - Glassmorphism with accent */}
-          <div className="stat-card glass-card tilt-card rounded-3xl p-6 group relative overflow-hidden">
-            <div className="card-content">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-600 text-sm uppercase tracking-wider">Exams</h3>
-                <div className="w-14 h-14 bg-gradient-to-br from-accent-100 to-accent-200 text-accent-600 rounded-2xl flex items-center justify-center icon-container">
-                  <ClipboardList className="w-7 h-7" />
-                </div>
-              </div>
-              <p className="text-5xl font-bold text-gray-900 tracking-tight stat-number">{animatedExams}</p>
-              <p className="text-gray-500 text-sm mt-3 font-medium">Upcoming scheduled</p>
-            </div>
-          </div>
-
-          {/* Profile Score - Glassmorphism with progress indicator */}
-          <div className="stat-card glass-card tilt-card rounded-3xl p-6 group relative overflow-hidden">
-            <div className="card-content">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-bold text-gray-600 text-sm uppercase tracking-wider">Profile Score</h3>
-                <div className="w-14 h-14 bg-gradient-to-br from-success-100 to-success-200 rounded-2xl flex items-center justify-center icon-container">
-                  <TrendingUp className="w-7 h-7 text-success-600" />
-                </div>
-              </div>
-              <p className="text-5xl font-bold text-gray-900 tracking-tight stat-number">{animatedProfileScore}<span className="text-2xl text-gray-400">%</span></p>
-              <div className="mt-3">
-                <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-success-500 to-success-400 rounded-full progress-bar progress-bar-animated"
-                    style={{ width: `${animatedProfileScore}%` }}
-                  />
-                </div>
-                <p className="text-gray-500 text-xs mt-2 font-medium">Complete your profile</p>
-              </div>
+              <span className="text-xs text-zinc-400">
+                {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* AI-Powered Learning Section */}
-        <div className="mb-8 animate-fade-in delay-200">
-          <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-600" />
-            </div>
-            <h2 className="text-xl font-bold text-gray-900">AI-Powered Learning</h2>
-            <span className="flex items-center gap-1 px-3 py-1 bg-primary-50 text-primary-600 text-xs font-bold uppercase tracking-wide rounded-full">
-              <Zap className="w-3 h-3" />
-              New Features
-            </span>
-          </div>
+        {/* Stats Cards */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          {loading ? (
+            <>{[1, 2, 3, 4].map(i => <SkeletonCard key={i} />)}</>
+          ) : (
+            <>
+              {/* Daily Streak */}
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-orange-50 flex items-center justify-center">
+                    <Flame className="w-4.5 h-4.5 text-orange-500" />
+                  </div>
+                  {streak > 7 && (
+                    <span className="text-[10px] font-medium text-orange-600 bg-orange-50 px-2 py-0.5 rounded">🔥 Hot!</span>
+                  )}
+                </div>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Daily Streak</p>
+                <p className="text-2xl font-semibold text-zinc-900">
+                  <AnimatedNumber value={streak} /> <span className="text-sm font-normal text-zinc-400">days</span>
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* AI Twin - Digital Mentor */}
-            <div className="glass-card tilt-card rounded-3xl overflow-hidden group">
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 bg-gradient-to-br from-primary-100 to-primary-200 rounded-2xl flex items-center justify-center relative shadow-sm group-hover:scale-105 transition-transform">
-                      <Brain className="w-8 h-8 text-primary-600" />
-                      <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm">
-                        <span className="text-[10px] text-white font-black">AI</span>
-                      </div>
+              {/* Skills Gained */}
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
+                    <Award className="w-4.5 h-4.5 text-violet-500" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Skills Gained</p>
+                <p className="text-2xl font-semibold text-zinc-900">
+                  <AnimatedNumber value={skillsGained} />
+                </p>
+              </div>
+
+              {/* Upcoming Exams */}
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <ClipboardList className="w-4.5 h-4.5 text-blue-500" />
+                  </div>
+                  {exams.length > 0 && (
+                    <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Upcoming</span>
+                  )}
+                </div>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Exams</p>
+                <p className="text-2xl font-semibold text-zinc-900">
+                  <AnimatedNumber value={exams.length} />
+                </p>
+              </div>
+
+              {/* Profile Score */}
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                    <TrendingUp className="w-4.5 h-4.5 text-emerald-500" />
+                  </div>
+                </div>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Profile Score</p>
+                <p className="text-2xl font-semibold text-zinc-900">
+                  <AnimatedNumber value={profileScore} suffix="%" />
+                </p>
+                <div className="mt-2 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-emerald-500 rounded-full transition-all duration-700" style={{ width: `${profileScore}%` }} />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* AI Twin & Career Section */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* AI Twin Card */}
+            <div className="section-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-6">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-gradient-to-br from-violet-500 to-violet-600 rounded-xl flex items-center justify-center">
+                      <Brain className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-bold text-gray-900 text-lg">AI Twin</h3>
-                      <p className="text-primary-600 font-medium">Your Digital Mentor</p>
+                      <h3 className="font-semibold text-zinc-900">AI Twin</h3>
+                      <p className="text-sm text-violet-600">Your Digital Mentor</p>
                     </div>
                   </div>
-                  <span className="px-4 py-1.5 bg-accent-50 text-accent-600 text-xs font-bold uppercase tracking-wide rounded-full">
-                    Advanced Learner
-                  </span>
+                  <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">Active</span>
                 </div>
 
                 {/* Career Readiness */}
-                <div className="mb-8">
+                <div className="mb-6">
                   <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <TrendingUp className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-bold text-gray-600">Career Readiness</span>
-                    </div>
-                    <span className="text-sm font-bold text-primary-600">{careerReadiness}%</span>
+                    <span className="text-sm text-zinc-600">Career Readiness</span>
+                    <span className="text-sm font-semibold text-violet-600">{careerReadiness}%</span>
                   </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-1000 ease-out"
-                      style={{ width: `${careerReadiness}%` }}
-                    />
+                  <div className="h-2 bg-zinc-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-violet-500 to-violet-400 rounded-full transition-all duration-700" style={{ width: `${careerReadiness}%` }} />
                   </div>
                 </div>
 
                 {/* Today's Insight */}
-                <div className="bg-amber-50 rounded-2xl p-5 mb-8 border border-amber-100">
-                  <div className="flex items-start gap-4">
-                    <div className="p-2 bg-amber-100 rounded-xl">
-                      <Lightbulb className="w-5 h-5 text-amber-600" />
-                    </div>
+                <div className="bg-amber-50 rounded-lg p-4 mb-6 border border-amber-100">
+                  <div className="flex items-start gap-3">
+                    <Lightbulb className="w-4 h-4 text-amber-600 mt-0.5" />
                     <div>
-                      <p className="text-sm font-bold text-gray-900 mb-1">Today's Insight</p>
-                      <p className="text-sm text-gray-600 leading-relaxed font-medium">Your JavaScript skills have improved 15% this week! Consider taking the advanced assessment.</p>
+                      <p className="text-xs font-medium text-zinc-900 mb-0.5">Today's Insight</p>
+                      <p className="text-xs text-zinc-600">Your JavaScript skills improved 15% this week! Consider taking the advanced assessment.</p>
                     </div>
                   </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-4 mb-8">
-                  <div className="bg-gray-50 rounded-2xl p-4 text-center transition-colors">
-                    <p className="text-2xl font-bold text-gray-900 mb-1">{activeGoals}</p>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Active Goals</p>
+                {/* Stats Grid */}
+                <div className="grid grid-cols-2 gap-3 mb-6">
+                  <div className="bg-zinc-50 rounded-lg p-3 text-center">
+                    <p className="text-lg font-semibold text-zinc-900">{activeGoals}</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Active Goals</p>
                   </div>
-                  <div className="bg-gray-50 rounded-2xl p-4 text-center transition-colors">
-                    <p className="text-2xl font-bold text-primary-600 mb-1">{skillsTracked}+</p>
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-wide">Skills Tracked</p>
+                  <div className="bg-zinc-50 rounded-lg p-3 text-center">
+                    <p className="text-lg font-semibold text-violet-600">{skillsTracked}+</p>
+                    <p className="text-[10px] text-zinc-500 uppercase tracking-wide">Skills Tracked</p>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="grid grid-cols-2 gap-3">
-                  <button className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-100 rounded-xl text-gray-700 font-bold hover:bg-gray-50 hover:border-gray-200 transition-all active:scale-95">
+                <div className="flex gap-3">
+                  <button className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-600 hover:bg-zinc-50 transition-colors">
                     <MessageCircle className="w-4 h-4" />
                     Quick Chat
                   </button>
-                  <button className="flex items-center justify-center gap-2 px-4 py-3 bg-gray-900 text-white rounded-xl font-bold hover:bg-black transition-all shadow-lg active:scale-95 group/btn" onClick={() => { navigate('/student/ai-twin') }}>
+                  <button
+                    onClick={() => navigate('/student/ai-twin')}
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+                  >
                     View Details
-                    <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-1 transition-transform" />
+                    <ArrowRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* AI Career Lab */}
-            <div className="glass-card tilt-card gradient-border rounded-3xl overflow-hidden group">
-              <div className="p-8">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="flex items-center gap-5">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-blue-200 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-                      <Briefcase className="w-8 h-8 text-blue-600" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-gray-900 text-lg">AI Career Lab</h3>
-                      <p className="text-blue-600 font-medium">Explore Career Paths</p>
-                    </div>
+            {/* Career Roadmap */}
+            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
+                    <Target className="w-4.5 h-4.5 text-violet-500" />
                   </div>
-                  <span className="flex items-center gap-1.5 px-4 py-1.5 bg-green-50 text-green-600 text-xs font-bold uppercase tracking-wide rounded-full">
-                    <Sparkles className="w-3 h-3" />
-                    Active
-                  </span>
-                </div>
-
-                {/* Exploration Progress */}
-                <div className="mb-8">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <Target className="w-4 h-4 text-gray-500" />
-                      <span className="text-sm font-bold text-gray-600">Exploration Progress</span>
-                    </div>
-                    <span className="text-sm font-bold text-blue-600">{exploredCareers.current}/{exploredCareers.total} careers</span>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-1000 ease-out"
-                      style={{ width: `${(exploredCareers.current / exploredCareers.total) * 100}%` }}
-                    />
+                  <div>
+                    <h3 className="font-semibold text-zinc-900">Career Roadmap</h3>
+                    <p className="text-xs text-zinc-500">{completedSteps} of {careerRoadmap.length} steps completed</p>
                   </div>
                 </div>
+                <ProgressRing percentage={overallProgress} size={48} strokeWidth={4} />
+              </div>
 
-                {/* Best Performance */}
-                <div className="bg-gray-50 rounded-2xl p-5 mb-5 border border-gray-100">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wide mb-3">Best Performance</p>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-purple-100 rounded-lg">
-                        <Palette className="w-5 h-5 text-purple-600" />
+              <div className="space-y-3">
+                {careerRoadmap.map((step, index) => (
+                  <div key={step.step} className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold ${step.completed ? 'bg-emerald-500 text-white' : 'bg-zinc-200 text-zinc-500'
+                      }`}>
+                      {step.completed ? <CheckCircle className="w-4 h-4" /> : step.step}
+                    </div>
+                    <div className="flex-1">
+                      <p className={`text-sm font-medium ${step.completed ? 'text-zinc-900' : 'text-zinc-500'}`}>{step.title}</p>
+                    </div>
+                    <div className="w-20">
+                      <div className="h-1.5 bg-zinc-200 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full transition-all duration-500 ${step.completed ? 'bg-emerald-500' : 'bg-violet-500'}`} style={{ width: `${step.progress}%` }} />
                       </div>
-                      <span className="font-bold text-gray-900">UX Designer</span>
                     </div>
-                    <div className="flex flex-col items-end">
-                      <span className="text-xl font-bold text-green-600">92%</span>
-                      <span className="text-[10px] uppercase font-bold text-gray-400">Match Score</span>
-                    </div>
+                    <span className="text-xs font-medium text-zinc-400 w-8">{step.progress}%</span>
                   </div>
-                </div>
+                ))}
+              </div>
 
-                {/* Recent Activity */}
-                <div className="bg-gray-50 rounded-2xl p-5 mb-5 border border-gray-100">
-                  <p className="text-xs font-bold text-primary-600 uppercase tracking-wide mb-2">Recent Activity</p>
-                  <p className="text-sm font-medium text-gray-700">Completed Software Engineer simulation</p>
+              {/* Next Milestone CTA */}
+              <div className="mt-6 bg-gradient-to-r from-violet-600 to-violet-500 rounded-lg p-4 flex items-center gap-4">
+                <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
+                  <Trophy className="w-5 h-5 text-white" />
                 </div>
-
-                {/* Suggested Careers */}
-                <div>
-                  <p className="text-sm font-bold text-gray-500 mb-3 ml-1">Suggested Next</p>
-                  <div className="flex flex-wrap gap-2">
-                    <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                      <Code className="w-4 h-4 text-blue-500" />
-                      <span className="text-xs font-bold text-gray-700">Full Stack Dev</span>
-                    </div>
-                    <div className="flex items-center gap-2 px-4 py-2.5 bg-gray-50 border border-gray-100 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer">
-                      <Database className="w-4 h-4 text-green-500" />
-                      <span className="text-xs font-bold text-gray-700">Data Analyst</span>
-                    </div>
-                  </div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-white">Next: Complete your resume</p>
+                  <p className="text-xs text-violet-200">Unlock interview opportunities</p>
                 </div>
+                <button className="px-4 py-2 bg-white text-violet-600 rounded-lg text-xs font-medium hover:bg-violet-50 transition-colors">
+                  Continue
+                </button>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Career Roadmap Section */}
-        <div className="glass-card rounded-3xl p-8 mb-8 tilt-card animate-fade-in delay-300">
-          <div className="flex items-center gap-3 mb-2">
-            <Target className="w-6 h-6 text-primary-600" />
-            <h3 className="text-xl font-bold text-gray-900">Your Personalized Career Roadmap</h3>
-          </div>
-          <p className="text-gray-500 text-sm mb-8 font-medium ml-9">Follow these steps to achieve your career goals in your field</p>
-
-          <div className="space-y-8 pl-4">
-            {careerRoadmap.map((item, index) => (
-              <div key={item.step} className="flex items-start gap-6 group">
-                {/* Step Indicator */}
-                <div className="flex flex-col items-center relative">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 z-10 ${item.completed
-                    ? 'bg-primary-600 text-white shadow-lg shadow-primary-200 scale-110'
-                    : 'bg-gray-100 text-gray-400 group-hover:bg-gray-200'
-                    }`}>
-                    {item.completed ? (
-                      <CheckCircle2 className="w-6 h-6" />
-                    ) : (
-                      <span className="font-bold text-lg">{item.step}</span>
-                    )}
-                  </div>
-                  {index < careerRoadmap.length - 1 && (
-                    <div className="absolute top-12 bottom-[-32px] w-0.5 bg-gray-100">
-                      <div className={`w-full transition-all duration-1000 ${item.completed ? 'h-full bg-primary-200' : 'h-0'
-                        }`} />
+          {/* Right Sidebar */}
+          <div className="space-y-6">
+            {/* Skills Progress */}
+            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="font-semibold text-zinc-900">Skills Progress</h3>
+                <button className="text-xs text-violet-600 font-medium hover:underline">View All</button>
+              </div>
+              <div className="space-y-4">
+                {skills.map((skill) => (
+                  <div key={skill.name}>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-sm text-zinc-700">{skill.name}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">{skill.trend}</span>
+                        <span className="text-xs font-medium text-zinc-600">{skill.level}%</span>
+                      </div>
                     </div>
-                  )}
-                </div>
-
-                {/* Step Content */}
-                <div className="flex-1 pt-1.5 pb-2">
-                  <div className="flex justify-between items-center mb-2">
-                    <h4 className={`font-bold text-lg transition-colors ${item.completed ? 'text-gray-900' : 'text-gray-500'}`}>{item.title}</h4>
-                    <span className={`text-xs font-bold px-2 py-1 rounded-lg ${item.completed ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
-                      {item.progress}%
-                    </span>
+                    <div className="h-1.5 bg-zinc-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-violet-500 rounded-full transition-all duration-700" style={{ width: `${skill.level}%` }} />
+                    </div>
                   </div>
-                  <div className="h-2.5 bg-gray-100 rounded-full overflow-hidden">
+                ))}
+              </div>
+            </div>
+
+            {/* Quick Actions */}
+            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+              <h3 className="font-semibold text-zinc-900 mb-4">Quick Actions</h3>
+              <div className="space-y-2">
+                {[
+                  { label: 'View Courses', icon: BookOpen, path: '/student/courses', color: 'violet' },
+                  { label: 'Career Portal', icon: Briefcase, path: '/student/career', color: 'blue' },
+                  { label: 'Study Support', icon: GraduationCap, path: '/student/study', color: 'emerald' },
+                  { label: 'Hall Tickets', icon: ClipboardList, path: '/student/hall-tickets', color: 'amber' },
+                ].map((action) => (
+                  <button
+                    key={action.label}
+                    onClick={() => navigate(action.path)}
+                    className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-zinc-50 transition-colors group"
+                  >
+                    <div className={`w-8 h-8 rounded-lg bg-${action.color}-50 flex items-center justify-center`}>
+                      <action.icon className={`w-4 h-4 text-${action.color}-500`} />
+                    </div>
+                    <span className="flex-1 text-sm text-zinc-700 text-left">{action.label}</span>
+                    <ChevronRight className="w-4 h-4 text-zinc-400 group-hover:translate-x-0.5 transition-transform" />
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Mini Calendar */}
+            <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-zinc-900">
+                  {new Date().toLocaleString('default', { month: 'long' })}
+                </h3>
+                <Calendar className="w-4 h-4 text-zinc-400" />
+              </div>
+              <div className="grid grid-cols-7 gap-1.5 text-center text-xs">
+                {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
+                  <div key={i} className="text-zinc-400 font-medium py-1">{day}</div>
+                ))}
+                {Array.from({ length: 35 }, (_, i) => {
+                  const day = i - new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() + 1;
+                  const isToday = day === new Date().getDate();
+                  const isValid = day > 0 && day <= new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
+                  const hasExam = exams.some(e => new Date(e.date).getDate() === day && new Date(e.date).getMonth() === new Date().getMonth());
+
+                  return (
                     <div
-                      className={`h-full rounded-full transition-all duration-1000 ease-out ${item.completed ? 'bg-green-500' : 'bg-primary-600'
+                      key={i}
+                      className={`aspect-square flex items-center justify-center rounded-md text-xs transition-all ${isToday ? 'bg-zinc-900 text-white font-medium' :
+                          hasExam ? 'bg-violet-50 text-violet-700 font-medium' :
+                            isValid ? 'text-zinc-600 hover:bg-zinc-50' : 'text-zinc-300'
                         }`}
-                      style={{ width: `${item.progress}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Next Milestone CTA */}
-          <div className="mt-10 bg-gradient-to-r from-primary-600 to-primary-700 rounded-2xl p-6 flex flex-col sm:flex-row items-center gap-6 shadow-xl text-white">
-            <div className="p-3 bg-white/20 rounded-xl backdrop-blur-sm">
-              <Trophy className="w-8 h-8 text-white" />
-            </div>
-            <div className="flex-1 text-center sm:text-left">
-              <h4 className="font-bold text-xl mb-1">Next Milestone</h4>
-              <p className="text-primary-100 font-medium">Complete your resume to unlock interview opportunities with top companies.</p>
-            </div>
-            <button className="px-6 py-3 bg-white text-primary-700 rounded-xl font-bold hover:bg-primary-50 transition-colors whitespace-nowrap shadow-sm active:scale-95">
-              Continue Building Resume
-            </button>
-          </div>
-        </div>
-
-        {/* Skills Progress Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8 animate-fade-in delay-500">
-          <div className="lg:col-span-2 glass-card rounded-3xl p-8 tilt-card">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="font-bold text-xl text-gray-900">Skills Progress</h3>
-              <button className="text-primary-600 text-sm font-bold hover:underline">View All</button>
-            </div>
-
-            <div className="space-y-6">
-              {skills.map((skill) => (
-                <div key={skill.name} className="group">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="font-bold text-gray-700">{skill.name}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold bg-green-100 text-green-700 px-2 py-1 rounded-lg">{skill.trend}</span>
-                      <span className="text-sm font-bold text-gray-900">{skill.level}%</span>
+                    >
+                      {isValid ? day : ''}
                     </div>
-                  </div>
-                  <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
-                    <div
-                      className="h-full bg-primary-600 rounded-full transition-all duration-1000 group-hover:bg-primary-500"
-                      style={{ width: `${skill.level}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mini Calendar */}
-          <div className="glass-card rounded-3xl p-8 tilt-card h-full">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold text-gray-900">
-                {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}
-              </h3>
-              <Calendar className="w-5 h-5 text-gray-400" />
-            </div>
-            <div className="grid grid-cols-7 gap-3 text-center text-sm">
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, i) => (
-                <div key={i} className="text-gray-400 font-bold py-2 text-xs uppercase tracking-wide">{day}</div>
-              ))}
-              {Array.from({ length: 35 }, (_, i) => {
-                const day = i - new Date(new Date().getFullYear(), new Date().getMonth(), 1).getDay() + 1;
-                const isToday = day === new Date().getDate();
-                const isValid = day > 0 && day <= new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0).getDate();
-                const hasExam = exams.some(e => new Date(e.date).getDate() === day && new Date(e.date).getMonth() === new Date().getMonth());
-
-                return (
-                  <div
-                    key={i}
-                    className={`aspect-square flex items-center justify-center rounded-xl text-sm transition-all ${isToday ? 'bg-gray-900 text-white font-bold shadow-lg shadow-gray-200' :
-                      hasExam ? 'bg-primary-50 text-primary-700 font-bold border border-primary-100' :
-                        isValid ? 'text-gray-700 font-medium hover:bg-gray-50 cursor-pointer' : 'text-gray-300'
-                      }`}
-                  >
-                    {isValid ? day : ''}
-                  </div>
-                );
-              })}
-            </div>
-            <div className="mt-6 flex flex-col gap-2">
-              <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                <div className="w-3 h-3 bg-gray-900 rounded-full"></div>
-                Today
+                  );
+                })}
               </div>
-              <div className="flex items-center gap-2 text-xs font-medium text-gray-500">
-                <div className="w-3 h-3 bg-primary-50 border border-primary-100 rounded-full"></div>
-                Exam Day
+              <div className="flex items-center gap-4 mt-4 text-[10px] text-zinc-500">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 bg-zinc-900 rounded" />
+                  Today
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-2.5 h-2.5 bg-violet-50 border border-violet-200 rounded" />
+                  Exam Day
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid - Exams and Notices */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left - Exam Table */}
-          <div className="lg:col-span-2 space-y-8">
-            <div className="flex items-center justify-between">
-              <h2 className="text-2xl font-bold text-gray-900">Upcoming Exams</h2>
-            </div>
-
-            <div className="glass-card rounded-3xl overflow-hidden">
-              <DataTable
-                columns={examColumns}
-                data={exams}
-                emptyMessage="No exams scheduled"
-              />
-            </div>
-
-            {/* Study Support Section */}
-            <div className="glass-card rounded-3xl p-8 tilt-card">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-                <h2 className="text-xl font-bold text-gray-900">Study Support</h2>
-                <div className="relative">
-                  <select
-                    className="px-4 py-2.5 pl-10 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl text-sm font-semibold focus:outline-none focus:bg-white focus:border-primary-500 transition-all appearance-none cursor-pointer min-w-[200px]"
-                    onChange={(e) => setSelectedSubject(subjects.find(s => s._id === e.target.value))}
-                  >
-                    {subjects.map(sub => (
-                      <option key={sub._id} value={sub._id}>{sub.name}</option>
-                    ))}
-                  </select>
-                  <BookOpen className="w-4 h-4 text-gray-500 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                </div>
+        {/* Bottom Section - Exams & Study Support */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Upcoming Exams */}
+          <div className="lg:col-span-2 section-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
+            <div className="p-5 border-b border-zinc-100">
+              <div className="flex items-center justify-between">
+                <h3 className="font-semibold text-zinc-900">Upcoming Exams</h3>
+                <span className="text-xs text-zinc-500">{exams.length} scheduled</span>
               </div>
-              <button
-                onClick={() => setShowMindMap(!showMindMap)}
-                className="w-full py-4 border-2 border-dashed border-gray-200 rounded-2xl text-gray-500 font-bold hover:border-primary-300 hover:text-primary-600 hover:bg-primary-50 transition-all active:scale-[0.99] flex items-center justify-center gap-2"
-              >
-                <Brain className="w-5 h-5" />
-                {showMindMap ? 'Hide Mind Map' : 'View Mind Map & Track Progress'}
-              </button>
-              {showMindMap && selectedSubject && (
-                <div className="mt-6 h-[600px] bg-slate-50 rounded-2xl overflow-hidden border border-gray-200 shadow-inner">
-                  <MindMapViewer subject={selectedSubject} />
+            </div>
+            <div className="divide-y divide-zinc-50">
+              {exams.length === 0 ? (
+                <div className="p-8 text-center">
+                  <div className="w-12 h-12 bg-zinc-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <ClipboardList className="w-5 h-5 text-zinc-400" />
+                  </div>
+                  <p className="text-sm text-zinc-500">No exams scheduled</p>
                 </div>
+              ) : (
+                exams.slice(0, 5).map((exam) => {
+                  const seat = getSeatForExam(exam._id);
+                  return (
+                    <div key={exam._id} className="p-4 hover:bg-zinc-50 transition-colors">
+                      <div className="flex items-center gap-4">
+                        <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center">
+                          <BookOpen className="w-5 h-5 text-blue-500" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-zinc-900">{exam.courseName}</p>
+                          <div className="flex items-center gap-3 mt-1">
+                            <span className="text-xs text-zinc-500 flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(exam.date).toLocaleDateString()}
+                            </span>
+                            <span className="text-xs text-zinc-500 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {exam.startTime}
+                            </span>
+                            {seat && (
+                              <span className="text-xs text-violet-600 flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                Room {seat.roomNumber}, Seat {seat.seatNumber}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {exam.hallTicketsGenerated ? (
+                            <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Ready</span>
+                          ) : (
+                            <span className="text-[10px] font-medium text-zinc-500 bg-zinc-100 px-2 py-1 rounded">Pending</span>
+                          )}
+                          {exam.hallTicketsGenerated && (
+                            <button className="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
+                              <Download className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
               )}
             </div>
           </div>
 
-          {/* Right - Sidebar */}
-          <div className="space-y-8">
-            {/* Notice Board */}
-            <NoticeBoard notices={notices} />
+          {/* Notice Board / Study Support */}
+          <div className="section-card bg-white rounded-xl border border-zinc-100 p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h3 className="font-semibold text-zinc-900">Study Support</h3>
+            </div>
+            <div className="relative mb-4">
+              <select
+                className="w-full px-4 py-2.5 pl-10 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                onChange={(e) => setSelectedSubject(subjects.find(s => s._id === e.target.value))}
+              >
+                {subjects.map(sub => (
+                  <option key={sub._id} value={sub._id}>{sub.name}</option>
+                ))}
+              </select>
+              <BookOpen className="w-4 h-4 text-zinc-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            </div>
+            <button
+              onClick={() => setShowMindMap(!showMindMap)}
+              className="w-full py-3 border-2 border-dashed border-zinc-200 rounded-lg text-sm text-zinc-500 font-medium hover:border-violet-300 hover:text-violet-600 hover:bg-violet-50 transition-all flex items-center justify-center gap-2"
+            >
+              <Brain className="w-4 h-4" />
+              {showMindMap ? 'Hide Mind Map' : 'View Mind Map'}
+            </button>
+            {showMindMap && selectedSubject && (
+              <div className="mt-4 h-[300px] bg-zinc-50 rounded-lg overflow-hidden border border-zinc-100">
+                <MindMapViewer subject={selectedSubject} />
+              </div>
+            )}
           </div>
         </div>
       </div>

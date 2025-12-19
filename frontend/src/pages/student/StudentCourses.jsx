@@ -1,24 +1,49 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
-import AnimatedNumber from '../../components/AnimatedNumber';
 import { getCourses, enrollInCourse, getCourseMaterials, submitStaffRating, canRateStaff } from '../../utils/api';
 import {
-  BookOpen, Search, Users, Clock, Star,
-  Play, CheckCircle, Filter, BookMarked, Award,
-  FileText, Download, File, X, Folder, BrainCircuit
+  BookOpen, Search, Users, Clock, Star, Play, CheckCircle, BookMarked, Award,
+  FileText, Download, File, Folder, BrainCircuit, Grid3X3, List
 } from 'lucide-react';
 import Modal from '../../components/Modal';
 import MindMapPreview from '../../components/MindMapPreview';
+import gsap from 'gsap';
+
+// Animated Counter
+const AnimatedNumber = ({ value }) => {
+  const [displayValue, setDisplayValue] = useState(0);
+  const prevValue = useRef(0);
+
+  useEffect(() => {
+    const end = typeof value === 'number' ? value : 0;
+    const start = prevValue.current;
+    const duration = 400;
+    const startTime = Date.now();
+
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayValue(Math.round(start + (end - start) * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+      else prevValue.current = end;
+    };
+    requestAnimationFrame(animate);
+  }, [value]);
+
+  return <span className="tabular-nums">{displayValue}</span>;
+};
 
 const StudentCourses = () => {
-  /* REMOVED: const { user } = useAuth(); */
   const user = useSelector(selectCurrentUser);
+  const pageRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterDept, setFilterDept] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [viewMode, setViewMode] = useState('grid');
   const [enrolling, setEnrolling] = useState(null);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   const [showMaterialsModal, setShowMaterialsModal] = useState(false);
@@ -39,31 +64,26 @@ const StudentCourses = () => {
   const [ratingStatus, setRatingStatus] = useState({ canRate: false, hasRated: false, existingRating: 0 });
   const [submittingRating, setSubmittingRating] = useState(false);
 
+  // GSAP Animations
   useEffect(() => {
-    fetchCourses();
-  }, []);
+    if (pageRef.current && !loading) {
+      gsap.fromTo('.metric-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.06, ease: 'power2.out' });
+      gsap.fromTo('.course-card', { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.35, stagger: 0.05, delay: 0.2, ease: 'power2.out' });
+    }
+  }, [loading, courses]);
+
+  useEffect(() => { fetchCourses(); }, []);
 
   const fetchCourses = async () => {
     try {
       setLoading(true);
       const { data } = await getCourses();
       setCourses(data);
-      // Filter enrolled courses for current user
-      const enrolled = data.filter(c =>
-        c.enrolledStudents?.some(s => s._id === user?._id || s === user?._id)
-      );
+      const enrolled = data.filter(c => c.enrolledStudents?.some(s => s._id === user?._id || s === user?._id));
       setEnrolledCourses(enrolled.map(c => c._id));
     } catch (error) {
       console.error('Error fetching courses:', error);
-      // Use mock data as fallback
-      setCourses([
-        { _id: '1', name: 'Data Structures & Algorithms', code: 'CS301', department: 'CSE', credits: 4, students: 156, instructor: 'Dr. Rajesh Kumar', status: 'Active', rating: 4.8, description: 'Learn fundamental data structures and algorithms.' },
-        { _id: '2', name: 'Machine Learning', code: 'CS401', department: 'CSE', credits: 4, students: 128, instructor: 'Prof. Priya Sharma', status: 'Active', rating: 4.7, description: 'Introduction to machine learning concepts and applications.' },
-        { _id: '3', name: 'Digital Electronics', code: 'EC201', department: 'ECE', credits: 3, students: 98, instructor: 'Dr. Amit Singh', status: 'Active', rating: 4.5, description: 'Fundamentals of digital circuits and systems.' },
-        { _id: '4', name: 'Database Management', code: 'CS302', department: 'CSE', credits: 3, students: 142, instructor: 'Prof. Meera Patel', status: 'Active', rating: 4.6, description: 'Learn SQL and database design principles.' },
-        { _id: '5', name: 'Computer Networks', code: 'CS303', department: 'CSE', credits: 3, students: 134, instructor: 'Dr. Vikram Reddy', status: 'Active', rating: 4.4, description: 'Understanding network protocols and architecture.' },
-        { _id: '6', name: 'Web Development', code: 'CS304', department: 'CSE', credits: 3, students: 112, instructor: 'Prof. Ananya Roy', status: 'Active', rating: 4.6, description: 'Full-stack web development with modern frameworks.' },
-      ]);
+      setCourses([]);
     } finally {
       setLoading(false);
     }
@@ -76,8 +96,7 @@ const StudentCourses = () => {
       setEnrolledCourses([...enrolledCourses, courseId]);
       fetchCourses();
     } catch (error) {
-      console.error('Error enrolling in course:', error);
-      // For demo, just add to enrolled
+      console.error('Error enrolling:', error);
       setEnrolledCourses([...enrolledCourses, courseId]);
     } finally {
       setEnrolling(null);
@@ -92,7 +111,6 @@ const StudentCourses = () => {
     setLoadingMaterials(true);
     try {
       const { data } = await getCourseMaterials(course._id);
-      // Handle both response formats: { materials: [...] } or direct array
       setMaterials(data.materials || data || []);
     } catch (error) {
       console.error('Error fetching materials:', error);
@@ -103,11 +121,10 @@ const StudentCourses = () => {
   };
 
   const getFileIcon = (type) => {
-    if (type?.includes('pdf')) return <FileText className="w-5 h-5 text-red-500" />;
-    if (type?.includes('word') || type?.includes('document')) return <FileText className="w-5 h-5 text-blue-500" />;
-    if (type?.includes('sheet') || type?.includes('excel')) return <FileText className="w-5 h-5 text-green-500" />;
-    if (type?.includes('presentation') || type?.includes('powerpoint')) return <FileText className="w-5 h-5 text-orange-500" />;
-    return <File className="w-5 h-5 text-gray-500" />;
+    if (type?.includes('pdf')) return <FileText className="w-4 h-4 text-red-500" />;
+    if (type?.includes('word') || type?.includes('document')) return <FileText className="w-4 h-4 text-blue-500" />;
+    if (type?.includes('sheet') || type?.includes('excel')) return <FileText className="w-4 h-4 text-green-500" />;
+    return <File className="w-4 h-4 text-zinc-500" />;
   };
 
   const formatFileSize = (bytes) => {
@@ -117,79 +134,44 @@ const StudentCourses = () => {
     return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  // Handle opening rating modal
   const handleOpenRating = async (course) => {
-    if (!course.instructorId) {
-      alert('Instructor information not available for this course');
-      return;
-    }
-
+    if (!course.instructorId) { alert('Instructor not available'); return; }
     setShowRatingModal(true);
     setUserRating(0);
     setRatingComment('');
-
     try {
       const { data } = await canRateStaff(course.instructorId, course._id);
       setRatingStatus(data);
-      if (data.existingRating) {
-        setUserRating(data.existingRating);
-      }
+      if (data.existingRating) setUserRating(data.existingRating);
     } catch (error) {
-      console.error('Error checking rating status:', error);
-      // Allow rating even if check fails
       setRatingStatus({ canRate: true, hasRated: false, existingRating: 0 });
     }
   };
 
-  // Handle rating submission
   const handleSubmitRating = async () => {
     if (!selectedCourse || !userRating) return;
-
     setSubmittingRating(true);
     try {
-      await submitStaffRating({
-        staffId: selectedCourse.instructorId,
-        courseId: selectedCourse._id,
-        rating: userRating,
-        comment: ratingComment
-      });
-
-      alert('Rating submitted successfully!');
+      await submitStaffRating({ staffId: selectedCourse.instructorId, courseId: selectedCourse._id, rating: userRating, comment: ratingComment });
+      alert('Rating submitted!');
       setShowRatingModal(false);
-      setUserRating(0);
-      setRatingComment('');
-      // Refresh courses to update rating display
       fetchCourses();
     } catch (error) {
-      console.error('Error submitting rating:', error);
-      alert(error.response?.data?.message || 'Failed to submit rating');
+      alert(error.response?.data?.message || 'Failed to submit');
     } finally {
       setSubmittingRating(false);
     }
   };
 
-  // Star Rating Component
   const StarRating = ({ rating, onRate, onHover, onLeave, size = 'lg', readonly = false }) => {
     const stars = [1, 2, 3, 4, 5];
-    const sizeClass = size === 'lg' ? 'w-10 h-10' : 'w-6 h-6';
-
+    const sizeClass = size === 'lg' ? 'w-8 h-8' : 'w-5 h-5';
     return (
       <div className="flex gap-1" onMouseLeave={onLeave}>
         {stars.map((star) => (
-          <button
-            key={star}
-            type="button"
-            disabled={readonly}
-            onClick={() => !readonly && onRate?.(star)}
-            onMouseEnter={() => !readonly && onHover?.(star)}
-            className={`${readonly ? '' : 'cursor-pointer hover:scale-110'} transition-transform`}
-          >
-            <Star
-              className={`${sizeClass} ${star <= (hoverRating || rating)
-                ? 'text-yellow-400 fill-yellow-400'
-                : 'text-gray-300'
-                } transition-colors`}
-            />
+          <button key={star} type="button" disabled={readonly} onClick={() => !readonly && onRate?.(star)} onMouseEnter={() => !readonly && onHover?.(star)}
+            className={`${readonly ? '' : 'cursor-pointer hover:scale-110'} transition-transform`}>
+            <Star className={`${sizeClass} ${star <= (hoverRating || rating) ? 'text-amber-400 fill-amber-400' : 'text-zinc-300'} transition-colors`} />
           </button>
         ))}
       </div>
@@ -200,8 +182,7 @@ const StudentCourses = () => {
 
   const filteredCourses = courses.filter(c => {
     const matchesSearch = c.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.code?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      c.instructor?.toLowerCase().includes(searchQuery.toLowerCase());
+      c.code?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesDept = filterDept === 'all' || c.department === filterDept || c.department?.code === filterDept;
     const matchesStatus = filterStatus === 'all' ||
       (filterStatus === 'enrolled' && isEnrolled(c._id)) ||
@@ -217,188 +198,204 @@ const StudentCourses = () => {
   };
 
   return (
-    <DashboardLayout title="My Courses">
-      <div className="space-y-6 sm:space-y-8 animate-fade-in">
+    <DashboardLayout>
+      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Course Catalog</h1>
-            <p className="text-gray-500 mt-1 text-lg">Browse and enroll in available courses</p>
+            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Course Catalog</h1>
+            <p className="text-sm text-zinc-500 mt-1">Browse and enroll in available courses</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="flex bg-zinc-100 rounded-lg p-1">
+              <button onClick={() => setViewMode('grid')} className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-white shadow-sm' : ''}`}>
+                <Grid3X3 className="w-4 h-4 text-zinc-600" />
+              </button>
+              <button onClick={() => setViewMode('list')} className={`p-2 rounded-md transition-colors ${viewMode === 'list' ? 'bg-white shadow-sm' : ''}`}>
+                <List className="w-4 h-4 text-zinc-600" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          <div className="bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl p-6 text-white shadow-lg shadow-primary-200 hover:scale-[1.02] transition-transform">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-primary-100 font-medium">Total Courses</p>
-                <p className="text-3xl font-bold mt-2"><AnimatedNumber value={stats.total} /></p>
-              </div>
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <BookOpen className="w-6 h-6 text-white" />
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-violet-50 flex items-center justify-center">
+                <BookOpen className="w-4.5 h-4.5 text-violet-500" />
               </div>
             </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Total Courses</p>
+            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.total} /></p>
           </div>
-          <div className="glass-card rounded-2xl p-6 tilt-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 font-medium">Enrolled</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.enrolled} /></p>
+
+          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center">
+                <BookMarked className="w-4.5 h-4.5 text-blue-500" />
               </div>
-              <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                <BookMarked className="w-6 h-6 text-blue-600" />
-              </div>
+              {stats.enrolled > 0 && (
+                <span className="text-[10px] font-medium text-blue-600 bg-blue-50 px-2 py-0.5 rounded">Active</span>
+              )}
             </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Enrolled</p>
+            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.enrolled} /></p>
           </div>
-          <div className="glass-card rounded-2xl p-6 tilt-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 font-medium">Available</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.available} /></p>
-              </div>
-              <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                <Play className="w-6 h-6 text-green-600" />
+
+          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center">
+                <Play className="w-4.5 h-4.5 text-emerald-500" />
               </div>
             </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Available</p>
+            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.available} /></p>
           </div>
-          <div className="glass-card rounded-2xl p-6 tilt-card">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-gray-500 font-medium">Completed</p>
-                <p className="text-3xl font-bold text-gray-900 mt-2"><AnimatedNumber value={stats.completed} /></p>
-              </div>
-              <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                <Award className="w-6 h-6 text-purple-600" />
+
+          <div className="metric-card bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all">
+            <div className="flex items-start justify-between mb-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Award className="w-4.5 h-4.5 text-amber-500" />
               </div>
             </div>
+            <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">Completed</p>
+            <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stats.completed} /></p>
           </div>
         </div>
+
         {/* Filters */}
-        <div className="glass-card rounded-2xl tilt-card p-5 animate-slide-in-up hover-card">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-            <div className="flex-1">
-              <div className="relative group">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-primary-500 transition-colors" />
-                <input
-                  type="text"
-                  placeholder="Search courses by name, code, or instructor..."
-                  className="w-full pl-12 pr-6 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 text-gray-900 transition-all font-medium placeholder-gray-400"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
+        <div className="bg-white rounded-xl border border-zinc-100 p-4 mb-6">
+          <div className="flex flex-col md:flex-row items-stretch md:items-center gap-3">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+              <input type="text" placeholder="Search courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
             </div>
-            <select
-              className="px-6 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all appearance-none"
-              value={filterDept}
-              onChange={(e) => setFilterDept(e.target.value)}
-            >
+            <select value={filterDept} onChange={(e) => setFilterDept(e.target.value)}
+              className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100">
               <option value="all">All Departments</option>
-              {departments.slice(1).map(d => (
-                <option key={d} value={d}>{d} Department</option>
-              ))}
+              {departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}
             </select>
-            <select
-              className="px-6 py-3.5 bg-gray-50 border-2 border-transparent hover:border-gray-200 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 text-gray-700 font-semibold cursor-pointer transition-all appearance-none"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
+            <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100">
               <option value="all">All Courses</option>
               <option value="enrolled">My Enrolled</option>
-              <option value="available">Available for Enrollment</option>
+              <option value="available">Available</option>
             </select>
           </div>
         </div>
 
-        {/* Courses Grid */}
-        {
-          loading ? (
-            <div className="text-center py-24 flex flex-col items-center justify-center">
-              <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mb-6"></div>
-              <p className="text-gray-500 font-medium text-lg">Loading your courses...</p>
-            </div>
-          ) : filteredCourses.length === 0 ? (
-            <div className="text-center py-20 bg-gray-50/50 rounded-3xl border border-dashed border-gray-200 animate-fade-in">
-              <BookOpen className="w-20 h-20 mx-auto mb-6 text-gray-200" />
-              <p className="text-xl font-bold text-gray-900">No courses found</p>
-              <p className="text-gray-500 mt-2">Try adjusting your search or filters to find what you're looking for.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-fade-in">
-              {filteredCourses.map((course) => (
-                <div key={course._id} className="glass-card rounded-2xl tilt-card overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col h-full">
-                  <div className="h-2 bg-gradient-to-r from-primary-500 via-primary-600 to-primary-700"></div>
-                  <div className="p-7 flex flex-col flex-1">
-                    <div className="flex items-start justify-between mb-4">
-                      <div className="flex-1">
-                        <div className="flex flex-wrap items-center gap-2 mb-3">
-                          <span className="px-2.5 py-1 bg-primary-50 text-primary-700 rounded-lg text-xs font-bold border border-primary-100 tracking-wide">
-                            {course.code}
+        {/* Courses */}
+        {loading ? (
+          <div className="text-center py-16">
+            <div className="w-10 h-10 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-sm text-zinc-500">Loading courses...</p>
+          </div>
+        ) : filteredCourses.length === 0 ? (
+          <div className="text-center py-16 bg-white rounded-xl border border-dashed border-zinc-200">
+            <BookOpen className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
+            <p className="text-sm font-medium text-zinc-700">No courses found</p>
+            <p className="text-xs text-zinc-500 mt-1">Try adjusting your search or filters</p>
+          </div>
+        ) : viewMode === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredCourses.map((course) => (
+              <div key={course._id} className="course-card bg-white rounded-xl border border-zinc-100 overflow-hidden hover:border-zinc-200 hover:shadow-md transition-all">
+                <div className="h-1.5 bg-gradient-to-r from-violet-500 to-violet-400" />
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-3">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-2 py-0.5 rounded">{course.code}</span>
+                        {isEnrolled(course._id) && (
+                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded flex items-center gap-1">
+                            <CheckCircle className="w-3 h-3" />Enrolled
                           </span>
-                          {isEnrolled(course._id) && (
-                            <span className="px-2.5 py-1 bg-green-50 text-green-700 rounded-lg text-xs font-bold border border-green-100 flex items-center gap-1">
-                              <CheckCircle className="w-3 h-3" />
-                              Enrolled
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="font-bold text-xl text-gray-900 mb-2 leading-tight group-hover:text-primary-600 transition-colors">{course.name}</h3>
-                        <p className="text-sm font-medium text-gray-500 flex items-center gap-2">
-                          <Users className="w-4 h-4 text-gray-400" />
-                          {course.instructor?.name || course.instructor || 'Instructor TBA'}
-                        </p>
+                        )}
+                      </div>
+                      <h3 className="font-medium text-zinc-900 text-sm mb-1">{course.name}</h3>
+                      <p className="text-xs text-zinc-500 flex items-center gap-1">
+                        <Users className="w-3 h-3" />
+                        {course.instructor?.name || course.instructor || 'TBA'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-zinc-500 line-clamp-2 mb-4">
+                    {course.description || 'No description available.'}
+                  </p>
+
+                  <div className="flex items-center justify-between py-3 px-3 bg-zinc-50 rounded-lg mb-4 text-xs">
+                    <div className="text-center">
+                      <p className="font-semibold text-zinc-900">{course.enrolledStudents?.length || 0}</p>
+                      <p className="text-zinc-400">Students</p>
+                    </div>
+                    <div className="text-center border-l border-zinc-200 pl-4">
+                      <p className="font-semibold text-zinc-900">{course.credits}</p>
+                      <p className="text-zinc-400">Credits</p>
+                    </div>
+                    <div className="text-center border-l border-zinc-200 pl-4">
+                      <div className="flex items-center gap-1">
+                        <span className="font-semibold text-zinc-900">{course.rating || '4.5'}</span>
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                      </div>
+                      <p className="text-zinc-400">Rating</p>
+                    </div>
+                  </div>
+
+                  {isEnrolled(course._id) ? (
+                    <button onClick={() => handleViewMaterials(course)}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
+                      <Play className="w-4 h-4" />Continue
+                    </button>
+                  ) : (
+                    <button onClick={() => handleEnroll(course._id)} disabled={enrolling === course._id}
+                      className="w-full flex items-center justify-center gap-2 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-50">
+                      {enrolling === course._id ? (
+                        <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Enrolling...</>
+                      ) : (
+                        <><BookMarked className="w-4 h-4" />Enroll</>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl border border-zinc-100 overflow-hidden">
+            <div className="divide-y divide-zinc-50">
+              {filteredCourses.map((course) => (
+                <div key={course._id} className="course-card p-4 hover:bg-zinc-50 transition-colors">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-violet-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-6 h-6 text-violet-500" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-medium text-zinc-900 text-sm">{course.name}</h3>
+                        <span className="text-[10px] font-medium text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded">{course.code}</span>
+                        {isEnrolled(course._id) && (
+                          <span className="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">Enrolled</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-4 text-xs text-zinc-500">
+                        <span className="flex items-center gap-1"><Users className="w-3 h-3" />{course.instructor?.name || 'TBA'}</span>
+                        <span>{course.credits} credits</span>
+                        <span className="flex items-center gap-1">{course.rating || '4.5'}<Star className="w-3 h-3 text-amber-400 fill-amber-400" /></span>
                       </div>
                     </div>
-
-                    <p className="text-sm text-gray-600 mb-6 line-clamp-3 leading-relaxed flex-1">
-                      {course.description || 'No description available for this course.'}
-                    </p>
-
-                    <div className="grid grid-cols-3 gap-3 py-4 border-t border-b border-gray-50 mb-6 bg-gray-50/50 rounded-xl px-2">
-                      <div className="text-center">
-                        <p className="text-lg font-bold text-gray-900">{course.enrolledStudents?.length || course.students || 0}</p>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Students</p>
-                      </div>
-                      <div className="text-center border-l border-gray-100">
-                        <p className="text-lg font-bold text-gray-900">{course.credits}</p>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Credits</p>
-                      </div>
-                      <div className="text-center border-l border-gray-100">
-                        <div className="flex items-center justify-center gap-1">
-                          <span className="text-lg font-bold text-gray-900">{course.rating || '4.5'}</span>
-                          <Star className="w-3.5 h-3.5 text-yellow-400 fill-yellow-400" />
-                        </div>
-                        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Rating</p>
-                      </div>
-                    </div>
-
-                    <div>
+                    <div className="flex-shrink-0">
                       {isEnrolled(course._id) ? (
-                        <button
-                          onClick={() => handleViewMaterials(course)}
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
-                        >
-                          <Play className="w-4 h-4 fill-current" />
-                          Continue Learning
+                        <button onClick={() => handleViewMaterials(course)}
+                          className="px-4 py-2 bg-zinc-900 text-white rounded-lg text-xs font-medium hover:bg-zinc-800">
+                          Continue
                         </button>
                       ) : (
-                        <button
-                          onClick={() => handleEnroll(course._id)}
-                          disabled={enrolling === course._id}
-                          className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-                        >
-                          {enrolling === course._id ? (
-                            <>
-                              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                              In Progress...
-                            </>
-                          ) : (
-                            <>
-                              <BookMarked className="w-5 h-5" />
-                              Enroll Now
-                            </>
-                          )}
+                        <button onClick={() => handleEnroll(course._id)} disabled={enrolling === course._id}
+                          className="px-4 py-2 bg-violet-600 text-white rounded-lg text-xs font-medium hover:bg-violet-700 disabled:opacity-50">
+                          Enroll
                         </button>
                       )}
                     </div>
@@ -406,132 +403,68 @@ const StudentCourses = () => {
                 </div>
               ))}
             </div>
-          )
-        }
+          </div>
+        )}
 
         {/* Course Materials Modal */}
-        <Modal
-          isOpen={showMaterialsModal && selectedCourse}
-          onClose={() => {
-            setShowMaterialsModal(false);
-            setSelectedCourse(null);
-            setMaterials([]);
-          }}
-          title={selectedCourse ? `${selectedCourse.name} (${selectedCourse.code})` : 'Course Materials'}
-          size="xl"
-        >
+        <Modal isOpen={showMaterialsModal && selectedCourse} onClose={() => { setShowMaterialsModal(false); setSelectedCourse(null); setMaterials([]); }}
+          title={selectedCourse ? `${selectedCourse.name}` : 'Materials'} size="xl">
           {selectedCourse && (
             <div className="space-y-6">
               {loadingMaterials ? (
-                <div className="text-center py-16">
-                  <div className="w-12 h-12 border-4 border-gray-900 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-                  <p className="text-gray-500 font-medium">Fetching course materials...</p>
+                <div className="text-center py-12">
+                  <div className="w-8 h-8 border-2 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-3" />
+                  <p className="text-sm text-zinc-500">Loading materials...</p>
                 </div>
               ) : materials.length > 0 ? (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 pb-4 border-b border-gray-100">
-                    <div className="p-2 bg-primary-50 rounded-lg">
-                      <Folder className="w-6 h-6 text-primary-600" />
-                    </div>
-                    <h4 className="font-bold text-gray-900 text-lg">Available Files <span className="text-gray-400 font-medium text-base ml-1">({materials.length})</span></h4>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 pb-3 border-b border-zinc-100">
+                    <Folder className="w-4 h-4 text-violet-500" />
+                    <span className="text-sm font-medium text-zinc-900">Files ({materials.length})</span>
                   </div>
-                  <div className="grid gap-3">
-                    {materials.map((material) => (
-                      <div
-                        key={material._id}
-                        className="flex items-center justify-between p-4 bg-white rounded-xl border border-gray-200 hover:border-primary-300 hover:shadow-md transition-all group"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className="p-3 bg-gray-50 rounded-xl group-hover:bg-primary-50 transition-colors">
-                            {getFileIcon(material.type)}
-                          </div>
-                          <div>
-                            <p className="font-bold text-gray-900 group-hover:text-primary-700 transition-colors">{material.name}</p>
-                            <p className="text-xs text-gray-500 mt-1 flex items-center gap-2">
-                              <span className="font-medium bg-gray-100 px-1.5 py-0.5 rounded text-gray-600">{formatFileSize(material.size)}</span>
-                              <span className="w-1 h-1 bg-gray-300 rounded-full"></span>
-                              <span>Uploaded {new Date(material.uploadedAt).toLocaleDateString()}</span>
-                            </p>
-                          </div>
+                  {materials.map((material) => (
+                    <div key={material._id} className="flex items-center justify-between p-3 bg-zinc-50 rounded-lg hover:bg-zinc-100 transition-colors">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center border border-zinc-100">
+                          {getFileIcon(material.type)}
                         </div>
-                        <a
-                          href={`http://localhost:5000${material.url}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-900 text-gray-700 hover:text-white rounded-xl text-sm font-bold transition-all"
-                        >
-                          <Download className="w-4 h-4" />
-                          <span className="hidden sm:inline">Download</span>
-                        </a>
+                        <div>
+                          <p className="text-sm font-medium text-zinc-900">{material.name}</p>
+                          <p className="text-xs text-zinc-500">{formatFileSize(material.size)}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
                         {material.mindMap && (
-                          <button
-                            onClick={() => {
-                              setSelectedMaterial(material);
-                              setShowMindMapModal(true);
-                            }}
-                            className="flex items-center gap-2 px-4 py-2 bg-purple-50 hover:bg-purple-600 text-purple-600 hover:text-white rounded-xl text-sm font-bold transition-all"
-                          >
+                          <button onClick={() => { setSelectedMaterial(material); setShowMindMapModal(true); }}
+                            className="p-2 text-violet-600 hover:bg-violet-50 rounded-lg transition-colors">
                             <BrainCircuit className="w-4 h-4" />
-                            Mind Map
                           </button>
                         )}
+                        <a href={`http://localhost:5000${material.url}`} target="_blank" rel="noopener noreferrer"
+                          className="p-2 text-zinc-600 hover:bg-zinc-200 rounded-lg transition-colors">
+                          <Download className="w-4 h-4" />
+                        </a>
                       </div>
-                    ))}
-                  </div>
+                    </div>
+                  ))}
                 </div>
               ) : (
-                <div className="text-center py-16 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
-                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <FileText className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <p className="font-bold text-gray-900 text-lg">No materials available yet</p>
-                  <p className="text-gray-500 mt-1 max-w-xs mx-auto">The instructor hasn't uploaded any study materials for this course yet. Check back later!</p>
+                <div className="text-center py-12 bg-zinc-50 rounded-lg">
+                  <FileText className="w-10 h-10 text-zinc-300 mx-auto mb-3" />
+                  <p className="text-sm font-medium text-zinc-700">No materials yet</p>
+                  <p className="text-xs text-zinc-500 mt-1">Check back later</p>
                 </div>
               )}
 
-              {/* Course Description */}
-              <div className="mt-8 pt-8 border-t border-gray-100">
-                <h4 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <BookOpen className="w-5 h-5 text-gray-400" />
-                  About This Course
-                </h4>
-                <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
-                  <p className="text-gray-600 leading-relaxed">
-                    {selectedCourse.description || 'No description available for this course.'}
-                  </p>
-                  <div className="grid grid-cols-3 gap-4 mt-6">
-                    <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                      <p className="text-2xl font-bold text-gray-900">{selectedCourse.credits}</p>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Credits</p>
-                    </div>
-                    <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                      <p className="text-2xl font-bold text-gray-900">{selectedCourse.enrolledStudents?.length || 0}</p>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Students</p>
-                    </div>
-                    <div className="text-center p-4 bg-white rounded-xl shadow-sm border border-gray-100">
-                      <p className="text-lg font-bold text-gray-900 truncate px-2" title={selectedCourse.instructor?.name || 'TBA'}>
-                        {selectedCourse.instructor?.name || 'TBA'}
-                      </p>
-                      <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mt-1">Instructor</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-gray-100 flex gap-3">
+              <div className="pt-4 border-t border-zinc-100 flex gap-3">
                 {selectedCourse?.instructorId && (
-                  <button
-                    onClick={() => handleOpenRating(selectedCourse)}
-                    className="flex-1 flex items-center justify-center gap-2 py-3.5 bg-primary-50 hover:bg-primary-100 text-primary-700 rounded-xl font-bold transition-all active:scale-95 border border-primary-200"
-                  >
-                    <Star className="w-5 h-5" />
-                    Rate Instructor
+                  <button onClick={() => handleOpenRating(selectedCourse)}
+                    className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-violet-50 text-violet-700 rounded-lg text-sm font-medium hover:bg-violet-100 transition-colors">
+                    <Star className="w-4 h-4" />Rate Instructor
                   </button>
                 )}
-                <button
-                  onClick={() => setShowMaterialsModal(false)}
-                  className="flex-1 py-3.5 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95"
-                >
+                <button onClick={() => setShowMaterialsModal(false)}
+                  className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors">
                   Close
                 </button>
               </div>
@@ -539,106 +472,50 @@ const StudentCourses = () => {
           )}
         </Modal>
 
-        {/* Staff Rating Modal */}
-        <Modal
-          isOpen={showRatingModal && selectedCourse}
-          onClose={() => {
-            setShowRatingModal(false);
-            setUserRating(0);
-            setRatingComment('');
-          }}
-          title="Rate Instructor"
-          size="md"
-        >
+        {/* Rating Modal */}
+        <Modal isOpen={showRatingModal && selectedCourse} onClose={() => { setShowRatingModal(false); setUserRating(0); setRatingComment(''); }} title="Rate Instructor" size="md">
           {selectedCourse && (
             <div className="space-y-6">
-              {/* Instructor Info */}
-              <div className="text-center pb-4 border-b border-gray-100">
-                <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Users className="w-8 h-8 text-primary-600" />
+              <div className="text-center pb-4 border-b border-zinc-100">
+                <div className="w-14 h-14 bg-violet-50 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Users className="w-7 h-7 text-violet-500" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900">
-                  {typeof selectedCourse.instructor === 'string' ? selectedCourse.instructor : (selectedCourse.instructor?.name || 'Instructor')}
-                </h3>
-                <p className="text-gray-500 text-sm mt-1">
-                  {selectedCourse.name} ({selectedCourse.code})
-                </p>
+                <h3 className="font-semibold text-zinc-900">{selectedCourse.instructor?.name || selectedCourse.instructor}</h3>
+                <p className="text-xs text-zinc-500 mt-1">{selectedCourse.name}</p>
               </div>
 
-              {/* Star Rating */}
               <div className="flex flex-col items-center py-4">
-                <p className="text-sm font-medium text-gray-600 mb-3">
-                  {ratingStatus.hasRated ? 'Update your rating' : 'How would you rate this instructor?'}
-                </p>
-                <StarRating
-                  rating={userRating}
-                  onRate={setUserRating}
-                  onHover={setHoverRating}
-                  onLeave={() => setHoverRating(0)}
-                />
-                <p className="text-2xl font-bold text-gray-900 mt-3">
-                  {hoverRating || userRating || 0} / 5
-                </p>
+                <p className="text-sm text-zinc-600 mb-3">{ratingStatus.hasRated ? 'Update rating' : 'Rate this instructor'}</p>
+                <StarRating rating={userRating} onRate={setUserRating} onHover={setHoverRating} onLeave={() => setHoverRating(0)} />
+                <p className="text-xl font-semibold text-zinc-900 mt-3">{hoverRating || userRating || 0} / 5</p>
               </div>
 
-              {/* Comment */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Add a comment (optional)
-                </label>
-                <textarea
-                  value={ratingComment}
-                  onChange={(e) => setRatingComment(e.target.value)}
-                  placeholder="Share your experience with this instructor..."
-                  rows={3}
-                  className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all text-gray-800 resize-none"
-                />
+                <label className="block text-xs font-medium text-zinc-600 mb-1.5">Comment (optional)</label>
+                <textarea value={ratingComment} onChange={(e) => setRatingComment(e.target.value)} placeholder="Share your experience..."
+                  rows={3} className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 resize-none" />
               </div>
 
-              {/* Actions */}
-              <div className="flex gap-3 pt-2">
-                <button
-                  onClick={() => setShowRatingModal(false)}
-                  className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
-                >
+              <div className="flex gap-3">
+                <button onClick={() => setShowRatingModal(false)} className="flex-1 py-2.5 border border-zinc-200 text-zinc-600 rounded-lg text-sm font-medium hover:bg-zinc-50">
                   Cancel
                 </button>
-                <button
-                  onClick={handleSubmitRating}
-                  disabled={!userRating || submittingRating}
-                  className="flex-1 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {submittingRating ? (
-                    <>
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Star className="w-5 h-5" />
-                      {ratingStatus.hasRated ? 'Update Rating' : 'Submit Rating'}
-                    </>
-                  )}
+                <button onClick={handleSubmitRating} disabled={!userRating || submittingRating}
+                  className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 disabled:opacity-50">
+                  {submittingRating ? <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Submitting...</> : 'Submit'}
                 </button>
               </div>
             </div>
           )}
         </Modal>
-      </div>
 
-      {/* Mind Map Modal */}
-      {showMindMapModal && selectedCourse && selectedMaterial && (
-        <MindMapPreview
-          courseId={selectedCourse._id}
-          materialId={selectedMaterial._id}
-          onClose={() => {
-            setShowMindMapModal(false);
-            setSelectedMaterial(null);
-          }}
-          readOnly={true}
-          initialMarkdown={selectedMaterial.mindMap}
-        />
-      )}
+        {/* Mind Map Modal */}
+        {showMindMapModal && selectedCourse && selectedMaterial && (
+          <MindMapPreview courseId={selectedCourse._id} materialId={selectedMaterial._id}
+            onClose={() => { setShowMindMapModal(false); setSelectedMaterial(null); }}
+            readOnly initialMarkdown={selectedMaterial.mindMap} />
+        )}
+      </div>
     </DashboardLayout>
   );
 };

@@ -3,46 +3,70 @@ import { selectCurrentUser, updateUserInfo } from '../../store/slices/authSlice'
 import DashboardLayout from '../../components/DashboardLayout';
 import { getProfile, updateProfile } from '../../utils/api';
 import {
-  User,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  GraduationCap,
-  BookOpen,
-  Hash,
-  Edit,
-  Save,
-  X,
-  CheckCircle,
-  Loader,
-  Lock
+  User, Mail, Phone, MapPin, Calendar, GraduationCap,
+  BookOpen, Hash, Edit, Save, X, CheckCircle, Loader, Lock,
+  Shield, Award, TrendingUp, Eye, EyeOff, Key
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
+import gsap from 'gsap';
+
+// Progress Ring Component
+const ProgressRing = ({ percentage, size = 80, strokeWidth = 6, color = '#8b5cf6' }) => {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (percentage / 100) * circumference;
+
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#f4f4f5" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
+          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
+          className="transition-all duration-700 ease-out" />
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-lg font-semibold text-zinc-700">{percentage}%</span>
+      </div>
+    </div>
+  );
+};
 
 const StudentProfile = () => {
   const user = useSelector(selectCurrentUser);
   const dispatch = useDispatch();
+  const pageRef = useRef(null);
   const [profile, setProfile] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    department: '',
-    year: '',
-    rollNumber: '',
-    bio: '',
-    address: '',
-    dateOfBirth: '',
-    gender: ''
+    name: '', email: '', phone: '', department: '', year: '',
+    rollNumber: '', bio: '', address: '', dateOfBirth: '', gender: ''
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
 
+  // Password change state
+  const [showPasswordSection, setShowPasswordSection] = useState(false);
+  const [passwordData, setPasswordData] = useState({ newPassword: '', confirmPassword: '' });
+  const [passwordMessage, setPasswordMessage] = useState({ type: '', text: '' });
+  const [savingPassword, setSavingPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Calculate profile completion
+  const calculateCompletion = () => {
+    const fields = ['name', 'email', 'phone', 'department', 'year', 'rollNumber', 'bio', 'address', 'dateOfBirth', 'gender'];
+    const filled = fields.filter(f => profile[f] && profile[f].toString().trim() !== '').length;
+    return Math.round((filled / fields.length) * 100);
+  };
+
+  // GSAP Animations
   useEffect(() => {
-    fetchProfile();
-  }, []);
+    if (pageRef.current && !loading) {
+      gsap.fromTo('.profile-card', { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.08, ease: 'power2.out' });
+    }
+  }, [loading]);
+
+  useEffect(() => { fetchProfile(); }, []);
 
   const fetchProfile = async () => {
     try {
@@ -80,11 +104,10 @@ const StudentProfile = () => {
 
     try {
       const { data } = await updateProfile(profile);
-      if (updateUserInfo) {
-        dispatch(updateUserInfo(data));
-      }
+      if (updateUserInfo) dispatch(updateUserInfo(data));
       setIsEditing(false);
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
+      setTimeout(() => setMessage({ type: '', text: '' }), 3000);
     } catch (error) {
       console.error('Error updating profile:', error);
       setMessage({ type: 'error', text: 'Failed to update profile' });
@@ -93,304 +116,404 @@ const StudentProfile = () => {
     }
   };
 
-  const handleCancel = () => {
-    fetchProfile();
-    setIsEditing(false);
+  const handleCancel = () => { fetchProfile(); setIsEditing(false); };
+
+  // Handle password change
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setPasswordMessage({ type: '', text: '' });
+
+    if (passwordData.newPassword.length < 6) {
+      setPasswordMessage({ type: 'error', text: 'Password must be at least 6 characters' });
+      return;
+    }
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setPasswordMessage({ type: 'error', text: 'Passwords do not match' });
+      return;
+    }
+
+    setSavingPassword(true);
+    try {
+      await updateProfile({ password: passwordData.newPassword });
+      setPasswordMessage({ type: 'success', text: 'Password changed successfully!' });
+      setPasswordData({ newPassword: '', confirmPassword: '' });
+      setShowPasswordSection(false);
+      setTimeout(() => setPasswordMessage({ type: '', text: '' }), 3000);
+    } catch (error) {
+      console.error('Error changing password:', error);
+      setPasswordMessage({ type: 'error', text: error.response?.data?.message || 'Failed to change password' });
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   if (loading) {
     return (
-      <DashboardLayout role="student" userName={user?.name}>
-        <div className="flex items-center justify-center h-[calc(100vh-100px)]">
+      <DashboardLayout>
+        <div className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 flex items-center justify-center">
           <div className="flex flex-col items-center gap-3">
-            <Loader className="w-10 h-10 text-primary-600 animate-spin" />
-            <span className="text-gray-500 font-medium">Loading profile...</span>
+            <div className="w-10 h-10 border-3 border-violet-200 border-t-violet-600 rounded-full animate-spin" />
+            <span className="text-sm text-zinc-500">Loading profile...</span>
           </div>
         </div>
       </DashboardLayout>
     );
   }
 
+  const profileCompletion = calculateCompletion();
+
   return (
-    <DashboardLayout role="student" userName={user?.name}>
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 animate-fade-in text-center sm:text-left">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Profile</h1>
-          <p className="text-gray-500 mt-1 text-lg">Manage your personal information and preferences</p>
-        </div>
-        {!isEditing ? (
-          <button
-            onClick={() => setIsEditing(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition-all shadow-lg active:scale-95 group"
-          >
-            <Edit className="w-5 h-5 group-hover:scale-110 transition-transform" />
-            Edit Profile
-          </button>
-        ) : (
+    <DashboardLayout>
+      <div ref={pageRef} className="min-h-screen bg-gradient-to-br from-zinc-50 via-white to-zinc-50 p-6 lg:p-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">My Profile</h1>
+            <p className="text-sm text-zinc-500 mt-1">Manage your personal information</p>
+          </div>
           <div className="flex gap-3">
-            <button
-              onClick={handleCancel}
-              className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-50 hover:border-gray-300 transition-all active:scale-95"
-            >
-              <X className="w-5 h-5" />
-              Cancel
-            </button>
-            <button
-              onClick={handleSubmit}
-              disabled={saving}
-              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-primary-200 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-            >
-              {saving ? <Loader className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-              Save Changes
-            </button>
+            {!isEditing ? (
+              <button
+                onClick={() => setIsEditing(true)}
+                className="flex items-center gap-2 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-medium hover:bg-zinc-800 transition-colors"
+              >
+                <Edit className="w-4 h-4" />
+                Edit Profile
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={handleCancel}
+                  className="flex items-center gap-2 px-4 py-2.5 border border-zinc-200 text-zinc-600 rounded-lg text-sm font-medium hover:bg-zinc-50 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSubmit}
+                  disabled={saving}
+                  className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 text-white rounded-lg text-sm font-medium hover:bg-violet-700 transition-colors disabled:opacity-50"
+                >
+                  {saving ? <Loader className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                  Save Changes
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* Message */}
+        {message.text && (
+          <div className={`mb-6 p-4 rounded-xl flex items-center gap-3 border ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border-emerald-100' : 'bg-red-50 text-red-700 border-red-100'
+            }`}>
+            <CheckCircle className="w-5 h-5" />
+            <p className="text-sm font-medium">{message.text}</p>
           </div>
         )}
-      </div>
 
-      {/* Message */}
-      {message.text && (
-        <div className={`mb-8 p-4 rounded-xl flex items-center gap-3 animate-slide-in-up border ${message.type === 'success' ? 'bg-green-50 text-green-800 border-green-100' : 'bg-red-50 text-red-800 border-red-100'
-          }`}>
-          <div className={`p-2 rounded-full ${message.type === 'success' ? 'bg-green-100' : 'bg-red-100'}`}>
-            <CheckCircle className={`w-5 h-5 ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`} />
-          </div>
-          <p className="font-bold">{message.text}</p>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-fade-in delay-100">
-        {/* Profile Card */}
-        <div className="lg:col-span-1">
-          <div className="glass-card rounded-3xl tilt-card overflow-hidden hover:shadow-xl transition-all duration-300 h-full group">
-            <div className="bg-gradient-to-br from-gray-900 to-gray-800 p-10 text-center relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8 opacity-5">
-                <User className="w-64 h-64 text-white -mr-20 -mt-20 transform rotate-12" />
-              </div>
-              <div className="relative z-10">
-                <div className="w-32 h-32 bg-white rounded-full mx-auto mb-6 flex items-center justify-center shadow-2xl ring-4 ring-white/10 group-hover:scale-105 transition-transform duration-300">
-                  <User className="w-16 h-16 text-gray-900" />
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Left Column - Profile Card */}
+          <div className="lg:col-span-1 space-y-6">
+            {/* Avatar Card */}
+            <div className="profile-card bg-white rounded-xl border border-zinc-100 overflow-hidden">
+              <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 p-8 text-center">
+                <div className="w-24 h-24 bg-white rounded-full mx-auto mb-4 flex items-center justify-center shadow-lg">
+                  <User className="w-12 h-12 text-zinc-700" />
                 </div>
-                <h2 className="text-2xl font-bold text-white tracking-tight mb-2">{profile.name}</h2>
-                <span className="inline-block px-4 py-1.5 bg-white/10 backdrop-blur-md rounded-full text-sm font-semibold text-gray-200 border border-white/10">
+                <h2 className="text-lg font-semibold text-white">{profile.name}</h2>
+                <span className="inline-block mt-2 px-3 py-1 bg-white/10 text-zinc-300 rounded-full text-xs font-medium">
                   {profile.rollNumber || 'Student'}
                 </span>
               </div>
-            </div>
-            <div className="p-8 space-y-6">
-              <div className="flex items-center gap-4 group/item">
-                <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover/item:bg-blue-100 transition-colors">
-                  <Mail className="w-6 h-6 text-blue-600" />
+              <div className="p-5 space-y-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center">
+                    <Mail className="w-4 h-4 text-blue-500" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Email</p>
+                    <p className="text-sm text-zinc-900 truncate">{profile.email}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Email</p>
-                  <p className="font-semibold text-gray-900 truncate" title={profile.email}>{profile.email}</p>
-                </div>
+                {profile.phone && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center">
+                      <Phone className="w-4 h-4 text-emerald-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Phone</p>
+                      <p className="text-sm text-zinc-900">{profile.phone}</p>
+                    </div>
+                  </div>
+                )}
+                {profile.department && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
+                      <GraduationCap className="w-4 h-4 text-violet-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Department</p>
+                      <p className="text-sm text-zinc-900">{profile.department}</p>
+                    </div>
+                  </div>
+                )}
+                {profile.year && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center">
+                      <BookOpen className="w-4 h-4 text-amber-500" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Year</p>
+                      <p className="text-sm text-zinc-900">{profile.year}{profile.year === '1' ? 'st' : profile.year === '2' ? 'nd' : profile.year === '3' ? 'rd' : 'th'} Year</p>
+                    </div>
+                  </div>
+                )}
               </div>
+            </div>
 
-              {profile.phone && (
-                <div className="flex items-center gap-4 group/item">
-                  <div className="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover/item:bg-green-100 transition-colors">
-                    <Phone className="w-6 h-6 text-green-600" />
+            {/* Profile Completion */}
+            <div className="profile-card bg-white rounded-xl border border-zinc-100 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-medium text-zinc-900">Profile Completion</h3>
+                <ProgressRing percentage={profileCompletion} size={64} strokeWidth={5} />
+              </div>
+              <div className="space-y-2">
+                {[
+                  { label: 'Basic Info', done: !!(profile.name && profile.email) },
+                  { label: 'Contact Details', done: !!profile.phone },
+                  { label: 'Academic Info', done: !!(profile.department && profile.year) },
+                  { label: 'Personal Details', done: !!(profile.dateOfBirth && profile.gender) },
+                  { label: 'Bio & Address', done: !!(profile.bio && profile.address) }
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-sm">
+                    <div className={`w-5 h-5 rounded-full flex items-center justify-center ${item.done ? 'bg-emerald-100' : 'bg-zinc-100'}`}>
+                      {item.done ? <CheckCircle className="w-3 h-3 text-emerald-600" /> : <div className="w-2 h-2 bg-zinc-300 rounded-full" />}
+                    </div>
+                    <span className={item.done ? 'text-zinc-700' : 'text-zinc-400'}>{item.label}</span>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Phone</p>
-                    <p className="font-semibold text-gray-900">{profile.phone}</p>
-                  </div>
-                </div>
-              )}
-
-              {profile.department && (
-                <div className="flex items-center gap-4 group/item">
-                  <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center group-hover/item:bg-purple-100 transition-colors">
-                    <GraduationCap className="w-6 h-6 text-purple-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Department</p>
-                    <p className="font-semibold text-gray-900">{profile.department}</p>
-                  </div>
-                </div>
-              )}
-
-              {profile.year && (
-                <div className="flex items-center gap-4 group/item">
-                  <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center group-hover/item:bg-orange-100 transition-colors">
-                    <BookOpen className="w-6 h-6 text-orange-600" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-0.5">Year of Study</p>
-                    <p className="font-semibold text-gray-900">{profile.year}</p>
-                  </div>
-                </div>
-              )}
+                ))}
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Edit Form / Details View */}
-        <div className="lg:col-span-2">
-          <div className="glass-card rounded-3xl tilt-card p-8 hover:shadow-lg transition-all duration-300 h-full">
-            <div className="flex items-center gap-3 mb-8 pb-6 border-b border-gray-100">
-              <div className="p-2 bg-primary-50 rounded-lg">
-                <User className="w-6 h-6 text-primary-600" />
+          {/* Right Column - Edit Form */}
+          <div className="lg:col-span-2">
+            <div className="profile-card bg-white rounded-xl border border-zinc-100 p-6">
+              <div className="flex items-center gap-3 mb-6 pb-4 border-b border-zinc-100">
+                <div className="w-9 h-9 bg-violet-50 rounded-lg flex items-center justify-center">
+                  <User className="w-4 h-4 text-violet-500" />
+                </div>
+                <h3 className="font-semibold text-zinc-900">Personal Information</h3>
               </div>
-              <h3 className="text-xl font-bold text-gray-900">Personal Information</h3>
-            </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Name */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Full Name</label>
-                  {isEditing ? (
-                    <input
-                      type="text"
-                      name="name"
-                      value={profile.name}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900"
-                    />
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.name || '-'}</p>
-                  )}
-                </div>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Full Name</label>
+                    {isEditing ? (
+                      <input type="text" name="name" value={profile.name} onChange={handleChange}
+                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                    ) : (
+                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.name || '-'}</p>
+                    )}
+                  </div>
 
-                {/* Email */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Email Address</label>
-                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">{profile.email}</p>
-                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
-                    <Lock className="w-3 h-3" />
-                    Email cannot be changed
-                  </p>
-                </div>
+                  {/* Email - Locked */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Email Address</label>
+                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.email}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot be changed</p>
+                  </div>
 
-                {/* Phone */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Phone Number</label>
-                  {isEditing ? (
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={profile.phone}
-                      onChange={handleChange}
-                      placeholder="Enter phone number"
-                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900"
-                    />
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.phone || '-'}</p>
-                  )}
-                </div>
+                  {/* Phone */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Phone Number</label>
+                    {isEditing ? (
+                      <input type="tel" name="phone" value={profile.phone} onChange={handleChange} placeholder="Enter phone"
+                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                    ) : (
+                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.phone || '-'}</p>
+                    )}
+                  </div>
 
-                {/* Roll Number - LOCKED */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Roll Number</label>
-                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">{profile.rollNumber || '-'}</p>
-                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
-                    <Lock className="w-3 h-3" />
-                    Auto-generated, cannot be changed
-                  </p>
-                </div>
+                  {/* Roll Number - Locked */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Roll Number</label>
+                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.rollNumber || '-'}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Auto-generated</p>
+                  </div>
 
-                {/* Department - LOCKED */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Department</label>
-                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">{profile.department || '-'}</p>
-                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
-                    <Lock className="w-3 h-3" />
-                    Cannot be changed after registration
-                  </p>
-                </div>
+                  {/* Department - Locked */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Department</label>
+                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">{profile.department || '-'}</p>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
+                  </div>
 
-                {/* Year - LOCKED */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2">Year of Study</label>
-                  <p className="px-5 py-3.5 bg-blue-50/50 border border-blue-100 rounded-xl text-blue-900 font-semibold">
-                    {profile.year ? `${profile.year}${profile.year === '1' ? 'st' : profile.year === '2' ? 'nd' : profile.year === '3' ? 'rd' : 'th'} Year` : '-'}
-                  </p>
-                  <p className="text-xs text-blue-500 mt-2 font-medium flex items-center gap-1.5 ml-1">
-                    <Lock className="w-3 h-3" />
-                    Cannot be changed after registration
-                  </p>
-                </div>
-
-                {/* Date of Birth */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Date of Birth</label>
-                  {isEditing ? (
-                    <input
-                      type="date"
-                      name="dateOfBirth"
-                      value={profile.dateOfBirth}
-                      onChange={handleChange}
-                      className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900"
-                    />
-                  ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">
-                      {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-IN') : '-'}
+                  {/* Year - Locked */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Year of Study</label>
+                    <p className="px-4 py-2.5 bg-blue-50/50 border border-blue-100 rounded-lg text-sm text-blue-900">
+                      {profile.year ? `${profile.year}${['st', 'nd', 'rd'][profile.year - 1] || 'th'} Year` : '-'}
                     </p>
-                  )}
-                </div>
+                    <p className="flex items-center gap-1 text-[10px] text-blue-500 mt-1.5"><Lock className="w-3 h-3" />Cannot change</p>
+                  </div>
 
-                {/* Gender */}
-                <div className="group">
-                  <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Gender</label>
-                  {isEditing ? (
-                    <div className="relative">
-                      <select
-                        name="gender"
-                        value={profile.gender}
-                        onChange={handleChange}
-                        className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900 appearance-none cursor-pointer"
-                      >
+                  {/* Date of Birth */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Date of Birth</label>
+                    {isEditing ? (
+                      <input type="date" name="dateOfBirth" value={profile.dateOfBirth} onChange={handleChange}
+                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300" />
+                    ) : (
+                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">
+                        {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-IN') : '-'}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Gender */}
+                  <div>
+                    <label className="block text-xs font-medium text-zinc-600 mb-1.5">Gender</label>
+                    {isEditing ? (
+                      <select name="gender" value={profile.gender} onChange={handleChange}
+                        className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300">
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
                         <option value="Female">Female</option>
                         <option value="Other">Other</option>
                       </select>
-                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <User className="w-5 h-5 text-gray-400" />
-                      </div>
-                    </div>
+                    ) : (
+                      <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.gender || '-'}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Address */}
+                <div>
+                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Address</label>
+                  {isEditing ? (
+                    <textarea name="address" value={profile.address} onChange={handleChange} rows={2} placeholder="Enter address"
+                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 resize-none" />
                   ) : (
-                    <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.gender || '-'}</p>
+                    <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.address || '-'}</p>
                   )}
                 </div>
-              </div>
 
-              {/* Address */}
-              <div className="group">
-                <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Address</label>
-                {isEditing ? (
-                  <textarea
-                    name="address"
-                    value={profile.address}
-                    onChange={handleChange}
-                    rows={2}
-                    placeholder="Enter your address"
-                    className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900 resize-none"
-                  />
-                ) : (
-                  <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent">{profile.address || '-'}</p>
+                {/* Bio */}
+                <div>
+                  <label className="block text-xs font-medium text-zinc-600 mb-1.5">Bio</label>
+                  {isEditing ? (
+                    <textarea name="bio" value={profile.bio} onChange={handleChange} rows={3} placeholder="Tell us about yourself..."
+                      className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300 resize-none" />
+                  ) : (
+                    <p className="px-4 py-2.5 bg-zinc-50 border border-zinc-100 rounded-lg text-sm text-zinc-900">{profile.bio || '-'}</p>
+                  )}
+                </div>
+              </form>
+
+              {/* Password Change Section */}
+              <div className="mt-8 pt-6 border-t border-zinc-100">
+                <button
+                  onClick={() => setShowPasswordSection(!showPasswordSection)}
+                  className="flex items-center gap-2 text-sm font-medium text-zinc-700 hover:text-violet-600 transition-colors"
+                >
+                  <Key className="w-4 h-4" />
+                  Change Password
+                  <span className={`transition-transform ${showPasswordSection ? 'rotate-180' : ''}`}>
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  </span>
+                </button>
+
+                {showPasswordSection && (
+                  <form onSubmit={handlePasswordChange} className="mt-4 p-4 bg-zinc-50 rounded-xl border border-zinc-100 space-y-4">
+                    {/* Password Message */}
+                    {passwordMessage.text && (
+                      <div className={`p-3 rounded-lg text-sm flex items-center gap-2 ${passwordMessage.type === 'success'
+                          ? 'bg-emerald-50 text-emerald-700 border border-emerald-100'
+                          : 'bg-red-50 text-red-700 border border-red-100'
+                        }`}>
+                        <CheckCircle className="w-4 h-4" />
+                        {passwordMessage.text}
+                      </div>
+                    )}
+
+                    {/* New Password */}
+                    <div>
+                      <label className="block text-xs font-medium text-zinc-600 mb-1.5">New Password</label>
+                      <div className="relative">
+                        <input
+                          type={showNewPassword ? 'text' : 'password'}
+                          value={passwordData.newPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, newPassword: e.target.value }))}
+                          placeholder="Enter new password (min 6 characters)"
+                          className="w-full px-4 py-2.5 pr-10 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowNewPassword(!showNewPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                        >
+                          {showNewPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Confirm Password */}
+                    <div>
+                      <label className="block text-xs font-medium text-zinc-600 mb-1.5">Confirm New Password</label>
+                      <div className="relative">
+                        <input
+                          type={showConfirmPassword ? 'text' : 'password'}
+                          value={passwordData.confirmPassword}
+                          onChange={(e) => setPasswordData(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                          placeholder="Confirm new password"
+                          className="w-full px-4 py-2.5 pr-10 bg-white border border-zinc-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-violet-100 focus:border-violet-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+                        >
+                          {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Submit Button */}
+                    <div className="flex items-center gap-3 pt-2">
+                      <button
+                        type="submit"
+                        disabled={savingPassword || !passwordData.newPassword || !passwordData.confirmPassword}
+                        className="flex items-center gap-2 px-4 py-2 bg-violet-600 text-white text-sm font-medium rounded-lg hover:bg-violet-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {savingPassword ? (
+                          <Loader className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Key className="w-4 h-4" />
+                        )}
+                        {savingPassword ? 'Changing...' : 'Change Password'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowPasswordSection(false);
+                          setPasswordData({ newPassword: '', confirmPassword: '' });
+                          setPasswordMessage({ type: '', text: '' });
+                        }}
+                        className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-800 transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </form>
                 )}
               </div>
-
-              {/* Bio */}
-              <div className="group">
-                <label className="block text-sm font-bold text-gray-700 mb-2 group-focus-within:text-primary-600 transition-colors">Bio</label>
-                {isEditing ? (
-                  <textarea
-                    name="bio"
-                    value={profile.bio}
-                    onChange={handleChange}
-                    rows={3}
-                    placeholder="Tell us about yourself..."
-                    className="w-full px-4 py-3.5 bg-gray-50 border-2 border-gray-100 rounded-xl focus:outline-none focus:bg-white focus:border-primary-500 transition-all font-semibold text-gray-900 resize-none"
-                  />
-                ) : (
-                  <p className="px-5 py-3.5 bg-gray-50 rounded-xl text-gray-900 font-semibold border border-transparent leading-relaxed">{profile.bio || '-'}</p>
-                )}
-              </div>
-            </form>
+            </div>
           </div>
         </div>
       </div>
