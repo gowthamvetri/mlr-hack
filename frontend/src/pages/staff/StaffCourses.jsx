@@ -64,7 +64,7 @@ const StaffCourses = () => {
         }
     };
 
-    const filteredCourses = courses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.code.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredCourses = Array.isArray(courses) ? courses.filter(c => c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.code.toLowerCase().includes(searchQuery.toLowerCase())) : [];
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>

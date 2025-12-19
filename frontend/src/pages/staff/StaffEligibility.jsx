@@ -61,7 +61,7 @@ const StaffEligibility = () => {
       if (staffDepartment) params.department = staffDepartment;
       if (filterYear !== 'all') params.year = filterYear;
       const studentsRes = await getStudentsForStaff(params);
-      setStudents(studentsRes.data);
+      setStudents(Array.isArray(studentsRes.data) ? studentsRes.data : []);
     } catch (error) {
       console.error('Error fetching students:', error);
     } finally {
@@ -90,15 +90,15 @@ const StaffEligibility = () => {
     }
   };
 
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = Array.isArray(students) ? students.filter(student => {
     const matchesSearch = student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || student.rollNumber?.toLowerCase().includes(searchQuery.toLowerCase());
     if (filterEligibility === 'eligible') return matchesSearch && student.attendance >= 75 && student.feesPaid;
     if (filterEligibility === 'ineligible') return matchesSearch && (student.attendance < 75 || !student.feesPaid);
     return matchesSearch;
-  });
+  }) : [];
 
-  const eligibleCount = students.filter(s => s.attendance >= 75 && s.feesPaid).length;
-  const ineligibleCount = students.filter(s => s.attendance < 75 || !s.feesPaid).length;
+  const eligibleCount = Array.isArray(students) ? students.filter(s => s.attendance >= 75 && s.feesPaid).length : 0;
+  const ineligibleCount = Array.isArray(students) ? students.filter(s => s.attendance < 75 || !s.feesPaid).length : 0;
   const years = [{ value: '1', label: '1st Year' }, { value: '2', label: '2nd Year' }, { value: '3', label: '3rd Year' }, { value: '4', label: '4th Year' }];
 
   return (

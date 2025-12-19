@@ -454,6 +454,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/staff/registration-requests"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffRegistrationRequests />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </Suspense>
       </Router>

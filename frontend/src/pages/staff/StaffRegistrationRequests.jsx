@@ -80,7 +80,7 @@ const StaffRegistrationRequests = () => {
             const userInfo = JSON.parse(localStorage.getItem('userInfo'));
             const token = userInfo?.token;
             const { data } = await axios.get('http://localhost:5000/api/registration-requests', { headers: { Authorization: `Bearer ${token}` }, params: filters });
-            setRequests(data);
+            setRequests(Array.isArray(data) ? data : []);
         } catch (error) { console.error('Error fetching requests:', error); }
         finally { setLoading(false); }
     };

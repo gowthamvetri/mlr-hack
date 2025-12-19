@@ -91,24 +91,17 @@ const StaffInvigilation = () => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const filteredAssignments = assignments.filter(a => {
+    const filteredAssignments = Array.isArray(assignments) ? assignments.filter(a => {
         const assignmentDate = new Date(a.date);
         assignmentDate.setHours(0, 0, 0, 0);
         if (filter === 'upcoming') return assignmentDate >= today;
         if (filter === 'past') return assignmentDate < today;
         return true;
-    });
+    }) : [];
 
     const upcomingCount = assignments.filter(a => { const d = new Date(a.date); d.setHours(0, 0, 0, 0); return d >= today; }).length;
     const pastCount = assignments.length - upcomingCount;
     const thisWeekCount = assignments.filter(a => { const d = new Date(a.date); const weekEnd = new Date(today); weekEnd.setDate(weekEnd.getDate() + 7); return d >= today && d <= weekEnd; }).length;
-    const completionRate = assignments.length > 0 ? Math.round((pastCount / assignments.length) * 100) : 0;
-
-    const todaysAssignment = assignments.find(a => {
-        const d = new Date(a.date);
-        d.setHours(0, 0, 0, 0);
-        return d.getTime() === today.getTime();
-    });
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
