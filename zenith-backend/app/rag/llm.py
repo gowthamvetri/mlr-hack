@@ -1,8 +1,9 @@
 """
-LLM Service - Google Gemini Integration
+LLM Service - Local LM Studio Integration
+Uses OpenAI-compatible API to connect to local LLM
 """
 from typing import List, Dict, Any, Optional
-import google.generativeai as genai
+from openai import OpenAI
 from app.config import settings
 import logging
 
@@ -10,18 +11,20 @@ logger = logging.getLogger(__name__)
 
 
 class LLMService:
-    """Service for LLM interactions using Google Gemini"""
+    """Service for LLM interactions using Local LM Studio"""
     
     def __init__(self):
         self.provider = settings.LLM_PROVIDER
         
-        # Configure Gemini API
-        genai.configure(api_key=settings.GEMINI_API_KEY)
-        # Use gemini-1.5-flash-latest (correct model name for API v1beta)
-        self.model = genai.GenerativeModel('gemini-2.5-flash')
+        # Configure OpenAI-compatible client for LM Studio
+        self.client = OpenAI(
+            base_url=settings.LM_STUDIO_BASE_URL,
+            api_key="lm-studio"  # LM Studio doesn't require real API key
+        )
+        self.model = settings.LM_STUDIO_MODEL
         
-        logger.info(f"✅ Initialized LLM Service with Google Gemini")
-        logger.info(f"Model: gemini-1.5-flash-latest (1500 requests/day free tier)")
+        logger.info(f"✅ Initialized LLM Service with Local LM Studio")
+        logger.info(f"Model: {self.model} at {settings.LM_STUDIO_BASE_URL}")
     
     def generate_response(
         self,
@@ -31,7 +34,7 @@ class LLMService:
         max_tokens: int = 1000
     ) -> str:
         """
-        Generate response from Google Gemini
+        Generate response from Local LM Studio
         
         Args:
             prompt: User prompt
@@ -43,40 +46,32 @@ class LLMService:
             Generated text
         """
         try:
-            # Combine system prompt and user prompt
-            full_prompt = prompt
+            # Build messages
+            messages = []
             if system_prompt:
-                full_prompt = f"{system_prompt}\n\n{prompt}"
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append({"role": "user", "content": prompt})
             
-            # Configure generation settings
-            generation_config = genai.types.GenerationConfig(
+            # Generate response using OpenAI-compatible API
+            response = self.client.chat.completions.create(
+                model=self.model,
+                messages=messages,
                 temperature=temperature,
-                max_output_tokens=max_tokens,
+                max_tokens=max_tokens
             )
             
-            # Generate response
-            response = self.model.generate_content(
-                full_prompt,
-                generation_config=generation_config
-            )
+            # Extract response
+            if response.choices and len(response.choices) > 0:
+                result = response.choices[0].message.content.strip()
+                if result:
+                    return result
             
-            # Handle response safely - NEVER use response.text directly
-            if response.candidates and len(response.candidates) > 0:
-                candidate = response.candidates[0]
-                if candidate.content and candidate.content.parts:
-                    # Extract text from parts
-                    text_parts = [part.text for part in candidate.content.parts if hasattr(part, 'text')]
-                    result = ' '.join(text_parts).strip()
-                    if result:
-                        return result
-            
-            # If no valid response, return empty string
-            logger.warning("Gemini returned empty response")
+            logger.warning("LM Studio returned empty response")
             return ""
             
         except Exception as e:
-            logger.error(f"Error generating Gemini response: {str(e)}")
-            raise Exception(f"Failed to get response from Gemini: {str(e)}")
+            logger.error(f"Error generating LM Studio response: {str(e)}")
+            raise Exception(f"Failed to get response from LM Studio: {str(e)}")
     
     def generate_rag_response(
         self,
@@ -171,65 +166,46 @@ Please provide a helpful answer based ONLY on the context above. Stay focused on
                 history_parts.append(f"{role}: {content}")
             history_context = "Previous Conversation:\n" + "\n".join(history_parts) + "\n\n"
         
-        # System prompt for formatting
-        system_prompt = """You are the Smart Campus Assistant for MLRIT college - friendly, helpful, and knowledgeable.
+        # SIMPLIFIED system prompt for clean, accurate responses
+        system_prompt = """You are the MLRIT Campus Assistant. Answer questions about MLR Institute of Technology.
 
-YOUR MISSION:
-Answer student questions naturally using the retrieved documents. Be conversational, not robotic.
+IMPORTANT RULES:
+1. USE the retrieved documents to answer - they contain relevant MLRIT information
+2. If the documents contain related info, share it helpfully
+3. For person-specific questions (principal/chairman), answer about THAT person only
+4. Don't say "I don't have info" if there IS related content in the documents
+5. For non-MLRIT questions, say "I only answer MLRIT-related queries"
 
-HOW TO ANSWER:
-1. READ the documents and extract relevant facts
-2. ANSWER in your own words - don't copy-paste document text
-3. Be CONCISE - give 2-5 sentences for simple questions
-4. Include specific details (names, dates, numbers) when relevant
-5. NEVER mention "document numbers" or "relevance scores" - just answer naturally
-6. NEVER say "according to the document" or "based on the retrieved text"
-7. If conversation history exists, use it to understand context
+WHEN TO SAY "I don't have that info":
+- ONLY if the retrieved documents have NO relevant information at all
+- If documents have RELATED info, share what you have
 
-RELEVANCE CHECK:
-- If ALL documents have relevance below 30% AND don't answer the question:
-  Say: "I don't have that information in my knowledge base. You can ask me about MLRIT's programs, placements, events, facilities, or contact details."
-
-EXAMPLES OF GOOD ANSWERS:
-
-Question: "Who founded MLRIT?"
-Bad: "Document 1 states that MLRIT was founded by..."
-Good: "MLRIT was founded in 2005 by Sri Marri Laxman Reddy under the KMR Educational Trust."
-
-Question: "What programs are offered?"
-Bad: "The retrieved documents list the following..."
-Good: "MLRIT offers B.Tech programs in Computer Science (including AI/ML, Data Science, Cyber Security), Electronics, Electrical, Mechanical, and Aeronautical Engineering. They also have M.Tech and MBA programs."
-
-Question: "Library facilities?"
-Bad: "According to Document 2..."
-Good: "The campus has a central library with physical books, e-resources, NPTEL access, and online journal subscriptions including IEEE and Elsevier."
-
-BE NATURAL, FRIENDLY, AND HELPFUL!"""
+FORMAT:
+- Use **bold** for names and important terms
+- Use *italics* for titles/designations  
+- Keep answers concise but informative
+- Only show contact info if it exists"""
         
-        # Simplify the context - don't show metadata to Gemini
-        simple_context_parts = []
-        for i, text in enumerate(retrieved_texts, 1):
-            simple_context_parts.append(f"Source {i}:\n{text}")
+        # Simplify the context
+        simple_context = "\n\n".join([f"[{i+1}] {text}" for i, text in enumerate(retrieved_texts)])
         
-        simple_context = "\n\n".join(simple_context_parts)
-        
-        prompt = f"""{history_context}Retrieved Information:
+        prompt = f"""Retrieved Information about MLRIT:
 {simple_context}
 
-Student Question: {question}
+Question: {question}
 
-Answer naturally and concisely."""
+Instructions: Answer the question using the information above. If the exact answer isn't available but related info exists, share what's available. Be helpful and informative. Use **bold** for important terms."""
         
         return self.generate_response(
             prompt=prompt,
             system_prompt=system_prompt,
-            temperature=0.3,  # Lower for more focused answers
-            max_tokens=500  # Shorter answers (2-5 sentences)
+            temperature=0.3,  # Slightly higher for more natural responses
+            max_tokens=500
         )
     
     def detect_category(self, question: str) -> str:
         """
-        Detect the category of a user question using Gemini
+        Detect the category of a user question using LLM
         Extracts key topics to match against dynamic categories
         
         Args:

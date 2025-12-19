@@ -239,4 +239,24 @@ export const getMyInvigilation = () => API.get('/seating/my-invigilation');
 export const getMySeating = () => API.get('/seating/my-seat');
 export const getAvailableInvigilators = () => API.get('/seating/invigilators');
 
+// Chatbot Content Management (RAG)
+const RAG_API = axios.create({
+  baseURL: import.meta.env.VITE_RAG_API || 'http://localhost:8000',
+});
+
+RAG_API.interceptors.request.use((req) => {
+  if (localStorage.getItem('userInfo')) {
+    const token = JSON.parse(localStorage.getItem('userInfo')).token;
+    req.headers.Authorization = `Bearer ${token}`;
+  }
+  return req;
+});
+
+export const getChatbotContent = () => RAG_API.get('/api/content');
+export const getChatbotContentStats = () => RAG_API.get('/api/content/stats');
+export const addChatbotContent = (data) => RAG_API.post('/api/content', data);
+export const updateChatbotContent = (id, data) => RAG_API.put(`/api/content/${id}`, data);
+export const deleteChatbotContent = (id) => RAG_API.delete(`/api/content/${id}`);
+export const clearAllChatbotContent = () => RAG_API.delete('/api/content/clear/all');
+
 export default API;

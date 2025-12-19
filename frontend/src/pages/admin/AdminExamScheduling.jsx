@@ -36,9 +36,12 @@ const AdminExamScheduling = () => {
         try {
             setLoadingData(true);
             const [examsRes, subjectsRes] = await Promise.all([getExams(), getSubjects()]);
-            setExams(examsRes.data || []);
-            setSubjects(subjectsRes.data || []);
-        } catch (err) { console.error('Error:', err); }
+            // Ensure both are arrays
+            const examsData = examsRes.data;
+            const subjectsData = subjectsRes.data;
+            setExams(Array.isArray(examsData) ? examsData : (examsData?.exams || []));
+            setSubjects(Array.isArray(subjectsData) ? subjectsData : (subjectsData?.subjects || []));
+        } catch (err) { console.error('Error:', err); setExams([]); setSubjects([]); }
         finally { setLoadingData(false); }
     };
 

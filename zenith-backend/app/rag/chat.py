@@ -7,6 +7,7 @@ import uuid
 from datetime import datetime
 from app.rag.embeddings import vector_store
 from app.rag.llm import llm_service
+from app.rag.intent_handler import intent_handler
 from app.config import settings
 from app.database import Namespaces
 import logging
@@ -46,12 +47,31 @@ class RAGChatService:
             if not conversation_id:
                 conversation_id = str(uuid.uuid4())
             
+            # ============================================
+            # STEP 0: Check for simple intents (greetings, farewells, etc.)
+            # This handles common phrases WITHOUT calling LLM/RAG
+            # ============================================
+            was_handled, instant_response = intent_handler.handle_message(question)
+            
+            if was_handled:
+                logger.info(f"✅ Intent handled locally - no LLM/RAG needed")
+                return {
+                    "answer": instant_response,
+                    "sources": [],
+                    "images": [],
+                    "category": "greeting",
+                    "conversation_id": conversation_id,
+                    "timestamp": datetime.utcnow(),
+                    "used_rag": False,
+                    "handled_locally": True
+                }
+            
             if use_rag:
-                # Step 1: Detect category using Gemini
+                # Step 1: Detect category using LLM
                 detected_category = self.llm.detect_category(question)
                 logger.info(f"🎯 Detected category: {detected_category}")
                 
-                # Step 2: Retrieval + Formatting: Search DB → Format with Gemini
+                # Step 2: Retrieval + Formatting: Search DB → Format with LLM
                 sources = await self._retrieve_relevant_context(question, category=detected_category)
                 
                 logger.info(f"🔍 Retrieved {len(sources)} sources from database")
@@ -64,8 +84,8 @@ class RAGChatService:
                 logger.info(f"🖼️ Found {len(images)} relevant images")
                 
                 if not sources:
-                    # No relevant context found in database
-                    answer = "I couldn't find any relevant information in the knowledge base. Please try rephrasing your question or ask about:\n• Management (Chairman, Principal, HODs)\n• Campus Events & Activities\n• Sports & Achievements\n• Academics & Departments\n• Placements & Companies\n• Student Clubs & Scholarships"
+                    # No relevant context found in database - simple message
+                    answer = "I don't have that information in my knowledge base."
                     return {
                         "answer": answer,
                         "sources": [],
@@ -121,8 +141,9 @@ class RAGChatService:
     
     async def _retrieve_relevant_context(self, question: str, category: str = None) -> List[Dict[str, Any]]:
         """
-        Retrieve relevant context from detected category namespace
-        NOW OPTIMIZED: Only searches detected category, not all namespaces!
+        Retrieve relevant context from Pinecone.
+        ALWAYS searches 'chatbot' and 'total' namespaces (where admin content lives)
+        PLUS any category-specific namespace.
         
         Args:
             question: User question
@@ -133,25 +154,30 @@ class RAGChatService:
         """
         all_results = []
         
-        # OPTIMIZED: Search ONLY the detected category namespace
-        if category and category != "general":
-            # Search detected category only
-            namespaces = [category]
-            logger.info(f"🎯 Searching ONLY namespace: '{category}'")
-        else:
-            # If no specific category, get all available namespaces from Pinecone
-            try:
-                stats = self.vector_store.index.describe_index_stats()
-                available_namespaces = list(stats.get('namespaces', {}).keys())
-                if available_namespaces:
-                    namespaces = available_namespaces
-                    logger.info(f"🔍 No specific category, searching ALL namespaces: {namespaces}")
-                else:
-                    namespaces = ["general"]  # Fallback
-                    logger.info(f"🔍 No namespaces found, using fallback: {namespaces}")
-            except Exception as e:
-                logger.warning(f"⚠️ Could not get namespaces: {e}, using fallback")
-                namespaces = ["about", "general", "total"]  # Common fallbacks
+        # CRITICAL: Always include these namespaces where admin-uploaded content lives
+        primary_namespaces = ["chatbot", "total", ""]  # "" is default namespace
+        
+        # Build list of namespaces to search
+        namespaces_to_search = set(primary_namespaces)
+        
+        # Also add detected category if it's not a general one
+        if category and category not in ["general", "greeting", "query"]:
+            namespaces_to_search.add(category)
+        
+        # Get all available namespaces from Pinecone for comprehensive search
+        try:
+            stats = self.vector_store.index.describe_index_stats()
+            available_namespaces = list(stats.get('namespaces', {}).keys())
+            logger.info(f"📊 Available namespaces in Pinecone: {available_namespaces}")
+            
+            # For comprehensive search, include all namespaces
+            namespaces_to_search.update(available_namespaces)
+        except Exception as e:
+            logger.warning(f"⚠️ Could not get namespaces: {e}")
+        
+        # Remove empty strings duplicates and sort
+        namespaces = sorted(list(namespaces_to_search))
+        logger.info(f"🔍 Searching namespaces: {namespaces} for question: '{question[:50]}...'")
         
         # Search each namespace
         for namespace in namespaces:
@@ -159,22 +185,33 @@ class RAGChatService:
                 results = await self.vector_store.search(
                     query=question,
                     namespace=namespace,
-                    top_k=5  # Get top 5 from the detected category
+                    top_k=10  # Get more results per namespace for better coverage
                 )
                 
-                # Add namespace to results
+                # Add namespace to results and filter by minimum score
                 for result in results:
                     result["namespace"] = namespace
-                    all_results.append(result)
+                    # Lower threshold to 0.15 to handle typos and variations
+                    if result.get("score", 0) >= 0.15:
+                        all_results.append(result)
             
             except Exception as e:
                 logger.warning(f"⚠️ Error searching namespace {namespace}: {str(e)}")
                 continue
         
         # Sort by score (highest first) and take top K
-        all_results.sort(key=lambda x: x["score"], reverse=True)
-        logger.info(f"✅ Found {len(all_results)} total results")
-        return all_results[:self.top_k]
+        all_results.sort(key=lambda x: x.get("score", 0), reverse=True)
+        
+        top_results = all_results[:self.top_k]
+        
+        if top_results:
+            logger.info(f"✅ Found {len(all_results)} total results, returning top {len(top_results)}")
+            for i, r in enumerate(top_results[:3]):
+                logger.info(f"  Top {i+1}: score={r.get('score', 0):.3f}, ns={r.get('namespace')}, text='{r.get('text', '')[:80]}...'")
+        else:
+            logger.warning(f"⚠️ No results found for query: '{question}'")
+        
+        return top_results
     
     async def _retrieve_relevant_images(self, question: str, category: str) -> List[Dict[str, str]]:
         """

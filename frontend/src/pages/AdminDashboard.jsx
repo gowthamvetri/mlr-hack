@@ -140,8 +140,10 @@ const AdminDashboard = () => {
         getAdminStats(),
         getEvents('Pending')
       ]);
-      setStats(statsRes.data);
-      setPendingEvents(eventsRes.data);
+      setStats(statsRes.data || {});
+      // Ensure pendingEvents is always an array
+      const eventsData = eventsRes.data;
+      setPendingEvents(Array.isArray(eventsData) ? eventsData : (eventsData?.events || []));
 
       try {
         const [deptDistRes, perfMetricsRes, courseStatsRes, facultyStatsRes, placementStatsRes, activitiesRes] = await Promise.all([

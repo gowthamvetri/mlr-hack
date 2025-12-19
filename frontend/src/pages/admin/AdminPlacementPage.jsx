@@ -36,10 +36,15 @@ const AdminPlacementPage = () => {
       const [slidesRes, recruitersRes, trainingRes] = await Promise.all([
         getAdminPlacementSlides(), getAdminRecruiters(), getAdminTrainingContent()
       ]);
-      setSlides(slidesRes.data);
-      setRecruiters(recruitersRes.data);
-      setTraining(trainingRes.data);
-    } catch (error) { console.error('Error:', error); }
+      // Ensure all responses are arrays
+      const slidesData = slidesRes.data;
+      const recruitersData = recruitersRes.data;
+      const trainingData = trainingRes.data;
+
+      setSlides(Array.isArray(slidesData) ? slidesData : (slidesData?.slides || []));
+      setRecruiters(Array.isArray(recruitersData) ? recruitersData : (recruitersData?.recruiters || []));
+      setTraining(Array.isArray(trainingData) ? trainingData : (trainingData?.training || trainingData?.content || []));
+    } catch (error) { console.error('Error:', error); setSlides([]); setRecruiters([]); setTraining([]); }
     finally { setLoading(false); }
   };
 

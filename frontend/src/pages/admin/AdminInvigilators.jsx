@@ -29,9 +29,14 @@ const AdminInvigilators = () => {
     const fetchData = async () => {
         try {
             const [examsRes, usersRes] = await Promise.all([getExams(), getUsers({ role: 'Staff' })]);
-            setExams((examsRes.data || []).filter(e => e.seatingPublished));
-            setFaculty(usersRes.data?.users || usersRes.data || []);
-        } catch (err) { console.error('Error:', err); }
+            // Ensure exams is always an array before filtering
+            const examsData = examsRes.data;
+            const examsArray = Array.isArray(examsData) ? examsData : (examsData?.exams || []);
+            setExams(examsArray.filter(e => e.seatingPublished));
+            // Ensure faculty is always an array
+            const usersData = usersRes.data;
+            setFaculty(Array.isArray(usersData) ? usersData : (usersData?.users || []));
+        } catch (err) { console.error('Error:', err); setExams([]); setFaculty([]); }
     };
 
     const fetchSchedule = async () => {

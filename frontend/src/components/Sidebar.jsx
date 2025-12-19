@@ -24,7 +24,8 @@ import {
   Brain,
   Wand2,
   UserCog,
-  ExternalLink
+  ExternalLink,
+  MessageSquare
 } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { selectCurrentUser, logout } from '../store/slices/authSlice';
@@ -67,6 +68,7 @@ const Sidebar = ({ isOpen, onClose }) => {
           { to: '/admin/exam-scheduling', icon: Wand2, label: 'Exam Management' },
           { to: '/admin/invigilators', icon: UserCog, label: 'Invigilators' },
           { to: '/admin/events', icon: Calendar, label: 'Events' },
+          { to: '/admin/chatbot-content', icon: MessageSquare, label: 'Chatbot Content' },
           { to: '/admin/profile', icon: UserCircle, label: 'My Profile' },
         ];
       case 'SeatingManager':

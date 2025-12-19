@@ -118,7 +118,8 @@ const AdminEvents = () => {
   const fetchEvents = async () => {
     try {
       const { data } = await getEvents();
-      setEvents(data || []);
+      // Ensure events is always an array
+      setEvents(Array.isArray(data) ? data : (data?.events || []));
     } catch (error) {
       setEvents([]);
     } finally {
@@ -362,12 +363,12 @@ const AdminEvents = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <h3 className="font-medium text-zinc-900 text-sm group-hover:text-violet-600 transition-colors truncate">{event.title}</h3>
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${event.status === 'Pending' ? 'bg-amber-50 text-amber-700' :
-                              event.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' :
-                                'bg-red-50 text-red-700'
+                            event.status === 'Approved' ? 'bg-emerald-50 text-emerald-700' :
+                              'bg-red-50 text-red-700'
                             }`}>
                             <span className={`w-1 h-1 rounded-full ${event.status === 'Pending' ? 'bg-amber-500' :
-                                event.status === 'Approved' ? 'bg-emerald-500' :
-                                  'bg-red-500'
+                              event.status === 'Approved' ? 'bg-emerald-500' :
+                                'bg-red-500'
                               }`} />
                             {event.status}
                           </span>
