@@ -28,15 +28,15 @@ const getPublicDepartments = async (req, res) => {
 const getDepartmentBySlug = async (req, res) => {
   try {
     const department = await Department.findOne({ slug: req.params.slug })
-    .populate('headOfDepartment', 'name email profileImage');
+      .populate('headOfDepartment', 'name email profileImage');
     if (!department) {
       return res.status(404).json({ message: 'Department not found' });
     }
-    
+
     // Get faculty for this department
     const faculty = await Faculty.find({ department: department._id })
       .select('name designation email phone profileImage specialization');
-    
+
     res.json({ ...department.toObject(), faculty });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -60,7 +60,7 @@ const getDepartmentById = async (req, res) => {
 const createDepartment = async (req, res) => {
   try {
     const { name, code, description, headOfDepartment } = req.body;
-    
+
     const existingDept = await Department.findOne({ $or: [{ name }, { code }] });
     if (existingDept) {
       return res.status(400).json({ message: 'Department already exists' });
@@ -91,8 +91,18 @@ const updateDepartment = async (req, res) => {
       return res.status(404).json({ message: 'Department not found' });
     }
 
-    Object.assign(department, req.body);
-    const updatedDepartment = await department.save();
+    // If name is being updated, generate new slug
+    const updateData = { ...req.body };
+    if (updateData.name && updateData.name !== department.name) {
+      updateData.slug = updateData.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    }
+
+    const updatedDepartment = await Department.findByIdAndUpdate(
+      req.params.id,
+      updateData,
+      { new: true, runValidators: true }
+    ).populate('headOfDepartment', 'name email');
+
     res.json(updatedDepartment);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -117,7 +127,7 @@ const deleteDepartment = async (req, res) => {
 const getDepartmentStats = async (req, res) => {
   try {
     const departments = await Department.find({});
-    
+
     // Get student count per department
     const deptStats = await Promise.all(
       departments.map(async (dept) => {
@@ -146,11 +156,11 @@ const getDepartmentStats = async (req, res) => {
   }
 };
 
-module.exports = { 
-  getDepartments, 
-  getDepartmentById, 
-  createDepartment, 
-  updateDepartment, 
+module.exports = {
+  getDepartments,
+  getDepartmentById,
+  createDepartment,
+  updateDepartment,
   deleteDepartment,
   getDepartmentStats,
   getPublicDepartments,
