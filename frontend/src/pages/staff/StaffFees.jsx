@@ -6,7 +6,8 @@ import Modal from '../../components/Modal';
 import gsap from 'gsap';
 import {
   CreditCard, Search, Save, Check, X,
-  AlertTriangle, RefreshCw, FileText, Loader
+  AlertTriangle, RefreshCw, FileText, Loader,
+  TrendingUp, Users, DollarSign, Percent
 } from 'lucide-react';
 import {
   getStudentsForStaff, updateStudentFeeStatus, getFeeSummary
@@ -122,24 +123,24 @@ const StaffFees = () => {
 
   return (
     <DashboardLayout role="staff" userName={user?.name}>
-      <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">
+      <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6 text-zinc-900">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Fee Management</h1>
-            <p className="text-dark-400 text-sm mt-0.5">
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Fee Management</h1>
+            <p className="text-zinc-500 text-sm mt-0.5 font-medium">
               Update and verify student fee status
-              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-dark-800 text-dark-300 border border-dark-700">{staffDepartment}</span>}
+              {staffDepartment && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-zinc-100 text-zinc-600 border border-zinc-200">{staffDepartment}</span>}
             </p>
           </div>
-          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors">
+          <button onClick={fetchData} className="flex items-center gap-2 px-4 py-2 bg-white border border-zinc-200 text-zinc-600 rounded-lg text-sm font-bold hover:bg-zinc-50 hover:text-zinc-900 transition-colors shadow-sm">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
         </div>
 
         {/* Success Message */}
         {successMessage && (
-          <div className="p-3 bg-emerald-500/10 text-emerald-400 rounded-lg text-sm flex items-center gap-2 border border-emerald-500/20">
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-lg text-sm font-bold flex items-center gap-2 border border-emerald-100 shadow-sm animate-in fade-in slide-in-from-top-2">
             <Check className="w-4 h-4" /> {successMessage}
           </div>
         )}
@@ -148,39 +149,52 @@ const StaffFees = () => {
         {summary && (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {[
-              { label: 'Total Students', value: summary.totalStudents, color: 'zinc' },
-              { label: 'Fees Cleared', value: summary.feesPaidCount, color: 'emerald' },
-              { label: 'Fees Pending', value: summary.feesPendingCount, color: 'red' },
-              { label: 'Clearance Rate', value: summary.clearanceRate, suffix: '%', color: 'violet' }
-            ].map((stat, i) => (
-              <div key={i} className="metric-card glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.label}</p>
-                <p className={`text-2xl font-bold ${stat.color === 'zinc' ? 'text-white' : `text-${stat.color}-400`}`}>
-                  <AnimatedNumber value={stat.value || 0} suffix={stat.suffix || ''} />
-                </p>
-              </div>
-            ))}
+              { label: 'Total Students', value: summary.totalStudents, color: 'blue', icon: Users },
+              { label: 'Fees Cleared', value: summary.feesPaidCount, color: 'emerald', icon: Check },
+              { label: 'Fees Pending', value: summary.feesPendingCount, color: 'red', icon: AlertTriangle },
+              { label: 'Clearance Rate', value: summary.clearanceRate, suffix: '%', color: 'violet', icon: Percent }
+            ].map((stat, i) => {
+              const colorClasses = {
+                blue: 'text-blue-600 bg-blue-50 border-blue-100',
+                emerald: 'text-emerald-600 bg-emerald-50 border-emerald-100',
+                red: 'text-red-600 bg-red-50 border-red-100',
+                violet: 'text-violet-600 bg-violet-50 border-violet-100'
+              };
+              return (
+                <div key={i} className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all shadow-sm group">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center border ${colorClasses[stat.color]}`}>
+                      <stat.icon className="w-5 h-5" strokeWidth={2} />
+                    </div>
+                  </div>
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">{stat.label}</p>
+                  <p className="text-2xl font-bold text-zinc-900">
+                    <AnimatedNumber value={stat.value || 0} suffix={stat.suffix || ''} />
+                  </p>
+                </div>
+              );
+            })}
           </div>
         )}
 
         {/* Filters */}
-        <div className="glass-card-dark rounded-xl border border-dark-700 p-4">
+        <div className="bg-white rounded-xl border border-zinc-200 p-4 shadow-sm">
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
               <input
                 type="text"
                 placeholder="Search by name or roll number..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all font-medium"
               />
             </div>
             <div className="flex gap-2">
               <select
                 value={filterYear}
                 onChange={(e) => setFilterYear(e.target.value)}
-                className="px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+                className="px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all cursor-pointer font-medium"
               >
                 <option value="all">All Years</option>
                 {years.map(year => <option key={year.value} value={year.value}>{year.label}</option>)}
@@ -188,7 +202,7 @@ const StaffFees = () => {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+                className="px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all cursor-pointer font-medium"
               >
                 <option value="all">All Status</option>
                 <option value="paid">Paid</option>
@@ -199,56 +213,56 @@ const StaffFees = () => {
         </div>
 
         {/* Students Table */}
-        <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-dark-800 border-b border-dark-700">
+              <thead className="bg-zinc-50 border-b border-zinc-200">
                 <tr>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Student</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Roll No</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Due Amount</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Status</th>
-                  <th className="text-left py-3 px-5 text-[10px] font-medium text-dark-400 uppercase tracking-wide">Actions</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Student</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Roll No</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Due Amount</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Status</th>
+                  <th className="text-left py-3 px-5 text-[10px] font-bold text-zinc-500 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-dark-700">
+              <tbody className="divide-y divide-zinc-200">
                 {loading ? (
-                  <tr><td colSpan="5" className="px-5 py-10 text-center text-dark-400 text-sm"><Loader className="w-5 h-5 animate-spin mx-auto text-primary-500" /></td></tr>
+                  <tr><td colSpan="5" className="px-5 py-10 text-center text-zinc-500 text-sm font-medium"><Loader className="w-5 h-5 animate-spin mx-auto text-zinc-400 mb-2" />Loading students...</td></tr>
                 ) : filteredStudents.length === 0 ? (
-                  <tr><td colSpan="5" className="px-5 py-10 text-center text-dark-400 text-sm">No students found</td></tr>
+                  <tr><td colSpan="5" className="px-5 py-10 text-center text-zinc-500 text-sm font-medium">No students found</td></tr>
                 ) : (
                   filteredStudents.map(student => (
-                    <tr key={student._id} className="hover:bg-dark-800/50 transition-colors">
+                    <tr key={student._id} className="hover:bg-zinc-50 transition-colors">
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center text-xs font-bold text-white border border-white/10 shadow-lg">
+                          <div className="w-8 h-8 bg-zinc-900 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm">
                             {student.name?.charAt(0)}
                           </div>
                           <div>
-                            <p className="text-sm font-medium text-white">{student.name}</p>
-                            <p className="text-xs text-dark-400">{student.email}</p>
+                            <p className="text-sm font-bold text-zinc-900">{student.name}</p>
+                            <p className="text-xs text-zinc-500 font-medium">{student.email}</p>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-5 text-sm font-mono text-dark-300">{student.rollNumber || '-'}</td>
+                      <td className="py-3 px-5 text-sm font-mono font-bold text-zinc-600">{student.rollNumber || '-'}</td>
                       <td className="py-3 px-5">
-                        <span className={`text-sm font-bold ${student.feeDetails?.dueAmount > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                        <span className={`text-sm font-bold ${student.feeDetails?.dueAmount > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                           ₹{student.feeDetails?.dueAmount?.toLocaleString() || '0'}
                         </span>
                       </td>
                       <td className="py-3 px-5">
                         {student.feesPaid ? (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"><Check className="w-3 h-3" /> Paid</span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-100"><Check className="w-3 h-3" /> Paid</span>
                         ) : (
-                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-red-500/10 text-red-400 border border-red-500/20"><AlertTriangle className="w-3 h-3" /> Pending</span>
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-red-50 text-red-600 border border-red-100"><AlertTriangle className="w-3 h-3" /> Pending</span>
                         )}
                       </td>
                       <td className="py-3 px-5">
                         <div className="flex items-center gap-1">
-                          <button onClick={() => handleQuickToggle(student)} disabled={saving === student._id} className={`p-1.5 rounded-md transition-colors disabled:opacity-50 ${student.feesPaid ? 'text-red-400 hover:bg-red-500/10' : 'text-emerald-400 hover:bg-emerald-500/10'}`} title={student.feesPaid ? 'Mark Pending' : 'Mark Paid'}>
+                          <button onClick={() => handleQuickToggle(student)} disabled={saving === student._id} className={`p-1.5 rounded-md transition-colors disabled:opacity-50 ${student.feesPaid ? 'text-red-600 hover:bg-red-50' : 'text-emerald-600 hover:bg-emerald-50'}`} title={student.feesPaid ? 'Mark Pending' : 'Mark Paid'}>
                             {student.feesPaid ? <X className="w-4 h-4" /> : <Check className="w-4 h-4" />}
                           </button>
-                          <button onClick={() => handleEditFees(student)} className="p-1.5 text-primary-400 hover:bg-primary-500/10 rounded-md transition-colors border border-transparent hover:border-primary-500/20" title="Edit Details">
+                          <button onClick={() => handleEditFees(student)} className="p-1.5 text-zinc-400 hover:bg-zinc-100 rounded-md transition-colors hover:text-zinc-900" title="Edit Details">
                             <FileText className="w-4 h-4" />
                           </button>
                         </div>
@@ -265,43 +279,49 @@ const StaffFees = () => {
         <Modal isOpen={showModal && !!selectedStudent} onClose={() => setShowModal(false)} title={`Fee Details - ${selectedStudent?.name || ''}`} size="md">
           <div className="space-y-5">
             <div>
-              <label className="block text-xs font-medium text-dark-400 mb-1.5">Total Fee Amount</label>
-              <input
-                type="number"
-                value={feeForm.totalAmount}
-                onChange={(e) => setFeeForm({ ...feeForm, totalAmount: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 placeholder-dark-500"
-              />
+              <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Total Fee Amount</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="number"
+                  value={feeForm.totalAmount}
+                  onChange={(e) => setFeeForm({ ...feeForm, totalAmount: parseInt(e.target.value) || 0 })}
+                  className="w-full pl-9 pr-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium"
+                />
+              </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-dark-400 mb-1.5">Paid Amount</label>
-              <input
-                type="number"
-                value={feeForm.paidAmount}
-                onChange={(e) => setFeeForm({ ...feeForm, paidAmount: parseInt(e.target.value) || 0 })}
-                className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 placeholder-dark-500"
-              />
+              <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Paid Amount</label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                <input
+                  type="number"
+                  value={feeForm.paidAmount}
+                  onChange={(e) => setFeeForm({ ...feeForm, paidAmount: parseInt(e.target.value) || 0 })}
+                  className="w-full pl-9 pr-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium"
+                />
+              </div>
             </div>
-            <div className="p-4 bg-dark-800 rounded-lg border border-dark-700">
-              <p className="text-xs text-dark-400">Due Amount</p>
-              <p className={`text-xl font-bold ${Math.max(0, feeForm.totalAmount - feeForm.paidAmount) > 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+            <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 flex justify-between items-center">
+              <span className="text-sm font-bold text-zinc-500">Due Amount</span>
+              <span className={`text-xl font-bold ${Math.max(0, feeForm.totalAmount - feeForm.paidAmount) > 0 ? 'text-red-600' : 'text-emerald-600'}`}>
                 ₹{Math.max(0, feeForm.totalAmount - feeForm.paidAmount).toLocaleString()}
-              </p>
+              </span>
             </div>
             <div>
-              <label className="block text-xs font-medium text-dark-400 mb-1.5">Remarks</label>
+              <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Remarks</label>
               <textarea
                 value={feeForm.remarks}
                 onChange={(e) => setFeeForm({ ...feeForm, remarks: e.target.value })}
                 rows="2"
-                className="w-full px-4 py-2.5 bg-dark-900/50 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 resize-none placeholder-dark-500"
+                className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 resize-none placeholder-zinc-400 font-medium"
                 placeholder="Add any notes..."
               />
             </div>
           </div>
-          <div className="flex gap-3 pt-4 mt-4 border-t border-dark-700">
-            <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
-            <button onClick={handleSaveFees} disabled={saving} className="flex-1 px-4 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 disabled:opacity-60 transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20">
+          <div className="flex gap-3 pt-4 mt-4 border-t border-zinc-100">
+            <button onClick={() => setShowModal(false)} className="flex-1 px-4 py-2.5 bg-white border border-zinc-200 text-zinc-600 rounded-lg text-sm font-bold hover:bg-zinc-50 hover:text-zinc-900 transition-colors">Cancel</button>
+            <button onClick={handleSaveFees} disabled={saving} className="flex-1 px-4 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 disabled:opacity-60 transition-colors flex items-center justify-center gap-2 shadow-md">
               <Save className="w-4 h-4" /> Save Changes
             </button>
           </div>

@@ -56,8 +56,8 @@ const CoordinatorProfile = () => {
       <DashboardLayout role="club_coordinator" userName={user?.name}>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500 font-medium">Loading profile...</p>
+            <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-zinc-500 font-medium">Loading profile...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -66,19 +66,19 @@ const CoordinatorProfile = () => {
 
   return (
     <DashboardLayout role="club_coordinator" userName={user?.name}>
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-6 animate-fade-in max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">Club Profile</h1>
-            <p className="text-gray-500 mt-1 text-lg">Manage your club's public profile</p>
+            <h1 className="text-3xl font-bold text-zinc-900 tracking-tight">Club Profile</h1>
+            <p className="text-zinc-500 mt-1 text-sm">Manage your club's public profile</p>
           </div>
           {!isEditing && (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-lg shadow-primary-200 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-700 text-white rounded-lg font-medium shadow-lg shadow-violet-200 transition-all text-sm"
             >
-              <Edit className="w-5 h-5" />
+              <Edit className="w-4 h-4" />
               Edit Profile
             </button>
           )}
@@ -87,69 +87,72 @@ const CoordinatorProfile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <div className="glass-card rounded-2xl tilt-card overflow-hidden">
-              <div className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 p-8 text-center">
-                <div className="w-24 h-24 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl">
-                  {profile.logo ? (
-                    <img src={profile.logo} alt={profile.clubName} className="w-20 h-20 rounded-xl object-cover" />
-                  ) : (
-                    <Building className="w-12 h-12 text-primary-600" />
+            <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+              <div className="bg-gradient-to-br from-violet-600 via-violet-700 to-violet-800 p-8 text-center relative">
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-[1px]" />
+                <div className="relative z-10">
+                  <div className="w-24 h-24 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl border-4 border-white/20">
+                    {profile.logo ? (
+                      <img src={profile.logo} alt={profile.clubName} className="w-20 h-20 rounded-xl object-cover" />
+                    ) : (
+                      <Building className="w-10 h-10 text-violet-600" />
+                    )}
+                  </div>
+                  <h2 className="text-xl font-bold text-white">{profile.clubName || 'Your Club Name'}</h2>
+                  {profile.tagline && (
+                    <p className="text-violet-100 mt-2 text-sm font-medium">{profile.tagline}</p>
                   )}
                 </div>
-                <h2 className="text-xl font-bold text-white">{profile.clubName || 'Your Club Name'}</h2>
-                {profile.tagline && (
-                  <p className="text-primary-100 mt-2 text-sm">{profile.tagline}</p>
-                )}
               </div>
               <div className="p-6 space-y-4">
                 {profile.contactEmail && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5 text-blue-600" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                    <div className="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-blue-100">
+                      <Mail className="w-4.5 h-4.5 text-blue-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs text-gray-500 font-medium">Email</p>
-                      <p className="font-semibold text-gray-800 truncate">{profile.contactEmail}</p>
+                      <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Email</p>
+                      <p className="font-semibold text-zinc-800 truncate text-sm">{profile.contactEmail}</p>
                     </div>
                   </div>
                 )}
                 {profile.website && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Globe className="w-5 h-5 text-green-600" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                    <div className="w-9 h-9 bg-emerald-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-emerald-100">
+                      <Globe className="w-4.5 h-4.5 text-emerald-600" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs text-gray-500 font-medium">Website</p>
-                      <a href={profile.website} className="font-semibold text-primary-600 hover:underline truncate block">{profile.website}</a>
+                      <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Website</p>
+                      <a href={profile.website} className="font-semibold text-violet-600 hover:underline truncate block text-sm">{profile.website}</a>
                     </div>
                   </div>
                 )}
                 {profile.memberCount && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Users className="w-5 h-5 text-purple-600" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                    <div className="w-9 h-9 bg-purple-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-purple-100">
+                      <Users className="w-4.5 h-4.5 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-medium">Members</p>
-                      <p className="font-semibold text-gray-800">{profile.memberCount}</p>
+                      <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Members</p>
+                      <p className="font-semibold text-zinc-800 text-sm">{profile.memberCount}</p>
                     </div>
                   </div>
                 )}
                 {profile.foundedYear && (
-                  <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl">
-                    <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Calendar className="w-5 h-5 text-orange-600" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-lg border border-zinc-100">
+                    <div className="w-9 h-9 bg-amber-50 rounded-lg flex items-center justify-center flex-shrink-0 border border-amber-100">
+                      <Calendar className="w-4.5 h-4.5 text-amber-600" />
                     </div>
                     <div>
-                      <p className="text-xs text-gray-500 font-medium">Founded</p>
-                      <p className="font-semibold text-gray-800">{profile.foundedYear}</p>
+                      <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Founded</p>
+                      <p className="font-semibold text-zinc-800 text-sm">{profile.foundedYear}</p>
                     </div>
                   </div>
                 )}
                 {!profile.contactEmail && !profile.website && !profile.memberCount && !profile.foundedYear && (
-                  <div className="text-center py-6 text-gray-400">
+                  <div className="text-center py-8 text-zinc-400">
                     <Sparkles className="w-10 h-10 mx-auto mb-2 opacity-50" />
-                    <p className="text-sm">Add details to showcase your club</p>
+                    <p className="text-sm font-medium">Add details to showcase your club</p>
                   </div>
                 )}
               </div>
@@ -158,22 +161,22 @@ const CoordinatorProfile = () => {
 
           {/* Edit Form */}
           <div className="lg:col-span-2">
-            <div className="glass-card rounded-2xl tilt-card overflow-hidden">
-              <div className="p-6 border-b border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900">
+            <div className="bg-white rounded-xl shadow-sm border border-zinc-200 overflow-hidden">
+              <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+                <h2 className="text-lg font-bold text-zinc-900">
                   {isEditing ? 'Edit Profile Details' : 'Profile Details'}
                 </h2>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="text-sm text-zinc-500 mt-0.5">
                   {isEditing ? 'Update your club information below' : 'View your club details'}
                 </p>
               </div>
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Club Name *</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Club Name *</label>
                     <input
                       type="text"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.clubName}
                       onChange={(e) => setProfile({ ...profile, clubName: e.target.value })}
                       placeholder="Enter club name"
@@ -182,10 +185,10 @@ const CoordinatorProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Tagline</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Tagline</label>
                     <input
                       type="text"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.tagline}
                       onChange={(e) => setProfile({ ...profile, tagline: e.target.value })}
                       placeholder="Short catchy tagline"
@@ -193,10 +196,10 @@ const CoordinatorProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Contact Email</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Contact Email</label>
                     <input
                       type="email"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.contactEmail}
                       onChange={(e) => setProfile({ ...profile, contactEmail: e.target.value })}
                       placeholder="club@example.com"
@@ -204,10 +207,10 @@ const CoordinatorProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Website</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Website</label>
                     <input
                       type="url"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.website}
                       onChange={(e) => setProfile({ ...profile, website: e.target.value })}
                       placeholder="https://yourclub.com"
@@ -215,10 +218,10 @@ const CoordinatorProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Founded Year</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Founded Year</label>
                     <input
                       type="number"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.foundedYear}
                       onChange={(e) => setProfile({ ...profile, foundedYear: e.target.value })}
                       placeholder="2020"
@@ -226,10 +229,10 @@ const CoordinatorProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Member Count</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Member Count</label>
                     <input
                       type="number"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.memberCount}
                       onChange={(e) => setProfile({ ...profile, memberCount: e.target.value })}
                       placeholder="50"
@@ -239,9 +242,9 @@ const CoordinatorProfile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Description</label>
                   <textarea
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all resize-none"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm resize-none"
                     value={profile.description}
                     onChange={(e) => setProfile({ ...profile, description: e.target.value })}
                     placeholder="Tell us about your club, its mission, and activities..."
@@ -251,18 +254,18 @@ const CoordinatorProfile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Logo URL</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Logo URL</label>
                   <div className="flex gap-3">
                     <input
                       type="url"
-                      className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:bg-gray-100 disabled:text-gray-500 transition-all"
+                      className="flex-1 px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 disabled:bg-zinc-50 disabled:text-zinc-500 transition-all text-sm"
                       value={profile.logo}
                       onChange={(e) => setProfile({ ...profile, logo: e.target.value })}
                       placeholder="https://example.com/logo.png"
                       disabled={!isEditing}
                     />
                     {profile.logo && (
-                      <div className="w-12 h-12 rounded-xl border border-gray-200 overflow-hidden flex items-center justify-center bg-gray-50 flex-shrink-0">
+                      <div className="w-10 h-10 rounded-lg border border-zinc-200 overflow-hidden flex items-center justify-center bg-zinc-50 flex-shrink-0">
                         <img src={profile.logo} alt="Preview" className="w-full h-full object-cover" />
                       </div>
                     )}
@@ -270,20 +273,20 @@ const CoordinatorProfile = () => {
                 </div>
 
                 {isEditing && (
-                  <div className="flex gap-3 pt-4">
+                  <div className="flex gap-3 pt-4 border-t border-zinc-100">
                     <button
                       type="submit"
                       disabled={saving}
-                      className="flex items-center justify-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-primary-200 disabled:opacity-50 transition-all"
+                      className="flex items-center justify-center gap-2 bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg shadow-violet-200 disabled:opacity-50 transition-all text-sm"
                     >
                       {saving ? (
                         <>
-                          <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                           Saving...
                         </>
                       ) : (
                         <>
-                          <Save className="w-5 h-5" />
+                          <Save className="w-4 h-4" />
                           Save Changes
                         </>
                       )}
@@ -291,7 +294,7 @@ const CoordinatorProfile = () => {
                     <button
                       type="button"
                       onClick={() => setIsEditing(false)}
-                      className="px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all"
+                      className="px-5 py-2.5 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 rounded-lg font-medium transition-all text-sm"
                     >
                       Cancel
                     </button>

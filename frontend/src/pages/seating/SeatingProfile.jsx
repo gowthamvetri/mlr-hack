@@ -5,7 +5,7 @@ import DashboardLayout from '../../components/DashboardLayout';
 import { getProfile, updateProfile } from '../../utils/api';
 import {
   User, Mail, Phone, MapPin, Calendar, Building, Edit, Save, X, CheckCircle,
-  Loader, Grid, Briefcase
+  Loader, Grid, Briefcase, Camera
 } from 'lucide-react';
 
 const SeatingProfile = () => {
@@ -76,10 +76,10 @@ const SeatingProfile = () => {
   if (loading) {
     return (
       <DashboardLayout role="seating_manager" userName={user?.name}>
-        <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+        <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 border-4 border-primary-500/30 border-t-primary-500 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-dark-400 font-bold">Loading profile...</p>
+            <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-zinc-500 font-bold">Loading profile...</p>
           </div>
         </div>
       </DashboardLayout>
@@ -88,17 +88,17 @@ const SeatingProfile = () => {
 
   return (
     <DashboardLayout role="seating_manager" userName={user?.name}>
-      <div className="min-h-screen bg-dark-900 p-6 lg:p-8">
+      <div className="max-w-[1600px] mx-auto space-y-8">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-8">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">My Profile</h1>
-            <p className="text-dark-400 mt-1 text-sm">View and manage your seating manager profile</p>
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">My Profile</h1>
+            <p className="text-zinc-500 mt-1 text-sm">View and manage your seating manager profile</p>
           </div>
           {!isEditing ? (
             <button
               onClick={() => setIsEditing(true)}
-              className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg shadow-primary-500/20 transition-all"
+              className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold shadow-lg shadow-zinc-200 transition-all"
             >
               <Edit className="w-5 h-5" />
               Edit Profile
@@ -107,7 +107,7 @@ const SeatingProfile = () => {
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
-                className="flex items-center gap-2 px-5 py-2.5 border border-dark-700 text-dark-300 rounded-xl font-bold hover:bg-dark-800 hover:text-white transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-zinc-200 text-zinc-600 rounded-xl font-bold hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-sm"
               >
                 <X className="w-5 h-5" />
                 Cancel
@@ -115,7 +115,7 @@ const SeatingProfile = () => {
               <button
                 onClick={handleSubmit}
                 disabled={saving}
-                className="flex items-center gap-2 px-6 py-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl font-bold shadow-lg shadow-primary-500/20 transition-all disabled:opacity-50"
+                className="flex items-center gap-2 px-6 py-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl font-bold shadow-lg shadow-zinc-200 transition-all disabled:opacity-50"
               >
                 {saving ? <Loader className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                 Save Changes
@@ -126,7 +126,7 @@ const SeatingProfile = () => {
 
         {/* Message */}
         {message.text && (
-          <div className={`p-4 rounded-xl flex items-center gap-3 mb-6 ${message.type === 'success' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'
+          <div className={`p-4 rounded-xl flex items-center gap-3 mb-6 ${message.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200'
             }`}>
             <CheckCircle className="w-5 h-5" />
             <span className="font-bold">{message.text}</span>
@@ -136,60 +136,61 @@ const SeatingProfile = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Card */}
           <div className="lg:col-span-1">
-            <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
-              <div className="bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800 p-8 text-center">
-                <div className="w-24 h-24 bg-dark-900 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl border border-dark-700">
-                  <Grid className="w-12 h-12 text-primary-400" />
+            <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
+              <div className="bg-gradient-to-br from-violet-600 via-violet-700 to-violet-800 p-8 text-center relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl" />
+                <div className="w-24 h-24 bg-white rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl border-4 border-white/20 relative z-10">
+                  <Grid className="w-10 h-10 text-violet-600" />
                 </div>
-                <h2 className="text-xl font-bold text-white">{profile.name || 'Your Name'}</h2>
-                <p className="text-primary-200 mt-1 flex items-center justify-center gap-2">
+                <h2 className="text-xl font-bold text-white relative z-10">{profile.name || 'Your Name'}</h2>
+                <p className="text-violet-100 mt-1 flex items-center justify-center gap-2 relative z-10 font-medium">
                   <Briefcase className="w-4 h-4" />
                   Seating Manager
                 </p>
               </div>
               <div className="p-6 space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-dark-800 rounded-xl border border-dark-700">
-                  <div className="w-10 h-10 bg-blue-500/10 border border-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Mail className="w-5 h-5 text-blue-400" />
+                <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                  <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                    <Mail className="w-5 h-5 text-zinc-500" />
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-dark-500 font-bold uppercase tracking-wide">Email</p>
-                    <p className="font-bold text-white truncate">{profile.email}</p>
+                    <p className="text-xs text-zinc-400 font-bold uppercase tracking-wide">Email</p>
+                    <p className="font-bold text-zinc-900 truncate">{profile.email}</p>
                   </div>
                 </div>
 
                 {profile.phone && (
-                  <div className="flex items-center gap-3 p-3 bg-dark-800 rounded-xl border border-dark-700">
-                    <div className="w-10 h-10 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Phone className="w-5 h-5 text-emerald-400" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <Phone className="w-5 h-5 text-zinc-500" />
                     </div>
                     <div>
-                      <p className="text-xs text-dark-500 font-bold uppercase tracking-wide">Phone</p>
-                      <p className="font-bold text-white">{profile.phone}</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-wide">Phone</p>
+                      <p className="font-bold text-zinc-900">{profile.phone}</p>
                     </div>
                   </div>
                 )}
 
                 {profile.office && (
-                  <div className="flex items-center gap-3 p-3 bg-dark-800 rounded-xl border border-dark-700">
-                    <div className="w-10 h-10 bg-primary-500/10 border border-primary-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <Building className="w-5 h-5 text-primary-400" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <Building className="w-5 h-5 text-zinc-500" />
                     </div>
                     <div>
-                      <p className="text-xs text-dark-500 font-bold uppercase tracking-wide">Office</p>
-                      <p className="font-bold text-white">{profile.office}</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-wide">Office</p>
+                      <p className="font-bold text-zinc-900">{profile.office}</p>
                     </div>
                   </div>
                 )}
 
                 {profile.address && (
-                  <div className="flex items-center gap-3 p-3 bg-dark-800 rounded-xl border border-dark-700">
-                    <div className="w-10 h-10 bg-orange-500/10 border border-orange-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
-                      <MapPin className="w-5 h-5 text-orange-400" />
+                  <div className="flex items-center gap-3 p-3 bg-zinc-50 rounded-xl border border-zinc-100">
+                    <div className="w-10 h-10 bg-white border border-zinc-200 rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm">
+                      <MapPin className="w-5 h-5 text-zinc-500" />
                     </div>
                     <div>
-                      <p className="text-xs text-dark-500 font-bold uppercase tracking-wide">Location</p>
-                      <p className="font-bold text-white">{profile.address}</p>
+                      <p className="text-xs text-zinc-400 font-bold uppercase tracking-wide">Location</p>
+                      <p className="font-bold text-zinc-900">{profile.address}</p>
                     </div>
                   </div>
                 )}
@@ -199,37 +200,37 @@ const SeatingProfile = () => {
 
           {/* Edit Form */}
           <div className="lg:col-span-2">
-            <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
-              <div className="p-6 border-b border-dark-700 bg-dark-800/30">
-                <h3 className="text-lg font-bold text-white">Personal Information</h3>
-                <p className="text-sm text-dark-400 mt-1">{isEditing ? 'Update your details below' : 'View your profile details'}</p>
+            <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
+              <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
+                <h3 className="text-lg font-bold text-zinc-900">Personal Information</h3>
+                <p className="text-sm text-zinc-500 mt-1">{isEditing ? 'Update your details below' : 'View your profile details'}</p>
               </div>
 
               <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Full Name</label>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Full Name</label>
                     {isEditing ? (
                       <input
                         type="text"
                         name="name"
                         value={profile.name}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 hover:border-zinc-300"
                       />
                     ) : (
-                      <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.name || '-'}</p>
+                      <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.name || '-'}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Email Address</label>
-                    <p className="px-4 py-3 bg-dark-800/50 rounded-xl text-dark-500 border border-dark-700">{profile.email}</p>
-                    <p className="text-xs text-dark-500 mt-1">Email cannot be changed</p>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Email Address</label>
+                    <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-500 border border-zinc-100">{profile.email}</p>
+                    <p className="text-xs text-zinc-400 mt-1 ml-1">Email cannot be changed</p>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Phone Number</label>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Phone Number</label>
                     {isEditing ? (
                       <input
                         type="tel"
@@ -237,15 +238,15 @@ const SeatingProfile = () => {
                         value={profile.phone}
                         onChange={handleChange}
                         placeholder="Enter phone number"
-                        className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white placeholder-dark-500"
+                        className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                       />
                     ) : (
-                      <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.phone || '-'}</p>
+                      <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.phone || '-'}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Office Location</label>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Office Location</label>
                     {isEditing ? (
                       <input
                         type="text"
@@ -253,38 +254,38 @@ const SeatingProfile = () => {
                         value={profile.office}
                         onChange={handleChange}
                         placeholder="Enter office location"
-                        className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white placeholder-dark-500"
+                        className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                       />
                     ) : (
-                      <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.office || '-'}</p>
+                      <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.office || '-'}</p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Date of Birth</label>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Date of Birth</label>
                     {isEditing ? (
                       <input
                         type="date"
                         name="dateOfBirth"
                         value={profile.dateOfBirth}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 hover:border-zinc-300"
                       />
                     ) : (
-                      <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">
+                      <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">
                         {profile.dateOfBirth ? new Date(profile.dateOfBirth).toLocaleDateString('en-IN') : '-'}
                       </p>
                     )}
                   </div>
 
                   <div>
-                    <label className="block text-sm font-bold text-dark-300 mb-2">Gender</label>
+                    <label className="block text-sm font-bold text-zinc-700 mb-2">Gender</label>
                     {isEditing ? (
                       <select
                         name="gender"
                         value={profile.gender}
                         onChange={handleChange}
-                        className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all text-white"
+                        className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 hover:border-zinc-300"
                       >
                         <option value="">Select Gender</option>
                         <option value="Male">Male</option>
@@ -292,13 +293,13 @@ const SeatingProfile = () => {
                         <option value="Other">Other</option>
                       </select>
                     ) : (
-                      <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.gender || '-'}</p>
+                      <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.gender || '-'}</p>
                     )}
                   </div>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-dark-300 mb-2">Address</label>
+                  <label className="block text-sm font-bold text-zinc-700 mb-2">Address</label>
                   {isEditing ? (
                     <textarea
                       name="address"
@@ -306,15 +307,15 @@ const SeatingProfile = () => {
                       onChange={handleChange}
                       rows={2}
                       placeholder="Enter your address"
-                      className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none text-white placeholder-dark-500"
+                      className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all resize-none text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                     />
                   ) : (
-                    <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.address || '-'}</p>
+                    <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.address || '-'}</p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-bold text-dark-300 mb-2">Bio</label>
+                  <label className="block text-sm font-bold text-zinc-700 mb-2">Bio</label>
                   {isEditing ? (
                     <textarea
                       name="bio"
@@ -322,10 +323,10 @@ const SeatingProfile = () => {
                       onChange={handleChange}
                       rows={3}
                       placeholder="Tell us about yourself..."
-                      className="w-full px-4 py-3 bg-dark-800 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none text-white placeholder-dark-500"
+                      className="w-full px-4 py-3 bg-white border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all resize-none text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                     />
                   ) : (
-                    <p className="px-4 py-3 bg-dark-800 rounded-xl text-white font-bold border border-dark-700">{profile.bio || '-'}</p>
+                    <p className="px-4 py-3 bg-zinc-50 rounded-xl text-zinc-900 font-medium border border-zinc-100">{profile.bio || '-'}</p>
                   )}
                 </div>
               </form>

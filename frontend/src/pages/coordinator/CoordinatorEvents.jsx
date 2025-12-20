@@ -76,85 +76,85 @@ const CoordinatorEvents = () => {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Approved': return 'bg-green-100 text-green-700';
-      case 'Rejected': return 'bg-red-100 text-red-700';
-      default: return 'bg-yellow-100 text-yellow-700';
+      case 'Approved': return 'bg-emerald-100 text-emerald-700 border border-emerald-200';
+      case 'Rejected': return 'bg-red-100 text-red-700 border border-red-200';
+      default: return 'bg-amber-100 text-amber-700 border border-amber-200';
     }
   };
 
   const getCategoryColor = (category) => {
     switch (category) {
-      case 'Technical': return 'bg-blue-100 text-blue-700';
-      case 'Cultural': return 'bg-purple-100 text-purple-700';
-      case 'Sports': return 'bg-orange-100 text-orange-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case 'Technical': return 'bg-blue-50 text-blue-700 border border-blue-100';
+      case 'Cultural': return 'bg-purple-50 text-purple-700 border border-purple-100';
+      case 'Sports': return 'bg-orange-50 text-orange-700 border border-orange-100';
+      default: return 'bg-zinc-50 text-zinc-700 border border-zinc-100';
     }
   };
 
   return (
     <DashboardLayout role="club_coordinator" userName={user?.name}>
-      <div className="space-y-6 animate-fade-in">
+      <div className="space-y-6 animate-fade-in max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 tracking-tight">My Events</h1>
-            <p className="text-gray-500 mt-1 text-lg">Manage your club event proposals</p>
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">My Events</h1>
+            <p className="text-zinc-500 mt-1 text-sm">Manage your club event proposals</p>
           </div>
           <button
             onClick={() => setShowForm(!showForm)}
-            className={`flex items-center gap-2 px-6 py-3 rounded-xl font-semibold transition-all shadow-lg ${showForm
-              ? 'bg-gray-200 text-gray-700 shadow-none'
-              : 'bg-primary-600 text-white hover:bg-primary-700 shadow-primary-200'
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm ${showForm
+              ? 'bg-zinc-100 text-zinc-700'
+              : 'bg-violet-600 text-white hover:bg-violet-700 shadow-violet-200'
               }`}
           >
-            {showForm ? <X className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+            {showForm ? <X className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             {showForm ? 'Cancel' : 'Propose Event'}
           </button>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 animate-slide-in-up">
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="bg-white rounded-xl p-5 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Total Events</p>
-                <p className="text-3xl font-bold text-gray-800 mt-1"><AnimatedNumber value={events.length} /></p>
+                <p className="text-zinc-500 font-medium text-xs uppercase tracking-wide">Total Events</p>
+                <p className="text-2xl font-bold text-zinc-900 mt-1"><AnimatedNumber value={events.length} /></p>
               </div>
-              <div className="w-11 h-11 bg-primary-100 rounded-xl flex items-center justify-center">
-                <Calendar className="w-5 h-5 text-primary-600" />
+              <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center border border-violet-100">
+                <Calendar className="w-5 h-5 text-violet-600" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="bg-white rounded-xl p-5 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Pending</p>
-                <p className="text-3xl font-bold text-yellow-600 mt-1"><AnimatedNumber value={pendingCount} /></p>
+                <p className="text-zinc-500 font-medium text-xs uppercase tracking-wide">Pending</p>
+                <p className="text-2xl font-bold text-amber-600 mt-1"><AnimatedNumber value={pendingCount} /></p>
               </div>
-              <div className="w-11 h-11 bg-yellow-50 rounded-xl flex items-center justify-center">
-                <Clock className="w-5 h-5 text-yellow-600" />
+              <div className="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center border border-amber-100">
+                <Clock className="w-5 h-5 text-amber-600" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="bg-white rounded-xl p-5 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Approved</p>
-                <p className="text-3xl font-bold text-green-600 mt-1"><AnimatedNumber value={approvedCount} /></p>
+                <p className="text-zinc-500 font-medium text-xs uppercase tracking-wide">Approved</p>
+                <p className="text-2xl font-bold text-emerald-600 mt-1"><AnimatedNumber value={approvedCount} /></p>
               </div>
-              <div className="w-11 h-11 bg-green-50 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center border border-emerald-100">
+                <CheckCircle className="w-5 h-5 text-emerald-600" />
               </div>
             </div>
           </div>
-          <div className="glass-card rounded-2xl p-5 tilt-card">
+          <div className="bg-white rounded-xl p-5 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-500 font-medium text-sm">Rejected</p>
-                <p className="text-3xl font-bold text-red-500 mt-1"><AnimatedNumber value={rejectedCount} /></p>
+                <p className="text-zinc-500 font-medium text-xs uppercase tracking-wide">Rejected</p>
+                <p className="text-2xl font-bold text-red-600 mt-1"><AnimatedNumber value={rejectedCount} /></p>
               </div>
-              <div className="w-11 h-11 bg-red-50 rounded-xl flex items-center justify-center">
-                <XCircle className="w-5 h-5 text-red-500" />
+              <div className="w-10 h-10 bg-red-50 rounded-lg flex items-center justify-center border border-red-100">
+                <XCircle className="w-5 h-5 text-red-600" />
               </div>
             </div>
           </div>
@@ -162,20 +162,20 @@ const CoordinatorEvents = () => {
 
         {/* Event Form */}
         {showForm && (
-          <div className="glass-card rounded-2xl tilt-card overflow-hidden animate-fade-in">
-            <div className="p-6 border-b border-gray-100 flex items-center gap-3">
-              <div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
-                <Sparkles className="w-5 h-5 text-green-600" />
+          <div className="bg-white rounded-xl border border-zinc-200 shadow-sm overflow-hidden animate-fade-in">
+            <div className="p-5 border-b border-zinc-100 flex items-center gap-3 bg-zinc-50/50">
+              <div className="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center border border-green-100">
+                <Sparkles className="w-4 h-4 text-green-600" />
               </div>
-              <h2 className="text-lg font-bold text-gray-900">Propose New Event</h2>
+              <h2 className="text-lg font-bold text-zinc-900">Propose New Event</h2>
             </div>
             <form onSubmit={handleSubmit} className="p-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Event Title *</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Event Title *</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                     value={newEvent.title}
                     onChange={(e) => setNewEvent({ ...newEvent, title: e.target.value })}
                     placeholder="Enter event title"
@@ -183,9 +183,9 @@ const CoordinatorEvents = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Category</label>
                   <select
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                     value={newEvent.category}
                     onChange={(e) => setNewEvent({ ...newEvent, category: e.target.value })}
                   >
@@ -195,9 +195,9 @@ const CoordinatorEvents = () => {
                   </select>
                 </div>
                 <div className="md:col-span-2">
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Description *</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Description *</label>
                   <textarea
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 resize-none"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm resize-none"
                     value={newEvent.description}
                     onChange={(e) => setNewEvent({ ...newEvent, description: e.target.value })}
                     placeholder="Describe your event"
@@ -206,10 +206,10 @@ const CoordinatorEvents = () => {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Date *</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Date *</label>
                   <input
                     type="date"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                     value={newEvent.date}
                     onChange={(e) => setNewEvent({ ...newEvent, date: e.target.value })}
                     required
@@ -217,20 +217,20 @@ const CoordinatorEvents = () => {
                 </div>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">Start *</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">Start *</label>
                     <input
                       type="time"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                       value={newEvent.startTime}
                       onChange={(e) => setNewEvent({ ...newEvent, startTime: e.target.value })}
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">End *</label>
+                    <label className="block text-xs font-medium text-zinc-500 mb-1.5">End *</label>
                     <input
                       type="time"
-                      className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                       value={newEvent.endTime}
                       onChange={(e) => setNewEvent({ ...newEvent, endTime: e.target.value })}
                       required
@@ -238,10 +238,10 @@ const CoordinatorEvents = () => {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">Venue *</label>
+                  <label className="block text-xs font-medium text-zinc-500 mb-1.5">Venue *</label>
                   <input
                     type="text"
-                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    className="w-full px-3 py-2.5 bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
                     value={newEvent.venue}
                     onChange={(e) => setNewEvent({ ...newEvent, venue: e.target.value })}
                     placeholder="Event venue"
@@ -252,16 +252,16 @@ const CoordinatorEvents = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="mt-6 flex items-center justify-center gap-2 w-full md:w-auto bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-green-200 disabled:opacity-50 transition-all"
+                className="mt-6 flex items-center justify-center gap-2 w-full md:w-auto bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-2.5 rounded-lg font-medium shadow-lg shadow-emerald-200 disabled:opacity-50 transition-all text-sm"
               >
                 {submitting ? (
                   <>
-                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                     Submitting...
                   </>
                 ) : (
                   <>
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                     Submit Proposal
                   </>
                 )}
@@ -271,24 +271,24 @@ const CoordinatorEvents = () => {
         )}
 
         {/* Search and Filter */}
-        <div className="glass-card rounded-2xl p-5 tilt-card">
+        <div className="bg-white rounded-xl p-4 border border-zinc-200 shadow-sm">
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative group">
-              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-primary-500 transition-colors" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400 group-focus-within:text-violet-500 transition-colors" />
               <input
                 type="text"
                 placeholder="Search events..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 transition-all"
+                className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm"
               />
             </div>
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-gray-400" />
+              <Filter className="w-4 h-4 text-zinc-400" />
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-3 bg-gray-50 border-2 border-transparent rounded-xl focus:bg-white focus:outline-none focus:border-primary-500 transition-all font-medium"
+                className="px-3 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg focus:bg-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-sm font-medium text-zinc-700"
               >
                 {statuses.map(status => (
                   <option key={status} value={status}>
@@ -303,61 +303,61 @@ const CoordinatorEvents = () => {
         {/* Events List */}
         {loading ? (
           <div className="text-center py-24">
-            <div className="w-16 h-16 border-4 border-primary-200 border-t-primary-600 rounded-full animate-spin mx-auto mb-4" />
-            <p className="text-gray-500 font-medium">Loading your events...</p>
+            <div className="w-12 h-12 border-4 border-violet-200 border-t-violet-600 rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-zinc-500 font-medium">Loading your events...</p>
           </div>
         ) : filteredEvents.length > 0 ? (
           <div className="space-y-4">
             {filteredEvents.map(event => (
               <div
                 key={event._id}
-                className={`glass-card rounded-2xl overflow-hidden hover:shadow-md transition-all ${event.status === 'Approved' ? 'border-green-200' :
+                className={`bg-white rounded-xl border overflow-hidden hover:shadow-md transition-all ${event.status === 'Approved' ? 'border-emerald-200' :
                   event.status === 'Rejected' ? 'border-red-200' :
-                    'border-yellow-200'
+                    'border-amber-200'
                   }`}
               >
-                <div className={`h-1 ${event.status === 'Approved' ? 'bg-gradient-to-r from-green-500 to-green-600' :
-                  event.status === 'Rejected' ? 'bg-gradient-to-r from-red-500 to-red-600' :
-                    'bg-gradient-to-r from-yellow-500 to-yellow-600'
+                <div className={`h-1 ${event.status === 'Approved' ? 'bg-emerald-500' :
+                  event.status === 'Rejected' ? 'bg-red-500' :
+                    'bg-amber-500'
                   }`} />
                 <div className="p-6">
                   <div className="flex items-start justify-between mb-4">
                     <div>
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="font-bold text-xl text-gray-900">{event.title}</h3>
-                        <span className={`px-2.5 py-1 rounded-lg text-xs font-bold ${getCategoryColor(event.category)}`}>
+                        <h3 className="font-bold text-lg text-zinc-900">{event.title}</h3>
+                        <span className={`px-2.5 py-0.5 rounded text-[10px] uppercase tracking-wide font-bold ${getCategoryColor(event.category)}`}>
                           {event.category}
                         </span>
                       </div>
-                      <p className="text-gray-600 line-clamp-2">{event.description}</p>
+                      <p className="text-zinc-600 line-clamp-2 text-sm">{event.description}</p>
                     </div>
-                    <span className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-semibold whitespace-nowrap ${getStatusColor(event.status)}`}>
-                      {event.status === 'Approved' && <CheckCircle className="w-4 h-4" />}
-                      {event.status === 'Rejected' && <XCircle className="w-4 h-4" />}
-                      {event.status === 'Pending' && <Clock className="w-4 h-4" />}
+                    <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium whitespace-nowrap ${getStatusColor(event.status)}`}>
+                      {event.status === 'Approved' && <CheckCircle className="w-3.5 h-3.5" />}
+                      {event.status === 'Rejected' && <XCircle className="w-3.5 h-3.5" />}
+                      {event.status === 'Pending' && <Clock className="w-3.5 h-3.5" />}
                       {event.status}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-6 text-sm text-gray-500">
+                  <div className="flex items-center gap-6 text-xs text-zinc-500 font-medium">
                     <span className="flex items-center gap-1.5">
-                      <CalendarDays className="w-4 h-4" />
+                      <CalendarDays className="w-4 h-4 text-zinc-400" />
                       {new Date(event.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <Clock className="w-4 h-4" />
+                      <Clock className="w-4 h-4 text-zinc-400" />
                       {event.startTime} - {event.endTime}
                     </span>
                     <span className="flex items-center gap-1.5">
-                      <MapPin className="w-4 h-4" />
+                      <MapPin className="w-4 h-4 text-zinc-400" />
                       {event.venue}
                     </span>
                   </div>
 
                   {event.adminComments && event.status === 'Rejected' && (
-                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-xl">
+                    <div className="mt-4 p-3 bg-red-50 border border-red-100 rounded-lg">
                       <p className="text-sm text-red-700">
-                        <strong>Admin Feedback:</strong> {event.adminComments}
+                        <span className="font-semibold">Admin Feedback:</span> {event.adminComments}
                       </p>
                     </div>
                   )}
@@ -366,12 +366,12 @@ const CoordinatorEvents = () => {
             ))}
           </div>
         ) : (
-          <div className="glass-card rounded-2xl p-16 text-center tilt-card">
-            <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Calendar className="w-10 h-10 text-gray-300" />
+          <div className="bg-white rounded-xl border border-zinc-200 p-16 text-center border-dashed">
+            <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
+              <Calendar className="w-8 h-8 text-zinc-300" />
             </div>
-            <p className="text-xl font-bold text-gray-900">No events found</p>
-            <p className="text-gray-500 mt-1">Click "Propose Event" to create your first event</p>
+            <p className="text-lg font-bold text-zinc-900">No events found</p>
+            <p className="text-zinc-500 mt-1 text-sm">Click "Propose Event" to create your first event</p>
           </div>
         )}
       </div>

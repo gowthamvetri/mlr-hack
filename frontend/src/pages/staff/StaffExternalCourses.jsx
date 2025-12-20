@@ -37,7 +37,7 @@ const RadialProgress = ({ value, size = 44, thickness = 4, color = '#8b5cf6' }) 
     return (
         <div className="relative" style={{ width: size, height: size }}>
             <svg width={size} height={size} className="transform -rotate-90">
-                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-dark-700" />
+                <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={thickness} className="text-zinc-100" />
                 <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={thickness}
                     strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
                     className="transition-all duration-1000 ease-out" />
@@ -55,34 +55,34 @@ const categories = ['AI/ML', 'Web Development', 'Mobile Development', 'Data Scie
 const CourseForm = ({ formData, setFormData, onSubmit, onCancel, submitting, isEdit = false }) => (
     <form onSubmit={onSubmit} className="space-y-5">
         <div>
-            <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Title *</label>
-            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 placeholder-dark-500" placeholder="e.g., Python for Beginners" />
+            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Course Title *</label>
+            <input type="text" required value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium" placeholder="e.g., Python for Beginners" />
         </div>
         <div>
-            <label className="block text-xs font-medium text-dark-400 mb-1.5">Description</label>
-            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 resize-none placeholder-dark-500" placeholder="Brief description..." />
+            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Description</label>
+            <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 resize-none placeholder-zinc-400 font-medium" placeholder="Brief description..." />
         </div>
         <div>
-            <label className="block text-xs font-medium text-dark-400 mb-1.5">Course URL *</label>
-            <input type="url" required value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 placeholder-dark-500" placeholder="https://..." />
+            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Course URL *</label>
+            <input type="url" required value={formData.url} onChange={(e) => setFormData({ ...formData, url: e.target.value })} className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium" placeholder="https://..." />
         </div>
         <div className="grid grid-cols-2 gap-4">
             <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Provider</label>
-                <select value={formData.provider} onChange={(e) => setFormData({ ...formData, provider: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50">
+                <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Provider</label>
+                <select value={formData.provider} onChange={(e) => setFormData({ ...formData, provider: e.target.value })} className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 cursor-pointer font-medium">
                     {providers.map(p => <option key={p} value={p}>{p}</option>)}
                 </select>
             </div>
             <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Category</label>
-                <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50">
+                <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Category</label>
+                <select value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} className="w-full px-4 py-2.5 bg-white border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 cursor-pointer font-medium">
                     {categories.map(c => <option key={c} value={c}>{c}</option>)}
                 </select>
             </div>
         </div>
-        <div className="flex gap-3 pt-4 border-t border-dark-700">
-            <button type="button" onClick={onCancel} className="flex-1 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors">Cancel</button>
-            <button type="submit" disabled={submitting} className="flex-1 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 disabled:opacity-60 transition-colors shadow-lg shadow-primary-500/20">{submitting ? 'Saving...' : (isEdit ? 'Update' : 'Add Course')}</button>
+        <div className="flex gap-3 pt-4 border-t border-zinc-100">
+            <button type="button" onClick={onCancel} className="flex-1 py-2.5 bg-white border border-zinc-200 text-zinc-600 rounded-lg text-sm font-bold hover:bg-zinc-50 hover:text-zinc-900 transition-colors">Cancel</button>
+            <button type="submit" disabled={submitting} className="flex-1 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 disabled:opacity-60 transition-colors shadow-md">{submitting ? 'Saving...' : (isEdit ? 'Update' : 'Add Course')}</button>
         </div>
     </form>
 );
@@ -117,6 +117,7 @@ const StaffExternalCourses = () => {
         try {
             setLoading(true);
             const { data } = await getExternalCourses();
+            setAllCourses(data || []);
             const myCourses = data.filter(c => c.postedBy?._id === user?._id);
             setCourses(myCourses);
         } catch (error) { console.error('Error fetching courses:', error); }
@@ -175,51 +176,46 @@ const StaffExternalCourses = () => {
 
     const getProviderColor = (provider) => {
         const colors = {
-            'Coursera': 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-            'NPTEL': 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-            'Udemy': 'bg-purple-500/10 text-purple-400 border-purple-500/20',
-            'edX': 'bg-red-500/10 text-red-400 border-red-500/20',
-            'Google': 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-            'Microsoft': 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-            'AWS': 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+            'Coursera': 'bg-blue-50 text-blue-600 border-blue-100',
+            'NPTEL': 'bg-orange-50 text-orange-600 border-orange-100',
+            'Udemy': 'bg-purple-50 text-purple-600 border-purple-100',
+            'edX': 'bg-red-50 text-red-600 border-red-100',
+            'Google': 'bg-emerald-50 text-emerald-600 border-emerald-100',
+            'Microsoft': 'bg-cyan-50 text-cyan-600 border-cyan-100',
+            'AWS': 'bg-amber-50 text-amber-600 border-amber-100'
         };
-        return colors[provider] || 'bg-dark-700/50 text-dark-300 border-dark-600';
+        return colors[provider] || 'bg-zinc-100 text-zinc-600 border-zinc-200';
     };
-
-
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
-            <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6">
+            <div ref={pageRef} className="max-w-[1400px] mx-auto space-y-6 text-zinc-900">
                 {/* Hero Section */}
-                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary-900/50 via-dark-900 to-accent-900/50 p-6 lg:p-8 border border-dark-700/50">
-                    <div className="absolute top-0 right-0 w-80 h-80 bg-primary-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-                    <div className="absolute bottom-0 left-0 w-48 h-48 bg-accent-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
-
+                <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-50 via-white to-violet-50 p-6 lg:p-8 border border-zinc-200 shadow-sm">
                     <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                         <div className="flex-1">
                             <div className="flex items-center gap-2 mb-3">
-                                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-primary-500/20 text-primary-300 rounded-full text-[11px] font-medium border border-primary-500/30">
+                                <span className="flex items-center gap-1.5 px-2.5 py-1 bg-white text-blue-600 rounded-full text-[11px] font-bold border border-blue-100 shadow-sm">
                                     <BookOpen className="w-3 h-3" />
                                     External Courses
                                 </span>
                             </div>
-                            <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
+                            <h1 className="text-xl lg:text-2xl font-bold text-zinc-900 mb-1.5 tracking-tight">
                                 Recommend Courses
                             </h1>
-                            <p className="text-dark-300 text-sm">
+                            <p className="text-zinc-500 text-sm font-medium">
                                 Share free certification links with your students • {allCourses.length} total courses in system
                             </p>
                         </div>
 
                         <div className="flex items-center gap-2.5">
                             <button onClick={handleRefresh} disabled={refreshing}
-                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800/50 border border-dark-700/50 hover:bg-dark-800 hover:text-white rounded-lg transition-all disabled:opacity-50">
+                                className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 hover:bg-zinc-50 hover:text-zinc-900 rounded-lg transition-all disabled:opacity-50 shadow-sm">
                                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                                 <span className="hidden sm:inline">Refresh</span>
                             </button>
                             <button onClick={() => { resetForm(); setShowAddModal(true); }}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary-600 hover:bg-primary-500 rounded-lg transition-all shadow-lg shadow-primary-500/20">
+                                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-zinc-900 hover:bg-zinc-800 rounded-lg transition-all shadow-md">
                                 <Plus className="w-4 h-4" />
                                 Add Course
                             </button>
@@ -229,118 +225,118 @@ const StaffExternalCourses = () => {
 
                 {/* Stats Grid */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all duration-300 group shadow-sm">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-primary-500/10 border border-primary-500/20 flex items-center justify-center">
-                                <BookOpen className="w-4.5 h-4.5 text-primary-400" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+                                <BookOpen className="w-4.5 h-4.5 text-blue-600" strokeWidth={2} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-primary-400">
+                            <div className="flex items-center gap-1 text-xs font-bold text-blue-600">
                                 <ArrowUpRight className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">My Courses</p>
-                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={courses.length} /></p>
-                        <div className="mt-4 pt-3 border-t border-dark-700/50">
-                            <p className="text-[10px] text-dark-400">Courses you've shared</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">My Courses</p>
+                        <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={courses.length} /></p>
+                        <div className="mt-4 pt-3 border-t border-zinc-100">
+                            <p className="text-[10px] text-zinc-400 font-medium">Courses you've shared</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all duration-300 group shadow-sm">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                <Award className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                                <Award className="w-4.5 h-4.5 text-emerald-600" strokeWidth={2} />
                             </div>
                             <RadialProgress value={Math.min(completionRate, 100)} color="#10b981" />
                         </div>
-                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Completions</p>
-                        <p className="text-2xl font-semibold text-emerald-400"><AnimatedNumber value={totalCompletions} /></p>
-                        <div className="mt-4 pt-3 border-t border-dark-700/50">
-                            <p className="text-[10px] text-dark-400">Students completed</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Completions</p>
+                        <p className="text-2xl font-bold text-emerald-600"><AnimatedNumber value={totalCompletions} /></p>
+                        <div className="mt-4 pt-3 border-t border-zinc-100">
+                            <p className="text-[10px] text-zinc-400 font-medium">Students completed</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all duration-300 group shadow-sm">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                <Globe className="w-4.5 h-4.5 text-blue-400" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                                <Globe className="w-4.5 h-4.5 text-violet-600" strokeWidth={2} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-blue-400">
+                            <div className="flex items-center gap-1 text-xs font-bold text-violet-600">
                                 <TrendingUp className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Providers</p>
-                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={providersUsed} /></p>
-                        <div className="mt-4 pt-3 border-t border-dark-700/50">
-                            <p className="text-[10px] text-dark-400">Different platforms</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Providers</p>
+                        <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={providersUsed} /></p>
+                        <div className="mt-4 pt-3 border-t border-zinc-100">
+                            <p className="text-[10px] text-zinc-400 font-medium">Different platforms</p>
                         </div>
                     </div>
 
-                    <div className="metric-card bg-dark-800 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300 group">
+                    <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all duration-300 group shadow-sm">
                         <div className="flex items-start justify-between mb-4">
-                            <div className="w-9 h-9 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center">
-                                <Users className="w-4.5 h-4.5 text-amber-400" strokeWidth={1.5} />
+                            <div className="w-9 h-9 rounded-lg bg-amber-50 border border-amber-100 flex items-center justify-center">
+                                <Users className="w-4.5 h-4.5 text-amber-600" strokeWidth={2} />
                             </div>
-                            <div className="flex items-center gap-1 text-xs font-medium text-amber-400">
+                            <div className="flex items-center gap-1 text-xs font-bold text-amber-600">
                                 <CheckCircle className="w-3 h-3" />
                             </div>
                         </div>
-                        <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg/Course</p>
-                        <p className="text-2xl font-semibold text-white"><AnimatedNumber value={courses.length > 0 ? Math.round(totalCompletions / courses.length) : 0} /></p>
-                        <div className="mt-4 pt-3 border-t border-dark-700/50">
-                            <p className="text-[10px] text-dark-400">Completions per course</p>
+                        <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Avg/Course</p>
+                        <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={courses.length > 0 ? Math.round(totalCompletions / courses.length) : 0} /></p>
+                        <div className="mt-4 pt-3 border-t border-zinc-100">
+                            <p className="text-[10px] text-zinc-400 font-medium">Completions per course</p>
                         </div>
                     </div>
                 </div>
 
                 {/* Search Bar */}
-                <div className="section-card bg-dark-800 rounded-xl border border-dark-700 p-4">
+                <div className="section-card bg-white rounded-xl border border-zinc-200 p-4 shadow-sm">
                     <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
-                        <input type="text" placeholder="Search your courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-dark-900 border border-dark-700 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all placeholder-dark-500" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
+                        <input type="text" placeholder="Search your courses..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium" />
                     </div>
                 </div>
 
                 {/* Courses Grid */}
                 {loading ? (
                     <div className="flex items-center justify-center h-64">
-                        <div className="w-10 h-10 border-2 border-primary-500/20 border-t-primary-500 rounded-full animate-spin" />
+                        <Loader className="w-8 h-8 text-zinc-300 animate-spin" />
                     </div>
                 ) : filteredCourses.length === 0 ? (
-                    <div className="bg-dark-800 rounded-xl border border-dark-700 p-12 text-center">
-                        <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookOpen className="w-7 h-7 text-dark-400" />
+                    <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center shadow-sm">
+                        <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
+                            <BookOpen className="w-7 h-7 text-zinc-300" />
                         </div>
-                        <p className="text-white font-medium">No Courses Yet</p>
-                        <p className="text-dark-400 text-sm mt-1 mb-4">Start by adding a free certification course for your students.</p>
-                        <button onClick={() => { resetForm(); setShowAddModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-500 transition-colors shadow-lg shadow-primary-500/20">
+                        <p className="text-zinc-900 font-bold">No Courses Yet</p>
+                        <p className="text-zinc-500 text-sm mt-1 mb-4 font-medium">Start by adding a free certification course for your students.</p>
+                        <button onClick={() => { resetForm(); setShowAddModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 transition-colors shadow-md">
                             <Plus className="w-4 h-4" />Add Course
                         </button>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                         {filteredCourses.map((course) => (
-                            <div key={course._id} className="course-card bg-dark-800 rounded-xl border border-dark-700 overflow-hidden hover:border-dark-500 hover:shadow-xl hover:shadow-black/20 transition-all duration-300 flex flex-col group">
-                                <div className="h-1.5 bg-gradient-to-r from-primary-600 to-accent-600 group-hover:from-primary-500 group-hover:to-accent-500 transition-all"></div>
+                            <div key={course._id} className="course-card bg-white rounded-xl border border-zinc-200 overflow-hidden hover:border-zinc-300 hover:shadow-lg transition-all duration-300 flex flex-col group shadow-sm">
+                                <div className="h-1.5 bg-gradient-to-r from-blue-500 to-violet-500"></div>
                                 <div className="p-5 flex-1">
                                     <div className="flex items-start justify-between mb-3">
                                         <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wide border ${getProviderColor(course.provider)}`}>{course.provider}</span>
-                                        <div className="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg border border-emerald-500/20">
+                                        <div className="flex items-center gap-1.5 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">
                                             <CheckCircle className="w-3.5 h-3.5" />
                                             <span className="text-xs font-bold">{course.completedBy?.length || 0}</span>
                                         </div>
                                     </div>
-                                    <h3 className="font-semibold text-sm text-white mb-2 line-clamp-1 group-hover:text-primary-400 transition-colors">{course.title}</h3>
-                                    <p className="text-xs text-dark-400 mb-3 line-clamp-2">{course.description || 'No description provided'}</p>
-                                    <span className="inline-block px-2 py-0.5 bg-dark-700 text-dark-300 rounded text-[10px] font-medium border border-dark-600">{course.category}</span>
+                                    <h3 className="font-bold text-sm text-zinc-900 mb-2 line-clamp-1 group-hover:text-blue-600 transition-colors">{course.title}</h3>
+                                    <p className="text-xs text-zinc-500 mb-3 line-clamp-2 font-medium">{course.description || 'No description provided'}</p>
+                                    <span className="inline-block px-2 py-0.5 bg-zinc-100 text-zinc-600 rounded text-[10px] font-bold border border-zinc-200">{course.category}</span>
                                 </div>
-                                <div className="p-4 border-t border-dark-700/50 bg-dark-900/30 flex items-center gap-2">
-                                    <a href={course.url} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 bg-dark-700 hover:bg-primary-600 text-white rounded-lg text-xs font-medium transition-all group-hover:shadow-lg shadow-black/20">
+                                <div className="p-4 border-t border-zinc-100 bg-zinc-50/50 flex items-center gap-2">
+                                    <a href={course.url} target="_blank" rel="noopener noreferrer" className="flex-1 flex items-center justify-center gap-2 py-2 bg-white border border-zinc-200 hover:bg-zinc-50 text-zinc-700 rounded-lg text-xs font-bold transition-all shadow-sm">
                                         <LinkIcon className="w-3.5 h-3.5" /> Open Course
                                     </a>
-                                    <button onClick={() => openEditModal(course)} className="p-2 hover:bg-dark-700 hover:text-white rounded-lg transition-colors border border-dark-700 bg-dark-800 text-dark-400">
+                                    <button onClick={() => openEditModal(course)} className="p-2 hover:bg-white hover:text-zinc-900 rounded-lg transition-colors border border-transparent hover:border-zinc-200 hover:shadow-sm text-zinc-400">
                                         <Edit2 className="w-4 h-4" />
                                     </button>
-                                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-2 hover:bg-red-500/10 hover:text-red-400 rounded-lg transition-colors border border-dark-700 bg-dark-800 text-dark-400">
+                                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-2 hover:bg-red-50 hover:text-red-600 rounded-lg transition-colors border border-transparent hover:border-red-100 text-zinc-400">
                                         <Trash2 className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -352,8 +348,8 @@ const StaffExternalCourses = () => {
                 {/* Results Count */}
                 {filteredCourses.length > 0 && (
                     <div className="text-center">
-                        <p className="text-xs text-dark-500">
-                            Showing <span className="font-medium text-dark-200">{filteredCourses.length}</span> of <span className="font-medium text-dark-200">{courses.length}</span> courses
+                        <p className="text-xs text-zinc-400 font-bold">
+                            Showing <span className="text-zinc-600">{filteredCourses.length}</span> of <span className="text-zinc-600">{courses.length}</span> courses
                         </p>
                     </div>
                 )}
@@ -381,11 +377,12 @@ const StaffExternalCourses = () => {
             </Modal>
             <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Course" size="sm">
                 <div className="text-center py-4">
-                    <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4"><Trash2 className="w-6 h-6 text-red-500" /></div>
-                    <p className="text-dark-200 text-sm mb-6">Delete "{selectedCourse?.title}"?</p>
+                    <div className="w-14 h-14 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-100"><Trash2 className="w-6 h-6 text-red-500" /></div>
+                    <p className="text-zinc-900 text-sm font-bold mb-1">Delete "{selectedCourse?.title}"?</p>
+                    <p className="text-zinc-500 text-xs font-medium mb-6">This action cannot be undone.</p>
                     <div className="flex gap-3">
-                        <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2.5 bg-dark-800 border border-dark-700 text-dark-300 rounded-lg text-sm font-medium hover:bg-dark-700 transition-colors">Cancel</button>
-                        <button onClick={handleDeleteCourse} disabled={submitting} className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-60 transition-colors">{submitting ? 'Deleting...' : 'Delete'}</button>
+                        <button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2.5 bg-white border border-zinc-200 text-zinc-600 rounded-lg text-sm font-bold hover:bg-zinc-50 transition-colors">Cancel</button>
+                        <button onClick={handleDeleteCourse} disabled={submitting} className="flex-1 py-2.5 bg-red-600 text-white rounded-lg text-sm font-bold hover:bg-red-700 disabled:opacity-60 transition-colors shadow-md">{submitting ? 'Deleting...' : 'Delete'}</button>
                     </div>
                 </div>
             </Modal>

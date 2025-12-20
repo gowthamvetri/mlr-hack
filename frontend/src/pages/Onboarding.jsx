@@ -236,7 +236,7 @@ const Onboarding = () => {
 
           <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <button
-              onClick={() => navigate('/register')}
+              onClick={() => navigate('/login')}
               className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1 hover:scale-105"
             >
               Get Started Free

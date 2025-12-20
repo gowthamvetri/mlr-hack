@@ -106,31 +106,31 @@ const StudentAITwin = () => {
 
     return (
         <DashboardLayout role="student" userName={user?.name}>
-            <div className="space-y-6 animate-fade-in">
+            <div className="max-w-[1400px] mx-auto space-y-6 animate-fade-in">
                 {/* Header */}
                 <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Link to="/student" className="flex items-center gap-2 text-dark-400 hover:text-white transition-colors">
+                        <Link to="/student" className="flex items-center gap-2 text-zinc-500 hover:text-zinc-900 transition-colors font-medium">
                             <ArrowLeft className="w-5 h-5" />
                             Back to Dashboard
                         </Link>
-                        <div className="h-6 w-px bg-dark-700" />
+                        <div className="h-6 w-px bg-zinc-200" />
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-primary-500/10 rounded-full flex items-center justify-center border border-primary-500/20">
-                                <Brain className="w-5 h-5 text-primary-400" />
+                            <div className="w-10 h-10 bg-zinc-100 rounded-full flex items-center justify-center border border-zinc-200">
+                                <Brain className="w-5 h-5 text-zinc-600" />
                             </div>
                             <div>
-                                <h1 className="text-xl font-bold text-white">AI Twin</h1>
-                                <p className="text-sm text-dark-400">Your Digital Learning Companion</p>
+                                <h1 className="text-xl font-bold text-zinc-900">AI Twin</h1>
+                                <p className="text-sm text-zinc-500">Your Digital Learning Companion</p>
                             </div>
                         </div>
                     </div>
                     <div className="flex items-center gap-3">
-                        <span className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-sm font-semibold flex items-center gap-1 shadow-sm">
+                        <span className="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-sm font-bold flex items-center gap-1 shadow-sm">
                             <Sparkles className="w-4 h-4" />
                             Active
                         </span>
-                        <button className="flex items-center gap-2 px-4 py-2 text-dark-400 hover:text-white hover:bg-dark-800 border border-transparent hover:border-dark-700 rounded-lg transition-all font-medium">
+                        <button className="flex items-center gap-2 px-4 py-2 text-zinc-600 hover:text-zinc-900 hover:bg-zinc-50 border border-transparent hover:border-zinc-200 rounded-lg transition-all font-bold">
                             <Settings className="w-4 h-4" />
                             Configure
                         </button>
@@ -140,7 +140,7 @@ const StudentAITwin = () => {
                 {/* Top Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-slide-in-up">
                     {/* Student Twin Card */}
-                    <div className="bg-gradient-to-br from-primary-600 to-primary-800 rounded-2xl p-6 text-white shadow-lg shadow-primary-900/20 border border-primary-500/30 overflow-hidden relative group">
+                    <div className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl p-6 text-white shadow-lg overflow-hidden relative group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16 blur-2xl group-hover:bg-white/20 transition-all duration-500"></div>
                         <div className="flex items-center gap-4 mb-4 relative z-10">
                             <div className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center backdrop-blur-sm border border-white/20 shadow-inner">
@@ -148,56 +148,56 @@ const StudentAITwin = () => {
                             </div>
                             <div>
                                 <h2 className="text-lg font-bold drop-shadow-sm">{twinData.name}</h2>
-                                <p className="text-primary-100 font-medium">{twinData.level}</p>
+                                <p className="text-zinc-300 font-medium">{twinData.level}</p>
                             </div>
-                            <Sparkles className="w-5 h-5 ml-auto text-primary-200" />
+                            <Sparkles className="w-5 h-5 ml-auto text-zinc-400" />
                         </div>
-                        <p className="text-sm text-primary-100 flex items-center gap-2 font-medium relative z-10">
+                        <p className="text-sm text-zinc-300 flex items-center gap-2 font-medium relative z-10">
                             <Clock className="w-4 h-4" />
                             Last sync: {twinData.lastSync}
                         </p>
                     </div>
 
                     {/* Career Readiness */}
-                    <div className="glass-card-dark rounded-2xl p-6 tilt-card border border-dark-700 shadow-xl group hover:border-emerald-500/30 transition-all">
-                        <div className="flex items-center gap-2 text-dark-400 mb-3 font-medium uppercase tracking-wide text-xs">
+                    <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm group hover:border-emerald-300 transition-all">
+                        <div className="flex items-center gap-2 text-zinc-500 mb-3 font-bold uppercase tracking-wide text-xs">
                             <TrendingUp className="w-4 h-4" />
                             <span>Career Readiness</span>
                         </div>
                         <div className="flex items-center justify-between mb-2">
-                            <span className="text-3xl font-bold text-white drop-shadow-sm"><AnimatedNumber value={twinData.careerReadiness} suffix="%" /></span>
-                            <span className="px-3 py-1 bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full text-sm font-bold">Industry Ready</span>
+                            <span className="text-3xl font-bold text-zinc-900"><AnimatedNumber value={twinData.careerReadiness} suffix="%" /></span>
+                            <span className="px-3 py-1 bg-blue-50 text-blue-600 border border-blue-100 rounded-full text-sm font-bold">Industry Ready</span>
                         </div>
-                        <div className="w-full bg-dark-700/50 rounded-full h-2 mb-2 border border-dark-600">
-                            <div className="bg-emerald-500 h-2 rounded-full transition-all shadow-[0_0_10px_rgba(16,185,129,0.3)]" style={{ width: `${twinData.careerReadiness}%` }} />
+                        <div className="w-full bg-zinc-100 rounded-full h-2 mb-2 border border-zinc-200">
+                            <div className="bg-emerald-500 h-2 rounded-full transition-all" style={{ width: `${twinData.careerReadiness}%` }} />
                         </div>
-                        <p className="text-sm text-emerald-400 font-bold">{twinData.careerChange}</p>
+                        <p className="text-sm text-emerald-600 font-bold">{twinData.careerChange}</p>
                     </div>
 
                     {/* Daily Wisdom */}
-                    <div className="glass-card-dark rounded-2xl p-6 tilt-card border border-dark-700 shadow-xl group hover:border-amber-500/30 transition-all">
-                        <div className="flex items-center gap-2 text-dark-400 mb-3 font-medium uppercase tracking-wide text-xs">
+                    <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm group hover:border-amber-300 transition-all">
+                        <div className="flex items-center gap-2 text-zinc-500 mb-3 font-bold uppercase tracking-wide text-xs">
                             <Lightbulb className="w-4 h-4 text-amber-500" />
                             <span>Daily Wisdom</span>
                         </div>
-                        <p className="text-white italic mb-3 font-medium leading-relaxed">"{twinData.dailyWisdom.quote}"</p>
-                        <p className="text-sm text-primary-400 font-bold">- Inspired by {twinData.dailyWisdom.author}</p>
+                        <p className="text-zinc-900 italic mb-3 font-medium leading-relaxed">"{twinData.dailyWisdom.quote}"</p>
+                        <p className="text-sm text-zinc-500 font-bold">- Inspired by {twinData.dailyWisdom.author}</p>
                     </div>
                 </div>
 
                 {/* Tabs Navigation */}
-                <div className="glass-card-dark rounded-2xl tilt-card p-2 border border-dark-700 shadow-lg">
+                <div className="bg-white rounded-2xl p-2 border border-zinc-200 shadow-sm">
                     <div className="flex gap-2">
                         {tabs.map(tab => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-xl font-bold transition-all ${activeTab === tab.id
-                                    ? 'bg-dark-700 text-white shadow-md border border-dark-600'
-                                    : 'text-dark-400 hover:bg-dark-800 hover:text-white'
+                                    ? 'bg-zinc-900 text-white shadow-md'
+                                    : 'text-zinc-500 hover:bg-zinc-50 hover:text-zinc-900'
                                     }`}
                             >
-                                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-primary-400' : 'text-dark-500'}`} />
+                                <tab.icon className={`w-5 h-5 ${activeTab === tab.id ? 'text-zinc-300' : 'text-zinc-400'}`} />
                                 {tab.label}
                             </button>
                         ))}
@@ -210,57 +210,57 @@ const StudentAITwin = () => {
                     {activeTab === 'overview' && (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             {/* Strengths & Development */}
-                            <div className="glass-card-dark rounded-2xl p-6 tilt-card border border-dark-700 shadow-xl">
-                                <div className="flex items-center gap-2 text-white mb-4">
-                                    <Target className="w-5 h-5 text-primary-400" />
+                            <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
+                                <div className="flex items-center gap-2 text-zinc-900 mb-4">
+                                    <Target className="w-5 h-5 text-zinc-600" />
                                     <h3 className="font-bold text-lg">Strengths & Development Areas</h3>
                                 </div>
 
                                 <div className="mb-6">
-                                    <h4 className="text-sm font-bold text-emerald-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                                    <h4 className="text-sm font-bold text-emerald-600 mb-3 flex items-center gap-2 uppercase tracking-wide">
                                         <CheckCircle className="w-4 h-4" />
                                         Key Strengths
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
                                         {twinData.strengths.map((s, i) => (
-                                            <span key={i} className="px-3 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-full text-sm font-bold shadow-sm">{s}</span>
+                                            <span key={i} className="px-3 py-1.5 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-full text-sm font-bold shadow-sm">{s}</span>
                                         ))}
                                     </div>
                                 </div>
 
                                 <div>
-                                    <h4 className="text-sm font-bold text-amber-400 mb-3 flex items-center gap-2 uppercase tracking-wide">
+                                    <h4 className="text-sm font-bold text-amber-600 mb-3 flex items-center gap-2 uppercase tracking-wide">
                                         <Target className="w-4 h-4" />
                                         Development Areas
                                     </h4>
                                     <div className="flex flex-wrap gap-2">
                                         {twinData.developmentAreas.map((d, i) => (
-                                            <span key={i} className="px-3 py-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-sm font-bold shadow-sm">{d}</span>
+                                            <span key={i} className="px-3 py-1.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-sm font-bold shadow-sm">{d}</span>
                                         ))}
                                     </div>
                                 </div>
                             </div>
 
                             {/* AI Recommendations */}
-                            <div className="glass-card-dark rounded-2xl p-6 tilt-card border border-dark-700 shadow-xl">
-                                <div className="flex items-center gap-2 text-white mb-4">
-                                    <Lightbulb className="w-5 h-5 text-amber-400" />
+                            <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm hover:shadow-md transition-all">
+                                <div className="flex items-center gap-2 text-zinc-900 mb-4">
+                                    <Lightbulb className="w-5 h-5 text-amber-500" />
                                     <h3 className="font-bold text-lg">AI Recommendations</h3>
                                 </div>
-                                <p className="text-sm text-dark-400 mb-4 font-medium">Personalized suggestions based on your learning pattern</p>
+                                <p className="text-sm text-zinc-500 mb-4 font-medium">Personalized suggestions based on your learning pattern</p>
 
                                 <div className="space-y-4">
                                     {twinData.recommendations.map((rec, i) => (
-                                        <div key={i} className="p-4 bg-dark-800/50 rounded-xl border border-dark-700 hover:border-primary-500/30 hover:bg-dark-800 transition-all group">
+                                        <div key={i} className="p-4 bg-zinc-50 rounded-xl border border-zinc-200 hover:border-zinc-300 hover:bg-white transition-all group shadow-sm">
                                             <div className="flex items-start justify-between mb-2">
-                                                <h4 className="font-bold text-white group-hover:text-primary-400 transition-colors">{rec.title}</h4>
-                                                <span className={`px-2 py-1 rounded-full text-xs font-bold border ${rec.priority === 'high' ? 'bg-red-500/10 text-red-400 border-red-500/20' : 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+                                                <h4 className="font-bold text-zinc-900 group-hover:text-blue-600 transition-colors">{rec.title}</h4>
+                                                <span className={`px-2 py-1 rounded-full text-xs font-bold border ${rec.priority === 'high' ? 'bg-red-50 text-red-600 border-red-100' : 'bg-amber-50 text-amber-600 border-amber-100'
                                                     }`}>
                                                     {rec.priority}
                                                 </span>
                                             </div>
-                                            <p className="text-sm text-dark-300 mb-2 font-medium">{rec.desc}</p>
-                                            <div className="flex items-center justify-between text-xs text-dark-500 font-medium">
+                                            <p className="text-sm text-zinc-600 mb-2 font-medium">{rec.desc}</p>
+                                            <div className="flex items-center justify-between text-xs text-zinc-500 font-bold">
                                                 <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{rec.duration}</span>
                                                 <span className="flex items-center gap-1"><BookOpen className="w-3 h-3" />{rec.category}</span>
                                             </div>
@@ -273,28 +273,28 @@ const StudentAITwin = () => {
 
                     {/* Growth Timeline Tab */}
                     {activeTab === 'timeline' && (
-                        <div className="glass-card-dark rounded-2xl p-6 tilt-card border border-dark-700 shadow-xl">
-                            <div className="flex items-center gap-2 text-white mb-2">
-                                <Clock className="w-5 h-5 text-primary-400" />
+                        <div className="bg-white rounded-2xl p-6 border border-zinc-200 shadow-sm">
+                            <div className="flex items-center gap-2 text-zinc-900 mb-2">
+                                <Clock className="w-5 h-5 text-zinc-600" />
                                 <h3 className="font-bold text-lg">Growth Timeline</h3>
                             </div>
-                            <p className="text-dark-400 mb-6 font-medium">Track your learning journey and achievements over time</p>
+                            <p className="text-zinc-500 mb-6 font-medium">Track your learning journey and achievements over time</p>
 
                             <div className="space-y-6">
                                 {timelineEvents.map((event, i) => (
                                     <div key={event.id} className="flex gap-4 group">
                                         <div className="flex flex-col items-center">
-                                            <div className={`w-4 h-4 rounded-full ${event.color} ring-4 ring-dark-800 shadow-lg`} />
-                                            {i < timelineEvents.length - 1 && <div className="w-0.5 flex-1 bg-dark-700 mt-2 group-hover:bg-dark-600 transition-colors" />}
+                                            <div className={`w-4 h-4 rounded-full ${event.color} ring-4 ring-white shadow-md`} />
+                                            {i < timelineEvents.length - 1 && <div className="w-0.5 flex-1 bg-zinc-200 mt-2 group-hover:bg-zinc-300 transition-colors" />}
                                         </div>
                                         <div className="flex-1 pb-6">
-                                            <div className="flex items-start justify-between bg-dark-800/30 p-4 rounded-xl border border-dark-700/50 hover:bg-dark-800/60 hover:border-dark-600 transition-all">
+                                            <div className="flex items-start justify-between bg-zinc-50/50 p-4 rounded-xl border border-zinc-200 hover:bg-white hover:shadow-md transition-all">
                                                 <div>
-                                                    <h4 className="font-bold text-white">{event.title}</h4>
-                                                    <p className="text-sm text-dark-300 mt-1 font-medium">{event.desc}</p>
-                                                    <p className="text-sm text-emerald-400 font-bold mt-2">{event.points}</p>
+                                                    <h4 className="font-bold text-zinc-900">{event.title}</h4>
+                                                    <p className="text-sm text-zinc-600 mt-1 font-medium">{event.desc}</p>
+                                                    <p className="text-sm text-emerald-600 font-bold mt-2">{event.points}</p>
                                                 </div>
-                                                <span className="text-xs text-dark-500 font-bold bg-dark-900/50 px-2 py-1 rounded border border-dark-700/50">{event.date}</span>
+                                                <span className="text-xs text-zinc-500 font-bold bg-white px-2 py-1 rounded border border-zinc-200 shadow-sm">{event.date}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -306,40 +306,40 @@ const StudentAITwin = () => {
                     {/* Role Models Tab */}
                     {activeTab === 'rolemodels' && (
                         <div className="space-y-6">
-                            <div className="flex items-center gap-2 text-white">
-                                <Users className="w-5 h-5 text-primary-400" />
+                            <div className="flex items-center gap-2 text-zinc-900">
+                                <Users className="w-5 h-5 text-zinc-600" />
                                 <h3 className="font-bold text-lg">Clone Role Models</h3>
                             </div>
-                            <p className="text-dark-400 font-medium">Clone successful mentors and industry experts as your AI guides. Ask for your role model like Sundar Pichai or choose from our recommendations.</p>
+                            <p className="text-zinc-500 font-medium">Clone successful mentors and industry experts as your AI guides. Ask for your role model like Sundar Pichai or choose from our recommendations.</p>
 
                             {/* Recommended */}
                             <div>
-                                <h4 className="text-sm font-bold text-dark-300 mb-4 flex items-center gap-2 uppercase tracking-wide">
-                                    <Sparkles className="w-4 h-4 text-amber-400" />
+                                <h4 className="text-sm font-bold text-zinc-500 mb-4 flex items-center gap-2 uppercase tracking-wide">
+                                    <Sparkles className="w-4 h-4 text-amber-500" />
                                     Recommended for You
                                 </h4>
                                 {roleModels.filter(r => r.recommended).map(rm => (
-                                    <div key={rm.id} className="glass-card-dark rounded-2xl p-6 tilt-card border-2 border-primary-500/20 hover:border-primary-500/40 transition-all shadow-lg shadow-primary-500/5">
+                                    <div key={rm.id} className="bg-white rounded-2xl p-6 border border-zinc-200 hover:border-zinc-300 transition-all shadow-sm hover:shadow-md">
                                         <div className="flex items-start gap-4">
-                                            <div className="w-14 h-14 bg-gradient-to-br from-primary-600 to-primary-800 rounded-full flex items-center justify-center text-white font-bold text-lg border-2 border-primary-500 shadow-md">
+                                            <div className="w-14 h-14 bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-lg border-2 border-zinc-800 shadow-md">
                                                 {rm.initials}
                                             </div>
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
-                                                    <h4 className="font-bold text-white text-lg">{rm.name}</h4>
-                                                    <span className="px-2 py-0.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm">
+                                                    <h4 className="font-bold text-zinc-900 text-lg">{rm.name}</h4>
+                                                    <span className="px-2 py-0.5 bg-amber-50 text-amber-600 border border-amber-100 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm">
                                                         <Star className="w-3 h-3" /> Recommended
                                                     </span>
                                                 </div>
-                                                <p className="text-primary-400 font-bold">{rm.role}</p>
-                                                <p className="text-dark-300 text-sm font-medium">{rm.expertise}</p>
-                                                <p className="text-dark-400 text-sm mt-2 font-medium leading-relaxed">{rm.desc}</p>
-                                                <div className="flex items-center gap-4 mt-3 text-sm text-dark-500 font-medium hod-stats">
+                                                <p className="text-zinc-600 font-bold">{rm.role}</p>
+                                                <p className="text-zinc-500 text-sm font-medium">{rm.expertise}</p>
+                                                <p className="text-zinc-600 text-sm mt-2 font-medium leading-relaxed">{rm.desc}</p>
+                                                <div className="flex items-center gap-4 mt-3 text-sm text-zinc-400 font-bold">
                                                     <span className="flex items-center gap-1"><Users className="w-4 h-4" />{rm.students} students</span>
                                                     <span className="flex items-center gap-1"><Star className="w-4 h-4 text-amber-500" />{rm.rating}</span>
                                                 </div>
                                             </div>
-                                            <button className="px-4 py-2 bg-primary-600 hover:bg-primary-500 text-white rounded-lg font-bold flex items-center gap-2 transition-colors shadow-lg shadow-primary-500/20">
+                                            <button className="px-4 py-2 bg-zinc-900 hover:bg-zinc-800 text-white rounded-lg font-bold flex items-center gap-2 transition-colors shadow-md">
                                                 <Copy className="w-4 h-4" />
                                                 Clone as AI Twin
                                             </button>
@@ -350,34 +350,34 @@ const StudentAITwin = () => {
 
                             {/* All Role Models */}
                             <div>
-                                <h4 className="text-sm font-bold text-dark-300 mb-4 uppercase tracking-wide">All Role Models</h4>
+                                <h4 className="text-sm font-bold text-zinc-500 mb-4 uppercase tracking-wide">All Role Models</h4>
                                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                     {roleModels.filter(r => !r.recommended).map(rm => (
-                                        <div key={rm.id} className="glass-card-dark rounded-2xl p-5 tilt-card hover:shadow-xl transition-all border border-dark-700 hover:border-dark-600 group">
+                                        <div key={rm.id} className="bg-white rounded-2xl p-5 hover:shadow-lg transition-all border border-zinc-200 hover:border-zinc-300 group">
                                             <div className="flex items-center gap-3 mb-3">
-                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm border-2 shadow-md ${rm.cloned
-                                                    ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                                                    : 'bg-dark-800 text-white border-dark-700'
+                                                <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm border-2 shadow-sm ${rm.cloned
+                                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-100'
+                                                    : 'bg-zinc-100 text-zinc-900 border-zinc-200'
                                                     }`}>
                                                     {rm.initials}
                                                 </div>
                                                 <div className="flex-1">
                                                     <div className="flex items-center gap-2">
-                                                        <h4 className="font-bold text-white group-hover:text-primary-400 transition-colors">{rm.name}</h4>
-                                                        {rm.cloned && <span className="text-xs text-emerald-400 font-bold flex items-center gap-1 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/20"><Copy className="w-3 h-3" />Cloned</span>}
+                                                        <h4 className="font-bold text-zinc-900 group-hover:text-blue-600 transition-colors">{rm.name}</h4>
+                                                        {rm.cloned && <span className="text-xs text-emerald-600 font-bold flex items-center gap-1 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100"><Copy className="w-3 h-3" />Cloned</span>}
                                                     </div>
-                                                    <p className="text-primary-400 text-xs font-bold">{rm.role}</p>
+                                                    <p className="text-zinc-500 text-xs font-bold">{rm.role}</p>
                                                 </div>
                                             </div>
-                                            <p className="text-dark-300 text-sm mb-2 font-medium">{rm.expertise}</p>
-                                            <p className="text-dark-400 text-xs mb-3 leading-relaxed">{rm.desc}</p>
-                                            <div className="flex items-center gap-3 text-xs text-dark-500 font-medium mb-4">
+                                            <p className="text-zinc-600 text-sm mb-2 font-medium">{rm.expertise}</p>
+                                            <p className="text-zinc-500 text-xs mb-3 leading-relaxed">{rm.desc}</p>
+                                            <div className="flex items-center gap-3 text-xs text-zinc-400 font-bold mb-4">
                                                 <span className="flex items-center gap-1"><Users className="w-3 h-3" />{rm.students}</span>
                                                 <span className="flex items-center gap-1"><Star className="w-3 h-3 text-amber-500" />{rm.rating}</span>
                                             </div>
-                                            <button className={`w-full py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-lg ${rm.cloned
-                                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20'
-                                                : 'bg-dark-800 hover:bg-primary-600 text-white border border-dark-600 hover:border-primary-500 hover:shadow-primary-500/20'
+                                            <button className={`w-full py-2.5 rounded-lg font-bold flex items-center justify-center gap-2 transition-all shadow-sm ${rm.cloned
+                                                ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-200'
+                                                : 'bg-white hover:bg-zinc-50 text-zinc-900 border border-zinc-200 hover:border-zinc-300'
                                                 }`}>
                                                 <MessageCircle className="w-4 h-4" />
                                                 {rm.cloned ? 'Chat with Clone' : 'Clone as AI Twin'}
@@ -391,33 +391,33 @@ const StudentAITwin = () => {
 
                     {/* AI Twin Chat Tab */}
                     {activeTab === 'chat' && (
-                        <div className="glass-card-dark rounded-2xl border border-dark-700 shadow-xl overflow-hidden flex flex-col h-[600px]">
-                            <div className="p-6 border-b border-dark-700 bg-dark-800/30">
-                                <div className="flex items-center gap-2 text-white">
-                                    <MessageCircle className="w-5 h-5 text-primary-400" />
+                        <div className="bg-white rounded-2xl border border-zinc-200 shadow-xl overflow-hidden flex flex-col h-[600px]">
+                            <div className="p-6 border-b border-zinc-200 bg-zinc-50/50">
+                                <div className="flex items-center gap-2 text-zinc-900">
+                                    <MessageCircle className="w-5 h-5 text-zinc-600" />
                                     <h3 className="font-bold text-lg">Chat with Your AI Twin</h3>
                                 </div>
-                                <p className="text-dark-400 text-sm mt-1 font-medium">Get personalized guidance and motivation from your digital companion</p>
+                                <p className="text-zinc-500 text-sm mt-1 font-medium">Get personalized guidance and motivation from your digital companion</p>
                             </div>
 
                             {/* Chat Messages */}
-                            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-dark-900/50 custom-scrollbar">
+                            <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-zinc-50/30 custom-scrollbar">
                                 {chatMessages.map(msg => (
                                     <div key={msg.id} className={`flex ${msg.type === 'user' ? 'justify-end' : 'justify-start'}`}>
                                         <div className={`max-w-[80%] p-4 rounded-2xl ${msg.type === 'user'
-                                            ? 'bg-primary-600 text-white rounded-br-none shadow-lg shadow-primary-900/20'
-                                            : 'bg-dark-800 text-white border border-dark-700 rounded-bl-none shadow-md'
+                                            ? 'bg-zinc-900 text-white rounded-br-none shadow-md'
+                                            : 'bg-white text-zinc-900 border border-zinc-200 rounded-bl-none shadow-sm'
                                             }`}>
                                             <p className="text-sm font-medium leading-relaxed">{msg.text}</p>
-                                            <p className={`text-[10px] mt-2 font-bold uppercase tracking-wide opacity-70 ${msg.type === 'user' ? 'text-primary-100' : 'text-dark-400'}`}>{msg.time}</p>
+                                            <p className={`text-[10px] mt-2 font-bold uppercase tracking-wide opacity-70 ${msg.type === 'user' ? 'text-zinc-300' : 'text-zinc-400'}`}>{msg.time}</p>
                                         </div>
                                     </div>
                                 ))}
                                 {sending && (
                                     <div className="flex justify-start">
-                                        <div className="bg-dark-800 p-4 rounded-2xl border border-dark-700 shadow-sm rounded-bl-none">
-                                            <div className="flex items-center gap-2 text-dark-400">
-                                                <Loader className="w-4 h-4 animate-spin text-primary-400" />
+                                        <div className="bg-white p-4 rounded-2xl border border-zinc-200 shadow-sm rounded-bl-none">
+                                            <div className="flex items-center gap-2 text-zinc-500">
+                                                <Loader className="w-4 h-4 animate-spin text-zinc-400" />
                                                 <span className="text-sm font-medium">AI Twin is typing...</span>
                                             </div>
                                         </div>
@@ -427,7 +427,7 @@ const StudentAITwin = () => {
                             </div>
 
                             {/* Chat Input */}
-                            <div className="p-4 border-t border-dark-700 bg-dark-800/80 backdrop-blur-md">
+                            <div className="p-4 border-t border-zinc-200 bg-white">
                                 <div className="flex items-center gap-3">
                                     <input
                                         type="text"
@@ -435,12 +435,12 @@ const StudentAITwin = () => {
                                         onChange={(e) => setNewMessage(e.target.value)}
                                         onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
                                         placeholder="Ask your AI Twin anything..."
-                                        className="flex-1 px-4 py-3 bg-dark-900 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-white placeholder-dark-500 transition-all shadow-inner"
+                                        className="flex-1 px-4 py-3 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent text-zinc-900 placeholder-zinc-400 transition-all font-medium"
                                     />
                                     <button
                                         onClick={handleSendMessage}
                                         disabled={!newMessage.trim() || sending}
-                                        className="p-3 bg-primary-600 hover:bg-primary-500 text-white rounded-xl disabled:bg-dark-700 disabled:text-dark-500 transition-all shadow-lg shadow-primary-500/20"
+                                        className="p-3 bg-zinc-900 hover:bg-zinc-800 text-white rounded-xl disabled:bg-zinc-100 disabled:text-zinc-300 transition-all shadow-md"
                                     >
                                         <Send className="w-5 h-5" />
                                     </button>

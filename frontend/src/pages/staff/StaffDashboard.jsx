@@ -48,8 +48,6 @@ const StaffDashboard = () => {
     avgAttendance: 0, feesClearedCount: 0, feesPendingCount: 0, pendingApprovals: 0
   });
   const [ineligibleList, setIneligibleList] = useState([]);
-
-  // Staff can only see students from their department
   const staffDepartment = user?.department || '';
 
   useEffect(() => {
@@ -109,33 +107,33 @@ const StaffDashboard = () => {
 
   const getColorClasses = (color) => {
     const colors = {
-      blue: { bg: 'bg-blue-500/10', text: 'text-blue-400', icon: 'text-blue-400', border: 'border-blue-500/20' },
-      emerald: { bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: 'text-emerald-400', border: 'border-emerald-500/20' },
-      red: { bg: 'bg-red-500/10', text: 'text-red-400', icon: 'text-red-400', border: 'border-red-500/20' },
-      violet: { bg: 'bg-violet-500/10', text: 'text-violet-400', icon: 'text-violet-400', border: 'border-violet-500/20' },
-      teal: { bg: 'bg-teal-500/10', text: 'text-teal-400', icon: 'text-teal-400', border: 'border-teal-500/20' },
-      amber: { bg: 'bg-amber-500/10', text: 'text-amber-400', icon: 'text-amber-400', border: 'border-amber-500/20' },
-      orange: { bg: 'bg-orange-500/10', text: 'text-orange-400', icon: 'text-orange-400', border: 'border-orange-500/20' }
+      blue: { bg: 'bg-blue-100', text: 'text-blue-600', icon: 'text-blue-600', border: 'border-blue-200' },
+      emerald: { bg: 'bg-emerald-100', text: 'text-emerald-600', icon: 'text-emerald-600', border: 'border-emerald-200' },
+      red: { bg: 'bg-red-100', text: 'text-red-600', icon: 'text-red-600', border: 'border-red-200' },
+      violet: { bg: 'bg-violet-100', text: 'text-violet-600', icon: 'text-violet-600', border: 'border-violet-200' },
+      teal: { bg: 'bg-teal-100', text: 'text-teal-600', icon: 'text-teal-600', border: 'border-teal-200' },
+      amber: { bg: 'bg-amber-100', text: 'text-amber-600', icon: 'text-amber-600', border: 'border-amber-200' },
+      orange: { bg: 'bg-orange-100', text: 'text-orange-600', icon: 'text-orange-600', border: 'border-orange-200' }
     };
     return colors[color] || colors.blue;
   };
 
   return (
     <DashboardLayout role="staff" userName={user?.name}>
-      <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto text-white">
+      <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Staff Dashboard</h1>
-            <p className="text-dark-400 text-sm mt-0.5">
+            <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Staff Dashboard</h1>
+            <p className="text-zinc-500 text-sm mt-0.5">
               Welcome back, {user?.name}
-              {user?.department && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-dark-800 text-dark-200 border border-dark-700">{user.department}</span>}
+              {user?.department && <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-zinc-100 text-zinc-600 border border-zinc-200">{user.department}</span>}
             </p>
           </div>
           {!user?.department && (
-            <div className="flex items-center gap-2 px-4 py-2 bg-amber-500/10 text-amber-400 rounded-lg text-sm border border-amber-500/20">
+            <div className="flex items-center gap-2 px-4 py-2 bg-amber-50 text-amber-600 rounded-lg text-sm border border-amber-200">
               <AlertTriangle className="w-4 h-4" />
-              <span>Department not set. <a href="/staff/profile" className="underline font-medium hover:text-amber-300">Update Profile</a></span>
+              <span>Department not set. <a href="/staff/profile" className="underline font-medium hover:text-amber-700">Update Profile</a></span>
             </div>
           )}
         </div>
@@ -145,7 +143,7 @@ const StaffDashboard = () => {
           {statCards.map((stat, index) => {
             const colors = getColorClasses(stat.color);
             return (
-              <div key={index} className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
+              <div key={index} className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all duration-300">
                 <div className="flex items-start justify-between mb-4">
                   <div className={`w-9 h-9 rounded-lg ${colors.bg} flex items-center justify-center border ${colors.border}`}>
                     <stat.icon className={`w-4.5 h-4.5 ${colors.icon}`} strokeWidth={1.5} />
@@ -154,12 +152,12 @@ const StaffDashboard = () => {
                     <ArrowUpRight className="w-3 h-3" />
                   </div>
                 </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.title}</p>
-                <p className="text-2xl font-bold text-white">
+                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1">{stat.title}</p>
+                <p className="text-2xl font-bold text-zinc-900">
                   <AnimatedNumber value={stat.value} suffix={stat.suffix || ''} />
                 </p>
-                <div className="mt-4 pt-3 border-t border-dark-700">
-                  <p className="text-[10px] text-dark-500">{stat.desc}</p>
+                <div className="mt-4 pt-3 border-t border-zinc-100">
+                  <p className="text-[10px] text-zinc-500">{stat.desc}</p>
                 </div>
               </div>
             );
@@ -168,51 +166,51 @@ const StaffDashboard = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Ineligible Students */}
-          <div className="lg:col-span-2 section-card bg-dark-800/50 backdrop-blur-md rounded-xl border border-dark-700 overflow-hidden flex flex-col">
-            <div className="p-5 border-b border-dark-700 flex items-center justify-between">
+          <div className="lg:col-span-2 section-card bg-white rounded-xl border border-zinc-200 overflow-hidden flex flex-col">
+            <div className="p-5 border-b border-zinc-100 flex items-center justify-between bg-zinc-50">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-red-500/10 rounded-lg flex items-center justify-center border border-red-500/20">
-                  <AlertTriangle className="w-4.5 h-4.5 text-red-500" />
+                <div className="w-9 h-9 bg-red-100 rounded-lg flex items-center justify-center border border-red-200">
+                  <AlertTriangle className="w-4.5 h-4.5 text-red-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-white text-sm">Action Required</h3>
-                  <p className="text-xs text-dark-400">Students with eligibility issues</p>
+                  <h3 className="font-semibold text-zinc-900 text-sm">Action Required</h3>
+                  <p className="text-xs text-zinc-500">Students with eligibility issues</p>
                 </div>
               </div>
-              <a href="/staff/attendance" className="text-xs font-medium text-primary-400 hover:text-primary-300 transition-colors">View All</a>
+              <a href="/staff/attendance" className="text-xs font-medium text-zinc-600 hover:text-zinc-900 transition-colors">View All</a>
             </div>
 
             <div className="p-5 flex-1">
               {loading ? (
-                <div className="text-center py-8 text-dark-400 text-xs">Loading...</div>
+                <div className="text-center py-8 text-zinc-400 text-xs">Loading...</div>
               ) : ineligibleList.length === 0 ? (
                 <div className="h-full flex flex-col items-center justify-center text-center py-8">
-                  <div className="w-12 h-12 bg-emerald-500/10 rounded-full flex items-center justify-center mb-3">
-                    <CheckCircle className="w-6 h-6 text-emerald-500" />
+                  <div className="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center mb-3">
+                    <CheckCircle className="w-6 h-6 text-emerald-600" />
                   </div>
-                  <p className="text-white font-medium text-sm">All Clear!</p>
-                  <p className="text-dark-400 text-xs mt-1">No students found with eligibility issues.</p>
+                  <p className="text-zinc-900 font-medium text-sm">All Clear!</p>
+                  <p className="text-zinc-500 text-xs mt-1">No students found with eligibility issues.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {ineligibleList.map((student, i) => (
-                    <div key={i} className="flex items-center justify-between p-3 bg-red-500/5 border border-red-500/10 rounded-lg hover:bg-red-500/10 transition-colors">
+                    <div key={i} className="flex items-center justify-between p-3 bg-red-50 border border-red-100 rounded-lg hover:bg-red-100 transition-colors">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 rounded-full bg-dark-700 flex items-center justify-center text-xs font-semibold text-red-400 border border-dark-600">
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-red-600 border border-red-200 shadow-sm">
                           {student.name?.charAt(0)}
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-200">{student.name}</p>
-                          <p className="text-xs text-dark-500">{student.rollNumber}</p>
+                          <p className="text-sm font-medium text-zinc-900">{student.name}</p>
+                          <p className="text-xs text-zinc-500">{student.rollNumber}</p>
                         </div>
                       </div>
                       <div className="text-right">
                         {student.issues?.slice(0, 1).map((issue, idx) => (
-                          <span key={idx} className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-red-500/10 text-red-400 border border-red-500/20">
+                          <span key={idx} className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-white text-red-600 border border-red-200 shadow-sm">
                             {issue}
                           </span>
                         ))}
-                        {student.issues?.length > 1 && <span className="ml-1 text-[10px] text-dark-500">+{student.issues.length - 1} more</span>}
+                        {student.issues?.length > 1 && <span className="ml-1 text-[10px] text-zinc-500">+{student.issues.length - 1} more</span>}
                       </div>
                     </div>
                   ))}
@@ -222,10 +220,10 @@ const StaffDashboard = () => {
           </div>
 
           {/* Quick Actions */}
-          <div className="lg:col-span-1 section-card glass-card-dark rounded-xl border border-dark-700 p-5">
+          <div className="lg:col-span-1 section-card bg-white rounded-xl border border-zinc-200 p-5">
             <div className="flex items-center gap-2 mb-5">
-              <Briefcase className="w-4 h-4 text-dark-400" />
-              <h3 className="font-semibold text-white text-sm">Quick Actions</h3>
+              <Briefcase className="w-4 h-4 text-zinc-400" />
+              <h3 className="font-semibold text-zinc-900 text-sm">Quick Actions</h3>
             </div>
 
             <div className="space-y-2">
@@ -235,13 +233,13 @@ const StaffDashboard = () => {
                 { label: 'Career Requests', path: '/staff/career-approvals', icon: Award, color: 'violet', desc: 'Approve certificates' },
                 { label: 'Eligibility Check', path: '/staff/eligibility', icon: CheckCircle, color: 'emerald', desc: 'Exam eligibility' },
               ].map((action, i) => (
-                <a key={i} href={action.path} className="flex items-center gap-4 p-3 rounded-lg border border-dark-700 hover:border-dark-600 hover:bg-dark-700/50 group transition-all">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors bg-${action.color}-500/10 text-${action.color}-400 group-hover:bg-${action.color}-500/20 border border-${action.color}-500/20`}>
+                <a key={i} href={action.path} className="flex items-center gap-4 p-3 rounded-lg border border-zinc-100 hover:border-zinc-200 hover:bg-zinc-50 group transition-all">
+                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center transition-colors bg-${action.color}-50 text-${action.color}-600 group-hover:bg-${action.color}-100 border border-${action.color}-100`}>
                     <action.icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-200">{action.label}</p>
-                    <p className="text-xs text-dark-400">{action.desc}</p>
+                    <p className="text-sm font-medium text-zinc-900">{action.label}</p>
+                    <p className="text-xs text-zinc-500">{action.desc}</p>
                   </div>
                 </a>
               ))}

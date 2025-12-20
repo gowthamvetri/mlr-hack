@@ -28,7 +28,7 @@ export const MindMapView = ({ markdown, options = {} }) => {
                     duration: 500,
                     maxWidth: 300,
                     color: (node) => {
-                        const colors = ['#8b5cf6', '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#ec4899'];
+                        const colors = ['#7c3aed', '#2563eb', '#059669', '#d97706', '#dc2626', '#db2777'];
                         return colors[node.depth % colors.length];
                     },
                     paddingX: 16,
@@ -74,75 +74,34 @@ export const MindMapView = ({ markdown, options = {} }) => {
     }
 
     return (
-        <div className="relative w-full h-full bg-gradient-to-br from-dark-800 to-dark-900 rounded-xl overflow-hidden border border-dark-700/50">
+        <div className="relative w-full h-full bg-white rounded-xl overflow-hidden border border-zinc-200">
             <svg ref={svgRef} className="w-full h-full min-h-[400px]" />
             <style>{`
-                /* Mind Map Text - Make highly visible on dark background */
+                /* Mind Map Text - Make highly visible on light background */
                 .markmap-node text {
-                    fill: #ffffff !important;
-                    font-weight: 500 !important;
+                    fill: #18181b !important;
+                    font-weight: 600 !important;
                     font-size: 14px !important;
-                    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+                    text-shadow: none !important;
                 }
                 .markmap-node foreignObject div {
-                    color: #ffffff !important;
-                    font-weight: 500 !important;
+                    color: #18181b !important;
+                    font-weight: 600 !important;
                 }
                 
                 /* Links/branches */
                 .markmap-link {
-                    stroke: #71717a !important;
+                    stroke: #a1a1aa !important;
                     stroke-width: 2px !important;
                     fill: none !important;
-                    stroke-opacity: 0.9 !important;
+                    stroke-opacity: 0.8 !important;
                 }
                 svg path {
-                    stroke: #71717a;
-                    stroke-width: 2px;
-                    fill: none;
-                }
-                
-                /* Nodes */
-                .markmap-node circle {
-                    cursor: pointer;
-                    stroke-width: 2px;
-                }
-                
-                /* Make all SVG text white */
-                svg text {
-                    fill: #ffffff !important;
-                }
-                
-                /* foreignObject content (some markmap versions use this) */
-                svg foreignObject {
-                    color: #ffffff !important;
-                }
-                svg foreignObject * {
-                    color: #ffffff !important;
+                    stroke: #a1a1aa;
                 }
             `}</style>
-            <div className="absolute bottom-3 left-3 px-3 py-1.5 bg-dark-900/90 backdrop-blur-sm rounded-lg border border-dark-700 text-[10px] text-dark-400 shadow-sm flex items-center gap-2">
-                <span>🖱️ Pan & Zoom</span>
-                <span className="w-0.5 h-3 bg-dark-700" />
-                <span>👆 Click to Fold</span>
-            </div>
         </div>
     );
 };
 
-/**
- * MindMapPreview - Simplified read-only preview (can be same implementation with locked interactions if needed, 
- * but for now just a wrapper with preset options)
- */
-export const MindMapPreview = ({ markdown }) => {
-    return (
-        <MindMapView
-            markdown={markdown}
-            options={{
-                zoom: true,
-                pan: true, // Students should still validly be able to explore it
-                initialExpandLevel: 2
-            }}
-        />
-    );
-};
+export default MindMapView;

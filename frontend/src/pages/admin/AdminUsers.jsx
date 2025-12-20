@@ -35,7 +35,7 @@ const AnimatedNumber = ({ value }) => {
 
 // Skeleton
 const SkeletonPulse = ({ className }) => (
-  <div className={`animate-pulse bg-gradient-to-r from-dark-800 via-dark-700 to-dark-800 rounded ${className}`} />
+  <div className={`animate-pulse bg-zinc-200 rounded ${className}`} />
 );
 
 const AdminUsers = () => {
@@ -94,11 +94,11 @@ const AdminUsers = () => {
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'Admin': return { bg: 'bg-red-500/10', text: 'text-red-400', icon: 'text-red-400' };
-      case 'Student': return { bg: 'bg-blue-500/10', text: 'text-blue-400', icon: 'text-blue-400' };
-      case 'SeatingManager': return { bg: 'bg-violet-500/10', text: 'text-violet-400', icon: 'text-violet-400' };
-      case 'ClubCoordinator': return { bg: 'bg-emerald-500/10', text: 'text-emerald-400', icon: 'text-emerald-400' };
-      default: return { bg: 'bg-dark-800/50', text: 'text-dark-400', icon: 'text-dark-400' };
+      case 'Admin': return { bg: 'bg-red-50', text: 'text-red-600', icon: 'text-red-500' };
+      case 'Student': return { bg: 'bg-blue-50', text: 'text-blue-600', icon: 'text-blue-500' };
+      case 'SeatingManager': return { bg: 'bg-violet-50', text: 'text-violet-600', icon: 'text-violet-500' };
+      case 'ClubCoordinator': return { bg: 'bg-emerald-50', text: 'text-emerald-600', icon: 'text-emerald-500' };
+      default: return { bg: 'bg-zinc-100', text: 'text-zinc-600', icon: 'text-zinc-500' };
     }
   };
 
@@ -133,22 +133,22 @@ const AdminUsers = () => {
         {/* ================================================================
             HERO SECTION - User summary with role breakdown
             ================================================================ */}
-        <div className="hero-section relative overflow-hidden rounded-2xl glass-card-dark p-6 lg:p-8 border border-dark-700">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+        <div className="hero-section relative overflow-hidden rounded-2xl bg-white p-6 lg:p-8 border border-zinc-200 shadow-sm">
+          <div className="absolute top-0 right-0 w-72 h-72 bg-violet-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex-1">
-              <h1 className="text-xl lg:text-2xl font-semibold text-white mb-1.5 tracking-tight">
+              <h1 className="text-xl lg:text-2xl font-semibold text-zinc-900 mb-1.5 tracking-tight">
                 {users.length} System Users
               </h1>
-              <p className="text-dark-400 text-sm">
+              <p className="text-zinc-500 text-sm">
                 {studentCount} students • {adminCount} admins • {managerCount} managers • {coordinatorCount} coordinators
               </p>
             </div>
 
             <div className="flex items-center gap-2.5">
-              <button onClick={() => refetch()} disabled={isFetching} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white/80 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition-all disabled:opacity-50">
+              <button onClick={() => refetch()} disabled={isFetching} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all disabled:opacity-50">
                 <RefreshCw className={`w-4 h-4 ${isFetching ? 'animate-spin' : ''}`} />
                 <span className="hidden sm:inline">Refresh</span>
               </button>
@@ -167,36 +167,36 @@ const AdminUsers = () => {
             { label: 'Seating Managers', value: managerCount, icon: Building, color: 'violet' },
             { label: 'Coordinators', value: coordinatorCount, icon: Calendar, color: 'emerald' },
           ].map((stat, i) => {
-            const colorMap = { blue: 'bg-blue-500/10 text-blue-400', red: 'bg-red-500/10 text-red-400', violet: 'bg-violet-500/10 text-violet-400', emerald: 'bg-emerald-500/10 text-emerald-400' };
+            const colorMap = { blue: 'bg-blue-50 text-blue-600', red: 'bg-red-50 text-red-600', violet: 'bg-violet-50 text-violet-600', emerald: 'bg-emerald-50 text-emerald-600' };
             return (
-              <div key={i} className="insight-panel group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
+              <div key={i} className="insight-panel group bg-white rounded-xl p-5 border border-zinc-100 hover:border-zinc-200 hover:shadow-sm transition-all duration-300">
                 <div className="flex items-start justify-between mb-3">
-                  <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center border border-white/5`}>
+                  <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center`}>
                     <stat.icon className={`w-4.5 h-4.5 ${colorMap[stat.color].split(' ')[1]}`} strokeWidth={1.5} />
                   </div>
                 </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.label}</p>
-                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stat.value} /></p>
+                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide mb-1">{stat.label}</p>
+                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stat.value} /></p>
               </div>
             );
           })}
         </div>
 
         {/* Filter Bar */}
-        <div className="glass-card-dark rounded-xl border border-dark-700 p-4">
+        <div className="bg-white rounded-xl border border-zinc-200 p-4">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" strokeWidth={1.5} />
-              <input type="text" placeholder="Search users..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all text-white placeholder-dark-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" strokeWidth={1.5} />
+              <input type="text" placeholder="Search users..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 transition-all text-zinc-900 placeholder-zinc-400" />
             </div>
             <div className="flex items-center gap-3">
               {roles.map(role => (
-                <button key={role} onClick={() => setFilterRole(role)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterRole === role ? 'bg-dark-700 text-white shadow-sm' : 'bg-dark-800 text-dark-400 hover:text-white hover:bg-dark-700'}`}>
+                <button key={role} onClick={() => setFilterRole(role)} className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${filterRole === role ? 'bg-zinc-900 text-white shadow-sm' : 'bg-zinc-100 text-zinc-600 hover:bg-zinc-200'}`}>
                   {role === 'all' ? 'All' : role === 'SeatingManager' ? 'Seating' : role === 'ClubCoordinator' ? 'Club' : role}
                 </button>
               ))}
               {hasActiveFilters && (
-                <button onClick={clearFilters} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-400 bg-violet-500/10 rounded-full hover:bg-violet-500/20 transition-colors border border-violet-500/10">
+                <button onClick={clearFilters} className="flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-violet-600 bg-violet-50 rounded-full hover:bg-violet-100 transition-colors border border-violet-100">
                   <X className="w-3 h-3" />Clear
                 </button>
               )}
@@ -205,81 +205,82 @@ const AdminUsers = () => {
         </div>
 
         {/* Users Table */}
-        <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden relative">
+        <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden relative">
           {isFetching && !isLoading && (
-            <div className="absolute inset-0 bg-dark-900/60 flex items-center justify-center z-10 backdrop-blur-[2px]">
-              <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
+            <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10 backdrop-blur-[1px]">
+              <Loader2 className="w-5 h-5 text-violet-600 animate-spin" />
             </div>
           )}
 
           {isLoading ? (
             <div className="p-12 text-center">
-              <Loader2 className="w-6 h-6 text-violet-500 animate-spin mx-auto mb-3" />
-              <p className="text-sm text-dark-400">Loading users...</p>
+              <Loader2 className="w-6 h-6 text-violet-600 animate-spin mx-auto mb-3" />
+              <p className="text-sm text-zinc-500">Loading users...</p>
             </div>
           ) : isError ? (
             <div className="p-12 text-center">
-              <p className="text-sm text-red-400">Failed to load users. Please try again.</p>
+              <p className="text-sm text-red-500">Failed to load users. Please try again.</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-dark-700">
-                    <th className="px-6 py-3 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">User</th>
-                    <th className="px-6 py-3 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Role</th>
-                    <th className="px-6 py-3 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Department</th>
-                    <th className="px-6 py-3 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Joined</th>
-                    <th className="px-6 py-3 text-right text-[10px] font-medium text-dark-400 uppercase tracking-wide">Actions</th>
+                  <tr className="border-b border-zinc-100">
+                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">User</th>
+                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Role</th>
+                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Department</th>
+                    <th className="px-6 py-3 text-left text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Joined</th>
+                    <th className="px-6 py-3 text-right text-[10px] font-medium text-zinc-400 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-700">
-                  const roleColors = getRoleColor(u.role);
-                  const RoleIcon = getRoleIcon(u.role);
-                  return (
-                  <tr key={u._id} className="hover:bg-dark-800/50 transition-colors">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 bg-gradient-to-br from-violet-600/20 to-violet-600/10 border border-violet-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-violet-300 font-medium text-sm">{u.name.charAt(0).toUpperCase()}</span>
-                        </div>
-                        <div>
-                          <p className="font-medium text-white text-sm">{u.name}</p>
-                          <p className="text-xs text-dark-400">{u.email}</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-white/5 ${roleColors.bg} ${roleColors.text}`}>
-                        <RoleIcon className={`w-3 h-3 ${roleColors.icon}`} strokeWidth={1.5} />{u.role}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-sm text-dark-300">{u.department || u.clubName || '-'}{u.year && ` • Year ${u.year}`}</span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="text-xs text-dark-400">{new Date(u.createdAt).toLocaleDateString()}</span>
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button className="p-2 text-dark-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
-                          <Edit className="w-4 h-4" />
-                        </button>
-                        <button onClick={() => handleDeleteUser(u._id)} disabled={isDeleting} className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors disabled:opacity-50">
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  );
-                    })}
+                <tbody className="divide-y divide-zinc-50">
+                  {users.map((u) => {
+                    const roleColors = getRoleColor(u.role);
+                    const RoleIcon = getRoleIcon(u.role);
+                    return (
+                      <tr key={u._id} className="hover:bg-zinc-50 transition-colors">
+                        <td className="px-6 py-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 bg-violet-50 rounded-full flex items-center justify-center text-violet-600 font-medium text-sm">
+                              {u.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <p className="font-medium text-zinc-900 text-sm">{u.name}</p>
+                              <p className="text-xs text-zinc-500">{u.email}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border border-transparent ${roleColors.bg} ${roleColors.text}`}>
+                            <RoleIcon className={`w-3 h-3 ${roleColors.icon}`} strokeWidth={1.5} />{u.role}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm text-zinc-600">{u.department || u.clubName || '-'}{u.year && ` • Year ${u.year}`}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-xs text-zinc-500">{new Date(u.createdAt).toLocaleDateString()}</span>
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-1">
+                            <button className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
+                              <Edit className="w-4 h-4" />
+                            </button>
+                            <button onClick={() => handleDeleteUser(u._id)} disabled={isDeleting} className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
               {users.length === 0 && (
                 <div className="text-center py-12">
-                  <Users className="w-12 h-12 mx-auto mb-3 text-dark-700" />
-                  <p className="text-sm font-medium text-dark-300">No users found</p>
-                  <p className="text-xs text-dark-500">Try adjusting your filters</p>
+                  <Users className="w-12 h-12 mx-auto mb-3 text-zinc-300" />
+                  <p className="text-sm font-medium text-zinc-500">No users found</p>
+                  <p className="text-xs text-zinc-400">Try adjusting your filters</p>
                 </div>
               )}
             </div>
@@ -289,7 +290,7 @@ const AdminUsers = () => {
         {/* Results Count */}
         {users.length > 0 && (
           <div className="text-center">
-            <p className="text-xs text-dark-400">Showing <span className="font-medium text-white">{users.length}</span> users</p>
+            <p className="text-xs text-zinc-500">Showing <span className="font-medium text-zinc-900">{users.length}</span> users</p>
           </div>
         )}
       </div>

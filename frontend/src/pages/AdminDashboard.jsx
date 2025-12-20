@@ -269,21 +269,23 @@ const AdminDashboard = () => {
         {/* ================================================================
             HERO SECTION - Primary insight at a glance
             ================================================================ */}
-        <div className="hero-section relative overflow-hidden rounded-2xl bg-gradient-to-br from-zinc-900 via-zinc-800 to-zinc-900 p-8 lg:p-10">
+        <div className="hero-section relative overflow-hidden rounded-2xl bg-white border border-zinc-200 shadow-sm p-8 lg:p-10">
           {/* Decorative elements */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
+          <div className="absolute top-0 right-0 w-96 h-96 bg-violet-50/50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
+          <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-50/50 rounded-full blur-3xl translate-y-1/2 -translate-x-1/2" />
 
           <div className="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div className="flex-1">
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-xs text-white/40">Updated {getTimeAgo(lastUpdated)}</span>
+                <span className="px-2.5 py-1 rounded-full bg-zinc-100 text-zinc-500 text-xs font-medium border border-zinc-200">
+                  Updated {getTimeAgo(lastUpdated)}
+                </span>
               </div>
 
-              <h1 className="text-2xl lg:text-3xl font-semibold text-white mb-2 tracking-tight">
+              <h1 className="text-2xl lg:text-3xl font-bold text-zinc-900 mb-2 tracking-tight">
                 Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.name?.split(' ')[0] || 'Admin'}
               </h1>
-              <p className="text-white/60 text-sm lg:text-base max-w-lg">
+              <p className="text-zinc-500 text-sm lg:text-base max-w-lg">
                 {Array.isArray(pendingEvents) && pendingEvents.length > 0
                   ? `You have ${pendingEvents.length} event${pendingEvents.length > 1 ? 's' : ''} awaiting approval. Student enrollment is up this month.`
                   : `Everything looks great! Student enrollment shows positive trends this month.`}
@@ -293,20 +295,20 @@ const AdminDashboard = () => {
             {/* Primary action & key stat */}
             <div className="flex items-center gap-6">
               <div className="hidden lg:block text-right">
-                <p className="text-white/50 text-xs uppercase tracking-wider mb-1">Total Enrollment</p>
-                <p className="text-4xl font-bold text-white">
+                <p className="text-zinc-400 text-xs uppercase tracking-wider mb-1">Total Enrollment</p>
+                <p className="text-4xl font-bold text-zinc-900">
                   <AnimatedValue value={stats?.totalStudents || 0} />
                 </p>
                 <div className="flex items-center justify-end gap-1.5 mt-1">
-                  <ArrowUpRight className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="text-xs font-medium text-emerald-400">+12% this month</span>
+                  <ArrowUpRight className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-xs font-medium text-emerald-600">+12% this month</span>
                 </div>
               </div>
 
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white text-zinc-900 rounded-xl font-medium text-sm hover:bg-zinc-100 transition-all disabled:opacity-60 shadow-lg shadow-white/10"
+                className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-xl font-medium text-sm hover:bg-zinc-800 transition-all disabled:opacity-60 shadow-lg shadow-zinc-200 hover:shadow-xl"
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
                 Refresh
@@ -321,10 +323,10 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-12 gap-6">
 
           {/* Left: Department distribution with flowing visualization */}
-          <div className="insight-block col-span-12 lg:col-span-7 bg-white rounded-2xl border border-zinc-100/80 p-6 lg:p-8">
+          <div className="insight-block col-span-12 lg:col-span-7 bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 lg:p-8">
             <div className="flex items-start justify-between mb-6">
               <div>
-                <h2 className="text-lg font-semibold text-zinc-900 mb-1">Student Distribution</h2>
+                <h2 className="text-lg font-bold text-zinc-900 mb-1">Student Distribution</h2>
                 <p className="text-sm text-zinc-500">Enrollment by department</p>
               </div>
               <button className="p-2 hover:bg-zinc-100 rounded-lg transition-colors">
@@ -349,13 +351,13 @@ const AdminDashboard = () => {
           </div>
 
           {/* Right: Placement highlight with radial progress */}
-          <div className="insight-block col-span-12 lg:col-span-5 bg-gradient-to-br from-violet-50 via-white to-violet-50/30 rounded-2xl border border-violet-100/50 p-6 lg:p-8">
+          <div className="insight-block col-span-12 lg:col-span-5 bg-gradient-to-br from-violet-50/50 via-white to-violet-50/20 rounded-2xl border border-violet-100/50 shadow-sm p-6 lg:p-8">
             <div className="flex items-center gap-2 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-violet-100 flex items-center justify-center border border-violet-200">
                 <Briefcase className="w-4 h-4 text-violet-600" />
               </div>
               <div>
-                <h2 className="text-lg font-semibold text-zinc-900">Placement Rate</h2>
+                <h2 className="text-lg font-bold text-zinc-900">Placement Rate</h2>
                 <p className="text-xs text-zinc-500">Current academic year</p>
               </div>
             </div>
@@ -365,13 +367,13 @@ const AdminDashboard = () => {
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-4">
-              <div className="p-3 bg-white/60 rounded-xl">
-                <p className="text-xs text-zinc-500 mb-0.5">Offers Made</p>
-                <p className="text-xl font-semibold text-zinc-900">847</p>
+              <div className="p-3 bg-white rounded-xl border border-zinc-100 shadow-sm">
+                <p className="text-xs text-zinc-500 mb-0.5 uppercase tracking-wide">Offers Made</p>
+                <p className="text-xl font-bold text-zinc-900">847</p>
               </div>
-              <div className="p-3 bg-white/60 rounded-xl">
-                <p className="text-xs text-zinc-500 mb-0.5">Avg. Package</p>
-                <p className="text-xl font-semibold text-zinc-900">₹8.5L</p>
+              <div className="p-3 bg-white rounded-xl border border-zinc-100 shadow-sm">
+                <p className="text-xs text-zinc-500 mb-0.5 uppercase tracking-wide">Avg. Package</p>
+                <p className="text-xl font-bold text-zinc-900">₹8.5L</p>
               </div>
             </div>
 
@@ -388,12 +390,12 @@ const AdminDashboard = () => {
             ================================================================ */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Students metric */}
-          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-100/80 p-5 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-violet-200 hover:shadow-md transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-100 to-violet-50 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center border border-violet-100">
                 <GraduationCap className="w-5 h-5 text-violet-600" strokeWidth={1.5} />
               </div>
-              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 rounded-full">
+              <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-50 rounded-full border border-emerald-100">
                 <ArrowUpRight className="w-3 h-3 text-emerald-600" />
                 <span className="text-[11px] font-semibold text-emerald-600">12%</span>
               </div>
@@ -408,9 +410,9 @@ const AdminDashboard = () => {
           </div>
 
           {/* Faculty metric */}
-          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-100/80 p-5 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-blue-200 hover:shadow-md transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center border border-blue-100">
                 <Users className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
               </div>
               <div className="flex items-center gap-2">
@@ -433,9 +435,9 @@ const AdminDashboard = () => {
           </div>
 
           {/* Courses metric */}
-          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-100/80 p-5 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-emerald-200 hover:shadow-md transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-50 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center border border-emerald-100">
                 <BookOpen className="w-5 h-5 text-emerald-600" strokeWidth={1.5} />
               </div>
               <div className="text-right">
@@ -455,13 +457,13 @@ const AdminDashboard = () => {
           </div>
 
           {/* Pending metric */}
-          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-100/80 p-5 hover:border-zinc-200 hover:shadow-md transition-all duration-300">
+          <div className="insight-block group relative bg-white rounded-2xl border border-zinc-200 shadow-sm p-5 hover:border-amber-200 hover:shadow-md transition-all duration-300">
             <div className="flex items-start justify-between mb-4">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-100 to-amber-50 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100">
                 <Clock className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
               </div>
               {Array.isArray(pendingEvents) && pendingEvents.length > 0 && (
-                <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 rounded-full animate-pulse">
+                <div className="flex items-center gap-1 px-2 py-0.5 bg-amber-50 rounded-full border border-amber-100 animate-pulse">
                   <Zap className="w-3 h-3 text-amber-600" />
                   <span className="text-[11px] font-semibold text-amber-600">Action needed</span>
                 </div>
@@ -483,20 +485,20 @@ const AdminDashboard = () => {
         <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
 
           {/* Pending Approvals - Primary action area */}
-          <div className="content-section lg:col-span-3 bg-white rounded-2xl border border-zinc-100/80 overflow-hidden">
-            <div className="p-6 border-b border-zinc-100">
+          <div className="content-section lg:col-span-3 bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-xl bg-amber-100 flex items-center justify-center">
+                  <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100">
                     <Calendar className="w-4.5 h-4.5 text-amber-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-zinc-900">Pending Approvals</h3>
+                    <h3 className="font-bold text-zinc-900">Pending Approvals</h3>
                     <p className="text-xs text-zinc-500">Review and approve events</p>
                   </div>
                 </div>
                 {Array.isArray(pendingEvents) && pendingEvents.length > 0 && (
-                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full">
+                  <span className="px-3 py-1 bg-amber-50 text-amber-700 text-xs font-semibold rounded-full border border-amber-100">
                     {pendingEvents.length} pending
                   </span>
                 )}
@@ -508,25 +510,25 @@ const AdminDashboard = () => {
                 <div className="space-y-2">
                   {pendingEvents.slice(0, 5).map((event, i) => (
                     <div key={event._id}
-                      className="flex items-center gap-4 p-4 rounded-xl hover:bg-zinc-50 transition-all group"
+                      className="flex items-center gap-4 p-4 rounded-xl hover:bg-zinc-50 border border-transparent hover:border-zinc-100 transition-all group"
                       style={{ animationDelay: `${i * 50}ms` }}
                     >
-                      <div className="w-11 h-11 bg-gradient-to-br from-violet-100 to-violet-50 rounded-xl flex items-center justify-center flex-shrink-0">
+                      <div className="w-11 h-11 bg-violet-50 rounded-xl flex items-center justify-center flex-shrink-0 border border-violet-100">
                         <Calendar className="w-5 h-5 text-violet-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <h4 className="font-medium text-zinc-900 text-sm truncate">{event.title}</h4>
-                        <p className="text-xs text-zinc-400 mt-0.5">
+                        <p className="text-xs text-zinc-500 mt-0.5">
                           {new Date(event.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })} • {event.category || 'Event'}
                         </p>
                       </div>
                       <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                         <button onClick={() => handleApproveEvent(event._id)}
-                          className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors">
+                          className="p-2.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-100 rounded-xl transition-colors border border-emerald-100">
                           <Check className="w-4 h-4" />
                         </button>
                         <button onClick={() => handleRejectEvent(event._id)}
-                          className="p-2.5 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition-colors">
+                          className="p-2.5 bg-red-50 text-red-500 hover:bg-red-100 rounded-xl transition-colors border border-red-100">
                           <X className="w-4 h-4" />
                         </button>
                       </div>
@@ -535,10 +537,10 @@ const AdminDashboard = () => {
                 </div>
               ) : (
                 <div className="py-16 text-center">
-                  <div className="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-2xl flex items-center justify-center border border-emerald-100">
                     <CheckCircle className="w-7 h-7 text-emerald-500" />
                   </div>
-                  <h4 className="font-medium text-zinc-800 mb-1">All caught up!</h4>
+                  <h4 className="font-medium text-zinc-900 mb-1">All caught up!</h4>
                   <p className="text-sm text-zinc-400">No pending approvals at the moment</p>
                 </div>
               )}
@@ -546,14 +548,14 @@ const AdminDashboard = () => {
           </div>
 
           {/* Recent Activity */}
-          <div className="content-section lg:col-span-2 bg-white rounded-2xl border border-zinc-100/80 overflow-hidden">
-            <div className="p-6 border-b border-zinc-100">
+          <div className="content-section lg:col-span-2 bg-white rounded-2xl border border-zinc-200 shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-zinc-100 bg-zinc-50/50">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-zinc-100 flex items-center justify-center border border-zinc-200">
                   <Activity className="w-4.5 h-4.5 text-zinc-600" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-zinc-900">Activity Feed</h3>
+                  <h3 className="font-bold text-zinc-900">Activity Feed</h3>
                   <p className="text-xs text-zinc-500">Recent updates</p>
                 </div>
               </div>
@@ -564,10 +566,10 @@ const AdminDashboard = () => {
                 <div className="space-y-1">
                   {recentActivities.slice(0, 8).map((activity, i) => {
                     const Icon = activity.icon;
-                    const colors = { blue: 'bg-blue-50 text-blue-600', green: 'bg-emerald-50 text-emerald-600', amber: 'bg-amber-50 text-amber-600', violet: 'bg-violet-50 text-violet-600', zinc: 'bg-zinc-100 text-zinc-600' };
+                    const colors = { blue: 'bg-blue-50 text-blue-600 border-blue-100', green: 'bg-emerald-50 text-emerald-600 border-emerald-100', amber: 'bg-amber-50 text-amber-600 border-amber-100', violet: 'bg-violet-50 text-violet-600 border-violet-100', zinc: 'bg-zinc-100 text-zinc-600 border-zinc-200' };
                     return (
                       <div key={i} className="flex items-start gap-3 p-3 rounded-xl hover:bg-zinc-50 transition-colors">
-                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${colors[activity.color] || colors.zinc}`}>
+                        <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 border ${colors[activity.color] || colors.zinc}`}>
                           <Icon className="w-4 h-4" />
                         </div>
                         <div className="flex-1 min-w-0">
@@ -590,14 +592,14 @@ const AdminDashboard = () => {
         {/* ================================================================
             PERFORMANCE METRICS - Visual summary
             ================================================================ */}
-        <div className="content-section bg-white rounded-2xl border border-zinc-100/80 p-6 lg:p-8">
+        <div className="content-section bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 lg:p-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-violet-100 flex items-center justify-center">
+              <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center border border-violet-100">
                 <TrendingUp className="w-4.5 h-4.5 text-violet-600" />
               </div>
               <div>
-                <h3 className="font-semibold text-zinc-900">Performance Overview</h3>
+                <h3 className="font-bold text-zinc-900">Performance Overview</h3>
                 <p className="text-xs text-zinc-500">Key metrics for this semester</p>
               </div>
             </div>
@@ -611,7 +613,7 @@ const AdminDashboard = () => {
             ]).slice(0, 3).map((metric, i) => (
               <div key={i} className="relative">
                 <div className="flex items-center justify-between mb-3">
-                  <span className="text-sm font-medium text-zinc-700">{metric.label}</span>
+                  <span className="text-sm font-medium text-zinc-600">{metric.label}</span>
                   <span className="text-xs font-medium text-emerald-600 flex items-center gap-0.5">
                     <ArrowUpRight className="w-3 h-3" />{metric.trend}
                   </span>

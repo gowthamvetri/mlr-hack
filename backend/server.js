@@ -84,6 +84,9 @@ app.use('/api/placement-page', require('./src/routes/placementPageRoutes'));
 app.use('/api/external-courses', require('./src/routes/externalCourseRoutes'));
 app.use('/api/hall-tickets', require('./src/routes/hallTicketRoutes'));
 app.use('/api/attendance', require('./src/routes/attendanceRoutes'));
+app.use('/api/timetables', require('./src/routes/timetableRoutes'));
+app.use('/api/subject-attendance', require('./src/routes/subjectAttendanceRoutes'));
+app.use('/api/results', require('./src/routes/resultRoutes'));
 
 const PORT = process.env.PORT || 5000;
 

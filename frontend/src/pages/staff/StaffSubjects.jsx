@@ -305,16 +305,16 @@ const StaffSubjects = () => {
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
-            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
+            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto text-zinc-900">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-white tracking-tight">My Subjects</h1>
-                        <p className="text-dark-400 text-sm mt-0.5">Upload materials and generate AI mind maps</p>
+                        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">My Subjects</h1>
+                        <p className="text-zinc-500 text-sm mt-0.5">Upload materials and generate AI mind maps</p>
                     </div>
                     <button
                         onClick={fetchSubjects}
-                        className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800 border border-dark-700/50 rounded-lg hover:bg-dark-700 hover:text-white transition-all"
+                        className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-sm"
                     >
                         <RefreshCw className="w-4 h-4" />
                         Refresh
@@ -324,26 +324,26 @@ const StaffSubjects = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                     {[
-                        { label: 'Assigned Subjects', value: subjects.length, icon: BookOpen, color: 'primary' },
-                        { label: 'Total Materials', value: totalMaterials, icon: FileText, color: 'accent' },
+                        { label: 'Assigned Subjects', value: subjects.length, icon: BookOpen, color: 'blue' },
+                        { label: 'Total Materials', value: totalMaterials, icon: FileText, color: 'violet' },
                         { label: 'Approved (Visible)', value: approvedMaterials, icon: CheckCircle, color: 'emerald' },
                         { label: 'With Mind Maps', value: subjects.reduce((sum, s) => sum + (s.materials?.filter(m => m.mindMap).length || 0), 0), icon: Brain, color: 'pink' },
                     ].map((stat, i) => {
                         const colorMap = {
-                            primary: 'bg-primary-500/10 text-primary-400 border-primary-500/20',
-                            accent: 'bg-accent-500/10 text-accent-400 border-accent-500/20',
-                            emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-                            pink: 'bg-pink-500/10 text-pink-400 border-pink-500/20'
+                            blue: 'bg-blue-50 border-blue-100 text-blue-600',
+                            violet: 'bg-violet-50 border-violet-100 text-violet-600',
+                            emerald: 'bg-emerald-50 border-emerald-100 text-emerald-600',
+                            pink: 'bg-pink-50 border-pink-100 text-pink-600'
                         };
                         return (
-                            <div key={i} className={`metric-card group bg-dark-800/80 rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300`}>
+                            <div key={i} className={`metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-md transition-all`}>
                                 <div className="flex items-start justify-between mb-3">
                                     <div className={`w-9 h-9 rounded-lg flex items-center justify-center border ${colorMap[stat.color]}`}>
-                                        <stat.icon className="w-4.5 h-4.5" strokeWidth={1.5} />
+                                        <stat.icon className="w-4.5 h-4.5" strokeWidth={2} />
                                     </div>
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.label}</p>
-                                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stat.value} /></p>
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">{stat.label}</p>
+                                <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={stat.value} /></p>
                             </div>
                         );
                     })}
@@ -353,46 +353,46 @@ const StaffSubjects = () => {
                 {loading ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {[1, 2, 3, 4].map(i => (
-                            <div key={i} className="bg-dark-800 rounded-xl border border-dark-700 p-5 animate-pulse">
-                                <div className="h-5 bg-dark-700 rounded w-1/3 mb-3" />
-                                <div className="h-4 bg-dark-700 rounded w-2/3 mb-4" />
-                                <div className="h-20 bg-dark-700/50 rounded" />
+                            <div key={i} className="bg-white rounded-xl border border-zinc-200 p-5 animate-pulse">
+                                <div className="h-5 bg-zinc-100 rounded w-1/3 mb-3" />
+                                <div className="h-4 bg-zinc-100 rounded w-2/3 mb-4" />
+                                <div className="h-20 bg-zinc-50 rounded" />
                             </div>
                         ))}
                     </div>
                 ) : subjects.length === 0 ? (
-                    <div className="bg-dark-800 rounded-xl border border-dark-700 p-12 text-center">
-                        <div className="w-16 h-16 bg-dark-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                            <BookOpen className="w-8 h-8 text-dark-500" />
+                    <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center shadow-sm">
+                        <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
+                            <BookOpen className="w-8 h-8 text-zinc-300" />
                         </div>
-                        <h3 className="text-lg font-medium text-dark-200 mb-2">No Subjects Assigned</h3>
-                        <p className="text-sm text-dark-400">
+                        <h3 className="text-lg font-bold text-zinc-900 mb-2">No Subjects Assigned</h3>
+                        <p className="text-sm text-zinc-500 font-medium">
                             You don't have any subjects assigned yet. Contact your administrator.
                         </p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {subjects.map((subject) => (
-                            <div key={subject._id} className="subject-card bg-dark-800 rounded-xl border border-dark-700 hover:border-dark-600 hover:shadow-xl hover:shadow-black/20 transition-all group">
+                            <div key={subject._id} className="subject-card bg-white rounded-xl border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all group shadow-sm">
                                 {/* Subject Header */}
-                                <div className="p-5 border-b border-dark-700/50">
+                                <div className="p-5 border-b border-zinc-100">
                                     <div className="flex items-start justify-between mb-2">
                                         <div>
                                             <div className="flex items-center gap-2 mb-1">
-                                                <span className="text-xs font-mono font-medium text-primary-400 bg-primary-500/10 border border-primary-500/20 px-2 py-0.5 rounded">{subject.code}</span>
-                                                <span className="text-xs text-dark-400">{subject.department}</span>
+                                                <span className="text-xs font-mono font-bold text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded">{subject.code}</span>
+                                                <span className="text-xs font-bold text-zinc-500">{subject.department}</span>
                                             </div>
-                                            <h3 className="font-medium text-white text-lg">{subject.name}</h3>
+                                            <h3 className="font-bold text-zinc-900 text-lg">{subject.name}</h3>
                                         </div>
                                         <button
                                             onClick={() => { setSelectedSubject(subject); setShowMaterialModal(true); setUploadMode('file'); setSelectedFile(null); }}
-                                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-primary-300 bg-primary-500/10 border border-primary-500/20 rounded-lg hover:bg-primary-500/20 hover:text-white transition-colors"
+                                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-blue-600 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors"
                                         >
                                             <Upload className="w-3.5 h-3.5" />
                                             Upload PDF
                                         </button>
                                     </div>
-                                    <div className="flex items-center gap-3 text-xs text-dark-400">
+                                    <div className="flex items-center gap-3 text-xs text-zinc-500 font-medium">
                                         <span className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
                                             Year {subject.year}, Sem {subject.semester}
@@ -405,33 +405,33 @@ const StaffSubjects = () => {
                                 </div>
 
                                 {/* Materials List */}
-                                <div className="p-4 bg-dark-900/30">
+                                <div className="p-4 bg-zinc-50/50">
                                     {subject.materials?.length > 0 ? (
                                         <div className="space-y-2">
-                                            <p className="text-xs font-medium text-dark-400 mb-2">{subject.materials.length} Materials</p>
+                                            <p className="text-xs font-bold text-zinc-400 uppercase tracking-wide mb-2">{subject.materials.length} Materials</p>
                                             {subject.materials.slice(0, 4).map((material) => {
                                                 const Icon = materialTypeIcons[material.type] || FileText;
                                                 return (
-                                                    <div key={material._id} className="flex items-center gap-3 p-2.5 bg-dark-800/50 rounded-lg border border-dark-700 hover:border-dark-600 transition-colors">
-                                                        <div className="w-8 h-8 rounded-lg bg-dark-700 flex items-center justify-center">
-                                                            <Icon className="w-4 h-4 text-dark-300" />
+                                                    <div key={material._id} className="flex items-center gap-3 p-2.5 bg-white rounded-lg border border-zinc-200 hover:border-zinc-300 transition-colors shadow-sm">
+                                                        <div className="w-8 h-8 rounded-lg bg-zinc-50 flex items-center justify-center border border-zinc-100">
+                                                            <Icon className="w-4 h-4 text-zinc-400" />
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex items-center gap-2">
-                                                                <p className="text-sm font-medium text-dark-200 truncate group-hover:text-white transition-colors">{material.title}</p>
+                                                                <p className="text-sm font-bold text-zinc-900 truncate hover:text-blue-600 transition-colors">{material.title}</p>
                                                                 {material.isApproved && (
-                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                                                         <Check className="w-2.5 h-2.5" /> Approved
                                                                     </span>
                                                                 )}
                                                                 {material.mindMap && (
-                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-medium bg-accent-500/10 text-accent-400 border border-accent-500/20">
+                                                                    <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9px] font-bold bg-pink-50 text-pink-600 border border-pink-100">
                                                                         <Brain className="w-2.5 h-2.5" /> Mind Map
                                                                     </span>
                                                                 )}
                                                             </div>
                                                             {material.description && (
-                                                                <p className="text-xs text-dark-500 truncate">{material.description}</p>
+                                                                <p className="text-xs text-zinc-500 truncate font-medium">{material.description}</p>
                                                             )}
                                                         </div>
                                                         <div className="flex items-center gap-1">
@@ -439,7 +439,7 @@ const StaffSubjects = () => {
                                                             {(material.type === 'PDF' || material.type === 'Document') && (
                                                                 <button
                                                                     onClick={() => handleGenerateMindMap(subject, material)}
-                                                                    className="p-1.5 text-accent-400 hover:text-white hover:bg-accent-500 rounded transition-colors"
+                                                                    className="p-1.5 text-pink-500 hover:text-pink-700 hover:bg-pink-50 rounded transition-colors"
                                                                     title={material.mindMap ? 'View Mind Map' : 'Generate Mind Map'}
                                                                 >
                                                                     <Sparkles className="w-3.5 h-3.5" />
@@ -450,14 +450,14 @@ const StaffSubjects = () => {
                                                                     href={material.url.startsWith('/') ? `${API_URL.replace('/api/', '')}${material.url}` : material.url}
                                                                     target="_blank"
                                                                     rel="noopener noreferrer"
-                                                                    className="p-1.5 text-dark-400 hover:text-blue-400 hover:bg-blue-500/10 rounded transition-colors"
+                                                                    className="p-1.5 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded transition-colors"
                                                                 >
                                                                     <ExternalLink className="w-3.5 h-3.5" />
                                                                 </a>
                                                             )}
                                                             <button
                                                                 onClick={() => handleDeleteMaterial(subject._id, material._id)}
-                                                                className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded transition-colors"
+                                                                className="p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded transition-colors"
                                                             >
                                                                 <Trash2 className="w-3.5 h-3.5" />
                                                             </button>
@@ -466,13 +466,13 @@ const StaffSubjects = () => {
                                                 );
                                             })}
                                             {subject.materials.length > 4 && (
-                                                <p className="text-xs text-center text-dark-400 pt-2">
+                                                <p className="text-xs text-center text-zinc-400 pt-2 font-bold">
                                                     +{subject.materials.length - 4} more materials
                                                 </p>
                                             )}
                                         </div>
                                     ) : (
-                                        <p className="text-xs text-dark-500 text-center py-4">
+                                        <p className="text-xs text-zinc-400 text-center py-4 font-medium">
                                             No materials uploaded yet
                                         </p>
                                     )}
@@ -486,18 +486,18 @@ const StaffSubjects = () => {
                 <Modal isOpen={showMaterialModal} onClose={() => { setShowMaterialModal(false); setSelectedFile(null); }} title={`Upload Material to ${selectedSubject?.name || ''}`} size="lg">
                     <form onSubmit={handleAddMaterial} className="space-y-4">
                         {/* Upload Mode Tabs */}
-                        <div className="flex gap-2 p-1 bg-dark-800 rounded-lg w-fit border border-dark-700">
+                        <div className="flex gap-2 p-1 bg-zinc-100 rounded-lg w-fit border border-zinc-200">
                             <button
                                 type="button"
                                 onClick={() => setUploadMode('file')}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${uploadMode === 'file' ? 'bg-dark-700 text-white shadow-sm' : 'text-dark-400 hover:text-white'}`}
+                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${uploadMode === 'file' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'}`}
                             >
                                 <Upload className="w-4 h-4 inline mr-1.5" />Upload PDF
                             </button>
                             <button
                                 type="button"
                                 onClick={() => setUploadMode('url')}
-                                className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${uploadMode === 'url' ? 'bg-dark-700 text-white shadow-sm' : 'text-dark-400 hover:text-white'}`}
+                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${uploadMode === 'url' ? 'bg-white text-zinc-900 shadow-sm' : 'text-zinc-500 hover:text-zinc-900'}`}
                             >
                                 <LinkIcon className="w-4 h-4 inline mr-1.5" />URL Link
                             </button>
@@ -512,7 +512,7 @@ const StaffSubjects = () => {
                                     onDragOver={handleDrag}
                                     onDrop={handleDrop}
                                     onClick={() => fileInputRef.current?.click()}
-                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${dragActive ? 'border-primary-500 bg-primary-500/10' : selectedFile ? 'border-emerald-500/50 bg-emerald-500/10' : 'border-dark-700 hover:border-primary-500/50 hover:bg-dark-800'
+                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${dragActive ? 'border-blue-500 bg-blue-50' : selectedFile ? 'border-emerald-300 bg-emerald-50' : 'border-zinc-300 hover:border-zinc-400 hover:bg-white bg-zinc-50'
                                         }`}
                                 >
                                     <input
@@ -524,73 +524,73 @@ const StaffSubjects = () => {
                                     />
                                     {selectedFile ? (
                                         <div className="flex items-center justify-center gap-3">
-                                            <div className="w-12 h-12 bg-emerald-500/10 rounded-lg flex items-center justify-center border border-emerald-500/20">
-                                                <FileText className="w-6 h-6 text-emerald-400" />
+                                            <div className="w-12 h-12 bg-emerald-100 rounded-lg flex items-center justify-center border border-emerald-200">
+                                                <FileText className="w-6 h-6 text-emerald-600" />
                                             </div>
                                             <div className="text-left">
-                                                <p className="font-medium text-white">{selectedFile.name}</p>
-                                                <p className="text-xs text-dark-400">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                                                <p className="font-bold text-zinc-900">{selectedFile.name}</p>
+                                                <p className="text-xs text-zinc-500 font-medium">{(selectedFile.size / 1024 / 1024).toFixed(2)} MB</p>
                                             </div>
                                             <button
                                                 type="button"
                                                 onClick={(e) => { e.stopPropagation(); setSelectedFile(null); }}
-                                                className="p-1 text-dark-400 hover:text-red-400 rounded"
+                                                className="p-1 text-zinc-400 hover:text-red-500 rounded"
                                             >
                                                 <X className="w-4 h-4" />
                                             </button>
                                         </div>
                                     ) : (
                                         <>
-                                            <Upload className="w-10 h-10 text-dark-500 mx-auto mb-3" />
-                                            <p className="text-sm font-medium text-dark-200 mb-1">Drop PDF here or click to browse</p>
-                                            <p className="text-xs text-dark-500">Max file size: 50MB</p>
+                                            <Upload className="w-10 h-10 text-zinc-400 mx-auto mb-3" />
+                                            <p className="text-sm font-bold text-zinc-900 mb-1">Drop PDF here or click to browse</p>
+                                            <p className="text-xs text-zinc-500 font-medium">Max file size: 50MB</p>
                                         </>
                                     )}
                                 </div>
                             </>
                         ) : (
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">URL</label>
+                                <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">URL</label>
                                 <input
                                     type="url"
                                     required
                                     value={materialForm.url}
                                     onChange={(e) => setMaterialForm({ ...materialForm, url: e.target.value })}
                                     placeholder="https://..."
-                                    className="w-full px-3 py-2.5 text-sm bg-dark-800 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-white placeholder-dark-500"
+                                    className="w-full px-4 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium text-zinc-900"
                                 />
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Title</label>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Title</label>
                             <input
                                 type="text"
                                 required
                                 value={materialForm.title}
                                 onChange={(e) => setMaterialForm({ ...materialForm, title: e.target.value })}
                                 placeholder="e.g., Chapter 1 Notes"
-                                className="w-full px-3 py-2.5 text-sm bg-dark-800 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-white placeholder-dark-500"
+                                className="w-full px-4 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium text-zinc-900"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Description (Optional)</label>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Description (Optional)</label>
                             <input
                                 type="text"
                                 value={materialForm.description}
                                 onChange={(e) => setMaterialForm({ ...materialForm, description: e.target.value })}
                                 placeholder="Brief description"
-                                className="w-full px-3 py-2.5 text-sm bg-dark-800 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-white placeholder-dark-500"
+                                className="w-full px-4 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 placeholder-zinc-400 font-medium text-zinc-900"
                             />
                         </div>
 
                         {uploadMode === 'url' && (
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Type</label>
+                                <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Type</label>
                                 <select
                                     value={materialForm.type}
                                     onChange={(e) => setMaterialForm({ ...materialForm, type: e.target.value })}
-                                    className="w-full px-3 py-2.5 text-sm bg-dark-800 border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 text-white"
+                                    className="w-full px-4 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 cursor-pointer font-medium text-zinc-900"
                                 >
                                     <option value="PDF">PDF</option>
                                     <option value="Video">Video</option>
@@ -601,18 +601,18 @@ const StaffSubjects = () => {
                             </div>
                         )}
 
-                        <div className="flex justify-end gap-2 pt-4 border-t border-dark-700/50 mt-4">
+                        <div className="flex justify-end gap-2 pt-4 border-t border-zinc-100 mt-4">
                             <button
                                 type="button"
                                 onClick={() => { setShowMaterialModal(false); setSelectedFile(null); }}
-                                className="px-4 py-2 text-sm text-dark-300 bg-dark-800 rounded-lg hover:bg-dark-700 transition-colors"
+                                className="px-4 py-2 text-sm font-bold text-zinc-500 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
                             >
                                 Cancel
                             </button>
                             <button
                                 type="submit"
                                 disabled={addingMaterial || uploading || (uploadMode === 'file' && !selectedFile)}
-                                className="px-4 py-2 text-sm text-white bg-primary-600 rounded-lg hover:bg-primary-500 disabled:opacity-50 transition-colors flex items-center gap-2 shadow-lg shadow-primary-500/20"
+                                className="px-4 py-2 text-sm font-bold text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 disabled:opacity-50 transition-colors flex items-center gap-2 shadow-md"
                             >
                                 {(addingMaterial || uploading) ? (
                                     <>
@@ -641,32 +641,32 @@ const StaffSubjects = () => {
                         {generatingMindMap ? (
                             <div className="flex flex-col items-center justify-center py-16">
                                 <div className="relative mb-4">
-                                    <Brain className="w-12 h-12 text-primary-500 animate-pulse" />
-                                    <Sparkles className="w-5 h-5 text-accent-500 absolute -top-1 -right-1 animate-bounce" />
+                                    <Brain className="w-12 h-12 text-violet-500 animate-pulse" />
+                                    <Sparkles className="w-5 h-5 text-pink-500 absolute -top-1 -right-1 animate-bounce" />
                                 </div>
-                                <p className="text-white font-medium mb-1">Generating Mind Map...</p>
-                                <p className="text-sm text-dark-400">AI is analyzing your PDF content</p>
+                                <p className="text-zinc-900 font-bold mb-1">Generating Mind Map...</p>
+                                <p className="text-sm text-zinc-500 font-medium">AI is analyzing your PDF content</p>
                             </div>
                         ) : (
                             <>
                                 {/* Editor/Preview Toggle */}
-                                <div className="flex items-center justify-between border-b border-dark-700 pb-3">
+                                <div className="flex items-center justify-between border-b border-zinc-100 pb-3">
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => setEditingMindMap(false)}
-                                            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${!editingMindMap ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20' : 'text-dark-400 hover:bg-dark-800'}`}
+                                            className={`px-3 py-1.5 text-sm font-bold rounded-md transition-colors ${!editingMindMap ? 'bg-violet-50 text-violet-600 border border-violet-100' : 'text-zinc-500 hover:bg-zinc-50'}`}
                                         >
                                             <Brain className="w-4 h-4 inline mr-1" />Mind Map
                                         </button>
                                         <button
                                             onClick={() => setEditingMindMap(true)}
-                                            className={`px-3 py-1.5 text-sm rounded-md transition-colors ${editingMindMap ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20' : 'text-dark-400 hover:bg-dark-800'}`}
+                                            className={`px-3 py-1.5 text-sm font-bold rounded-md transition-colors ${editingMindMap ? 'bg-violet-50 text-violet-600 border border-violet-100' : 'text-zinc-500 hover:bg-zinc-50'}`}
                                         >
                                             <Code className="w-4 h-4 inline mr-1" />Edit Source
                                         </button>
                                     </div>
                                     {selectedMaterial?.isApproved && (
-                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                             <CheckCircle className="w-3.5 h-3.5" /> Approved & Visible to Students
                                         </span>
                                     )}
@@ -678,24 +678,24 @@ const StaffSubjects = () => {
                                         <textarea
                                             value={mindMapMarkdown}
                                             onChange={(e) => setMindMapMarkdown(e.target.value)}
-                                            className="w-full h-[400px] px-4 py-3 text-sm font-mono border border-dark-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500/50 resize-none bg-dark-900 text-emerald-400"
+                                            className="w-full h-[400px] px-4 py-3 text-sm font-mono border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-zinc-900 resize-none bg-zinc-50 text-zinc-900"
                                             placeholder="# Main Topic&#10;&#10;## Subtopic 1&#10;- Point A&#10;- Point B&#10;&#10;## Subtopic 2&#10;- Point C&#10;- Point D"
                                         />
                                     ) : mindMapMarkdown ? (
                                         <MindMapView markdown={mindMapMarkdown} />
                                     ) : (
-                                        <div className="flex items-center justify-center h-[400px] bg-dark-800 rounded-lg border border-dark-700">
-                                            <p className="text-sm text-dark-500">No content yet. Generate or add markdown.</p>
+                                        <div className="flex items-center justify-center h-[400px] bg-zinc-50 rounded-lg border border-zinc-200">
+                                            <p className="text-sm text-zinc-500 font-bold">No content yet. Generate or add markdown.</p>
                                         </div>
                                     )}
                                 </div>
 
                                 {/* Actions */}
-                                <div className="flex justify-between items-center pt-4 border-t border-dark-700">
+                                <div className="flex justify-between items-center pt-4 border-t border-zinc-100">
                                     <button
                                         onClick={() => handleGenerateMindMap(selectedSubject, selectedMaterial)}
                                         disabled={generatingMindMap}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm text-accent-400 bg-accent-500/10 border border-accent-500/20 rounded-lg hover:bg-accent-500/20 transition-colors disabled:opacity-50"
+                                        className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-pink-600 bg-pink-50 border border-pink-100 rounded-lg hover:bg-pink-100 transition-colors disabled:opacity-50"
                                     >
                                         <Sparkles className="w-4 h-4" />
                                         Regenerate
@@ -703,14 +703,14 @@ const StaffSubjects = () => {
                                     <div className="flex gap-2">
                                         <button
                                             onClick={() => { setShowMindMapModal(false); setEditingMindMap(false); }}
-                                            className="px-4 py-2 text-sm text-dark-400 bg-dark-800 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
+                                            className="px-4 py-2 text-sm font-bold text-zinc-500 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
                                         >
                                             Cancel
                                         </button>
                                         <button
                                             onClick={handleSaveMindMap}
                                             disabled={savingMindMap || !mindMapMarkdown}
-                                            className="flex items-center gap-2 px-4 py-2 text-sm text-white bg-emerald-600 rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition-colors shadow-lg shadow-emerald-500/20"
+                                            className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-emerald-600 rounded-lg hover:bg-emerald-500 disabled:opacity-50 transition-colors shadow-md"
                                         >
                                             {savingMindMap ? (
                                                 <>

@@ -38,6 +38,9 @@ const StudentCareer = lazy(() => import('./pages/student/StudentCareer'));
 const StudentProfile = lazy(() => import('./pages/student/StudentProfile'));
 const StudentCalculators = lazy(() => import('./pages/student/StudentCalculators'));
 const StudentAITwin = lazy(() => import('./pages/student/StudentAITwin'));
+const StudentTimetable = lazy(() => import('./pages/student/StudentTimetable'));
+const StudentAttendance = lazy(() => import('./pages/student/StudentAttendance'));
+const StudentResults = lazy(() => import('./pages/student/StudentResults'));
 
 // Admin Pages
 const AdminEvents = lazy(() => import('./pages/admin/AdminEvents'));
@@ -55,6 +58,7 @@ const AdminInvigilators = lazy(() => import('./pages/admin/AdminInvigilators'));
 const AdminSubjects = lazy(() => import('./pages/admin/AdminSubjects'));
 const AdminChatbotContent = lazy(() => import('./pages/admin/AdminChatbotContent'));
 const AdminDepartments = lazy(() => import('./pages/admin/AdminDepartments'));
+const AdminResultPublication = lazy(() => import('./pages/admin/AdminResultPublication'));
 
 // Seating Manager Pages
 const SeatingAllocate = lazy(() => import('./pages/seating/SeatingAllocate'));
@@ -76,6 +80,8 @@ const StaffProfile = lazy(() => import('./pages/staff/StaffProfile'));
 const StaffCourses = lazy(() => import('./pages/staff/StaffCourses'));
 const StaffExternalCourses = lazy(() => import('./pages/staff/StaffExternalCourses'));
 const StaffInvigilation = lazy(() => import('./pages/staff/StaffInvigilation'));
+const StaffTimetable = lazy(() => import('./pages/staff/StaffTimetable'));
+const StaffAttendance = lazy(() => import('./pages/staff/StaffAttendance'));
 
 
 function App() {
@@ -102,6 +108,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Student']}>
                   <StudentDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/results"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentResults />
                 </ProtectedRoute>
               }
             />
@@ -166,6 +180,23 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Student']}>
                   <StudentAITwin />
+                </ProtectedRoute>
+              }
+            />
+
+            <Route
+              path="/student/timetable"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentTimetable />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/student/attendance"
+              element={
+                <ProtectedRoute allowedRoles={['Student']}>
+                  <StudentAttendance />
                 </ProtectedRoute>
               }
             />
@@ -247,6 +278,14 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Admin']}>
                   <AdminEvents />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/results"
+              element={
+                <ProtectedRoute allowedRoles={['Admin']}>
+                  <AdminResultPublication />
                 </ProtectedRoute>
               }
             />
@@ -454,6 +493,22 @@ function App() {
               element={
                 <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
                   <StaffRegistrationRequests />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/timetable"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffTimetable />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/staff/attendance"
+              element={
+                <ProtectedRoute allowedRoles={['Staff', 'Faculty']}>
+                  <StaffAttendance />
                 </ProtectedRoute>
               }
             />

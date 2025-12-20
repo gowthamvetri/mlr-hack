@@ -18,79 +18,48 @@ import gsap from 'gsap';
 const AnimatedNumber = ({ value, suffix = '', prefix = '' }) => {
   const [displayValue, setDisplayValue] = useState(0);
   const prevValue = useRef(0);
-
   useEffect(() => {
-    const duration = 600;
-    const start = prevValue.current;
-    const end = typeof value === 'number' ? value : parseFloat(value) || 0;
-    const startTime = Date.now();
-
+    const duration = 600; const start = prevValue.current; const end = typeof value === 'number' ? value : parseFloat(value) || 0; const startTime = Date.now();
     const animate = () => {
-      const elapsed = Date.now() - startTime;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      const newVal = start + (end - start) * eased;
+      const elapsed = Date.now() - startTime; const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3); const newVal = start + (end - start) * eased;
       setDisplayValue(suffix === '/5' ? parseFloat(newVal.toFixed(1)) : Math.round(newVal));
-      if (progress < 1) requestAnimationFrame(animate);
-      else prevValue.current = end;
+      if (progress < 1) requestAnimationFrame(animate); else prevValue.current = end;
     };
     requestAnimationFrame(animate);
   }, [value, suffix]);
-
   return <span className="tabular-nums tracking-tight">{prefix}{displayValue}{suffix}</span>;
 };
 
 // Minimal Progress Ring
 const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6' }) => {
-  const radius = (size - strokeWidth) / 2;
-  const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (percentage / 100) * circumference;
-
+  const radius = (size - strokeWidth) / 2; const circumference = radius * 2 * Math.PI; const offset = circumference - (percentage / 100) * circumference;
   return (
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#27272a" strokeWidth={strokeWidth} />
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth}
-          strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
-          className="transition-all duration-700 ease-out" />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="#e4e4e7" strokeWidth={strokeWidth} />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke={color} strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" className="transition-all duration-700 ease-out" />
       </svg>
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-[10px] font-semibold text-dark-400">{percentage}%</span>
-      </div>
+      <div className="absolute inset-0 flex items-center justify-center"><span className="text-[10px] font-semibold text-zinc-500">{percentage}%</span></div>
     </div>
   );
 };
 
 // Skeleton Components
 const SkeletonCard = () => (
-  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
+  <div className="rounded-xl p-5 bg-white border border-zinc-200">
     <div className="animate-pulse">
-      <div className="flex items-start justify-between mb-6">
-        <div className="w-9 h-9 bg-dark-700 rounded-lg" />
-        <div className="w-16 h-5 bg-dark-700 rounded-full" />
-      </div>
-      <div className="space-y-2">
-        <div className="h-3 w-20 bg-dark-700 rounded" />
-        <div className="h-8 w-14 bg-dark-700 rounded" />
-      </div>
+      <div className="flex items-start justify-between mb-6"><div className="w-9 h-9 bg-zinc-100 rounded-lg" /><div className="w-16 h-5 bg-zinc-100 rounded-full" /></div>
+      <div className="space-y-2"><div className="h-3 w-20 bg-zinc-100 rounded" /><div className="h-8 w-14 bg-zinc-100 rounded" /></div>
     </div>
   </div>
 );
 
 const SkeletonCourseCard = () => (
-  <div className="rounded-xl p-5 bg-dark-800/50 border border-dark-700">
+  <div className="rounded-xl p-5 bg-white border border-zinc-200">
     <div className="animate-pulse">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="w-10 h-10 bg-dark-700 rounded-lg" />
-        <div className="space-y-2 flex-1">
-          <div className="h-4 w-32 bg-dark-700 rounded" />
-          <div className="h-3 w-20 bg-dark-700 rounded" />
-        </div>
-      </div>
-      <div className="space-y-2">
-        <div className="h-3 w-full bg-dark-700 rounded" />
-        <div className="h-3 w-2/3 bg-dark-700 rounded" />
-      </div>
+      <div className="flex items-center gap-3 mb-4"><div className="w-10 h-10 bg-zinc-100 rounded-lg" /><div className="space-y-2 flex-1"><div className="h-4 w-32 bg-zinc-100 rounded" /><div className="h-3 w-20 bg-zinc-100 rounded" /></div></div>
+      <div className="space-y-2"><div className="h-3 w-full bg-zinc-100 rounded" /><div className="h-3 w-2/3 bg-zinc-100 rounded" /></div>
     </div>
   </div>
 );
@@ -127,7 +96,6 @@ const AdminCourses = () => {
 
   const statuses = ['all', 'Active', 'Upcoming', 'Completed'];
 
-  // Refined GSAP Animations
   useEffect(() => {
     if (!pageRef.current || loading) return;
     const timer = setTimeout(() => {
@@ -146,9 +114,8 @@ const AdminCourses = () => {
 
   useEffect(() => {
     if (!socket) return;
-    socket.on('course_created', () => { fetchCourses(); fetchInitialData(); });
-    socket.on('course_updated', () => { fetchCourses(); fetchInitialData(); });
-    socket.on('course_deleted', () => { fetchCourses(); fetchInitialData(); });
+    const refresh = () => { fetchCourses(); fetchInitialData(); };
+    socket.on('course_created', refresh); socket.on('course_updated', refresh); socket.on('course_deleted', refresh);
     return () => { socket.off('course_created'); socket.off('course_updated'); socket.off('course_deleted'); };
   }, [socket]);
 
@@ -157,48 +124,29 @@ const AdminCourses = () => {
       const { data } = await getDepartments();
       const deptCodes = data.map(d => d.code);
       setDepartments(['all', ...deptCodes]);
-      try {
-        const staffRes = await getUsers({ role: 'Staff' });
-        setStaffList(Array.isArray(staffRes.data) ? staffRes.data : []);
-      } catch (e) { setStaffList([]); }
-      try {
-        const statsRes = await getCourseStats();
-        setStats({ total: statsRes.data.totalCourses || 0, active: statsRes.data.activeCourses || 0, students: statsRes.data.totalEnrollments || 0, avgRating: statsRes.data.avgRating || 0 });
-      } catch (e) { }
-    } catch (error) {
-      setDepartments(['all', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT']);
-    }
+      try { const staffRes = await getUsers({ role: 'Staff' }); setStaffList(Array.isArray(staffRes.data) ? staffRes.data : []); } catch (e) { setStaffList([]); }
+      try { const statsRes = await getCourseStats(); setStats({ total: statsRes.data.totalCourses || 0, active: statsRes.data.activeCourses || 0, students: statsRes.data.totalEnrollments || 0, avgRating: statsRes.data.avgRating || 0 }); } catch (e) { }
+    } catch (error) { setDepartments(['all', 'CSE', 'ECE', 'EEE', 'MECH', 'CIVIL', 'IT']); }
   };
 
   const fetchCourses = async () => {
     try {
-      setLoading(true);
-      const params = {};
-      if (filterDept !== 'all') params.department = filterDept;
-      if (filterStatus !== 'all') params.status = filterStatus;
-      const { data } = await getCourses(params);
-      setCourses(data);
-      const courseData = data;
+      setLoading(true); const params = {}; if (filterDept !== 'all') params.department = filterDept; if (filterStatus !== 'all') params.status = filterStatus;
+      const { data } = await getCourses(params); setCourses(data);
       setStats({
-        total: courseData.length,
-        active: courseData.filter(c => c.status === 'Active' || c.status === 'active').length,
-        students: courseData.reduce((acc, c) => acc + (c.enrolledStudents?.length || c.students || 0), 0),
-        avgRating: courseData.length > 0 ? (courseData.reduce((acc, c) => acc + (c.rating || 0), 0) / courseData.length).toFixed(1) : 0
+        total: data.length,
+        active: data.filter(c => c.status === 'Active' || c.status === 'active').length,
+        students: data.reduce((acc, c) => acc + (c.enrolledStudents?.length || c.students || 0), 0),
+        avgRating: data.length > 0 ? (data.reduce((acc, c) => acc + (c.rating || 0), 0) / data.length).toFixed(1) : 0
       });
-    } catch (error) {
-      setCourses([]);
-      setStats({ total: 0, active: 0, students: 0, avgRating: 0 });
-    } finally {
-      setLoading(false);
-    }
+    } catch (error) { setCourses([]); setStats({ total: 0, active: 0, students: 0, avgRating: 0 }); } finally { setLoading(false); }
   };
 
   const handleAddCourse = async (e) => {
     e.preventDefault(); setFormError(''); setFormSuccess('');
     if (!formData.name || !formData.code) { setFormError('Please fill in all required fields'); return; }
     try {
-      await createCourse(formData);
-      setFormSuccess('Course added successfully!');
+      await createCourse(formData); setFormSuccess('Course added successfully!');
       setTimeout(() => { setShowAddModal(false); setFormData({ name: '', code: '', department: 'CSE', credits: 3, instructor: '', status: 'Active' }); setFormSuccess(''); fetchCourses(); }, 1500);
     } catch (error) { setFormError(error.response?.data?.message || 'Error adding course'); }
   };
@@ -213,21 +161,14 @@ const AdminCourses = () => {
     e.preventDefault(); setFormError(''); setFormSuccess('');
     if (!formData.name || !formData.code) { setFormError('Please fill in all required fields'); return; }
     try {
-      await updateCourse(selectedCourse._id, formData);
-      setFormSuccess('Course updated successfully!');
+      await updateCourse(selectedCourse._id, formData); setFormSuccess('Course updated successfully!');
       setTimeout(() => { setShowEditModal(false); setSelectedCourse(null); setFormData({ name: '', code: '', department: 'CSE', credits: 3, instructor: '', status: 'Active' }); setFormSuccess(''); fetchCourses(); }, 1500);
     } catch (error) { setFormError(error.response?.data?.message || 'Error updating course'); }
   };
 
   const handleViewClick = async (course) => {
-    try {
-      const { data } = await getCourseById(course._id);
-      setViewCourse(data);
-      setShowViewModal(true);
-    } catch (error) {
-      setViewCourse(course);
-      setShowViewModal(true);
-    }
+    try { const { data } = await getCourseById(course._id); setViewCourse(data); setShowViewModal(true); }
+    catch (error) { setViewCourse(course); setShowViewModal(true); }
   };
 
   const handleDeleteCourse = async () => {
@@ -237,611 +178,228 @@ const AdminCourses = () => {
   };
 
   const handleUploadMaterial = async (e) => {
-    e.preventDefault();
-    if (!materialFile || !selectedCourse) return;
+    e.preventDefault(); if (!materialFile || !selectedCourse) return;
     setUploadingMaterial(true);
     try {
-      const formData = new FormData();
-      formData.append('file', materialFile);
-      formData.append('name', materialName || materialFile.name);
-      await uploadCourseMaterial(selectedCourse._id, formData);
-      const { data } = await getCourseById(selectedCourse._id);
-      setSelectedCourse(data);
-      setMaterialFile(null);
-      setMaterialName('');
-      setFormSuccess('Material uploaded successfully!');
-      setTimeout(() => setFormSuccess(''), 3000);
-    } catch (error) {
-      setFormError(error.response?.data?.message || 'Error uploading material');
-    } finally {
-      setUploadingMaterial(false);
-    }
+      const formData = new FormData(); formData.append('file', materialFile); formData.append('name', materialName || materialFile.name);
+      await uploadCourseMaterial(selectedCourse._id, formData); const { data } = await getCourseById(selectedCourse._id); setSelectedCourse(data);
+      setMaterialFile(null); setMaterialName(''); setFormSuccess('Material uploaded successfully!'); setTimeout(() => setFormSuccess(''), 3000);
+    } catch (error) { setFormError(error.response?.data?.message || 'Error uploading material'); } finally { setUploadingMaterial(false); }
   };
 
   const handleDeleteMaterial = async (materialId) => {
     if (!selectedCourse || !materialId) return;
-    try {
-      await deleteCourseMaterial(selectedCourse._id, materialId);
-      const { data } = await getCourseById(selectedCourse._id);
-      setSelectedCourse(data);
-    } catch (error) { alert('Error deleting material'); }
+    try { await deleteCourseMaterial(selectedCourse._id, materialId); const { data } = await getCourseById(selectedCourse._id); setSelectedCourse(data); } catch (error) { alert('Error deleting material'); }
   };
 
   const openMaterialModal = async (course) => {
-    try {
-      const { data } = await getCourseById(course._id);
-      setSelectedCourse(data);
-      setShowMaterialModal(true);
-    } catch (error) {
-      setSelectedCourse(course);
-      setShowMaterialModal(true);
-    }
+    try { const { data } = await getCourseById(course._id); setSelectedCourse(data); setShowMaterialModal(true); }
+    catch (error) { setSelectedCourse(course); setShowMaterialModal(true); }
   };
 
   const handleExport = () => {
     const headers = ['Name', 'Code', 'Department', 'Credits', 'Instructor', 'Students', 'Rating', 'Status'];
     const csvContent = [headers.join(','), ...filteredCourses.map(c => [c.name, c.code, c.department, c.credits, c.instructor, c.students, c.rating, c.status].join(','))].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `courses_${new Date().toISOString().split('T')[0]}.csv`; a.click();
+    const blob = new Blob([csvContent], { type: 'text/csv' }); const url = window.URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `courses_${new Date().toISOString().split('T')[0]}.csv`; a.click();
   };
 
   const clearFilters = () => { setSearchQuery(''); setFilterDept('all'); setFilterStatus('all'); };
-  const hasActiveFilters = searchQuery || filterDept !== 'all' || filterStatus !== 'all';
-
   const filteredCourses = courses.filter(c => {
-    const matchesSearch = c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.code?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesDept = filterDept === 'all' || c.department === filterDept || c.department?.code === filterDept;
-    const matchesStatus = filterStatus === 'all' || c.status?.toLowerCase() === filterStatus.toLowerCase();
-    return matchesSearch && matchesDept && matchesStatus;
+    return (c.name?.toLowerCase().includes(searchQuery.toLowerCase()) || c.code?.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (filterDept === 'all' || c.department === filterDept || c.department?.code === filterDept) &&
+      (filterStatus === 'all' || c.status?.toLowerCase() === filterStatus.toLowerCase());
   });
 
-  // Department distribution
-  const deptDistribution = departments.slice(1).map(d => ({
-    name: d,
-    count: courses.filter(c => c.department === d).length
-  })).filter(d => d.count > 0);
+  const deptDistribution = departments.slice(1).map(d => ({ name: d, count: courses.filter(c => c.department === d).length })).filter(d => d.count > 0);
 
   return (
     <DashboardLayout role="admin" userName={user?.name}>
-      <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto">
-
-        {/* Premium Header */}
+      <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto text-zinc-900">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-white tracking-tight">Course Catalog</h1>
-            <p className="text-dark-400 text-sm mt-0.5">Manage courses and curriculum</p>
-          </div>
+          <div><h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Course Catalog</h1><p className="text-zinc-500 text-sm mt-0.5 font-medium">Manage courses and curriculum</p></div>
           <div className="flex items-center gap-2.5">
-            <FilterTriggerButton
-              isOpen={filterPanelOpen}
-              onClick={() => setFilterPanelOpen(!filterPanelOpen)}
-              activeFiltersCount={(filterDept !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)}
-            />
-            <button onClick={handleExport} className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-400 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all duration-200">
-              <Download className="w-4 h-4" />
-              <span className="hidden sm:inline">Export</span>
-            </button>
-            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-all duration-200 shadow-sm shadow-violet-500/20">
-              <Plus className="w-4 h-4" />
-              <span>Add Course</span>
-            </button>
+            <FilterTriggerButton isOpen={filterPanelOpen} onClick={() => setFilterPanelOpen(!filterPanelOpen)} activeFiltersCount={(filterDept !== 'all' ? 1 : 0) + (filterStatus !== 'all' ? 1 : 0) + (searchQuery ? 1 : 0)} />
+            <button onClick={handleExport} className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all duration-200 shadow-sm"><Download className="w-4 h-4" /><span className="hidden sm:inline">Export</span></button>
+            <button onClick={() => setShowAddModal(true)} className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all duration-200 shadow-md"><Plus className="w-4 h-4" /><span>Add Course</span></button>
           </div>
         </div>
 
-        {/* Metric Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          {loading ? (
-            <><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></>
-          ) : (
+          {loading ? <><SkeletonCard /><SkeletonCard /><SkeletonCard /><SkeletonCard /></> : (
             <>
-              {/* Total Courses */}
-              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-dark-700/50 flex items-center justify-center border border-white/5">
-                    <BookOpen className="w-4.5 h-4.5 text-dark-400" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
-                    <ArrowUpRight className="w-3 h-3" />
-                    <span>8</span>
-                  </div>
-                </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Courses</p>
-                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.total} /></p>
-                <div className="mt-4 pt-3 border-t border-white/5">
-                  <div className="flex flex-wrap gap-1">
-                    {deptDistribution.slice(0, 3).map((d) => (
-                      <span key={d.name} className="text-[10px] text-dark-400 bg-dark-700/50 px-1.5 py-0.5 rounded border border-white/5">{d.name}: {d.count}</span>
-                    ))}
-                  </div>
-                </div>
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div className="flex items-start justify-between mb-4"><div className="w-9 h-9 rounded-lg bg-zinc-100 flex items-center justify-center border border-zinc-200"><BookOpen className="w-4.5 h-4.5 text-zinc-500" /></div><div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100"><ArrowUpRight className="w-3 h-3" /><span>8</span></div></div>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Total Courses</p>
+                <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={stats.total} /></p>
+                <div className="mt-4 pt-3 border-t border-zinc-100"><div className="flex flex-wrap gap-1">{deptDistribution.slice(0, 3).map(d => <span key={d.name} className="text-[10px] bg-zinc-100 text-zinc-600 px-1.5 py-0.5 rounded border border-zinc-200 font-bold">{d.name}: {d.count}</span>)}</div></div>
               </div>
-
-              {/* Active Courses */}
-              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center border border-emerald-500/10">
-                    <BookOpen className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
-                  </div>
-                  <ProgressRing percentage={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0} color="#10b981" />
-                </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Active Courses</p>
-                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.active} /></p>
-                <div className="mt-4 pt-3 border-t border-white/5">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                    </span>
-                    <span className="text-xs text-dark-400">Currently taught</span>
-                  </div>
-                </div>
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div className="flex items-start justify-between mb-4"><div className="w-9 h-9 rounded-lg bg-emerald-50 flex items-center justify-center border border-emerald-100"><BookOpen className="w-4.5 h-4.5 text-emerald-600" /></div><ProgressRing percentage={stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0} color="#10b981" /></div>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Active Courses</p>
+                <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={stats.active} /></p>
+                <div className="mt-4 pt-3 border-t border-zinc-100"><div className="flex items-center gap-2"><span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span><span className="text-xs text-zinc-500 font-medium">Currently taught</span></div></div>
               </div>
-
-              {/* Enrolled Students */}
-              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/10">
-                    <Users className="w-4.5 h-4.5 text-blue-400" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex items-center gap-1 text-xs font-medium text-emerald-400">
-                    <ArrowUpRight className="w-3 h-3" />
-                    <span>12%</span>
-                  </div>
-                </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Enrolled</p>
-                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stats.students} /></p>
-                <div className="mt-4 pt-3 border-t border-white/5">
-                  <p className="text-[10px] text-dark-400">Across all courses</p>
-                </div>
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div className="flex items-start justify-between mb-4"><div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center border border-blue-100"><Users className="w-4.5 h-4.5 text-blue-600" /></div><div className="flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100"><ArrowUpRight className="w-3 h-3" /><span>12%</span></div></div>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Total Enrolled</p>
+                <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={stats.students} /></p>
+                <div className="mt-4 pt-3 border-t border-zinc-100"><p className="text-[10px] text-zinc-400 font-medium">Across all courses</p></div>
               </div>
-
-              {/* Avg Rating */}
-              <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-9 h-9 rounded-lg bg-amber-500/10 flex items-center justify-center border border-amber-500/10">
-                    <Star className="w-4.5 h-4.5 text-amber-400" strokeWidth={1.5} />
-                  </div>
-                  <div className="flex items-center gap-0.5">
-                    {[1, 2, 3, 4, 5].map(i => (
-                      <Star key={i} className={`w-3 h-3 transition-colors ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-dark-600'}`} />
-                    ))}
-                  </div>
-                </div>
-                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg. Rating</p>
-                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} suffix="/5" /></p>
-                <div className="mt-4 pt-3 border-t border-white/5">
-                  <div className="relative h-1.5 bg-dark-700 rounded-full overflow-hidden">
-                    <div className="absolute h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full transition-all duration-700" style={{ width: `${((parseFloat(stats.avgRating) || 0) / 5) * 100}%` }} />
-                  </div>
-                </div>
+              <div className="metric-card bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300 shadow-sm">
+                <div className="flex items-start justify-between mb-4"><div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center border border-amber-100"><Star className="w-4.5 h-4.5 text-amber-600" /></div><div className="flex items-center gap-0.5">{[1, 2, 3, 4, 5].map(i => <Star key={i} className={`w-3 h-3 ${i <= Math.round(parseFloat(stats.avgRating) || 0) ? 'text-amber-400 fill-amber-400' : 'text-zinc-300'}`} />)}</div></div>
+                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Avg. Rating</p>
+                <p className="text-2xl font-bold text-zinc-900"><AnimatedNumber value={parseFloat(stats.avgRating) || 0} suffix="/5" /></p>
+                <div className="mt-4 pt-3 border-t border-zinc-100"><div className="relative h-1.5 bg-zinc-100 rounded-full overflow-hidden"><div className="absolute h-full bg-gradient-to-r from-amber-400 to-amber-300 rounded-full" style={{ width: `${((parseFloat(stats.avgRating) || 0) / 5) * 100}%` }} /></div></div>
               </div>
             </>
           )}
         </div>
 
-        {/* Collapsible Premium Filter Panel */}
         <PremiumFilterBar
-          isOpen={filterPanelOpen}
-          onClose={() => setFilterPanelOpen(false)}
-
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          searchPlaceholder="Search by name or code..."
-
-          departments={departments}
-          filterDept={filterDept}
-          setFilterDept={setFilterDept}
-          deptCounts={deptDistribution.reduce((acc, d) => ({ ...acc, [d.name]: d.count }), {})}
-
-          statuses={statuses}
-          filterStatus={filterStatus}
-          setFilterStatus={setFilterStatus}
-
-          viewMode={viewMode}
-          setViewMode={setViewMode}
-          showViewToggle={true}
-
-          onClearFilters={clearFilters}
-          hasActiveFilters={hasActiveFilters}
-
-          filteredCount={filteredCourses.length}
-          totalCount={courses.length}
+          isOpen={filterPanelOpen} onClose={() => setFilterPanelOpen(false)}
+          searchQuery={searchQuery} setSearchQuery={setSearchQuery} searchPlaceholder="Search by name or code..."
+          departments={departments} filterDept={filterDept} setFilterDept={setFilterDept} deptCounts={deptDistribution.reduce((acc, d) => ({ ...acc, [d.name]: d.count }), {})}
+          statuses={statuses} filterStatus={filterStatus} setFilterStatus={setFilterStatus} viewMode={viewMode} setViewMode={setViewMode} showViewToggle={true}
+          onClearFilters={clearFilters} hasActiveFilters={searchQuery || filterDept !== 'all' || filterStatus !== 'all'} filteredCount={filteredCourses.length} totalCount={courses.length}
         />
 
-        {/* Courses Display */}
-        {loading ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {[1, 2, 3, 4, 5, 6].map(i => <SkeletonCourseCard key={i} />)}
-          </div>
-        ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredCourses.length > 0 ? filteredCourses.map((course) => (
-              <div key={course._id} className="course-item group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-br from-violet-600/20 to-violet-600/10 rounded-lg flex items-center justify-center border border-violet-500/20">
-                      <BookOpen className="w-5 h-5 text-violet-300" strokeWidth={1.5} />
+        {loading ? <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">{[1, 2, 3, 4, 5, 6].map(i => <SkeletonCourseCard key={i} />)}</div> :
+          viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredCourses.length > 0 ? filteredCourses.map((course) => (
+                <div key={course._id} className="course-item group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300 shadow-sm">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-violet-50 rounded-lg flex items-center justify-center border border-violet-100"><BookOpen className="w-5 h-5 text-violet-600" /></div>
+                      <div><h3 className="font-bold text-zinc-900 text-sm group-hover:text-violet-600 transition-colors line-clamp-1">{course.name}</h3><p className="text-xs text-zinc-500 font-mono font-medium">{course.code}</p></div>
                     </div>
-                    <div>
-                      <h3 className="font-medium text-white text-sm group-hover:text-violet-400 transition-colors line-clamp-1">{course.name}</h3>
-                      <p className="text-xs text-dark-400 font-mono">{course.code}</p>
+                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100"><MoreHorizontal className="w-4 h-4" /></button>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center border border-zinc-100"><p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5 font-bold">Dept</p><p className="text-xs font-bold text-zinc-600">{typeof course.department === 'object' ? course.department?.code : course.department}</p></div>
+                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center border border-zinc-100"><p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5 font-bold">Credits</p><p className="text-xs font-bold text-zinc-600">{course.credits || 3}</p></div>
+                    <div className="px-2 py-2 bg-zinc-50 rounded-lg text-center border border-zinc-100"><p className="text-[10px] text-zinc-400 uppercase tracking-wide mb-0.5 font-bold">Students</p><p className="text-xs font-bold text-zinc-600">{course.enrolledStudents?.length || course.students || 0}</p></div>
+                  </div>
+                  {course.rating > 0 && (
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-[10px] mb-1"><span className="text-zinc-500 font-medium">Rating</span><div className="flex items-center gap-0.5"><Star className="w-3 h-3 text-amber-400 fill-amber-400" /><span className="font-bold text-zinc-600">{course.rating}</span></div></div>
+                      <div className="h-1 bg-zinc-100 rounded-full overflow-hidden"><div className="h-full bg-amber-400 rounded-full" style={{ width: `${(course.rating / 5) * 100}%` }} /></div>
                     </div>
-                  </div>
-                  <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
-                    <MoreHorizontal className="w-4 h-4" />
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
-                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Dept</p>
-                    <p className="text-xs font-medium text-dark-300">{typeof course.department === 'object' ? course.department?.code : course.department}</p>
-                  </div>
-                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
-                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Credits</p>
-                    <p className="text-xs font-medium text-dark-300">{course.credits || 3}</p>
-                  </div>
-                  <div className="px-2 py-2 bg-dark-700/50 rounded-lg text-center border border-white/5">
-                    <p className="text-[10px] text-dark-500 uppercase tracking-wide mb-0.5">Students</p>
-                    <p className="text-xs font-medium text-dark-300">{course.enrolledStudents?.length || course.students || 0}</p>
-                  </div>
-                </div>
-
-                {course.rating > 0 && (
-                  <div className="mb-4">
-                    <div className="flex items-center justify-between text-[10px] mb-1">
-                      <span className="text-dark-400">Rating</span>
-                      <div className="flex items-center gap-0.5">
-                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                        <span className="font-medium text-dark-300">{course.rating}</span>
-                      </div>
-                    </div>
-                    <div className="h-1 bg-dark-700 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-400 rounded-full transition-all duration-700" style={{ width: `${(course.rating / 5) * 100}%` }} />
+                  )}
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
+                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold border ${course.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : course.status === 'Upcoming' ? 'bg-blue-50 text-blue-600 border-blue-100' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}>
+                      <span className={`w-1.5 h-1.5 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : course.status === 'Upcoming' ? 'bg-blue-500' : 'bg-zinc-400'}`} />{course.status || 'Active'}
+                    </span>
+                    <div className="flex items-center gap-0.5">
+                      <button onClick={() => handleViewClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleEditClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => openMaterialModal(course)} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-md transition-colors"><FileText className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                     </div>
                   </div>
-                )}
-
-                <div className="flex items-center justify-between pt-3 border-t border-white/5">
-                  <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium border border-white/5 ${course.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : course.status === 'Upcoming' ? 'bg-blue-500/10 text-blue-400' : 'bg-dark-700 text-dark-400'}`}>
-                    <span className={`w-1.5 h-1.5 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : course.status === 'Upcoming' ? 'bg-blue-500' : 'bg-dark-500'}`} />
-                    {course.status || 'Active'}
-                  </span>
-                  <div className="flex items-center gap-0.5">
-                    <button onClick={() => handleViewClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => handleEditClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => openMaterialModal(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><FileText className="w-3.5 h-3.5" /></button>
-                    <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                  </div>
                 </div>
-              </div>
-            )) : (
-              <div className="col-span-full text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-medium text-white mb-1">No courses found</h3>
-                <p className="text-xs text-dark-400 mb-4">Try adjusting your filters</p>
-                {hasActiveFilters && (
-                  <button onClick={clearFilters} className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-dark-700 text-dark-300 rounded-lg text-xs font-medium hover:bg-dark-600 transition-colors">
-                    <X className="w-3 h-3" />Clear filters
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
-            <div className="overflow-x-auto">
+              )) : (
+                <div className="col-span-full text-center py-16"><div className="w-16 h-16 mx-auto mb-4 bg-zinc-100 rounded-full flex items-center justify-center text-zinc-400"><BookOpen className="w-7 h-7" /></div><h3 className="text-sm font-bold text-zinc-900">No courses found</h3></div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
               <table className="w-full">
-                <thead className="bg-dark-800/50 border-b border-dark-700">
+                <thead className="bg-zinc-50 border-b border-zinc-200">
                   <tr>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Course</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Department</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Credits</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Rating</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Status</th>
-                    <th className="text-left py-3 px-5 text-xs font-medium text-dark-400 uppercase tracking-wide">Actions</th>
+                    <th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Course</th><th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Department</th><th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Credits</th><th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Rating</th><th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Status</th><th className="text-left py-3 px-5 text-xs font-bold text-zinc-500 uppercase tracking-wide">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-dark-700">
-                  {filteredCourses.map((course) => (
-                    <tr key={course._id} className="course-item group hover:bg-dark-800/30 transition-colors">
-                      <td className="py-3 px-5">
-                        <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 bg-gradient-to-br from-violet-600/20 to-violet-600/10 border border-violet-500/20 rounded-lg flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-violet-300" strokeWidth={1.5} />
-                          </div>
-                          <div>
-                            <p className="text-sm font-medium text-white">{course.name}</p>
-                            <p className="text-xs text-dark-400 font-mono">{course.code}</p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="py-3 px-5"><span className="px-2 py-1 bg-dark-700/50 text-dark-300 border border-white/5 rounded text-xs font-medium">{typeof course.department === 'object' ? course.department?.code : course.department}</span></td>
-                      <td className="py-3 px-5 text-sm text-dark-400">{course.credits || 3}</td>
-                      <td className="py-3 px-5">
-                        <div className="flex items-center gap-1">
-                          <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span className="text-sm font-medium text-dark-300">{course.rating || '—'}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-5">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium border border-white/5 ${course.status === 'Active' ? 'bg-emerald-500/10 text-emerald-400' : 'bg-dark-700 text-dark-400'}`}>
-                          <span className={`w-1 h-1 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : 'bg-dark-500'}`} />
-                          {course.status || 'Active'}
-                        </span>
-                      </td>
-                      <td className="py-3 px-5">
-                        <div className="flex items-center gap-0.5">
-                          <button onClick={() => handleViewClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Eye className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => handleEditClick(course)} className="p-1.5 text-dark-400 hover:text-white hover:bg-white/10 rounded-md transition-colors"><Edit className="w-3.5 h-3.5" /></button>
-                          <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-md transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
-                        </div>
-                      </td>
+                <tbody className="divide-y divide-zinc-200">
+                  {filteredCourses.map(course => (
+                    <tr key={course._id} className="group hover:bg-zinc-50 transition-colors">
+                      <td className="py-3 px-5"><div className="flex items-center gap-3"><div className="w-9 h-9 bg-violet-50 border border-violet-100 rounded-lg flex items-center justify-center"><BookOpen className="w-4 h-4 text-violet-600" /></div><div><p className="text-sm font-bold text-zinc-900">{course.name}</p><p className="text-xs text-zinc-500 font-mono">{course.code}</p></div></div></td>
+                      <td className="py-3 px-5"><span className="px-2 py-1 bg-zinc-100 text-zinc-600 border border-zinc-200 rounded text-xs font-bold">{typeof course.department === 'object' ? course.department?.code : course.department}</span></td>
+                      <td className="py-3 px-5 text-sm font-medium text-zinc-600">{course.credits || 3}</td>
+                      <td className="py-3 px-5"><div className="flex items-center gap-1"><Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" /><span className="text-sm font-bold text-zinc-600">{course.rating || '—'}</span></div></td>
+                      <td className="py-3 px-5"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold border ${course.status === 'Active' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-zinc-100 text-zinc-500 border-zinc-200'}`}><span className={`w-1 h-1 rounded-full ${course.status === 'Active' ? 'bg-emerald-500' : 'bg-zinc-400'}`} />{course.status || 'Active'}</span></td>
+                      <td className="py-3 px-5"><div className="flex items-center gap-0.5">
+                        <button onClick={() => handleViewClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded"><Eye className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleEditClick(course)} className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded"><Edit className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => { setSelectedCourse(course); setShowDeleteModal(true); }} className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div></td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-            {filteredCourses.length === 0 && (
-              <div className="text-center py-16">
-                <div className="w-16 h-16 mx-auto mb-4 bg-dark-700 rounded-full flex items-center justify-center">
-                  <BookOpen className="w-7 h-7 text-dark-400" strokeWidth={1.5} />
-                </div>
-                <h3 className="text-sm font-medium text-white mb-1">No courses found</h3>
-              </div>
-            )}
-            {filteredCourses.length > 0 && (
-              <div className="px-5 py-3 bg-dark-800/30 border-t border-dark-700">
-                <p className="text-xs text-dark-500">Showing <span className="font-medium text-white">{filteredCourses.length}</span> of <span className="font-medium text-white">{courses.length}</span> courses</p>
-              </div>
-            )}
-          </div>
-        )}
+          )}
 
         {/* Add Course Modal */}
         <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Course" size="md">
           <form onSubmit={handleAddCourse} className="space-y-4">
-            {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-            {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
-            <div>
-              <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" placeholder="Enter course name" />
-            </div>
+            {formError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm border border-red-100 flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Code *</label>
-                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all font-mono" placeholder="CS101" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Credits</label>
-                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white transition-all" min="1" max="6" />
-              </div>
+              <div><label className="text-xs font-bold text-zinc-500 uppercase">Code *</label><input type="text" value={formData.code} onChange={e => setFormData({ ...formData, code: e.target.value })} className="w-full mt-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium" /></div>
+              <div><label className="text-xs font-bold text-zinc-500 uppercase">Credits</label><input type="number" value={formData.credits} onChange={e => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full mt-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium" /></div>
             </div>
+            <div><label className="text-xs font-bold text-zinc-500 uppercase">Name *</label><input type="text" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full mt-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium" /></div>
             <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                  {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-800">{d}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Status</label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                  <option className="bg-dark-800">Active</option>
-                  <option className="bg-dark-800">Upcoming</option>
-                  <option className="bg-dark-800">Completed</option>
-                </select>
-              </div>
+              <div><label className="text-xs font-bold text-zinc-500 uppercase">Dept</label><select value={formData.department} onChange={e => setFormData({ ...formData, department: e.target.value })} className="w-full mt-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium">{departments.slice(1).map(d => <option key={d} value={d}>{d}</option>)}</select></div>
+              <div><label className="text-xs font-bold text-zinc-500 uppercase">Status</label><select value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value })} className="w-full mt-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium"><option>Active</option><option>Upcoming</option><option>Completed</option></select></div>
             </div>
-            {(() => {
-              const filteredStaff = staffList.filter(s => {
-                const staffDept = s.department?.code || s.department;
-                return staffDept === formData.department;
-              });
-              return filteredStaff.length > 0 ? (
-                <div>
-                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Instructor <span className="text-dark-500 font-normal">({filteredStaff.length} in {formData.department})</span></label>
-                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                    <option value="" className="bg-dark-800">Select instructor</option>
-                    {filteredStaff.map(s => <option key={s._id} value={s._id} className="bg-dark-800">{s.name}</option>)}
-                  </select>
-                </div>
-              ) : (
-                <div className="p-3 bg-amber-500/10 border border-amber-500/10 rounded-lg">
-                  <p className="text-xs text-amber-400">No staff available in {formData.department} department</p>
-                </div>
-              );
-            })()}
-            <div className="flex gap-2.5 pt-3">
-              <button type="button" onClick={() => setShowAddModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
-              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Add Course</button>
-            </div>
+            <div className="flex gap-2 pt-2"><button type="button" onClick={() => setShowAddModal(false)} className="flex-1 py-2 text-sm font-bold text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50">Cancel</button><button type="submit" className="flex-1 py-2 text-sm font-bold text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 shadow-md">Add Course</button></div>
           </form>
         </Modal>
 
-        {/* Edit Course Modal */}
-        <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Course" size="md">
-          <form onSubmit={handleUpdateCourse} className="space-y-4">
-            {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm flex items-center gap-2"><AlertTriangle className="w-4 h-4" />{formError}</div>}
-            {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm flex items-center gap-2"><CheckCircle className="w-4 h-4" />{formSuccess}</div>}
-            <div>
-              <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Name *</label>
-              <input type="text" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all" />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Course Code *</label>
-                <input type="text" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500 transition-all font-mono" />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Credits</label>
-                <input type="number" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white transition-all" min="1" max="6" />
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
-                <select value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value, instructor: '' })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                  {departments.slice(1).map(d => <option key={d} value={d} className="bg-dark-800">{d}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-dark-400 mb-1.5">Status</label>
-                <select value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                  <option className="bg-dark-800">Active</option>
-                  <option className="bg-dark-800">Upcoming</option>
-                  <option className="bg-dark-800">Completed</option>
-                </select>
-              </div>
-            </div>
-            {(() => {
-              const filteredStaff = staffList.filter(s => {
-                const staffDept = s.department?.code || s.department;
-                return staffDept === formData.department;
-              });
-              return filteredStaff.length > 0 ? (
-                <div>
-                  <label className="block text-xs font-medium text-dark-400 mb-1.5">Instructor <span className="text-dark-500 font-normal">({filteredStaff.length} in {formData.department})</span></label>
-                  <select value={formData.instructor} onChange={(e) => setFormData({ ...formData, instructor: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                    <option value="" className="bg-dark-800">Select instructor</option>
-                    {filteredStaff.map(s => <option key={s._id} value={s._id} className="bg-dark-800">{s.name}</option>)}
-                  </select>
-                </div>
-              ) : (
-                <div className="p-3 bg-amber-500/10 border border-amber-500/10 rounded-lg">
-                  <p className="text-xs text-amber-400">No staff available in {formData.department} department</p>
-                </div>
-              );
-            })()}
-            <div className="flex gap-2.5 pt-3">
-              <button type="button" onClick={() => setShowEditModal(false)} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
-              <button type="submit" className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors">Update Course</button>
-            </div>
-          </form>
-        </Modal>
-
-        {/* View Course Modal */}
+        {/* View Modal */}
         <Modal isOpen={showViewModal} onClose={() => setShowViewModal(false)} title="Course Details" size="md">
           {viewCourse && (
             <div className="space-y-4">
-              <div className="flex items-center gap-3 pb-4 border-b border-white/5">
-                <div className="w-12 h-12 bg-gradient-to-br from-violet-600 to-violet-500 rounded-xl flex items-center justify-center">
-                  <BookOpen className="w-6 h-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-white">{viewCourse.name}</h3>
-                  <p className="text-sm text-dark-400 font-mono">{viewCourse.code}</p>
-                </div>
+              <div className="flex items-center gap-3 pb-4 border-b border-zinc-100">
+                <div className="w-12 h-12 bg-violet-600 rounded-xl flex items-center justify-center shadow-md"><BookOpen className="w-6 h-6 text-white" /></div>
+                <div><h3 className="font-bold text-zinc-900">{viewCourse.name}</h3><p className="text-sm text-zinc-500 font-mono">{viewCourse.code}</p></div>
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
-                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Department</p>
-                  <p className="text-sm font-medium text-dark-300">{typeof viewCourse.department === 'object' ? viewCourse.department?.name : viewCourse.department}</p>
-                </div>
-                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
-                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Credits</p>
-                  <p className="text-sm font-medium text-dark-300">{viewCourse.credits || 3}</p>
-                </div>
-                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
-                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Instructor</p>
-                  <p className="text-sm font-medium text-dark-300">{viewCourse.instructor?.name || 'Not assigned'}</p>
-                </div>
-                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
-                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Status</p>
-                  <p className="text-sm font-medium text-dark-300">{viewCourse.status || 'Active'}</p>
-                </div>
+                <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-lg"><p className="text-xs text-zinc-400 uppercase font-bold mb-1">Department</p><p className="text-sm font-bold text-zinc-700">{typeof viewCourse.department === 'object' ? viewCourse.department?.name : viewCourse.department}</p></div>
+                <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-lg"><p className="text-xs text-zinc-400 uppercase font-bold mb-1">Credits</p><p className="text-sm font-bold text-zinc-700">{viewCourse.credits}</p></div>
+                <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-lg"><p className="text-xs text-zinc-400 uppercase font-bold mb-1">Status</p><p className="text-sm font-bold text-zinc-700">{viewCourse.status}</p></div>
+                {viewCourse.instructor && <div className="p-3 bg-zinc-50 border border-zinc-100 rounded-lg"><p className="text-xs text-zinc-400 uppercase font-bold mb-1">Instructor</p><p className="text-sm font-bold text-zinc-700">{viewCourse.instructor.name}</p></div>}
               </div>
-              {viewCourse.description && (
-                <div className="p-3 bg-dark-700/50 border border-white/5 rounded-lg">
-                  <p className="text-xs text-dark-400 uppercase tracking-wide mb-1">Description</p>
-                  <p className="text-sm text-dark-400">{viewCourse.description}</p>
-                </div>
-              )}
             </div>
           )}
         </Modal>
 
         {/* Delete Modal */}
-        <Modal isOpen={showDeleteModal && selectedCourse} onClose={() => setShowDeleteModal(false)} size="sm">
-          {selectedCourse && (
-            <div className="text-center py-2">
-              <div className="w-14 h-14 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-red-500/10">
-                <AlertTriangle className="w-6 h-6 text-red-500" />
-              </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Delete Course?</h3>
-              <p className="text-sm text-dark-400 mb-6">Are you sure you want to delete <strong className="text-white">{selectedCourse.name}</strong>?</p>
-              <div className="flex gap-2.5">
-                <button onClick={() => { setShowDeleteModal(false); setSelectedCourse(null); }} className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-400 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
-                <button onClick={handleDeleteCourse} className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition-colors">Delete</button>
-              </div>
-            </div>
-          )}
+        <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} size="sm">
+          <div className="text-center">
+            <div className="w-12 h-12 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-3 border border-red-100"><AlertTriangle className="w-6 h-6" /></div>
+            <h3 className="text-lg font-bold text-zinc-900">Delete Course?</h3>
+            <p className="text-sm text-zinc-500 mb-6 font-medium">Are you sure you want to delete <strong className="text-zinc-900">{selectedCourse?.name}</strong>?</p>
+            <div className="flex gap-2"><button onClick={() => setShowDeleteModal(false)} className="flex-1 py-2 text-sm font-bold text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50">Cancel</button><button onClick={handleDeleteCourse} className="flex-1 py-2 text-sm font-bold text-white bg-red-600 rounded-lg hover:bg-red-700 shadow-md">Delete</button></div>
+          </div>
         </Modal>
 
-        {/* Materials Modal */}
+        {/* Material Modal */}
         <Modal isOpen={showMaterialModal} onClose={() => { setShowMaterialModal(false); setSelectedCourse(null); }} title="Course Materials" size="lg">
           {selectedCourse && (
             <div className="space-y-4">
-              <form onSubmit={handleUploadMaterial} className="p-4 bg-dark-700/30 rounded-xl border border-white/5">
-                <div className="flex flex-col sm:flex-row gap-3">
-                  <input type="text" value={materialName} onChange={(e) => setMaterialName(e.target.value)} placeholder="Material name (optional)" className="flex-1 px-3 py-2.5 text-sm bg-dark-900 border border-dark-700 rounded-lg focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 text-white placeholder-dark-500" />
-                  <label className="flex items-center gap-2 px-4 py-2.5 bg-dark-800 border border-dark-700 rounded-lg cursor-pointer hover:bg-dark-700 transition-colors">
-                    <Upload className="w-4 h-4 text-dark-400" />
-                    <span className="text-sm text-dark-300">{materialFile ? materialFile.name : 'Choose file'}</span>
-                    <input type="file" className="hidden" onChange={(e) => setMaterialFile(e.target.files[0])} />
-                  </label>
-                  <button type="submit" disabled={!materialFile || uploadingMaterial} className="px-4 py-2.5 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 disabled:opacity-50 transition-colors">
-                    {uploadingMaterial ? 'Uploading...' : 'Upload'}
-                  </button>
+              <form onSubmit={handleUploadMaterial} className="p-4 bg-zinc-50 rounded-xl border border-zinc-200">
+                <div className="flex gap-3">
+                  <input type="text" value={materialName} onChange={e => setMaterialName(e.target.value)} placeholder="Material Name" className="flex-1 px-3 py-2 bg-white border border-zinc-200 rounded-lg text-sm font-medium" />
+                  <label className="flex items-center gap-2 px-3 py-2 bg-white border border-zinc-200 rounded-lg cursor-pointer hover:bg-zinc-100 text-sm font-bold text-zinc-600"><Upload className="w-4 h-4" />{materialFile ? 'Selected' : 'Choose'}<input type="file" className="hidden" onChange={e => setMaterialFile(e.target.files[0])} /></label>
+                  <button type="submit" disabled={!materialFile || uploadingMaterial} className="px-4 py-2 bg-violet-600 text-white rounded-lg text-sm font-bold hover:bg-violet-700 disabled:opacity-50">{uploadingMaterial ? '...' : 'Upload'}</button>
                 </div>
               </form>
-
-              {formError && <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/10 rounded-lg text-sm">{formError}</div>}
-              {formSuccess && <div className="p-3 bg-emerald-500/10 text-emerald-400 border border-emerald-500/10 rounded-lg text-sm">{formSuccess}</div>}
-
-              <div className="space-y-2">
-                {selectedCourse.materials?.length > 0 ? selectedCourse.materials.map((material) => (
-                  <div key={material._id} className="flex items-center justify-between p-3 bg-dark-800 border border-dark-700 rounded-lg hover:border-dark-600 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 bg-dark-700/50 rounded-lg flex items-center justify-center border border-white/5">
-                        <File className="w-4 h-4 text-dark-400" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">{material.name}</p>
-                        <p className="text-xs text-dark-400">{new Date(material.uploadedAt).toLocaleDateString()}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <button onClick={() => { setSelectedMaterial(material); setShowMindMapModal(true); }} className="p-2 text-dark-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors" title="Generate Mind Map">
-                        <BrainCircuit className="w-4 h-4" />
-                      </button>
-                      <a href={material.url} target="_blank" rel="noopener noreferrer" className="p-2 text-dark-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
-                        <Download className="w-4 h-4" />
-                      </a>
-                      <button onClick={() => handleDeleteMaterial(material._id)} className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </div>
+              <div className="space-y-2 max-h-60 overflow-y-auto">
+                {selectedCourse.materials?.map((m, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 bg-white border border-zinc-200 rounded-lg hover:shadow-sm transition-shadow">
+                    <div className="flex items-center gap-3"><div className="w-8 h-8 bg-violet-50 text-violet-600 rounded flex items-center justify-center"><FileText className="w-4 h-4" /></div><div><p className="text-sm font-bold text-zinc-900">{m.name}</p><p className="text-xs text-zinc-500">{new Date(m.uploadDate).toLocaleDateString()}</p></div></div>
+                    <div className="flex gap-1"><a href={m.url} target="_blank" rel="noopener noreferrer" className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded"><Download className="w-4 h-4" /></a><button onClick={() => handleDeleteMaterial(m._id)} className="p-1.5 text-zinc-400 hover:text-red-500 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button></div>
                   </div>
-                )) : (
-                  <div className="text-center py-8 text-dark-500">
-                    <FileText className="w-12 h-12 mx-auto mb-2 opacity-30" />
-                    <p className="text-sm">No materials uploaded yet</p>
-                  </div>
-                )}
+                ))}
+                {(!selectedCourse.materials || selectedCourse.materials.length === 0) && <p className="text-center text-sm text-zinc-400 py-4 italic">No materials uploaded yet.</p>}
               </div>
             </div>
           )}
         </Modal>
-
-        {/* Mind Map Modal */}
-        <Modal isOpen={showMindMapModal} onClose={() => { setShowMindMapModal(false); setSelectedMaterial(null); }} title="Mind Map Preview" size="xl">
-          {selectedMaterial && <MindMapPreview material={selectedMaterial} />}
-        </Modal>
       </div>
-    </DashboardLayout >
+    </DashboardLayout>
   );
 };
 

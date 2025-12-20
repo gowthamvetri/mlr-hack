@@ -170,26 +170,26 @@ const AdminSubjects = () => {
             header: 'Staff', render: (row) => (
                 <div className="flex items-center gap-1">
                     {row.assignedStaff?.length > 0 ? (
-                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100">
                             <Users className="w-3 h-3" />
                             {row.assignedStaff.length} assigned
                         </span>
                     ) : (
-                        <span className="text-xs text-dark-500">No staff</span>
+                        <span className="text-xs text-zinc-500">No staff</span>
                     )}
                 </div>
             )
         },
         {
             header: 'Type', render: (row) => (
-                <span className={`px-2 py-1 rounded-full text-[10px] font-medium ${row.subjectType === 'HEAVY' ? 'bg-violet-500/10 text-violet-400 border border-violet-500/20' : 'bg-dark-700 text-dark-300 border border-dark-600'}`}>{row.subjectType}</span>
+                <span className={`px-2 py-1 rounded-full text-[10px] font-medium ${row.subjectType === 'HEAVY' ? 'bg-violet-50 text-violet-600 border border-violet-100' : 'bg-zinc-100 text-zinc-600 border border-zinc-200'}`}>{row.subjectType}</span>
             )
         },
         {
             header: 'Actions', render: (row) => (
                 <div className="flex gap-1">
-                    <button onClick={() => handleEdit(row)} className="p-2 text-dark-400 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"><Edit className="w-4 h-4" /></button>
-                    <button onClick={() => handleDelete(row._id)} className="p-2 text-dark-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
+                    <button onClick={() => handleEdit(row)} className="p-2 text-zinc-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Edit className="w-4 h-4" /></button>
+                    <button onClick={() => handleDelete(row._id)} className="p-2 text-zinc-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"><Trash2 className="w-4 h-4" /></button>
                 </div>
             )
         }
@@ -203,8 +203,8 @@ const AdminSubjects = () => {
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-semibold text-white tracking-tight">Semester Subjects</h1>
-                        <p className="text-dark-400 text-sm mt-0.5">Manage subjects, credits, and staff assignments</p>
+                        <h1 className="text-2xl font-semibold text-zinc-900 tracking-tight">Semester Subjects</h1>
+                        <p className="text-zinc-500 text-sm mt-0.5">Manage subjects, credits, and staff assignments</p>
                     </div>
                     <div className="flex gap-2">
                         <FilterTriggerButton
@@ -212,7 +212,7 @@ const AdminSubjects = () => {
                             onClick={() => setFilterPanelOpen(!filterPanelOpen)}
                             activeFiltersCount={(filters.department ? 1 : 0) + (filters.year ? 1 : 0) + (filters.semester ? 1 : 0) + (filters.search ? 1 : 0)}
                         />
-                        <button onClick={() => setShowBulkModal(true)} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 glass-card-dark border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-all">
+                        <button onClick={() => setShowBulkModal(true)} className="inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-all">
                             <Upload className="w-4 h-4" />Bulk Import
                         </button>
                         <button onClick={() => { resetForm(); setShowModal(true); }} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-all shadow-lg shadow-violet-600/20">
@@ -229,16 +229,16 @@ const AdminSubjects = () => {
                         { label: 'Total Credits', value: subjects.reduce((sum, s) => sum + (s.credits || 0), 0), icon: BookOpen, color: 'blue' },
                         { label: 'Departments', value: departments.length, icon: BookOpen, color: 'amber' },
                     ].map((stat, i) => {
-                        const colorMap = { violet: 'bg-violet-500/10 text-violet-400 border-violet-500/20', blue: 'bg-blue-500/10 text-blue-400 border-blue-500/20', emerald: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20', amber: 'bg-amber-500/10 text-amber-400 border-amber-500/20' };
+                        const colorMap = { violet: 'bg-violet-50 text-violet-500 border-violet-100', blue: 'bg-blue-50 text-blue-500 border-blue-100', emerald: 'bg-emerald-50 text-emerald-500 border-emerald-100', amber: 'bg-amber-50 text-amber-500 border-amber-100' };
                         return (
-                            <div key={i} className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all duration-300">
+                            <div key={i} className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all duration-300">
                                 <div className="flex items-start justify-between mb-3">
-                                    <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center border ${colorMap[stat.color].split(' ')[2]}`}>
+                                    <div className={`w-9 h-9 rounded-lg ${colorMap[stat.color].split(' ')[0]} flex items-center justify-center border ${colorMap[stat.color].split(' ')[2] || 'border-transparent'}`}>
                                         <stat.icon className={`w-4.5 h-4.5 ${colorMap[stat.color].split(' ')[1]}`} strokeWidth={1.5} />
                                     </div>
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">{stat.label}</p>
-                                <p className="text-2xl font-semibold text-white"><AnimatedNumber value={stat.value} /></p>
+                                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-1">{stat.label}</p>
+                                <p className="text-2xl font-semibold text-zinc-900"><AnimatedNumber value={stat.value} /></p>
                             </div>
                         );
                     })}
@@ -275,70 +275,70 @@ const AdminSubjects = () => {
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Code</label>
-                                <input type="text" required value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} placeholder="CS101" className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-dark-500" />
+                                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Code</label>
+                                <input type="text" required value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })} placeholder="CS101" className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-zinc-400" />
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Credits</label>
-                                <input type="number" required min="1" max="6" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50" />
+                                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Credits</label>
+                                <input type="number" required min="1" max="6" value={formData.credits} onChange={(e) => setFormData({ ...formData, credits: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50" />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Name</label>
-                            <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Introduction to Programming" className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-dark-500" />
+                            <label className="block text-xs font-medium text-zinc-500 mb-1.5">Name</label>
+                            <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} placeholder="Introduction to Programming" className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-zinc-400" />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
-                            <input type="text" required value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value.toUpperCase() })} placeholder="CSE" className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-dark-500" />
+                            <label className="block text-xs font-medium text-zinc-500 mb-1.5">Department</label>
+                            <input type="text" required value={formData.department} onChange={(e) => setFormData({ ...formData, department: e.target.value.toUpperCase() })} placeholder="CSE" className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50 placeholder-zinc-400" />
                         </div>
                         <div className="grid grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Year</label>
-                                <select value={formData.year} onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                                    {[1, 2, 3, 4].map(y => <option key={y} value={y} className="bg-dark-900">Year {y}</option>)}
+                                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Year</label>
+                                <select value={formData.year} onChange={(e) => setFormData({ ...formData, year: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                                    {[1, 2, 3, 4].map(y => <option key={y} value={y} className="bg-white">Year {y}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Semester</label>
-                                <select value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                                    {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s} className="bg-dark-900">Sem {s}</option>)}
+                                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Semester</label>
+                                <select value={formData.semester} onChange={(e) => setFormData({ ...formData, semester: parseInt(e.target.value) })} className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                                    {[1, 2, 3, 4, 5, 6, 7, 8].map(s => <option key={s} value={s} className="bg-white">Sem {s}</option>)}
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Type</label>
-                                <select value={formData.subjectType} onChange={(e) => setFormData({ ...formData, subjectType: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
-                                    <option value="HEAVY" className="bg-dark-900">HEAVY</option>
-                                    <option value="NONMAJOR" className="bg-dark-900">NONMAJOR</option>
+                                <label className="block text-xs font-medium text-zinc-500 mb-1.5">Type</label>
+                                <select value={formData.subjectType} onChange={(e) => setFormData({ ...formData, subjectType: e.target.value })} className="w-full px-3 py-2.5 text-sm bg-white border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500/50">
+                                    <option value="HEAVY" className="bg-white">HEAVY</option>
+                                    <option value="NONMAJOR" className="bg-white">NONMAJOR</option>
                                 </select>
                             </div>
                         </div>
 
                         {/* Staff Assignment Section */}
-                        <div className="border-t border-dark-700 pt-4">
-                            <label className="flex items-center gap-2 text-xs font-medium text-dark-400 mb-2">
+                        <div className="border-t border-zinc-200 pt-4">
+                            <label className="flex items-center gap-2 text-xs font-medium text-zinc-500 mb-2">
                                 <UserPlus className="w-4 h-4" />
-                                Assign Staff {formData.assignedStaff?.length > 0 && <span className="text-violet-400">({formData.assignedStaff.length} selected)</span>}
+                                Assign Staff {formData.assignedStaff?.length > 0 && <span className="text-violet-600">({formData.assignedStaff.length} selected)</span>}
                             </label>
-                            <div className="max-h-40 overflow-y-auto border border-dark-700 rounded-lg p-2 bg-dark-800">
+                            <div className="max-h-40 overflow-y-auto border border-zinc-200 rounded-lg p-2 bg-zinc-50">
                                 {staffList.length === 0 ? (
-                                    <p className="text-xs text-dark-500 text-center py-4">
+                                    <p className="text-xs text-zinc-500 text-center py-4">
                                         {formData.department ? 'No staff found in this department' : 'Enter department to see available staff'}
                                     </p>
                                 ) : (
                                     <div className="space-y-1">
                                         {staffList.map(staff => (
-                                            <label key={staff._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-dark-700 cursor-pointer transition-colors">
+                                            <label key={staff._id} className="flex items-center gap-2 p-2 rounded-lg hover:bg-white cursor-pointer transition-colors border border-transparent hover:border-zinc-100 shadow-sm hover:shadow-md">
                                                 <input
                                                     type="checkbox"
                                                     checked={formData.assignedStaff?.includes(staff._id) || false}
                                                     onChange={() => toggleStaffSelection(staff._id)}
-                                                    className="w-4 h-4 rounded border-dark-600 bg-dark-900 text-violet-600 focus:ring-violet-500"
+                                                    className="w-4 h-4 rounded border-zinc-300 bg-white text-violet-600 focus:ring-violet-500"
                                                 />
                                                 <div className="flex-1 min-w-0">
-                                                    <p className="text-sm font-medium text-white truncate">{staff.name}</p>
-                                                    <p className="text-xs text-dark-400 truncate">{staff.email}</p>
+                                                    <p className="text-sm font-medium text-zinc-900 truncate">{staff.name}</p>
+                                                    <p className="text-xs text-zinc-500 truncate">{staff.email}</p>
                                                 </div>
-                                                <span className="text-[10px] text-dark-400 bg-dark-700 px-1.5 py-0.5 rounded">{staff.department}</span>
+                                                <span className="text-[10px] text-zinc-500 bg-zinc-200/50 px-1.5 py-0.5 rounded">{staff.department}</span>
                                             </label>
                                         ))}
                                     </div>
@@ -347,7 +347,7 @@ const AdminSubjects = () => {
                         </div>
 
                         <div className="flex justify-end gap-2 pt-4">
-                            <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-dark-300 border border-dark-600 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Cancel</button>
+                            <button type="button" onClick={() => setShowModal(false)} className="px-4 py-2 text-sm text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Cancel</button>
                             <button type="submit" className="px-4 py-2 text-sm text-white bg-violet-600 rounded-lg hover:bg-violet-700 transition-colors shadow-lg shadow-violet-600/20">{editingSubject ? 'Update' : 'Create'}</button>
                         </div>
                     </form>
@@ -357,21 +357,21 @@ const AdminSubjects = () => {
                 <Modal isOpen={showBulkModal} onClose={() => { setShowBulkModal(false); setBulkResult(null); }} title="Bulk Import">
                     <div className="space-y-4">
                         <div className="flex items-center justify-between">
-                            <p className="text-xs text-dark-400">Import using JSON format</p>
-                            <button onClick={downloadTemplate} className="flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300">
+                            <p className="text-xs text-zinc-500">Import using JSON format</p>
+                            <button onClick={downloadTemplate} className="flex items-center gap-1 text-xs text-violet-600 hover:text-violet-700">
                                 <Download className="w-3 h-3" />Template
                             </button>
                         </div>
-                        <textarea value={bulkData} onChange={(e) => setBulkData(e.target.value)} placeholder='[{"code": "CS101", ...}]' rows={8} className="w-full px-3 py-3 text-sm font-mono bg-dark-900 border border-dark-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-violet-500/20 placeholder-dark-500" />
+                        <textarea value={bulkData} onChange={(e) => setBulkData(e.target.value)} placeholder='[{"code": "CS101", ...}]' rows={8} className="w-full px-3 py-3 text-sm font-mono bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:outline-none focus:ring-2 focus:ring-violet-500/20 placeholder-zinc-400" />
                         {bulkResult && (
-                            <div className="p-4 bg-dark-800 rounded-lg border border-dark-700 space-y-2">
-                                <p className="font-medium text-white text-sm">{bulkResult.message}</p>
-                                {bulkResult.results?.success?.length > 0 && <div className="flex items-center gap-2 text-xs text-emerald-400"><CheckCircle className="w-3 h-3" />{bulkResult.results.success.length} imported</div>}
-                                {bulkResult.results?.failed?.length > 0 && <div className="flex items-center gap-2 text-xs text-red-400"><XCircle className="w-3 h-3" />{bulkResult.results.failed.length} failed</div>}
+                            <div className="p-4 bg-zinc-50 rounded-lg border border-zinc-200 space-y-2">
+                                <p className="font-medium text-zinc-900 text-sm">{bulkResult.message}</p>
+                                {bulkResult.results?.success?.length > 0 && <div className="flex items-center gap-2 text-xs text-emerald-600"><CheckCircle className="w-3 h-3" />{bulkResult.results.success.length} imported</div>}
+                                {bulkResult.results?.failed?.length > 0 && <div className="flex items-center gap-2 text-xs text-red-600"><XCircle className="w-3 h-3" />{bulkResult.results.failed.length} failed</div>}
                             </div>
                         )}
                         <div className="flex justify-end gap-2">
-                            <button onClick={() => { setShowBulkModal(false); setBulkResult(null); }} className="px-4 py-2 text-sm text-dark-300 border border-dark-600 rounded-lg hover:bg-dark-700 hover:text-white transition-colors">Close</button>
+                            <button onClick={() => { setShowBulkModal(false); setBulkResult(null); }} className="px-4 py-2 text-sm text-zinc-600 border border-zinc-200 rounded-lg hover:bg-zinc-50 transition-colors">Close</button>
                             <button onClick={handleBulkImport} disabled={!bulkData.trim()} className="px-4 py-2 text-sm text-white bg-violet-600 rounded-lg hover:bg-violet-700 disabled:opacity-50 transition-colors shadow-lg shadow-violet-600/20">Import</button>
                         </div>
                     </div>

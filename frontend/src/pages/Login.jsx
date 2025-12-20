@@ -100,19 +100,13 @@ const Login = () => {
     }
   };
 
-  const roleCards = [
-    { icon: GraduationCap, label: 'Student', color: 'from-primary-500 to-primary-600' },
-    { icon: Shield, label: 'Admin', color: 'from-accent-500 to-accent-600' },
-    { icon: Users, label: 'Staff', color: 'from-success-500 to-success-600' },
-  ];
-
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-primary-900/40 via-dark-900 to-accent-900/40 flex items-center justify-center p-4 overflow-hidden relative selection:bg-primary-500/30">
+    <div ref={containerRef} className="min-h-screen bg-zinc-50 flex items-center justify-center p-4 overflow-hidden relative selection:bg-violet-100">
       {/* Background Decorations */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="bg-blob absolute top-20 left-10 w-96 h-96 bg-primary-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse-glow"></div>
-        <div className="bg-blob absolute top-40 right-10 w-96 h-96 bg-accent-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-40 animate-pulse-glow delay-1000"></div>
-        <div className="bg-blob absolute -bottom-32 left-1/2 w-96 h-96 bg-success-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-30"></div>
+        <div className="bg-blob absolute top-20 left-10 w-96 h-96 bg-violet-200/40 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-pulse-glow"></div>
+        <div className="bg-blob absolute top-40 right-10 w-96 h-96 bg-blue-200/40 rounded-full mix-blend-multiply filter blur-[100px] opacity-70 animate-pulse-glow delay-1000"></div>
+        <div className="bg-blob absolute -bottom-32 left-1/2 w-96 h-96 bg-emerald-200/40 rounded-full mix-blend-multiply filter blur-[100px] opacity-60"></div>
       </div>
 
       <div className="relative w-full max-w-6xl grid lg:grid-cols-2 gap-8 items-center z-10">
@@ -123,36 +117,36 @@ const Login = () => {
               <img
                 src="/mlrit-logo.png"
                 alt="MLRIT Logo"
-                className="h-16 w-auto object-contain drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
+                className="h-16 w-auto object-contain"
               />
             </div>
           </div>
 
           <div className="space-y-4">
-            <h2 className="text-4xl font-bold text-white tracking-tight">
-              Welcome <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-accent-400">Back!</span>
+            <h2 className="text-4xl font-bold text-zinc-900 tracking-tight">
+              Welcome <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-blue-600">Back!</span>
             </h2>
-            <p className="text-dark-300 text-lg leading-relaxed max-w-md">
+            <p className="text-zinc-600 text-lg leading-relaxed max-w-md">
               Sign in to access your personalized portal, track your academic progress, and manage your campus life.
             </p>
           </div>
 
           <div className="space-y-4 pt-4">
-            <div className="flex items-center gap-4 text-dark-200">
-              <div className="w-10 h-10 bg-success-500/10 border border-success-500/20 rounded-xl flex items-center justify-center shadow-lg shadow-success-500/10">
-                <Shield className="w-5 h-5 text-success-400" />
+            <div className="flex items-center gap-4 text-zinc-700">
+              <div className="w-10 h-10 bg-emerald-50 border border-emerald-100 rounded-xl flex items-center justify-center shadow-sm">
+                <Shield className="w-5 h-5 text-emerald-600" />
               </div>
               <span className="font-medium">Secure & encrypted login</span>
             </div>
-            <div className="flex items-center gap-4 text-dark-200">
-              <div className="w-10 h-10 bg-primary-500/10 border border-primary-500/20 rounded-xl flex items-center justify-center shadow-lg shadow-primary-500/10">
-                <Users className="w-5 h-5 text-primary-400" />
+            <div className="flex items-center gap-4 text-zinc-700">
+              <div className="w-10 h-10 bg-violet-50 border border-violet-100 rounded-xl flex items-center justify-center shadow-sm">
+                <Users className="w-5 h-5 text-violet-600" />
               </div>
               <span className="font-medium">Unified academic portal</span>
             </div>
-            <div className="flex items-center gap-4 text-dark-200">
-              <div className="w-10 h-10 bg-accent-500/10 border border-accent-500/20 rounded-xl flex items-center justify-center shadow-lg shadow-accent-500/10">
-                <GraduationCap className="w-5 h-5 text-accent-400" />
+            <div className="flex items-center gap-4 text-zinc-700">
+              <div className="w-10 h-10 bg-blue-50 border border-blue-100 rounded-xl flex items-center justify-center shadow-sm">
+                <GraduationCap className="w-5 h-5 text-blue-600" />
               </div>
               <span className="font-medium">Real-time updates & notifications</span>
             </div>
@@ -161,38 +155,38 @@ const Login = () => {
 
         {/* Right Side - Login Form */}
         <div ref={formRef} className="w-full max-w-md mx-auto lg:mx-0">
-          <div className="glass-card-dark rounded-3xl shadow-2xl p-8 lg:p-10 relative overflow-hidden group hover:border-dark-600/50 transition-all duration-500">
+          <div className="bg-white rounded-3xl shadow-xl border border-zinc-200 p-8 lg:p-10 relative overflow-hidden group hover:border-zinc-300 transition-all duration-500">
 
             {/* Top accent line */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary-500 via-accent-500 to-primary-500 opacity-50"></div>
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-blue-500 to-violet-500 opacity-80"></div>
 
             <div className="mb-8">
-              <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Sign In</h2>
-              <p className="text-dark-400">Enter your credentials to access your account</p>
+              <h2 className="text-3xl font-bold text-zinc-900 mb-2 tracking-tight">Sign In</h2>
+              <p className="text-zinc-500">Enter your credentials to access your account</p>
             </div>
 
             {error && (
-              <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3 animate-slide-in">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl flex items-start gap-3 animate-slide-in">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-medium text-red-400">Login Failed</p>
-                  <p className="text-xs text-red-300/80 mt-0.5">{error}</p>
+                  <p className="text-sm font-medium text-red-700">Login Failed</p>
+                  <p className="text-xs text-red-600/80 mt-0.5">{error}</p>
                 </div>
               </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-dark-400 mb-2 ml-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2 ml-1">
                   Email Address
                 </label>
                 <div className="relative group/input">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Mail className="w-5 h-5 text-dark-500 group-focus-within/input:text-primary-400 transition-colors" />
+                    <Mail className="w-5 h-5 text-zinc-400 group-focus-within/input:text-violet-600 transition-colors" />
                   </div>
                   <input
                     type="email"
-                    className="w-full pl-12 pr-4 py-3.5 bg-dark-900/50 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all text-white placeholder-dark-600 hover:border-dark-600"
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -202,16 +196,16 @@ const Login = () => {
               </div>
 
               <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-dark-400 mb-2 ml-1">
+                <label className="block text-xs font-bold uppercase tracking-wider text-zinc-500 mb-2 ml-1">
                   Password
                 </label>
                 <div className="relative group/input">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <Lock className="w-5 h-5 text-dark-500 group-focus-within/input:text-primary-400 transition-colors" />
+                    <Lock className="w-5 h-5 text-zinc-400 group-focus-within/input:text-violet-600 transition-colors" />
                   </div>
                   <input
                     type="password"
-                    className="w-full pl-12 pr-4 py-3.5 bg-dark-900/50 border border-dark-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:border-primary-500/50 transition-all text-white placeholder-dark-600 hover:border-dark-600"
+                    className="w-full pl-12 pr-4 py-3.5 bg-zinc-50 border border-zinc-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500 transition-all text-zinc-900 placeholder-zinc-400 hover:border-zinc-300"
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -222,10 +216,10 @@ const Login = () => {
 
               <div className="flex items-center justify-between">
                 <label className="flex items-center cursor-pointer group">
-                  <input type="checkbox" className="w-4 h-4 text-primary-600 border-dark-600 rounded bg-dark-800 focus:ring-primary-500 focus:ring-offset-dark-900" />
-                  <span className="ml-2 text-sm text-dark-400 group-hover:text-dark-300 transition-colors">Remember me</span>
+                  <input type="checkbox" className="w-4 h-4 text-violet-600 border-zinc-300 rounded bg-white focus:ring-violet-500" />
+                  <span className="ml-2 text-sm text-zinc-500 group-hover:text-zinc-700 transition-colors">Remember me</span>
                 </label>
-                <a href="#" className="text-sm font-medium text-primary-400 hover:text-primary-300 transition-colors">
+                <a href="#" className="text-sm font-medium text-violet-600 hover:text-violet-700 transition-colors">
                   Forgot password?
                 </a>
               </div>
@@ -233,7 +227,7 @@ const Login = () => {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-gradient-to-r from-primary-600 to-accent-600 text-white font-bold py-3.5 px-6 rounded-xl hover:from-primary-500 hover:to-accent-500 focus:outline-none focus:ring-2 focus:ring-primary-500/50 focus:ring-offset-2 focus:ring-offset-dark-900 transition-all shadow-lg shadow-primary-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:shadow-primary-500/20 hover:-translate-y-0.5"
+                className="w-full bg-zinc-900 text-white font-bold py-3.5 px-6 rounded-xl hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-200 disabled:opacity-70 disabled:cursor-not-allowed flex items-center justify-center gap-2 hover:shadow-xl hover:-translate-y-0.5"
               >
                 {loading ? (
                   <>
@@ -249,12 +243,12 @@ const Login = () => {
               </button>
             </form>
 
-            <div className="mt-8 pt-6 border-t border-dark-700/50 text-center">
+            <div className="mt-8 pt-6 border-t border-zinc-100 text-center">
               <Link
                 to="/"
-                className="inline-flex items-center justify-center gap-2 text-sm text-dark-400 hover:text-white transition-colors group"
+                className="inline-flex items-center justify-center gap-2 text-sm text-zinc-500 hover:text-zinc-900 transition-colors group"
               >
-                <Building className="w-4 h-4 group-hover:text-primary-400 transition-colors" />
+                <Building className="w-4 h-4 group-hover:text-violet-600 transition-colors" />
                 Back to Home
               </Link>
             </div>

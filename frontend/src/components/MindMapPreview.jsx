@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { Transformer } from 'markmap-lib';
 import { Markmap } from 'markmap-view';
 import { Loader2, Save, RefreshCw, X, Edit, Download } from 'lucide-react';
@@ -72,7 +73,7 @@ const MindMapPreview = ({ courseId, materialId, onClose, onSave, readOnly = fals
         }
     };
 
-    return (
+    return createPortal(
         <div className="fixed inset-0 bg-black/50 z-[60] flex items-center justify-center p-4 backdrop-blur-sm">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col">
                 <div className="flex justify-between items-center p-4 border-b border-gray-100">
@@ -134,6 +135,7 @@ const MindMapPreview = ({ courseId, materialId, onClose, onSave, readOnly = fals
                                     .markmap-node foreignObject div,
                                     .markmap-node foreignObject * {
                                         color: #ffffff !important;
+                                        font-weight: 500 !important;
                                     }
                                     svg text {
                                         fill: #ffffff !important;
@@ -155,7 +157,8 @@ const MindMapPreview = ({ courseId, materialId, onClose, onSave, readOnly = fals
                     Use # for headings, - for lists to structure your mind map.
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 };
 

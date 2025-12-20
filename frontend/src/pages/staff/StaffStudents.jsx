@@ -62,7 +62,7 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
                     className="transition-all duration-700 ease-out" />
             </svg>
             <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-[10px] font-semibold text-zinc-600">{percentage}%</span>
+                <span className="text-[10px] font-bold text-zinc-600">{percentage}%</span>
             </div>
         </div>
     );
@@ -70,33 +70,33 @@ const ProgressRing = ({ percentage, size = 40, strokeWidth = 3, color = '#8b5cf6
 
 // Skeleton components
 const SkeletonCard = () => (
-    <div className="rounded-xl p-5 bg-dark-800 border border-dark-700">
+    <div className="rounded-xl p-5 bg-white border border-zinc-200 shadow-sm">
         <div className="animate-pulse">
             <div className="flex items-start justify-between mb-6">
-                <div className="w-9 h-9 bg-dark-700 rounded-lg" />
-                <div className="w-16 h-5 bg-dark-700 rounded-full" />
+                <div className="w-9 h-9 bg-zinc-100 rounded-lg" />
+                <div className="w-16 h-5 bg-zinc-100 rounded-full" />
             </div>
             <div className="space-y-2">
-                <div className="h-3 w-20 bg-dark-700 rounded" />
-                <div className="h-8 w-14 bg-dark-700 rounded" />
+                <div className="h-3 w-20 bg-zinc-100 rounded" />
+                <div className="h-8 w-14 bg-zinc-100 rounded" />
             </div>
         </div>
     </div>
 );
 
 const SkeletonStudentCard = () => (
-    <div className="rounded-xl p-5 bg-dark-800 border border-dark-700">
+    <div className="rounded-xl p-5 bg-white border border-zinc-200 shadow-sm">
         <div className="animate-pulse">
             <div className="flex items-center gap-3 mb-4">
-                <div className="w-11 h-11 bg-dark-700 rounded-full" />
+                <div className="w-11 h-11 bg-zinc-100 rounded-full" />
                 <div className="space-y-2 flex-1">
-                    <div className="h-4 w-28 bg-dark-700 rounded" />
-                    <div className="h-3 w-36 bg-dark-700 rounded" />
+                    <div className="h-4 w-28 bg-zinc-100 rounded" />
+                    <div className="h-3 w-36 bg-zinc-100 rounded" />
                 </div>
             </div>
             <div className="space-y-2">
-                <div className="h-3 w-full bg-dark-700 rounded" />
-                <div className="h-3 w-2/3 bg-dark-700 rounded" />
+                <div className="h-3 w-full bg-zinc-100 rounded" />
+                <div className="h-3 w-2/3 bg-zinc-100 rounded" />
             </div>
         </div>
     </div>
@@ -346,41 +346,41 @@ const StaffStudents = () => {
 
     return (
         <DashboardLayout role="staff" userName={user?.name}>
-            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto text-white">
+            <div ref={pageRef} className="space-y-6 max-w-[1400px] mx-auto text-zinc-900">
 
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
-                        <h1 className="text-2xl font-bold text-white tracking-tight">Department Students</h1>
-                        <p className="text-dark-400 text-sm mt-0.5">
-                            Managing students in <span className="font-medium text-primary-400">{user?.department || 'your department'}</span>
+                        <h1 className="text-2xl font-bold text-zinc-900 tracking-tight">Department Students</h1>
+                        <p className="text-zinc-500 text-sm mt-0.5">
+                            Managing students in <span className="font-bold text-zinc-900">{user?.department || 'your department'}</span>
                         </p>
                     </div>
                     <div className="flex items-center gap-2.5">
                         <button
                             onClick={() => setShowAddModal(true)}
-                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-500 shadow-lg shadow-primary-500/20 transition-all"
+                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 shadow-md transition-all"
                         >
                             <UserPlus className="w-4 h-4" />
                             <span className="hidden sm:inline">Add Student</span>
                         </button>
                         <button
                             onClick={() => setShowBulkModal(true)}
-                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 transition-all hover:text-white"
+                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-sm"
                         >
                             <Upload className="w-4 h-4" />
                             <span className="hidden sm:inline">Bulk Import</span>
                         </button>
                         <button
                             onClick={fetchStudents}
-                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 transition-all hover:text-white"
+                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-sm"
                         >
                             <RefreshCw className="w-4 h-4" />
                             <span className="hidden sm:inline">Refresh</span>
                         </button>
                         <button
                             onClick={handleExport}
-                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-medium text-dark-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 transition-all hover:text-white"
+                            className="flex items-center gap-2 px-3.5 py-2 text-sm font-bold text-zinc-600 bg-white border border-zinc-200 rounded-lg hover:bg-zinc-50 hover:text-zinc-900 transition-all shadow-sm"
                         >
                             <Download className="w-4 h-4" />
                             <span className="hidden sm:inline">Export</span>
@@ -395,26 +395,26 @@ const StaffStudents = () => {
                     ) : (
                         <>
                             {/* Total Students */}
-                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
+                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md transition-all">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                                        <Users className="w-4.5 h-4.5 text-violet-400" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                                        <Users className="w-4.5 h-4.5 text-violet-600" strokeWidth={2} />
                                     </div>
-                                    <span className="text-[10px] font-medium text-violet-400 bg-violet-500/10 border border-violet-500/20 px-2 py-0.5 rounded">
+                                    <span className="text-[10px] font-bold text-violet-600 bg-violet-50 border border-violet-100 px-2 py-0.5 rounded">
                                         {user?.department}
                                     </span>
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Total Students</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Total Students</p>
+                                <p className="text-2xl font-bold text-zinc-900">
                                     <AnimatedNumber value={stats.total} />
                                 </p>
                                 {/* Mini bar chart */}
-                                <div className="mt-4 pt-3 border-t border-dark-700">
+                                <div className="mt-4 pt-3 border-t border-zinc-100">
                                     <div className="flex items-end gap-1 h-8">
                                         {yearDistribution.map((y) => (
                                             <div
                                                 key={y.year}
-                                                className="flex-1 bg-violet-500/30 rounded-sm transition-all duration-500 hover:bg-violet-500"
+                                                className="flex-1 bg-violet-100 rounded-sm transition-all duration-500 hover:bg-violet-500"
                                                 style={{ height: `${(y.count / maxYearCount) * 100}%`, minHeight: '4px' }}
                                                 title={`Year ${y.year}: ${y.count}`}
                                             />
@@ -422,83 +422,83 @@ const StaffStudents = () => {
                                     </div>
                                     <div className="flex justify-between mt-1.5">
                                         {yearDistribution.map((y) => (
-                                            <span key={y.year} className="text-[9px] text-dark-500 flex-1 text-center">Y{y.year}</span>
+                                            <span key={y.year} className="text-[9px] text-zinc-500 font-bold flex-1 text-center">Y{y.year}</span>
                                         ))}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Approved Students */}
-                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
+                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md transition-all">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
-                                        <GraduationCap className="w-4.5 h-4.5 text-emerald-400" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-emerald-50 border border-emerald-100 flex items-center justify-center">
+                                        <GraduationCap className="w-4.5 h-4.5 text-emerald-600" strokeWidth={2} />
                                     </div>
                                     <ProgressRing percentage={stats.total > 0 ? Math.round((stats.approved / stats.total) * 100) : 0} color="#10b981" />
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Approved</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Approved</p>
+                                <p className="text-2xl font-bold text-zinc-900">
                                     <AnimatedNumber value={stats.approved} />
                                 </p>
-                                <div className="mt-4 pt-3 border-t border-dark-700">
+                                <div className="mt-4 pt-3 border-t border-zinc-100">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs text-dark-400">Enrolled students</span>
+                                        <span className="text-xs text-zinc-500 font-medium">Enrolled students</span>
                                         {stats.pending > 0 && (
-                                            <span className="text-[10px] font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">{stats.pending} pending</span>
+                                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded">{stats.pending} pending</span>
                                         )}
                                     </div>
                                 </div>
                             </div>
 
                             {/* Avg Attendance */}
-                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
+                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md transition-all">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
-                                        <Target className="w-4.5 h-4.5 text-blue-400" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center">
+                                        <Target className="w-4.5 h-4.5 text-blue-600" strokeWidth={2} />
                                     </div>
                                     {stats.lowAttendance > 0 && (
-                                        <span className="text-[10px] font-medium text-red-400 bg-red-500/10 border border-red-500/20 px-2 py-0.5 rounded">{stats.lowAttendance} low</span>
+                                        <span className="text-[10px] font-bold text-red-600 bg-red-50 border border-red-100 px-2 py-0.5 rounded">{stats.lowAttendance} low</span>
                                     )}
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Avg. Attendance</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Avg. Attendance</p>
+                                <p className="text-2xl font-bold text-zinc-900">
                                     <AnimatedNumber value={stats.avgAttendance} suffix="%" />
                                 </p>
-                                <div className="mt-4 pt-3 border-t border-dark-700">
-                                    <div className="relative h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                                <div className="mt-4 pt-3 border-t border-zinc-100">
+                                    <div className="relative h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                                         <div
                                             className={`absolute h-full rounded-full transition-all duration-700 ${stats.avgAttendance >= 75 ? 'bg-emerald-500' : 'bg-amber-500'}`}
                                             style={{ width: `${stats.avgAttendance}%` }}
                                         />
-                                        <div className="absolute top-0 bottom-0 w-0.5 bg-dark-500" style={{ left: '75%' }} />
+                                        <div className="absolute top-0 bottom-0 w-0.5 bg-zinc-300" style={{ left: '75%' }} />
                                     </div>
                                     <div className="flex justify-between mt-1.5 text-[10px]">
-                                        <span className="text-dark-500">0%</span>
-                                        <span className={`font-medium ${stats.avgAttendance >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <span className="text-zinc-400 font-bold">0%</span>
+                                        <span className={`font-bold ${stats.avgAttendance >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                             {stats.avgAttendance >= 75 ? '✓ Above 75%' : '↑ Below 75%'}
                                         </span>
-                                        <span className="text-dark-500">100%</span>
+                                        <span className="text-zinc-400 font-bold">100%</span>
                                     </div>
                                 </div>
                             </div>
 
                             {/* Fees Paid */}
-                            <div className="metric-card group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all">
+                            <div className="metric-card group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 shadow-sm hover:shadow-md transition-all">
                                 <div className="flex items-start justify-between mb-4">
-                                    <div className="w-9 h-9 rounded-lg bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
-                                        <CheckCircle className="w-4.5 h-4.5 text-violet-400" strokeWidth={1.5} />
+                                    <div className="w-9 h-9 rounded-lg bg-violet-50 border border-violet-100 flex items-center justify-center">
+                                        <CheckCircle className="w-4.5 h-4.5 text-violet-600" strokeWidth={2} />
                                     </div>
                                     <ProgressRing percentage={stats.total > 0 ? Math.round((stats.feesPaid / stats.total) * 100) : 0} color="#8b5cf6" />
                                 </div>
-                                <p className="text-xs font-medium text-dark-400 uppercase tracking-wide mb-1">Fees Cleared</p>
-                                <p className="text-2xl font-bold text-white">
+                                <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-1">Fees Cleared</p>
+                                <p className="text-2xl font-bold text-zinc-900">
                                     <AnimatedNumber value={stats.feesPaid} />
                                 </p>
-                                <div className="mt-4 pt-3 border-t border-dark-700">
+                                <div className="mt-4 pt-3 border-t border-zinc-100">
                                     <div className="flex items-center justify-between">
-                                        <span className="text-xs text-dark-400">Financial clearance</span>
+                                        <span className="text-xs text-zinc-500 font-medium">Financial clearance</span>
                                         {stats.total - stats.feesPaid > 0 && (
-                                            <span className="text-[10px] font-medium text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded">
+                                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-100 px-1.5 py-0.5 rounded">
                                                 {stats.total - stats.feesPaid} pending
                                             </span>
                                         )}
@@ -510,17 +510,17 @@ const StaffStudents = () => {
                 </div>
 
                 {/* Filters */}
-                <div className="glass-card-dark rounded-xl border border-dark-700 p-4">
+                <div className="bg-white rounded-xl border border-zinc-200 p-4 shadow-sm">
                     <div className="flex flex-wrap items-center gap-3">
                         {/* Search */}
                         <div className="relative flex-1 min-w-[200px]">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-400" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
                             <input
                                 type="text"
                                 placeholder="Search by name, email, roll number..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
-                                className="w-full pl-10 pr-4 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50"
+                                className="w-full pl-10 pr-4 py-2.5 text-sm bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 placeholder-zinc-400 focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all font-medium"
                             />
                         </div>
 
@@ -528,7 +528,7 @@ const StaffStudents = () => {
                         <select
                             value={filterYear}
                             onChange={(e) => setFilterYear(e.target.value)}
-                            className="px-3 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50"
+                            className="px-3 py-2.5 text-sm bg-zinc-50 border border-zinc-200 rounded-lg text-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all font-bold cursor-pointer"
                         >
                             <option value="all">All Years</option>
                             {['1', '2', '3', '4'].map(y => (
@@ -537,23 +537,23 @@ const StaffStudents = () => {
                         </select>
 
                         {/* View Toggle */}
-                        <div className="flex items-center gap-1 bg-dark-900/50 rounded-lg p-1 border border-dark-700">
+                        <div className="flex items-center gap-1 bg-zinc-50 rounded-lg p-1 border border-zinc-200">
                             <button
                                 onClick={() => setViewMode('grid')}
-                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-dark-700 shadow-sm text-white' : 'text-dark-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'grid' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
                             >
                                 <Grid3X3 className="w-4 h-4" />
                             </button>
                             <button
                                 onClick={() => setViewMode('list')}
-                                className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-dark-700 shadow-sm text-white' : 'text-dark-400 hover:text-white'}`}
+                                className={`p-2 rounded-md transition-all ${viewMode === 'list' ? 'bg-white shadow-sm text-zinc-900' : 'text-zinc-400 hover:text-zinc-600'}`}
                             >
                                 <List className="w-4 h-4" />
                             </button>
                         </div>
 
                         {/* Results count */}
-                        <span className="text-sm text-dark-400">
+                        <span className="text-sm text-zinc-500 font-bold">
                             {students.length} student{students.length !== 1 ? 's' : ''}
                         </span>
                     </div>
@@ -565,12 +565,12 @@ const StaffStudents = () => {
                         {[1, 2, 3, 4, 5, 6].map(i => <SkeletonStudentCard key={i} />)}
                     </div>
                 ) : students.length === 0 ? (
-                    <div className="glass-card-dark rounded-xl border border-dark-700 p-12 text-center">
-                        <div className="w-16 h-16 bg-dark-800 rounded-full flex items-center justify-center mx-auto mb-4 border border-dark-700">
-                            <Users className="w-8 h-8 text-dark-400" />
+                    <div className="bg-white rounded-xl border border-zinc-200 p-12 text-center shadow-sm">
+                        <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
+                            <Users className="w-8 h-8 text-zinc-300" />
                         </div>
-                        <h3 className="text-lg font-medium text-white mb-2">No Students Found</h3>
-                        <p className="text-sm text-dark-400">
+                        <h3 className="text-lg font-bold text-zinc-900 mb-2">No Students Found</h3>
+                        <p className="text-sm text-zinc-500 font-medium">
                             {searchQuery || filterYear !== 'all'
                                 ? 'No students match your current filters.'
                                 : 'No students in your department yet.'}
@@ -581,24 +581,24 @@ const StaffStudents = () => {
                         {students.map((student) => (
                             <div
                                 key={student._id}
-                                className="student-item group glass-card-dark rounded-xl p-5 border border-dark-700 hover:border-dark-600 hover:shadow-lg transition-all"
+                                className="student-item group bg-white rounded-xl p-5 border border-zinc-200 hover:border-zinc-300 hover:shadow-lg transition-all"
                             >
                                 {/* Header */}
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center gap-3">
                                         <div className="relative">
-                                            <div className="w-11 h-11 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center border border-white/10 shadow-lg">
+                                            <div className="w-11 h-11 bg-zinc-900 rounded-full flex items-center justify-center border border-zinc-100 shadow-md">
                                                 <span className="text-white font-medium text-sm">
                                                     {student.name?.charAt(0).toUpperCase()}
                                                 </span>
                                             </div>
-                                            <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-dark-800 ${student.isApproved ? 'bg-emerald-500' : 'bg-amber-500'}`} />
+                                            <div className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white ${student.isApproved ? 'bg-emerald-500' : 'bg-amber-500'}`} />
                                         </div>
                                         <div>
-                                            <h3 className="font-medium text-white text-sm group-hover:text-primary-400 transition-colors">
+                                            <h3 className="font-bold text-zinc-900 text-sm group-hover:text-blue-600 transition-colors">
                                                 {student.name}
                                             </h3>
-                                            <p className="text-xs text-dark-400 flex items-center gap-1">
+                                            <p className="text-xs text-zinc-500 flex items-center gap-1 font-medium">
                                                 <Mail className="w-3 h-3" />
                                                 <span className="truncate max-w-[140px]">{student.email}</span>
                                             </p>
@@ -606,7 +606,7 @@ const StaffStudents = () => {
                                     </div>
                                     <button
                                         onClick={() => { setSelectedStudent(student); setShowDetailsModal(true); }}
-                                        className="p-1.5 text-dark-400 hover:text-white hover:bg-dark-700 rounded-lg transition-colors"
+                                        className="p-1.5 text-zinc-400 hover:text-zinc-900 hover:bg-zinc-100 rounded-lg transition-colors"
                                     >
                                         <Eye className="w-4 h-4" />
                                     </button>
@@ -614,29 +614,29 @@ const StaffStudents = () => {
 
                                 {/* Info Grid */}
                                 <div className="grid grid-cols-3 gap-2 mb-4">
-                                    <div className="px-2 py-2 bg-dark-800/50 border border-dark-700 rounded-lg text-center">
-                                        <Hash className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
-                                        <p className="text-[10px] font-mono font-medium text-gray-300 truncate">{student.rollNumber}</p>
+                                    <div className="px-2 py-2 bg-zinc-50 border border-zinc-100 rounded-lg text-center">
+                                        <Hash className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={2} />
+                                        <p className="text-[10px] font-mono font-bold text-zinc-600 truncate">{student.rollNumber}</p>
                                     </div>
-                                    <div className="px-2 py-2 bg-dark-800/50 border border-dark-700 rounded-lg text-center">
-                                        <BookOpen className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
-                                        <p className="text-[10px] font-medium text-gray-300">{student.department}</p>
+                                    <div className="px-2 py-2 bg-zinc-50 border border-zinc-100 rounded-lg text-center">
+                                        <BookOpen className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={2} />
+                                        <p className="text-[10px] font-bold text-zinc-600">{student.department}</p>
                                     </div>
-                                    <div className="px-2 py-2 bg-dark-800/50 border border-dark-700 rounded-lg text-center">
-                                        <Calendar className="w-3 h-3 mx-auto text-dark-400 mb-0.5" strokeWidth={1.5} />
-                                        <p className="text-[10px] font-medium text-gray-300">Year {student.year}</p>
+                                    <div className="px-2 py-2 bg-zinc-50 border border-zinc-100 rounded-lg text-center">
+                                        <Calendar className="w-3 h-3 mx-auto text-zinc-400 mb-0.5" strokeWidth={2} />
+                                        <p className="text-[10px] font-bold text-zinc-600">Year {student.year}</p>
                                     </div>
                                 </div>
 
                                 {/* Attendance Bar */}
                                 <div className="mb-4">
                                     <div className="flex items-center justify-between text-[10px] mb-1">
-                                        <span className="text-dark-400">Attendance</span>
-                                        <span className={`font-medium ${(student.attendance || 0) >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                        <span className="text-zinc-500 font-bold">Attendance</span>
+                                        <span className={`font-bold ${(student.attendance || 0) >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                             {student.attendance || 0}%
                                         </span>
                                     </div>
-                                    <div className="h-1 bg-dark-700 rounded-full overflow-hidden">
+                                    <div className="h-1 bg-zinc-100 rounded-full overflow-hidden">
                                         <div
                                             className="h-full rounded-full transition-all duration-700"
                                             style={{
@@ -648,19 +648,19 @@ const StaffStudents = () => {
                                 </div>
 
                                 {/* Footer */}
-                                <div className="flex items-center justify-between pt-3 border-t border-dark-700">
+                                <div className="flex items-center justify-between pt-3 border-t border-zinc-100">
                                     {student.isApproved ? (
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                             <CheckCircle className="w-3 h-3" />
                                             Approved
                                         </span>
                                     ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
                                             <Clock className="w-3 h-3" />
                                             Pending
                                         </span>
                                     )}
-                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-medium ${student.feesPaid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                    <span className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full text-[10px] font-bold ${student.feesPaid ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
                                         {student.feesPaid ? 'Fees Paid' : 'Fees Due'}
                                     </span>
                                 </div>
@@ -669,37 +669,37 @@ const StaffStudents = () => {
                     </div>
                 ) : (
                     /* List View */
-                    <div className="glass-card-dark rounded-xl border border-dark-700 overflow-hidden">
+                    <div className="bg-white rounded-xl border border-zinc-200 overflow-hidden shadow-sm">
                         <table className="w-full">
-                            <thead className="bg-dark-800 border-b border-dark-700">
+                            <thead className="bg-zinc-50 border-b border-zinc-200">
                                 <tr>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Student</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Roll Number</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Year</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Attendance</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Status</th>
-                                    <th className="px-4 py-3 text-left text-xs font-medium text-dark-400 uppercase tracking-wide">Fees</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Student</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Roll Number</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Year</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Attendance</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Status</th>
+                                    <th className="px-4 py-3 text-left text-xs font-bold text-zinc-500 uppercase tracking-wide">Fees</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-dark-700">
+                            <tbody className="divide-y divide-zinc-200">
                                 {students.map((student) => (
-                                    <tr key={student._id} className="student-item hover:bg-dark-700/50 transition-colors">
+                                    <tr key={student._id} className="student-item hover:bg-zinc-50 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center border border-white/10">
-                                                    <span className="text-white font-medium text-xs">{student.name?.charAt(0).toUpperCase()}</span>
+                                                <div className="w-9 h-9 bg-zinc-900 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                                                    {student.name?.charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
-                                                    <p className="text-sm font-medium text-white">{student.name}</p>
-                                                    <p className="text-xs text-dark-400">{student.email}</p>
+                                                    <p className="text-sm font-bold text-zinc-900">{student.name}</p>
+                                                    <p className="text-xs text-zinc-500 font-medium">{student.email}</p>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3 text-sm font-mono text-dark-300">{student.rollNumber}</td>
-                                        <td className="px-4 py-3 text-sm text-dark-300">Year {student.year}</td>
+                                        <td className="px-4 py-3 text-sm font-mono font-medium text-zinc-600">{student.rollNumber}</td>
+                                        <td className="px-4 py-3 text-sm font-medium text-zinc-600">Year {student.year}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-2">
-                                                <div className="w-16 h-1.5 bg-dark-700 rounded-full overflow-hidden">
+                                                <div className="w-16 h-1.5 bg-zinc-100 rounded-full overflow-hidden">
                                                     <div
                                                         className="h-full rounded-full"
                                                         style={{
@@ -708,24 +708,24 @@ const StaffStudents = () => {
                                                         }}
                                                     />
                                                 </div>
-                                                <span className={`text-xs font-medium ${(student.attendance || 0) >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                                <span className={`text-xs font-bold ${(student.attendance || 0) >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                                     {student.attendance || 0}%
                                                 </span>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             {student.isApproved ? (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-100">
                                                     <CheckCircle className="w-3 h-3" /> Approved
                                                 </span>
                                             ) : (
-                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-100">
                                                     <Clock className="w-3 h-3" /> Pending
                                                 </span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${student.feesPaid ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 'bg-red-500/10 text-red-400 border border-red-500/20'}`}>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${student.feesPaid ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' : 'bg-red-50 text-red-600 border border-red-100'}`}>
                                                 {student.feesPaid ? '✓ Paid' : '× Due'}
                                             </span>
                                         </td>
@@ -741,55 +741,55 @@ const StaffStudents = () => {
                     {selectedStudent && (
                         <div className="space-y-4">
                             <div className="flex items-center gap-4">
-                                <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-violet-700 rounded-full flex items-center justify-center border border-white/10 shadow-lg">
+                                <div className="w-16 h-16 bg-zinc-900 rounded-full flex items-center justify-center shadow-md">
                                     <span className="text-white font-bold text-2xl">{selectedStudent.name?.charAt(0).toUpperCase()}</span>
                                 </div>
                                 <div>
-                                    <h3 className="text-lg font-bold text-white mb-1">{selectedStudent.name}</h3>
-                                    <p className="text-sm text-dark-400 flex items-center gap-2">
+                                    <h3 className="text-lg font-bold text-zinc-900 mb-1">{selectedStudent.name}</h3>
+                                    <p className="text-sm text-zinc-500 flex items-center gap-2 font-medium">
                                         <Mail className="w-4 h-4" /> {selectedStudent.email}
                                     </p>
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Roll Number</p>
-                                    <p className="text-sm font-mono font-medium text-white">{selectedStudent.rollNumber}</p>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Roll Number</p>
+                                    <p className="text-sm font-mono font-bold text-zinc-900">{selectedStudent.rollNumber}</p>
                                 </div>
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Department</p>
-                                    <p className="text-sm font-medium text-white">{selectedStudent.department}</p>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Department</p>
+                                    <p className="text-sm font-bold text-zinc-900">{selectedStudent.department}</p>
                                 </div>
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Year</p>
-                                    <p className="text-sm font-medium text-white">Year {selectedStudent.year}</p>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Year</p>
+                                    <p className="text-sm font-bold text-zinc-900">Year {selectedStudent.year}</p>
                                 </div>
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Semester</p>
-                                    <p className="text-sm font-medium text-white">{selectedStudent.semester || '-'}</p>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Semester</p>
+                                    <p className="text-sm font-bold text-zinc-900">{selectedStudent.semester || '-'}</p>
                                 </div>
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Attendance</p>
-                                    <p className={`text-sm font-medium ${(selectedStudent.attendance || 0) >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Attendance</p>
+                                    <p className={`text-sm font-bold ${(selectedStudent.attendance || 0) >= 75 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                         {selectedStudent.attendance || 0}%
                                     </p>
                                 </div>
-                                <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                    <p className="text-xs text-dark-400 mb-1">Status</p>
-                                    <p className={`text-sm font-medium ${selectedStudent.isApproved ? 'text-emerald-400' : 'text-amber-400'}`}>
+                                <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                    <p className="text-xs text-zinc-500 font-bold mb-1">Status</p>
+                                    <p className={`text-sm font-bold ${selectedStudent.isApproved ? 'text-emerald-600' : 'text-amber-600'}`}>
                                         {selectedStudent.isApproved ? 'Approved' : 'Pending'}
                                     </p>
                                 </div>
                             </div>
 
-                            <div className="p-3 bg-dark-800 border border-dark-700 rounded-lg">
-                                <p className="text-xs text-dark-400 mb-1">Fee Status</p>
-                                <p className={`text-sm font-medium ${selectedStudent.feesPaid ? 'text-emerald-400' : 'text-red-400'}`}>
+                            <div className="p-3 bg-zinc-50 border border-zinc-200 rounded-lg">
+                                <p className="text-xs text-zinc-500 font-bold mb-1">Fee Status</p>
+                                <p className={`text-sm font-bold ${selectedStudent.feesPaid ? 'text-emerald-600' : 'text-red-600'}`}>
                                     {selectedStudent.feesPaid ? '✓ Fees Paid' : '× Fees Due'}
                                 </p>
                                 {selectedStudent.feeDetails && (
-                                    <div className="mt-2 text-xs text-dark-400">
+                                    <div className="mt-2 text-xs text-zinc-600 font-medium">
                                         {selectedStudent.feeDetails.paidAmount && <p>Paid: ₹{selectedStudent.feeDetails.paidAmount}</p>}
                                         {selectedStudent.feeDetails.dueAmount && <p>Due: ₹{selectedStudent.feeDetails.dueAmount}</p>}
                                     </div>
@@ -798,246 +798,200 @@ const StaffStudents = () => {
 
                             <button
                                 onClick={() => { setShowDetailsModal(false); setSelectedStudent(null); }}
-                                className="w-full py-2.5 text-sm font-medium text-dark-300 bg-dark-800 border border-dark-700 rounded-lg hover:bg-dark-700 hover:text-white transition-colors"
+                                className="w-full py-2.5 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-800 transition-colors shadow-md"
                             >
-                                Close
+                                Close Details
                             </button>
                         </div>
                     )}
                 </Modal>
 
                 {/* Add Student Modal */}
-                <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add New Student" size="md">
+                <Modal isOpen={showAddModal} onClose={() => setShowAddModal(false)} title="Add Student" size="md">
                     <form onSubmit={handleAddStudent} className="space-y-4">
                         {formError && (
-                            <div className="p-3 bg-red-500/10 text-red-400 border border-red-500/20 rounded-lg text-sm flex items-center gap-2">
-                                <AlertTriangle className="w-4 h-4" />
-                                {formError}
+                            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-xs flex items-center gap-2 border border-red-100 font-bold">
+                                <AlertTriangle className="w-4 h-4" />{formError}
                             </div>
                         )}
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Full Name *</label>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Full Name</label>
                             <input
                                 type="text"
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                className="w-full px-3 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
+                                className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all placeholder-zinc-400"
                                 placeholder="Enter student name"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Email *</label>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Email</label>
                             <input
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                className="w-full px-3 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
-                                placeholder="student@example.com"
+                                className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all placeholder-zinc-400"
+                                placeholder="Enter email address"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-dark-400 mb-1.5">Password *</label>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Password</label>
                             <input
                                 type="password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                className="w-full px-3 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white placeholder-dark-500 focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50 transition-all"
-                                placeholder="Min 6 characters"
+                                className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all placeholder-zinc-400"
+                                placeholder="Enter initial password"
                             />
                         </div>
-                        <div className="p-3 bg-violet-500/10 rounded-lg border border-violet-500/20">
-                            <div className="flex items-center gap-2 text-violet-400">
-                                <Hash className="w-4 h-4" />
-                                <span className="text-xs font-medium">Roll Number Auto-Generated</span>
-                            </div>
-                            <p className="text-[10px] text-violet-300/80 mt-1">Format: 24MLRID{user?.department}001</p>
-                        </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Department</label>
-                                <div className="px-3 py-2.5 text-sm border border-dark-700 rounded-lg bg-dark-800 text-dark-300 font-medium">
-                                    {user?.department || 'CSE'}
-                                </div>
-                                <p className="text-[10px] text-dark-500 mt-1">Auto-assigned</p>
-                            </div>
-                            <div>
-                                <label className="block text-xs font-medium text-dark-400 mb-1.5">Year</label>
-                                <select
-                                    value={formData.year}
-                                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
-                                    className="w-full px-3 py-2.5 text-sm bg-dark-900/50 border border-dark-700 rounded-lg text-white focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500/50"
-                                >
-                                    <option value="1">1st Year</option>
-                                    <option value="2">2nd Year</option>
-                                    <option value="3">3rd Year</option>
-                                    <option value="4">4th Year</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="flex gap-2.5 pt-3">
-                            <button
-                                type="button"
-                                onClick={() => setShowAddModal(false)}
-                                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-300 border border-dark-700 rounded-lg hover:bg-dark-800 transition-colors"
+                        <div>
+                            <label className="block text-xs font-bold text-zinc-500 mb-1.5 uppercase tracking-wide">Year</label>
+                            <select
+                                value={formData.year}
+                                onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                                className="w-full px-4 py-2.5 bg-zinc-50 border border-zinc-200 rounded-lg text-sm font-medium text-zinc-900 focus:outline-none focus:ring-2 focus:ring-zinc-900 focus:border-transparent transition-all cursor-pointer"
                             >
-                                Cancel
-                            </button>
-                            <button
-                                type="submit"
-                                disabled={isCreating}
-                                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-500 transition-colors disabled:opacity-50 shadow-lg shadow-primary-500/20"
-                            >
-                                {isCreating ? 'Adding...' : 'Add Student'}
-                            </button>
+                                <option value="1">Year 1</option>
+                                <option value="2">Year 2</option>
+                                <option value="3">Year 3</option>
+                                <option value="4">Year 4</option>
+                            </select>
                         </div>
+                        <button
+                            type="submit"
+                            disabled={isCreating}
+                            className="w-full py-2.5 bg-zinc-900 text-white rounded-lg font-bold hover:bg-zinc-800 transition-colors shadow-md disabled:opacity-70 flex items-center justify-center gap-2"
+                        >
+                            {isCreating ? 'Adding...' : 'Add Student'}
+                        </button>
                     </form>
                 </Modal>
 
                 {/* Bulk Import Modal */}
-                <Modal isOpen={showBulkModal} onClose={() => { setShowBulkModal(false); setBulkResult(null); clearExcelPreview(); }} title="Bulk Import Students" size="xl">
-                    <div className="space-y-5">
-                        {/* Info Banner */}
-                        <div className="p-4 bg-violet-500/10 rounded-xl border border-violet-500/20">
-                            <div className="flex items-start gap-3">
-                                <FileSpreadsheet className="w-5 h-5 text-violet-400 mt-0.5" />
+                <Modal isOpen={showBulkModal} onClose={() => { setShowBulkModal(false); clearExcelPreview(); }} title="Bulk Import Students" size="lg">
+                    <div className="space-y-6">
+                        {/* Step 1: Download Template */}
+                        <div className="p-4 bg-blue-50 border border-blue-100 rounded-xl relative overflow-hidden group">
+                            <div className="absolute right-0 top-0 w-32 h-32 bg-blue-100 rounded-full -mr-16 -mt-16 blur-2xl opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                            <div className="relative z-10 flex items-start justify-between">
                                 <div>
-                                    <h4 className="text-sm font-medium text-violet-300 mb-1">Excel File Format</h4>
-                                    <p className="text-xs text-violet-300/80">Columns: <span className="font-medium text-violet-200">Name (required), Email (optional), Password (optional), Year, JoiningYear</span></p>
-                                    <div className="mt-2 text-[10px] text-violet-300/70 space-y-0.5">
-                                        <p>📧 <strong>Email:</strong> If empty, auto-generated as <code className="bg-violet-500/20 px-1 rounded text-violet-200">firstname.lastname.{user?.department?.toLowerCase()}@mlrit.ac.in</code></p>
-                                        <p>🔑 <strong>Password:</strong> If empty, uses email prefix without dots</p>
-                                        <p>🏢 <strong>Department:</strong> Auto-assigned to <span className="font-semibold text-violet-200">{user?.department}</span></p>
-                                        <p>🎫 <strong>Roll Number:</strong> Auto-generated as 24MLRID{user?.department}001</p>
-                                    </div>
-                                    <button onClick={downloadExcelTemplate} className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-violet-300 hover:text-white bg-violet-500/20 hover:bg-violet-500/30 px-2.5 py-1.5 rounded-md transition-colors border border-violet-500/20">
-                                        <Download className="w-3.5 h-3.5" />
-                                        Download Sample Excel Template
-                                    </button>
+                                    <h4 className="font-bold text-blue-900 flex items-center gap-2">
+                                        <FileSpreadsheet className="w-5 h-5" />
+                                        Step 1: Download Template
+                                    </h4>
+                                    <p className="text-sm text-blue-700 mt-1 max-w-sm font-medium">Get the correctly formatted Excel template to add students.</p>
                                 </div>
+                                <button
+                                    onClick={downloadExcelTemplate}
+                                    className="px-4 py-2 bg-white text-blue-600 rounded-lg text-sm font-bold shadow-sm border border-blue-200 hover:bg-blue-50 transition-colors flex items-center gap-2"
+                                >
+                                    <Download className="w-4 h-4" /> Download
+                                </button>
                             </div>
                         </div>
 
-                        {/* Drag & Drop Upload Zone */}
-                        {excelPreview.length === 0 && (
-                            <div
-                                onDragEnter={handleDrag}
-                                onDragLeave={handleDrag}
-                                onDragOver={handleDrag}
-                                onDrop={handleDrop}
-                                onClick={() => fileInputRef.current?.click()}
-                                className={`relative border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${dragActive ? 'border-primary-500 bg-primary-500/10' : 'border-dark-700 hover:border-dark-600 hover:bg-dark-800'
-                                    }`}
-                            >
-                                <input
-                                    ref={fileInputRef}
-                                    type="file"
-                                    accept=".xlsx,.xls"
-                                    onChange={handleFileChange}
-                                    className="hidden"
-                                />
-                                <div className="flex flex-col items-center gap-3">
-                                    <div className={`w-14 h-14 rounded-xl flex items-center justify-center transition-colors ${dragActive ? 'bg-primary-500/20' : 'bg-dark-800'}`}>
-                                        <Upload className={`w-6 h-6 ${dragActive ? 'text-primary-400' : 'text-dark-400'}`} />
+                        {/* Step 2: Upload File */}
+                        <div>
+                            <h4 className="font-bold text-zinc-900 mb-2 flex items-center gap-2">
+                                <Upload className="w-5 h-5 text-zinc-500" />
+                                Step 2: Upload Excel File
+                            </h4>
+                            {!excelPreview.length && !bulkResult ? (
+                                <div
+                                    className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${dragActive ? 'border-zinc-900 bg-zinc-50' : 'border-zinc-300 hover:border-zinc-400 bg-white'}`}
+                                    onDragEnter={handleDrag}
+                                    onDragLeave={handleDrag}
+                                    onDragOver={handleDrag}
+                                    onDrop={handleDrop}
+                                >
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileChange}
+                                        className="hidden"
+                                        accept=".xlsx, .xls"
+                                    />
+                                    <div className="w-16 h-16 bg-zinc-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-zinc-100">
+                                        <FileSpreadsheet className="w-8 h-8 text-zinc-400" />
                                     </div>
-                                    <div>
-                                        <p className="text-sm font-medium text-white">{dragActive ? 'Drop your Excel file here' : 'Drag & drop Excel file here'}</p>
-                                        <p className="text-xs text-dark-500 mt-1">or click to browse (.xlsx, .xls)</p>
-                                    </div>
-                                </div>
-                            </div>
-                        )}
-
-                        {/* Excel Preview Table */}
-                        {excelPreview.length > 0 && (
-                            <div className="space-y-3">
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <Table className="w-4 h-4 text-emerald-400" />
-                                        <span className="text-sm font-medium text-white">Preview ({excelPreview.length} students)</span>
-                                    </div>
-                                    <button onClick={clearExcelPreview} className="text-xs text-dark-400 hover:text-white flex items-center gap-1 transition-colors">
-                                        <RefreshCw className="w-3.5 h-3.5" />
-                                        Upload Different File
+                                    <p className="text-zinc-900 font-bold text-lg mb-1">Drag and drop excel file here</p>
+                                    <p className="text-zinc-500 text-sm mb-4">or click to browse from your computer</p>
+                                    <button
+                                        onClick={() => fileInputRef.current?.click()}
+                                        className="px-5 py-2.5 bg-zinc-900 text-white rounded-lg text-sm font-bold hover:bg-zinc-800 transition-all shadow-md"
+                                    >
+                                        Browse Files
                                     </button>
                                 </div>
-                                <div className="max-h-[300px] overflow-auto border border-dark-700 rounded-xl">
-                                    <table className="w-full text-sm">
-                                        <thead className="bg-dark-800 sticky top-0">
-                                            <tr>
-                                                <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">#</th>
-                                                <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Name</th>
-                                                <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Email</th>
-                                                <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Year</th>
-                                                <th className="px-4 py-2.5 text-left text-[10px] font-medium text-dark-400 uppercase tracking-wide">Dept</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-dark-700">
-                                            {excelPreview.slice(0, 50).map((student, idx) => (
-                                                <tr key={idx} className="hover:bg-dark-800/50 transition-colors">
-                                                    <td className="px-4 py-2.5 text-dark-500 text-xs">{idx + 1}</td>
-                                                    <td className="px-4 py-2.5 font-medium text-white">{student.name || <span className="text-red-400">Missing</span>}</td>
-                                                    <td className="px-4 py-2.5 text-dark-400">
-                                                        {student.email ? student.email : <span className="text-blue-400 italic text-xs">Auto-generated</span>}
-                                                    </td>
-                                                    <td className="px-4 py-2.5 text-dark-400">{student.year || '-'}</td>
-                                                    <td className="px-4 py-2.5 text-violet-400 font-medium">{student.department}</td>
+                            ) : null}
+
+                            {/* Preview Table */}
+                            {excelPreview.length > 0 && !bulkResult && (
+                                <div className="space-y-4 animate-fade-in">
+                                    <div className="flex items-center justify-between">
+                                        <p className="font-bold text-zinc-900 flex items-center gap-2">
+                                            <Eye className="w-4 h-4 text-zinc-500" />
+                                            Preview ({excelPreview.length} students)
+                                        </p>
+                                        <button onClick={clearExcelPreview} className="text-sm text-red-600 hover:text-red-700 font-bold hover:underline">
+                                            Cancel & Upload New
+                                        </button>
+                                    </div>
+                                    <div className="bg-zinc-50 border border-zinc-200 rounded-xl overflow-hidden max-h-60 overflow-y-auto custom-scrollbar">
+                                        <table className="w-full text-sm">
+                                            <thead className="bg-zinc-100 sticky top-0 z-10">
+                                                <tr>
+                                                    <th className="px-4 py-2 text-left font-bold text-zinc-600">Name</th>
+                                                    <th className="px-4 py-2 text-left font-bold text-zinc-600">Email</th>
+                                                    <th className="px-4 py-2 text-left font-bold text-zinc-600">Year</th>
+                                                    <th className="px-4 py-2 text-left font-bold text-zinc-600">Dept</th>
                                                 </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                    {excelPreview.length > 50 && (
-                                        <div className="p-3 bg-dark-800 text-center text-xs text-dark-400 border-t border-dark-700">
-                                            Showing first 50 of {excelPreview.length} students
-                                        </div>
-                                    )}
+                                            </thead>
+                                            <tbody className="divide-y divide-zinc-200">
+                                                {excelPreview.map((row, i) => (
+                                                    <tr key={i} className="bg-white">
+                                                        <td className="px-4 py-2 text-zinc-900">{row.name}</td>
+                                                        <td className="px-4 py-2 text-zinc-500 font-mono text-xs">{row.email}</td>
+                                                        <td className="px-4 py-2 text-zinc-500">{row.year}</td>
+                                                        <td className="px-4 py-2 text-zinc-500">{row.department}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button
+                                            onClick={handleExcelImport}
+                                            disabled={bulkLoading}
+                                            className="flex-1 py-3 bg-zinc-900 text-white rounded-xl font-bold hover:bg-zinc-800 transition-all shadow-lg shadow-zinc-900/10 flex items-center justify-center gap-2"
+                                        >
+                                            {bulkLoading ? <span className="animate-spin">⌛</span> : <Upload className="w-5 h-5" />}
+                                            {bulkLoading ? 'Importing...' : 'Confirm Import'}
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
 
-                        {/* Result Display */}
-                        {bulkResult && (
-                            <div className={`p-4 rounded-xl border ${bulkResult.error ? 'bg-red-500/10 border-red-500/20' : 'bg-emerald-500/10 border-emerald-500/20'}`}>
-                                {bulkResult.error ? (
-                                    <div className="flex items-center gap-2 text-red-400">
-                                        <AlertTriangle className="w-4 h-4" />
-                                        <span className="text-sm">{bulkResult.error}</span>
+                            {/* Result Message */}
+                            {bulkResult && (
+                                <div className={`p-6 rounded-xl border animate-fade-in ${bulkResult.error ? 'bg-red-50 border-red-100 text-center' : 'bg-emerald-50 border-emerald-100 text-center'}`}>
+                                    <div className={`w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3 ${bulkResult.error ? 'bg-red-100 text-red-600' : 'bg-emerald-100 text-emerald-600'}`}>
+                                        {bulkResult.error ? <XCircle className="w-6 h-6" /> : <CheckCircle className="w-6 h-6" />}
                                     </div>
-                                ) : (
-                                    <div className="space-y-2">
-                                        <div className="flex items-center gap-2 text-emerald-400">
-                                            <CheckCircle className="w-4 h-4" />
-                                            <span className="text-sm font-medium">{bulkResult.message}</span>
-                                        </div>
-                                        <div className="text-xs text-emerald-500/80">
-                                            <p>✓ {bulkResult.successful} imported successfully</p>
-                                            {bulkResult.duplicates > 0 && <p>⚠ {bulkResult.duplicates} duplicates skipped</p>}
-                                            {bulkResult.failed > 0 && <p>✗ {bulkResult.failed} failed</p>}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Actions */}
-                        <div className="flex gap-2.5 pt-2">
-                            <button
-                                type="button"
-                                onClick={() => { setShowBulkModal(false); setBulkResult(null); clearExcelPreview(); }}
-                                className="flex-1 px-4 py-2.5 text-sm font-medium text-dark-300 border border-dark-700 rounded-lg hover:bg-dark-800 transition-colors"
-                            >
-                                Close
-                            </button>
-                            <button
-                                onClick={handleExcelImport}
-                                disabled={bulkLoading || excelPreview.length === 0}
-                                className="flex-1 px-4 py-2.5 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-500 transition-colors disabled:opacity-50 flex items-center justify-center gap-2 shadow-lg shadow-primary-500/20"
-                            >
-                                {bulkLoading ? (
-                                    <><div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> Importing...</>
-                                ) : (
-                                    <><Upload className="w-4 h-4" /> Import {excelPreview.length} Students</>
-                                )}
-                            </button>
+                                    <h4 className={`text-lg font-bold mb-1 ${bulkResult.error ? 'text-red-900' : 'text-emerald-900'}`}>
+                                        {bulkResult.error ? 'Import Failed' : 'Import Successful!'}
+                                    </h4>
+                                    <p className={`text-sm mb-4 font-medium ${bulkResult.error ? 'text-red-700' : 'text-emerald-700'}`}>
+                                        {bulkResult.error || `Successfully imported ${bulkResult.count} students.`}
+                                    </p>
+                                    <button
+                                        onClick={clearExcelPreview}
+                                        className={`px-6 py-2 rounded-lg font-bold text-sm transition-all shadow-sm ${bulkResult.error ? 'bg-white text-red-600 border border-red-200 hover:bg-red-50' : 'bg-white text-emerald-600 border border-emerald-200 hover:bg-emerald-50'}`}
+                                    >
+                                        {bulkResult.error ? 'Try Again' : 'Done'}
+                                    </button>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </Modal>

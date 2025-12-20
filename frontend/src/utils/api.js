@@ -250,6 +250,23 @@ export const getMyInvigilation = () => API.get('/seating/my-invigilation');
 export const getMySeating = () => API.get('/seating/my-seat');
 export const getAvailableInvigilators = () => API.get('/seating/invigilators');
 
+// Timetable Management
+export const getTimetables = (params) => API.get('/timetables', { params });
+export const getTimetableById = (id) => API.get(`/timetables/${id}`);
+export const createTimetable = (data) => API.post('/timetables', data);
+export const updateTimetable = (id, data) => API.put(`/timetables/${id}`, data);
+export const deleteTimetable = (id) => API.delete(`/timetables/${id}`);
+export const getMyTimetable = () => API.get('/timetables/my-timetable');
+export const getTimetableSubjects = (params) => API.get('/timetables/subjects', { params });
+
+// Subject Attendance Management
+export const getMySubjectAttendance = () => API.get('/subject-attendance/my-attendance');
+export const getMySubjectHistory = (subjectId) => API.get(`/subject-attendance/my-attendance/${subjectId}`);
+export const markSubjectAttendance = (data) => API.post('/subject-attendance/mark', data);
+export const getSubjectAttendance = (subjectId, params) => API.get(`/subject-attendance/subject/${subjectId}`, { params });
+export const getSubjectStudentsAttendance = (subjectId) => API.get(`/subject-attendance/subject/${subjectId}/students`);
+export const getStaffAttendanceSummary = () => API.get('/subject-attendance/staff-summary');
+
 // Zenith RAG Chatbot Content Management API (connects to Python backend)
 const ZENITH_API = axios.create({
   baseURL: import.meta.env.VITE_ZENITH_API || 'http://localhost:8000',
@@ -261,5 +278,13 @@ export const addChatbotContent = (data) => ZENITH_API.post('/api/content', data)
 export const updateChatbotContent = (id, data) => ZENITH_API.put(`/api/content/${id}`, data);
 export const deleteChatbotContent = (id, namespace) => ZENITH_API.delete(`/api/content/${id}`, { params: { namespace } });
 export const clearAllChatbotContent = () => ZENITH_API.delete('/api/content/clear');
+
+// Result APIs
+export const uploadResults = (data) => API.post('/results/upload', data);
+export const getAdminResults = () => API.get('/results/admin');
+export const getResultBatch = (batchId) => API.get(`/results/admin/batch/${batchId}`);
+export const toggleBatchPublish = (batchId, published) => API.put(`/results/publish/${batchId}`, { published });
+export const deleteResultBatch = (batchId) => API.delete(`/results/batch/${batchId}`);
+export const getMyResults = () => API.get('/results/my-results');
 
 export default API;
