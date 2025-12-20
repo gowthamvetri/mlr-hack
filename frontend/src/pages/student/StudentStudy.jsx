@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { selectCurrentUser } from '../../store/slices/authSlice';
 import DashboardLayout from '../../components/DashboardLayout';
 import AnimatedNumber from '../../components/AnimatedNumber';
-import { MindMapPreview } from '../../components/MindMapViewer';
+import MindMapPreview from '../../components/MindMapPreview';
 import { getExternalCourses, markExternalCourseComplete, getSubjectsForStudent } from '../../utils/api';
 import {
   BookOpen, Video, FileText, Link as LinkIcon, Search, Filter, Star, Clock, ExternalLink,
