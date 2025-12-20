@@ -91,8 +91,10 @@ const Onboarding = () => {
 
   const fetchDepartments = async () => {
     try {
+      console.log(API_URL);
       const response = await fetch(`${API_URL}departments/public`);
       const data = await response.json();
+
       setDepartments(data);
     } catch (error) {
       setDepartments(defaultDepartments);
@@ -160,20 +162,20 @@ const Onboarding = () => {
   };
 
   return (
-    <div ref={containerRef} className="mesh-gradient-bg min-h-screen overflow-x-hidden">
+    <div ref={containerRef} className="min-h-screen bg-zinc-50 overflow-x-hidden">
       {/* Fixed Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 bg-white/80 backdrop-blur-lg shadow-sm ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-700 bg-white border-b border-zinc-200 ${isLoaded ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <img src="/mlrit-logo.png" alt="MLRIT" className="h-14 w-auto drop-shadow-lg" />
             <div className="hidden md:flex items-center gap-6">
-              <button onClick={() => scrollToSection(heroRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Home</button>
-              <button onClick={() => scrollToSection(departmentsRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Departments</button>
-              <button onClick={() => scrollToSection(portalsRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Portals</button>
-              <button onClick={() => scrollToSection(contactRef)} className="text-gray-600 hover:text-primary-600 font-medium transition-colors">Contact</button>
+              <button onClick={() => scrollToSection(heroRef)} className="text-zinc-600 hover:text-zinc-900 font-medium transition-colors text-sm">Home</button>
+              <button onClick={() => scrollToSection(departmentsRef)} className="text-zinc-600 hover:text-zinc-900 font-medium transition-colors text-sm">Departments</button>
+              <button onClick={() => scrollToSection(portalsRef)} className="text-zinc-600 hover:text-zinc-900 font-medium transition-colors text-sm">Portals</button>
+              <button onClick={() => scrollToSection(contactRef)} className="text-zinc-600 hover:text-zinc-900 font-medium transition-colors text-sm">Contact</button>
             </div>
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-6 py-2.5 bg-primary-600 text-white rounded-full hover:bg-primary-700 transition-all font-semibold hover:scale-105 shadow-lg shadow-primary-500/25">
+              <button onClick={() => navigate('/login')} className="flex items-center gap-2 px-5 py-2.5 bg-zinc-900 text-white rounded-lg hover:bg-zinc-800 transition-all font-medium text-sm">
                 Login <ArrowRight className="w-4 h-4" />
               </button>
             </div>
@@ -184,7 +186,7 @@ const Onboarding = () => {
       {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
-        className={`fixed bottom-8 right-8 z-[100] p-4 bg-primary-500 text-white rounded-full shadow-2xl shadow-primary-500/30 hover:bg-primary-600 hover:scale-110 transition-all duration-300 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
+        className={`fixed bottom-8 right-8 z-[100] p-4 bg-zinc-900 text-white rounded-xl shadow-lg hover:bg-zinc-800 transition-all duration-300 ${showScrollTop ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}
         aria-label="Scroll to top"
       >
         <ChevronUp className="w-6 h-6" />
@@ -200,14 +202,14 @@ const Onboarding = () => {
           <iframe
             width="100%"
             height="100%"
-            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1"
+            src="https://www.youtube.com/embed/GQecKPAIzKE?autoplay=1&mute=1&loop=1&playlist=GQecKPAIzKE&controls=0&showinfo=0&modestbranding=1&start=10"
             title="MLRIT"
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             className="w-full h-full object-cover scale-150"
             style={{ pointerEvents: 'none' }}
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-white/50 via-white/50 to-white/50" />
+          <div className="absolute inset-0 bg-gradient-to-r from-white/70 via-white/60 to-white/70" />
         </div>
 
         {/* Floating Elements */}
@@ -221,30 +223,30 @@ const Onboarding = () => {
         <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
 
           <h1 className="mb-6">
-            <span className="hero-title-1 block text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-[1.1] tracking-tight">
+            <span className="hero-title-1 block text-5xl sm:text-6xl lg:text-7xl font-bold text-zinc-900 leading-[1.1] tracking-tight">
               Transform Your
             </span>
-            <span className="hero-title-2 block mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold gradient-text">
+            <span className="hero-title-2 block mt-3 text-5xl sm:text-6xl lg:text-7xl font-bold text-violet-600">
               Academic Journey
             </span>
           </h1>
 
-          <p className="hero-subtitle text-xl sm:text-2xl text-gray-600 mb-12 leading-relaxed max-w-3xl mx-auto">
+          <p className="hero-subtitle text-xl sm:text-2xl text-zinc-600 mb-12 leading-relaxed max-w-3xl mx-auto">
             One unified platform for students, faculty, and administrators with
-            <span className="text-gray-900 font-medium"> AI-powered</span> exam management and career guidance.
+            <span className="text-zinc-900 font-medium"> AI-powered</span> exam management and career guidance.
           </p>
 
           <div className="hero-cta flex flex-col sm:flex-row gap-4 justify-center mb-16">
             <button
               onClick={() => navigate('/login')}
-              className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all transform hover:-translate-y-1 hover:scale-105"
+              className="group flex items-center justify-center gap-3 px-8 py-4 bg-zinc-900 text-white rounded-xl font-semibold text-lg shadow-xl hover:bg-zinc-800 transition-all transform hover:-translate-y-1"
             >
               Get Started Free
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
             <button
               onClick={() => navigate('/placements')}
-              className="group flex items-center justify-center gap-3 px-8 py-4 glass-card text-gray-700 rounded-full font-bold text-lg hover:bg-white/80 transition-all hover:scale-105 shadow-lg"
+              className="group flex items-center justify-center gap-3 px-8 py-4 bg-white border border-zinc-200 text-zinc-700 rounded-xl font-semibold text-lg hover:bg-zinc-50 transition-all shadow-lg"
             >
               <Briefcase className="w-5 h-5" />
               View Placements
@@ -256,15 +258,15 @@ const Onboarding = () => {
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className="group glass-card rounded-2xl p-5 tilt-card hover:shadow-xl transition-all duration-300"
+                className="group bg-white border border-zinc-200 rounded-xl p-5 hover:shadow-lg hover:border-zinc-300 transition-all duration-300"
               >
                 <div className={`w-10 h-10 mx-auto mb-3 rounded-xl bg-gradient-to-br ${stat.color} flex items-center justify-center shadow-lg`}>
                   <stat.icon className="w-5 h-5 text-white" />
                 </div>
-                <p className="text-2xl sm:text-3xl font-bold text-gray-900">
+                <p className="text-2xl sm:text-3xl font-bold text-zinc-900">
                   <AnimatedNumber value={stat.value} duration={2000} />{stat.suffix}
                 </p>
-                <p className="text-xs text-gray-500 mt-1 font-medium">{stat.label}</p>
+                <p className="text-xs text-zinc-500 mt-1 font-medium">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -272,26 +274,26 @@ const Onboarding = () => {
 
         {/* Scroll Hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
-          <span className="text-xs text-gray-500 uppercase tracking-widest">Scroll to explore</span>
-          <ChevronDown className="w-5 h-5 text-gray-400 animate-bounce" />
+          <span className="text-xs text-zinc-500 uppercase tracking-widest">Scroll to explore</span>
+          <ChevronDown className="w-5 h-5 text-zinc-400 animate-bounce" />
         </div>
       </section>
 
       {/* ===== SECTION 2: DEPARTMENTS ===== */}
       <section
         ref={departmentsRef}
-        className="py-24 mesh-gradient-bg relative overflow-hidden"
+        className="py-24 bg-zinc-50 relative overflow-hidden"
       >
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-purple-600">
+            <span className="animate-card inline-flex items-center gap-2 px-4 py-2 bg-violet-50 border border-violet-100 rounded-lg text-sm font-medium mb-6 text-violet-600">
               <Building2 className="w-4 h-4" />
               Explore Programs
             </span>
-            <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Our <span className="gradient-text">Departments</span>
+            <h2 className="animate-card text-4xl sm:text-5xl font-bold text-zinc-900 mb-6">
+              Our <span className="text-violet-600">Departments</span>
             </h2>
-            <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="animate-card text-lg text-zinc-600 max-w-2xl mx-auto">
               Choose from our wide range of undergraduate and postgraduate programs
             </p>
           </div>
@@ -304,7 +306,7 @@ const Onboarding = () => {
                 <Link
                   key={dept._id || index}
                   to={`/departments/${deptSlug}`}
-                  className="animate-card group glass-card rounded-2xl overflow-hidden tilt-card hover:shadow-xl transition-all duration-300"
+                  className="animate-card group bg-white border border-zinc-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-zinc-300 transition-all duration-300"
                 >
                   <div className="aspect-[4/3] overflow-hidden">
                     <img
@@ -313,8 +315,8 @@ const Onboarding = () => {
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                     />
                   </div>
-                  <div className="p-3 bg-white/80">
-                    <h3 className="font-semibold text-gray-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
+                  <div className="p-3 bg-white">
+                    <h3 className="font-medium text-zinc-800 text-xs sm:text-sm text-center leading-tight line-clamp-2">
                       {dept.name}
                     </h3>
                   </div>
@@ -326,7 +328,7 @@ const Onboarding = () => {
           <div className="text-center mt-10">
             <button
               onClick={() => navigate('/register')}
-              className="animate-card inline-flex items-center gap-3 px-8 py-4 bg-gray-900 text-white rounded-full font-bold text-lg hover:bg-gray-800 transition-all hover:scale-105 shadow-xl"
+              className="animate-card inline-flex items-center gap-3 px-8 py-4 bg-zinc-900 text-white rounded-xl font-semibold text-lg hover:bg-zinc-800 transition-all shadow-lg"
             >
               Explore All Programs
               <ArrowRight className="w-5 h-5" />
@@ -338,18 +340,18 @@ const Onboarding = () => {
       {/* ===== SECTION 3: PORTALS ===== */}
       <section
         ref={portalsRef}
-        className="py-24 mesh-gradient-bg relative overflow-hidden"
+        className="py-24 bg-white relative overflow-hidden"
       >
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 glass-card rounded-full text-sm font-medium mb-6 text-green-600">
+            <span className="animate-card inline-flex items-center gap-2 px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-lg text-sm font-medium mb-6 text-emerald-600">
               <Globe className="w-4 h-4" />
               Access Portals
             </span>
-            <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-              Choose Your <span className="gradient-text">Portal</span>
+            <h2 className="animate-card text-4xl sm:text-5xl font-bold text-zinc-900 mb-6">
+              Choose Your <span className="text-violet-600">Portal</span>
             </h2>
-            <p className="animate-card text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="animate-card text-lg text-zinc-600 max-w-2xl mx-auto">
               Tailored experiences designed for every role in your academic institution
             </p>
           </div>
@@ -358,24 +360,24 @@ const Onboarding = () => {
             {portalTypes.map((portal, index) => (
               <div
                 key={index}
-                className={`animate-card group relative rounded-3xl p-8 transition-all duration-500 hover:-translate-y-3 ${portal.primary
-                  ? 'bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 text-white shadow-2xl shadow-primary-500/30'
-                  : 'glass-card tilt-card'
+                className={`animate-card group relative rounded-2xl p-8 transition-all duration-500 hover:-translate-y-2 ${portal.primary
+                  ? 'bg-zinc-900 text-white shadow-2xl'
+                  : 'bg-white border border-zinc-200 hover:shadow-lg hover:border-zinc-300'
                   }`}
               >
                 {portal.primary && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-gradient-to-r from-yellow-400 to-orange-400 text-gray-900 text-xs font-bold rounded-full shadow-lg uppercase tracking-wider">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-violet-500 text-white text-xs font-semibold rounded-lg shadow-lg uppercase tracking-wider">
                     Most Popular
                   </div>
                 )}
 
-                <div className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-6 ${portal.primary ? 'bg-white/20' : 'bg-gradient-to-br from-primary-500/10 to-orange-500/10'
+                <div className={`w-14 h-14 rounded-xl flex items-center justify-center mb-6 ${portal.primary ? 'bg-white/10' : 'bg-violet-50'
                   }`}>
-                  <portal.icon className={`w-8 h-8 ${portal.primary ? 'text-white' : 'text-primary-600'}`} />
+                  <portal.icon className={`w-7 h-7 ${portal.primary ? 'text-white' : 'text-violet-600'}`} />
                 </div>
 
-                <h3 className={`text-2xl font-bold mb-3 ${portal.primary ? 'text-white' : 'text-gray-900'}`}>{portal.title}</h3>
-                <p className={`mb-6 ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                <h3 className={`text-xl font-bold mb-3 ${portal.primary ? 'text-white' : 'text-zinc-900'}`}>{portal.title}</h3>
+                <p className={`mb-6 text-sm ${portal.primary ? 'text-white/80' : 'text-zinc-600'}`}>
                   {portal.description}
                 </p>
 
@@ -384,7 +386,7 @@ const Onboarding = () => {
                     <li key={idx} className="flex items-start gap-3">
                       <CheckCircle className={`w-5 h-5 flex-shrink-0 mt-0.5 ${portal.primary ? 'text-green-300' : 'text-green-500'
                         }`} />
-                      <span className={`text-sm ${portal.primary ? 'text-white/80' : 'text-gray-600'}`}>
+                      <span className={`text-sm ${portal.primary ? 'text-white/80' : 'text-zinc-600'}`}>
                         {feature}
                       </span>
                     </li>
@@ -393,9 +395,9 @@ const Onboarding = () => {
 
                 <button
                   onClick={portal.action}
-                  className={`w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 transition-all ${portal.primary
-                    ? 'bg-white text-primary-600 hover:bg-gray-100 shadow-xl'
-                    : 'bg-gradient-to-r from-primary-500 to-primary-600 text-white shadow-lg shadow-primary-500/20 hover:shadow-primary-500/40'
+                  className={`w-full py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all text-sm ${portal.primary
+                    ? 'bg-white text-zinc-900 hover:bg-zinc-100'
+                    : 'bg-zinc-900 text-white hover:bg-zinc-800'
                     }`}
                 >
                   {portal.cta}
@@ -410,18 +412,18 @@ const Onboarding = () => {
       {/* ===== SECTION 4: FOOTER ===== */}
       <section
         ref={contactRef}
-        className="py-24 bg-gray-900 relative overflow-hidden"
+        className="py-24 bg-zinc-900 relative overflow-hidden"
       >
         <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left - CTA */}
             <div className="text-center lg:text-left">
-              <span className="animate-card inline-flex items-center gap-2 px-5 py-2.5 bg-primary-500/20 border border-primary-500/30 rounded-full text-sm font-medium mb-6 text-primary-300">
+              <span className="animate-card inline-flex items-center gap-2 px-4 py-2 bg-violet-500/20 border border-violet-500/30 rounded-lg text-sm font-medium mb-6 text-violet-300">
                 <Sparkles className="w-4 h-4" />
                 Get Started Today
               </span>
-              <h2 className="animate-card text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-                Ready to <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 to-orange-400">Transform</span> Your Institution?
+              <h2 className="animate-card text-4xl sm:text-5xl font-bold text-white mb-6 leading-tight">
+                Ready to <span className="text-violet-400">Transform</span> Your Institution?
               </h2>
               <p className="animate-card text-lg text-gray-400 mb-10 max-w-lg">
                 Join thousands of students and educators already using MLRIT Academic Portal for a seamless educational experience.
@@ -429,7 +431,7 @@ const Onboarding = () => {
               <div className="animate-card flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => navigate('/register')}
-                  className="group flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-bold text-lg shadow-2xl shadow-primary-500/30 hover:shadow-primary-500/50 transition-all hover:scale-105"
+                  className="group flex items-center justify-center gap-3 px-8 py-4 bg-white text-zinc-900 rounded-xl font-semibold text-lg hover:bg-zinc-100 transition-all shadow-xl"
                 >
                   Start Free Today
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

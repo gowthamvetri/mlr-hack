@@ -592,7 +592,7 @@ const AdminDashboard = () => {
         {/* ================================================================
             PERFORMANCE METRICS - Visual summary
             ================================================================ */}
-        <div className="content-section bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 lg:p-8">
+        {/* <div className="content-section bg-white rounded-2xl border border-zinc-200 shadow-sm p-6 lg:p-8">
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center border border-violet-100">
@@ -629,7 +629,7 @@ const AdminDashboard = () => {
               </div>
             ))}
           </div>
-        </div>
+        </div> */}
       </div>
     </DashboardLayout>
   );
